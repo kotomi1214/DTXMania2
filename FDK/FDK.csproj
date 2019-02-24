@@ -182,20 +182,6 @@
     </Compile>
     <Compile Include="SelectableList.cs" />
     <Compile Include="TraceLogListener.cs" />
-    <Compile Include="UI\Button.cs" />
-    <Compile Include="UI\DropDownList.cs" />
-    <Compile Include="UI\Label.cs" />
-    <Compile Include="UI\ListView.cs" />
-    <Compile Include="UI\ListViewItem.cs" />
-    <Compile Include="UI\RootElement.cs" />
-    <Compile Include="UI\TextArea.cs" />
-    <Compile Include="UI\TextBox.cs" />
-    <Compile Include="UI\UIEventArgs.cs" />
-    <Compile Include="UI\Image.cs" />
-    <Compile Include="UI\Element.cs" />
-    <Compile Include="UI\Framework.cs" />
-    <Compile Include="UI\UIMouseEventArgs.cs" />
-    <Compile Include="UI\Window.cs" />
     <Compile Include="VariablePath.cs" />
     <Compile Include="カウンタ\Counter.cs" />
     <Compile Include="カウンタ\FPS.cs" />

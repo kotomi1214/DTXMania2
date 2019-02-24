@@ -39,9 +39,6 @@ namespace FDK
                         this.FormBorderStyle = FormBorderStyle.None;
                         this.WindowState = FormWindowState.Maximized;
 
-                        if( !( グラフィックデバイス.Instance.UIFramework.Root.可視 ) )
-                            Cursor.Hide();
-
                         this.IsFullscreen = true;
                     }
                     else
@@ -87,11 +84,6 @@ namespace FDK
 			PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
 
             this.UserResized += this._UserResize;
-            this.Click += this._Click;
-            this.MouseDown += this._MouseDown;
-            this.MouseUp += this._MouseUp;
-            this.MouseMove += this._MouseMove;
-            this.KeyDown += this._KeyDown;
 
             this._初期化完了 = true;
         }
@@ -128,9 +120,6 @@ namespace FDK
 
                 // アニメーションを進行する。
                 gd.Animation.進行する();
-
-                // 現在のUIツリーを描画する。
-                gd.UIFramework.描画する( gd.D2DDeviceContext );
 
                 // 全面を黒で塗りつぶすだけのサンプル。
                 gd.D2DDeviceContext.BeginDraw();
@@ -191,46 +180,6 @@ namespace FDK
 
                 this.スワップチェーンに依存するグラフィックリソースを作成する();
             }
-        }
-        private void _MouseDown( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseDown( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _Click( object sender, EventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.Click( sender, new FDK.UI.UIEventArgs( gd.D2DDeviceContext, マウス位置dpx ) );
-        }
-        private void _MouseUp( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseUp( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _MouseMove( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseMove( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _KeyDown( object sender, KeyEventArgs e )
-        {
-            グラフィックデバイス.Instance.UIFramework.KeyDown( sender, e );
         }
 
         protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()

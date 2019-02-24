@@ -503,9 +503,6 @@ namespace DTXMania
                 // 現在のステージを進行＆描画。
                 App.ステージ管理.現在のステージ.進行描画する( gd.D2DDeviceContext );
 
-                // 現在のUIツリーを描画する。
-                gd.UIFramework.描画する( gd.D2DDeviceContext );
-
                 // ステージの進行描画の結果（フェーズの状態など）を受けての後処理。
                 switch( App.ステージ管理.現在のステージ )
                 {

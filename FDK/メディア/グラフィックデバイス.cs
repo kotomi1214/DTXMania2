@@ -58,9 +58,6 @@ namespace FDK
             this._スワップチェーンを解放する();
             this._スワップチェーンに依存しないグラフィックリソースを解放する();
 
-            this.UIFramework.Dispose();
-            this.UIFramework = null;
-
             SharpDX.MediaFoundation.MediaManager.Shutdown();
         }
 
@@ -107,8 +104,6 @@ namespace FDK
         public SharpDX.Direct3D11.DepthStencilState D3DDepthStencilState { get; private set; } = null;
 
         public SharpDX.Mathematics.Interop.RawViewportF[] D3DViewPort { get; } = new SharpDX.Mathematics.Interop.RawViewportF[ 1 ];
-
-        public FDK.UI.Framework UIFramework { get; private set; } = null;
         //----------------
         #endregion
 
@@ -584,17 +579,9 @@ namespace FDK
                 //----------------
                 #endregion
             }
-
-            if( null == this.UIFramework )
-                this.UIFramework = new UI.Framework();
-            this.UIFramework.活性化する();
-            this.UIFramework.Root.可視 = false;
         }
         private void _スワップチェーンに依存するグラフィックリソースを解放する()
         {
-            this.UIFramework?.非活性化する();
-            //this._UIFramework = null; --> Activityツリーは破棄しない。
-
             if( null != this.D3DDevice )
             {
                 this.D3DDevice.ImmediateContext.ClearState();
