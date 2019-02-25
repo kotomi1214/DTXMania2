@@ -104,6 +104,55 @@ namespace DTXMania
         }
 
 
+        public static void システム設定を初期化する()
+        {
+            var vpath = システム設定.システム設定ファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"システム設定ファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+
+            App.システム設定 = システム設定.復元する(); // ファイルがない場合、新規に作られる
+        }
+
+        public static void 曲データベースを初期化する()
+        {
+            App.曲ツリー.非活性化する();
+
+            var vpath = データベース.曲.SongDB.曲DBファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"曲データベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+        }
+
+        public static void ユーザデータベースを初期化する()
+        {
+            App.ユーザ管理.Dispose();
+
+            var vpath = データベース.ユーザ.UserDB.ユーザDBファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"ユーザデータベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+
+            App.ユーザ管理 = new ユーザ管理();    // 再生成。
+            App.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
+        }
+
+
         /// <summary>
         ///     コンストラクタ；アプリの初期化
         /// </summary>
@@ -179,8 +228,8 @@ namespace DTXMania
                 // WCFサービス用
                 App.サービスメッセージキュー = new ServiceMessageQueue();
 
-
-                this._活性化する();
+                // 活性化
+                this._グローバルリソースを活性化する();
 
                 // ビュアーモードでは常にウィンドウモードで起動。
                 base.全画面モード = (App.ビュアーモードである)  ? false : App.ユーザ管理.ログオン中のユーザ.全画面モードである;
@@ -190,6 +239,9 @@ namespace DTXMania
             }
         }
 
+        /// <summary>
+        ///     アプリの終了処理を行う。
+        /// </summary>
         protected override void Dispose( bool disposing )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -198,7 +250,7 @@ namespace DTXMania
                 {
                     this._Dispose済み = true;
 
-                    this._非活性化する();
+                    this._グローバルリソースを非活性化する();
 
                     App.ユーザ管理?.Dispose();
                     App.ユーザ管理 = null;
@@ -244,107 +296,226 @@ namespace DTXMania
         }
 
         /// <summary>
-        ///     メインループ。
+        ///     進行処理。
+        ///     描画以外の反復処理が必要なら、ここで行う。
         /// </summary>
-        public override void Run()
+        public override void 進行する()
         {
-            RenderLoop.Run( this, () => {
-
-                if( this.FormWindowState == FormWindowState.Minimized )
-                    return;
-
-                switch( this._AppStatus )
-                {
-                    case AppStatus.開始:
-
-                        // アプリは、(1)高速進行タスク と (2)進行描画タスク の２つのスレッドでループを回す。
-
-                        // 高速進行タスク起動。
-                        this._高速進行ステータス = new TriStateEvent( TriStateEvent.状態種別.OFF );
-                        Task.Factory.StartNew( this._高速進行タスクエントリ );
-
-                        // 描画タスク起動。
-                        this._AppStatus = AppStatus.実行中;
-
-                        break;
-
-                    case AppStatus.実行中:
-                        this._進行と描画を行う();
-                        break;
-
-                    case AppStatus.終了:
-                        Thread.Sleep( 500 );    // 終了待機中。
-                        break;
-                }
-
-            } );
+            App.ステージ管理.現在のステージ.高速進行する();
         }
 
-        public static void システム設定を初期化する()
+        /// <summary>
+        ///     描画処理。
+        ///     Direct2D, 3D などを用いた描画を行う。
+        ///     スワップチェーンの呼び出しは行わない（呼び出しもとが行う）。
+        /// </summary>
+        public override void 描画する()
         {
-            var vpath = システム設定.システム設定ファイルパス;
-            try
+            var gd = グラフィックデバイス.Instance;
+
+            #region " D2D, D3Dレンダリングの前処理を行う。"
+            //----------------
+            gd.D2DDeviceContext.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            gd.D2DDeviceContext.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
+
+            // 既定のD3Dレンダーターゲットビューを黒でクリアする。
+            gd.D3DDevice.ImmediateContext.ClearRenderTargetView( グラフィックデバイス.Instance.D3DRenderTargetView, Color4.Black );
+
+            // 深度バッファを 1.0f でクリアする。
+            gd.D3DDevice.ImmediateContext.ClearDepthStencilView(
+                グラフィックデバイス.Instance.D3DDepthStencilView,
+                SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
+                depth: 1.0f,
+                stencil: 0 );
+            //----------------
+            #endregion
+
+            // Windows Animation を進行。
+            gd.Animation.進行する();
+
+            // 現在のステージを進行＆描画。
+            App.ステージ管理.現在のステージ.進行描画する( gd.D2DDeviceContext );
+
+            // ステージの進行描画の結果（フェーズの状態など）を受けての後処理。
+            switch( App.ステージ管理.現在のステージ )
             {
-                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
-            }
-            catch( Exception e )
-            {
-                Log.ERROR( $"システム設定ファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
-            }
-
-            App.システム設定 = システム設定.復元する(); // ファイルがない場合、新規に作られる
-        }
-
-        public static void 曲データベースを初期化する()
-        {
-            App.曲ツリー.非活性化する();
-
-            var vpath = データベース.曲.SongDB.曲DBファイルパス;
-            try
-            {
-                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
-            }
-            catch( Exception e )
-            {
-                Log.ERROR( $"曲データベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
-            }
-        }
-
-        public static void ユーザデータベースを初期化する()
-        {
-            App.ユーザ管理.Dispose();
-
-            var vpath = データベース.ユーザ.UserDB.ユーザDBファイルパス;
-            try
-            {
-                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
-            }
-            catch( Exception e )
-            {
-                Log.ERROR( $"ユーザデータベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
-            }
-
-            App.ユーザ管理 = new ユーザ管理();    // 再生成。
-            App.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
-        }
-
-
-        protected override void OnClosing( CancelEventArgs e )
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                lock( this._高速進行と描画の同期 )
-                {
-                    // 通常は進行タスクから終了するが、Alt+F4でここに来た場合はそれが行われてないので、行う。
-                    if( this._AppStatus != AppStatus.終了 )
+                case ステージ.起動.起動ステージ stage:
+                    #region " 確定 → 通常時はタイトルステージ、ビュアーモード時は演奏ステージ_ビュアーモードへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.起動.起動ステージ.フェーズ.確定 )
                     {
+                        if( App.ビュアーモードである )
+                        {
+                            // (A) ビュアーモードなら 演奏ステージ_ビュアーモード へ
+                            App.ステージ管理.ステージを遷移する( nameof( ステージ.演奏.演奏ステージ_ビュアーモード ) );
+                        }
+                        else
+                        {
+                            // (B) 通常時はタイトルステージへ
+                            App.ステージ管理.ステージを遷移する( nameof( ステージ.タイトル.タイトルステージ ) );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.タイトル.タイトルステージ stage:
+                    #region " キャンセル → 終了ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.タイトル.タイトルステージ.フェーズ.キャンセル )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.終了.終了ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定 → 認証ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.タイトル.タイトルステージ.フェーズ.確定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.認証.認証ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.認証.認証ステージ stage:
+                    #region " キャンセル → 終了ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.認証.認証ステージ.フェーズ.キャンセル )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.終了.終了ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定 → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.認証.認証ステージ.フェーズ.確定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.選曲.選曲ステージ stage:
+                    #region " キャンセル → タイトルステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.キャンセル )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.タイトル.タイトルステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定_選曲 → 曲読み込みステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.確定_選曲 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.曲読み込み.曲読み込みステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定_設定 → 設定ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.確定_設定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.オプション設定.オプション設定ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.オプション設定.オプション設定ステージ stage:
+                    #region " キャンセル, 確定 → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.キャンセル ||
+                        stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.確定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " 再起動 "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.再起動 )
+                    {
+                        Application.Restart();
+                        return;
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.曲読み込み.曲読み込みステージ stage:
+                    #region " 確定 → 演奏ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.曲読み込み.曲読み込みステージ.フェーズ.完了 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.演奏.演奏ステージ ) );
+
+                        // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
+                        var 演奏ステージ = App.ステージ管理.ステージリスト[ nameof( ステージ.演奏.演奏ステージ ) ] as ステージ.演奏.演奏ステージ;
+                        演奏ステージ.キャプチャ画面 = 画面キャプチャ.取得する();
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.演奏.演奏ステージ stage:
+                    #region " キャンセル → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.演奏.演奏ステージ.フェーズ.キャンセル完了 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    #region " クリア → 結果ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.演奏.演奏ステージ.フェーズ.クリア )
+                    {
+                        if( App.ビュアーモードである )
+                        {
+                            // ビュアーモードならクリアフェーズを維持。（サービスメッセージ待ち。）
+                        }
+                        else
+                        {
+                            App.ステージ管理.ステージを遷移する( nameof( ステージ.結果.結果ステージ ) );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.演奏.演奏ステージ_ビュアーモード stage:
+                    // このステージからどこかへ遷移することはない。
+                    break;
+
+                case ステージ.結果.結果ステージ stage:
+                    #region " 確定 → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.結果.結果ステージ.フェーズ.確定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case ステージ.終了.終了ステージ stage:
+                    #region " 確定 → アプリを終了する。"
+                    //----------------
+                    if( stage.現在のフェーズ == ステージ.終了.終了ステージ.フェーズ.確定 )
+                    {
+                        App.ステージ管理.ステージを遷移する( null );
                         this._アプリを終了する();
                     }
-
-                    base.OnClosing( e );
-                }
+                    //----------------
+                    #endregion
+                    break;
             }
+
         }
+
 
         protected override void OnKeyDown( KeyEventArgs e )
         {
@@ -387,19 +558,6 @@ namespace DTXMania
         }
 
 
-        // ※ Form イベントの override メソッドは描画スレッドで実行されるため、処理中に進行タスクが呼び出されると困る場合には、進行タスクとの lock を忘れないこと。
-        private readonly object _高速進行と描画の同期 = new object();
-
-        private enum AppStatus { 開始, 実行中, 終了 };
-        private AppStatus _AppStatus = AppStatus.開始;
-
-
-        /// <summary>
-        ///		進行タスクの状態。
-        ///		OFF:タスク起動前、ON:タスク実行中、無効:タスク終了済み
-        /// </summary>
-        private TriStateEvent _高速進行ステータス;
-
         private bool _Dispose済み = false;
 
 
@@ -407,7 +565,7 @@ namespace DTXMania
         ///		グローバルリソース（Appクラスのstaticメンバ）のうち、
         ///		グラフィックリソースを持つものについて、活性化がまだなら活性化する。
         /// </summary>
-        private void _活性化する()
+        private void _グローバルリソースを活性化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -421,7 +579,7 @@ namespace DTXMania
         ///		グローバルリソース（Appクラスのstaticメンバ）のうち、
         ///		グラフィックリソースを持つものについて、活性化中なら非活性化する。
         /// </summary>
-        private void _非活性化する()
+        private void _グローバルリソースを非活性化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -432,278 +590,16 @@ namespace DTXMania
         }
 
         /// <summary>
-        ///		高速進行タスクの処理内容。
-        /// </summary>
-        private void _高速進行タスクエントリ()
-        {
-            Log.現在のスレッドに名前をつける( "高速進行" );
-            Log.Header( "高速進行タスクを開始します。" );
-
-            this._高速進行ステータス.現在の状態 = TriStateEvent.状態種別.ON;
-
-            var 元のMMCSS特性 = FDKUtilities.AvSetMmThreadCharacteristics( "Playback", out int taskIndex );
-
-            while( true )
-            {
-                lock( this._高速進行と描画の同期 )
-                {
-                    if( this._高速進行ステータス.現在の状態 != TriStateEvent.状態種別.ON )    // lock してる間に状態が変わることがあるので注意。
-                        break;
-
-					//App.入力管理.すべての入力デバイスをポーリングする();
-					// --> 入力のポーリングはここでは行わない。入力ポーリングの挙動はステージごとに異なるので、それぞれのステージ内で行うこと。
-
-                    App.ステージ管理.現在のステージ.高速進行する();
-				}
-
-                Thread.Sleep( App.システム設定.入力発声スレッドのスリープ量ms );  // ウェイト。
-			}
-
-            this._高速進行ステータス.現在の状態 = TriStateEvent.状態種別.無効;
-
-            FDKUtilities.AvRevertMmThreadCharacteristics( 元のMMCSS特性 );
-
-            Log.Header( "高速進行タスクを終了しました。" );
-        }
-
-        /// <summary>
-        ///		進行描画タスクの処理内容。
-        /// </summary>
-        private void _進行と描画を行う()
-        {
-            bool vsync = true;
-
-            var gd = グラフィックデバイス.Instance;
-
-            lock( this._高速進行と描画の同期 )
-            {
-                if( this._AppStatus != AppStatus.実行中 )  // 上記lock中に終了されている場合があればそれをはじく。
-                    return;
-
-                #region " D2D, D3Dレンダリングの前処理を行う。"
-                //----------------
-                gd.D2DDeviceContext.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
-                gd.D2DDeviceContext.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
-
-                // 既定のD3Dレンダーターゲットビューを黒でクリアする。
-                gd.D3DDevice.ImmediateContext.ClearRenderTargetView( グラフィックデバイス.Instance.D3DRenderTargetView, Color4.Black );
-
-                // 深度バッファを 1.0f でクリアする。
-                gd.D3DDevice.ImmediateContext.ClearDepthStencilView(
-                    グラフィックデバイス.Instance.D3DDepthStencilView,
-                    SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
-                    depth: 1.0f,
-                    stencil: 0 );
-                //----------------
-                #endregion
-
-                // Windows Animation を進行。
-                gd.Animation.進行する();
-
-                // 現在のステージを進行＆描画。
-                App.ステージ管理.現在のステージ.進行描画する( gd.D2DDeviceContext );
-
-                // ステージの進行描画の結果（フェーズの状態など）を受けての後処理。
-                switch( App.ステージ管理.現在のステージ )
-                {
-                    case ステージ.起動.起動ステージ stage:
-                        #region " 確定 → 通常時はタイトルステージ、ビュアーモード時は演奏ステージ_ビュアーモードへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.起動.起動ステージ.フェーズ.確定 )
-                        {
-                            if( App.ビュアーモードである )
-                            {
-                                // (A) ビュアーモードなら 演奏ステージ_ビュアーモード へ
-                                App.ステージ管理.ステージを遷移する( nameof( ステージ.演奏.演奏ステージ_ビュアーモード ) );
-                            }
-                            else
-                            {
-                                // (B) 通常時はタイトルステージへ
-                                App.ステージ管理.ステージを遷移する( nameof( ステージ.タイトル.タイトルステージ ) );
-                            }
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.タイトル.タイトルステージ stage:
-                        #region " キャンセル → 終了ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.タイトル.タイトルステージ.フェーズ.キャンセル )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.終了.終了ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " 確定 → 認証ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.タイトル.タイトルステージ.フェーズ.確定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.認証.認証ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.認証.認証ステージ stage:
-                        #region " キャンセル → 終了ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.認証.認証ステージ.フェーズ.キャンセル )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.終了.終了ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " 確定 → 選曲ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.認証.認証ステージ.フェーズ.確定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.選曲.選曲ステージ stage:
-                        #region " キャンセル → タイトルステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.キャンセル )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.タイトル.タイトルステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " 確定_選曲 → 曲読み込みステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.確定_選曲 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.曲読み込み.曲読み込みステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " 確定_設定 → 設定ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.選曲.選曲ステージ.フェーズ.確定_設定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.オプション設定.オプション設定ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.オプション設定.オプション設定ステージ stage:
-                        #region " キャンセル, 確定 → 選曲ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.キャンセル ||
-                            stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.確定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " 再起動 "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.オプション設定.オプション設定ステージ.フェーズ.再起動 )
-                        {
-                            Application.Restart();
-                            return;
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.曲読み込み.曲読み込みステージ stage:
-                        #region " 確定 → 演奏ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.曲読み込み.曲読み込みステージ.フェーズ.完了 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.演奏.演奏ステージ ) );
-
-                            // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
-                            var 演奏ステージ = App.ステージ管理.ステージリスト[ nameof( ステージ.演奏.演奏ステージ ) ] as ステージ.演奏.演奏ステージ;
-                            演奏ステージ.キャプチャ画面 = 画面キャプチャ.取得する();
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.演奏.演奏ステージ stage:
-                        #region " キャンセル → 選曲ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.演奏.演奏ステージ.フェーズ.キャンセル完了 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        #region " クリア → 結果ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.演奏.演奏ステージ.フェーズ.クリア )
-                        {
-                            if( App.ビュアーモードである )
-                            {
-                                // ビュアーモードならクリアフェーズを維持。（サービスメッセージ待ち。）
-                            }
-                            else
-                            {
-                                App.ステージ管理.ステージを遷移する( nameof( ステージ.結果.結果ステージ ) );
-                            }
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.演奏.演奏ステージ_ビュアーモード stage:
-                        // このステージからどこかへ遷移することはない。
-                        break;
-
-                    case ステージ.結果.結果ステージ stage:
-                        #region " 確定 → 選曲ステージへ "
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.結果.結果ステージ.フェーズ.確定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( nameof( ステージ.選曲.選曲ステージ ) );
-                        }
-                        //----------------
-                        #endregion
-                        break;
-
-                    case ステージ.終了.終了ステージ stage:
-                        #region " 確定 → アプリを終了する。"
-                        //----------------
-                        if( stage.現在のフェーズ == ステージ.終了.終了ステージ.フェーズ.確定 )
-                        {
-                            App.ステージ管理.ステージを遷移する( null );
-                            this._アプリを終了する();
-                        }
-                        //----------------
-                        #endregion
-                        break;
-                }
-            }
-
-            // スワップチェーン表示。
-            gd.SwapChain.Present( ( vsync ) ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
-        }
-
-        /// <summary>
-        ///		高速進行タスクを終了し、ウィンドウを閉じ、アプリを終了する。
+        ///	    ウィンドウを閉じ、アプリを終了する。
         /// </summary>
         private void _アプリを終了する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this._AppStatus != AppStatus.終了 )
-                {
-                    this._高速進行ステータス.現在の状態 = TriStateEvent.状態種別.OFF;
+                // ユーザ設定を保存する。念のため。
+                App.ユーザ管理.ログオン中のユーザ?.保存する();
 
-                    // ユーザ情報を保存する。
-                    App.ユーザ管理.ログオン中のユーザ?.保存する();
-
-                    // _AppStatus を変更してから、GUI スレッドで非同期実行を指示する。
-                    this._AppStatus = AppStatus.終了;
-                    this.BeginInvoke( new Action( () => { this.Close(); } ) );
-                }
+                this.Close();
             }
         }
     }

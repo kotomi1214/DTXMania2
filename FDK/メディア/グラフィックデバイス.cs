@@ -88,6 +88,8 @@ namespace FDK
         public FDK.アニメーション管理 Animation { get; private set; } = null;
 
         public SharpDX.Direct3D11.Device D3DDevice { get; protected set; }
+
+        public SharpDX.DXGI.Output DXGIOutput { get; protected set; }
         //----------------
         #endregion
 
@@ -386,6 +388,12 @@ namespace FDK
 
                 // DXGIデバイスマネージャに D3Dデバイスを登録する。MediaFoundationで必須。
                 this.DXGIDeviceManager.ResetDevice( this.D3DDevice );
+
+                // 既定のDXGI出力を取得する。
+                using( var dxgiAdapter = dxgiDevice.Adapter )
+                {
+                    this.DXGIOutput = dxgiAdapter.Outputs[ 0 ];
+                }
             }
 
             テクスチャ.全インスタンスで共有するリソースを作成する();
@@ -398,6 +406,9 @@ namespace FDK
             this.Animation = null;
 
             テクスチャ.全インスタンスで共有するリソースを解放する();
+
+            this.DXGIOutput?.Dispose();
+            this.DXGIOutput = null;
 
             this.DCompTarget.Root = null;
 

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 
@@ -106,27 +108,64 @@ namespace FDK
         }
 
         /// <summary>
+        ///     描画処理。
+        /// </summary>
+        public virtual void 描画する()
+        {
+            //
+            // 以下はサンプル。派生クラスで適宜オーバーライドすること。
+            //
+
+            var gd = グラフィックデバイス.Instance;
+
+            // アニメーションを進行する。
+            gd.Animation.進行する();
+
+            // 全面を黒で塗りつぶすだけのサンプル。
+            gd.D2DDeviceContext.BeginDraw();
+            gd.D2DDeviceContext.Clear( Color4.Black );
+            gd.D2DDeviceContext.EndDraw();
+        }
+
+        /// <summary>
+        ///     進行処理。（描画以外の処理。）
+        /// </summary>
+        public virtual void 進行する()
+        {
+            //
+            // 描画以外の反復処理があれば、これをオーバーライドすること。
+            //
+        }
+
+
+        /// <summary>
         ///		メインループ。
-        ///		派生クラスでオーバーライドすること。
         /// </summary>
         public virtual void Run()
         {
             SharpDX.Windows.RenderLoop.Run( this, () => {
 
-                var gd = グラフィックデバイス.Instance;
-
+                // 最小化されてたら何もしない。
                 if( this.FormWindowState == FormWindowState.Minimized )
                     return;
 
-                // アニメーションを進行する。
-                gd.Animation.進行する();
+                if( Interlocked.Read( ref this._PresentNow ) == 0 )
+                {
+                    this.描画する();
 
-                // 全面を黒で塗りつぶすだけのサンプル。
-                gd.D2DDeviceContext.BeginDraw();
-                gd.D2DDeviceContext.Clear( Color4.Black );
-                gd.D2DDeviceContext.EndDraw();
+                    // SwapChain を表示するタスクを起動。
+                    Interlocked.Increment( ref this._PresentNow );        // 1: 表示開始
+                    Task.Run( () => {
+                        グラフィックデバイス.Instance.DXGIOutput.WaitForVerticalBlank();
+                        グラフィックデバイス.Instance.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                        Interlocked.Decrement( ref this._PresentNow );    // 0: 表示完了
+                    } );
 
-                gd.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                }
+                else
+                {
+                    this.進行する();
+                }
 
             } );
         }
@@ -153,6 +192,29 @@ namespace FDK
         }
 
         protected FormWindowState FormWindowState = FormWindowState.Normal;
+
+        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
+        {
+            // スワップチェーンの作成直後に呼び出される。
+            // 派生クラスで実装すること。
+        }
+        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
+        {
+            // スワップチェーンの破棄直前に呼び出される。
+            // 派生クラスで実装すること。
+        }
+
+        /// <summary>
+        ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
+        /// </summary>
+        private long _PresentNow = 0;
+
+        /// <summary>
+        ///		ウィンドウを全画面モードにする直前に取得し、
+        ///		再びウィンドウモードに戻して状態を復元する時に参照する。
+        ///		（<see cref="全画面モード"/> を参照。）
+        /// </summary>
+        private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
 
         private void _UserResize( object sender, EventArgs e )
         {
@@ -181,23 +243,5 @@ namespace FDK
                 this.スワップチェーンに依存するグラフィックリソースを作成する();
             }
         }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
-        {
-            // スワップチェーンの作成直後に呼び出される。
-            // 派生クラスで実装すること。
-        }
-        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
-        {
-            // スワップチェーンの破棄直前に呼び出される。
-            // 派生クラスで実装すること。
-        }
-
-        /// <summary>
-        ///		ウィンドウを全画面モードにする直前に取得し、
-        ///		再びウィンドウモードに戻して状態を復元する時に参照する。
-        ///		（<see cref="全画面モード"/> を参照。）
-        /// </summary>
-        private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
     }
 }
