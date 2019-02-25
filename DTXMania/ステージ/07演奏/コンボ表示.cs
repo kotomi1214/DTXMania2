@@ -47,6 +47,7 @@ namespace DTXMania.ステージ.演奏
                 this._百ごとのアニメ = new 百ごとのアニメ();
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -174,8 +175,11 @@ namespace DTXMania.ステージ.演奏
 
 
         private int _前回表示した値 = 0;
+
         private string _前回表示した数字 = "    ";
+
         private 画像 _コンボ文字画像 = null;
+
         private Dictionary<string, RectangleF> _コンボ文字の矩形リスト = null;
 
         

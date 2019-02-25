@@ -28,6 +28,7 @@ namespace DTXMania.ステージ.演奏
             {
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

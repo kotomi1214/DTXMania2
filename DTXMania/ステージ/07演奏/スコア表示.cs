@@ -55,6 +55,7 @@ namespace DTXMania.ステージ.演奏
                     this._判定toヒット数.Add( judge, 0 );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -135,9 +136,13 @@ namespace DTXMania.ステージ.演奏
         private int _前回表示したスコア = 0;
 
         private 画像 _スコア数字画像 = null;
+
         private Dictionary<string, RectangleF> _スコア数字の矩形リスト = null;
+
         private Dictionary<判定種別, int> _判定toヒット数 = null;
+
         private string _前回表示した数字 = "        0";
+
 
         // 桁ごとのアニメーション
 

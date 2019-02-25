@@ -184,8 +184,11 @@ namespace DTXMania.ステージ.演奏
 
 
         private Dictionary<判定種別, int> _判定toヒット数 = null;
+
         private Dictionary<判定種別, int> _判定toヒット数Auto含まない = null;
+
         private Dictionary<判定種別, int> _最後にスコアを更新したときの判定toヒット数 = null;
+
         private readonly Dictionary<判定種別, double> _判定値表 = new Dictionary<判定種別, double>() {
             { 判定種別.PERFECT, 1.0 },
             { 判定種別.GREAT,   0.5 },
@@ -193,7 +196,9 @@ namespace DTXMania.ステージ.演奏
             { 判定種別.OK,      0.0 },
             { 判定種別.MISS,    0.0 },
         };
+
         private double _オプション補正 = 1.0;
+
         private double _譜面レベル = 5.0;
 
 

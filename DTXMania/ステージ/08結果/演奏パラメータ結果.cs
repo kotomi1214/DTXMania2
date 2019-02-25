@@ -63,6 +63,7 @@ namespace DTXMania.ステージ.結果
                 this._パラメータアニメ.ストーリーボード.Schedule( animation.Timer.Time );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -166,6 +167,7 @@ namespace DTXMania.ステージ.結果
                 this.不透明度 = null;
             }
         };
+
         private パラメータアニメ _パラメータアニメ = null;
 
         protected new const float _改行幅dpx = 27f;

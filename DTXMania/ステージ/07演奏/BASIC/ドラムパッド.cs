@@ -51,6 +51,7 @@ namespace DTXMania.ステージ.演奏.BASIC
                 }
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -102,7 +103,9 @@ namespace DTXMania.ステージ.演奏.BASIC
             }
         }
 
+
         private テクスチャ _パッド絵 = null;
+
         private Dictionary<string, RectangleF> _パッド絵の矩形リスト = null;
 
         private struct パッドContext
@@ -113,7 +116,6 @@ namespace DTXMania.ステージ.演奏.BASIC
             public Counter アニメカウンタ;
         };
         private Dictionary<表示レーン種別, パッドContext> _レーンtoパッドContext = null;
-
 
         private class YAMLマップ
         {

@@ -26,6 +26,7 @@ namespace FDK
         /// </summary>
         public string 変数付きパス { get; protected set; } = null;
 
+
         public VariablePath()
         {
             // Yamlデシリアライズのためにデフォルトコンストラクタが必要。
@@ -40,7 +41,7 @@ namespace FDK
         }
 
         /// <summary>
-        ///     string から <see cref="VariablePath"/> の暗黙的変換。
+        ///     string から <see cref="VariablePath"/> への暗黙的変換。
         /// </summary>
         public static implicit operator VariablePath( string パス )
             => ( null == パス ) ? null : new VariablePath( パス );
@@ -66,10 +67,13 @@ namespace FDK
         }
 
 
+        // IYamlConvertible 実装
+
         // Yaml から変換する
         void IYamlConvertible.Read( YamlDotNet.Core.IParser parser, Type expectedType, ObjectDeserializer nestedObjectDeserializer )
         {
             var vpath = (string) nestedObjectDeserializer( typeof( string ) );
+
             this._初期化( vpath );
         }
 

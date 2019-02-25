@@ -505,6 +505,7 @@ namespace DTXMania.入力
         private IntPtr _hWindow;
 
         private bool _入力履歴を記録中である = true;
+
         private bool _入力履歴の記録を中断している
         {
             get

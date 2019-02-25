@@ -47,6 +47,7 @@ namespace DTXMania.ステージ.演奏
                 this._初めての進行描画 = true;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

@@ -24,6 +24,7 @@ namespace DTXMania.ステージ.選曲
             確定_設定,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
 
 

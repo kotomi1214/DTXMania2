@@ -29,6 +29,7 @@ namespace DTXMania.ステージ.選曲
                 this._現在表示しているノード = null;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -106,8 +107,11 @@ namespace DTXMania.ステージ.選曲
 
 
         private 画像フォント _数字画像 = null;
+
         private テクスチャ _ロゴ画像 = null;
+
         private MusicNode _現在表示しているノード = null;
+
         private string _スキル値文字列 = null;
     }
 }

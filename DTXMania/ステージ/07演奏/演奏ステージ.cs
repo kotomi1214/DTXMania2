@@ -28,6 +28,7 @@ namespace DTXMania.ステージ.演奏
             キャンセル時フェードアウト,
             キャンセル完了,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
 
         /// <summary>
@@ -853,45 +854,77 @@ namespace DTXMania.ステージ.演奏
         // 画面を構成するもの
 
         private 画像 _背景画像 = null;
+
         private 曲名パネル _曲名パネル = null;
+
         private FPS _FPS = null;
+
         private BASIC.レーンフレーム _レーンフレームBASIC = null;
+
         private EXPERT.レーンフレーム _レーンフレームEXPERT = null;
+
         private BASIC.ヒットバー _ヒットバーBASIC = null;
+
         private BASIC.ドラムパッド _ドラムパッドBASIC = null;
+
         private EXPERT.ドラムキットとヒットバー _ドラムキットとヒットバーEXPERT = null;
+
         private BASIC.ドラムチップ _ドラムチップBASIC = null;
+
         private EXPERT.ドラムチップ _ドラムチップEXPERT = null;
+
         private 譜面スクロール速度 _譜面スクロール速度 = null;
+
         private エキサイトゲージ _エキサイトゲージ = null;
+
         private フェーズパネル _フェーズパネル = null;
+
         private カウントマップライン _カウントマップライン = null;
+
         private 左サイドクリアパネル _左サイドクリアパネル = null;
+
         private 右サイドクリアパネル _右サイドクリアパネル = null;
 
+        
         // 左サイドクリアパネル内に表示されるもの
 
         private スコア表示 _スコア表示 = null;
+
         private プレイヤー名表示 _プレイヤー名表示 = null;
+
         private 判定パラメータ表示 _判定パラメータ表示 = null;
+
         private 達成率表示 _達成率表示 = null;
+
         private 曲別SKILL _曲別SKILL = null;
+
 
         // 右サイドクリアパネル内に表示されるもの
 
         private コンボ表示 _コンボ表示 = null;
 
+
         // 譜面上に表示されるもの
 
         private BASIC.レーンフラッシュ _レーンフラッシュBASIC = null;
+
         private EXPERT.レーンフラッシュ _レーンフラッシュEXPERT = null;
+
         private 判定文字列 _判定文字列 = null;
+
         private チップ光 _チップ光 = null;
+
         private 画像フォント _数字フォント中グレー48x64 = null;
 
+
+        // 小節線・拍線
+
         private SolidColorBrush _小節線色 = null;
+
         private SolidColorBrush _小節線影色 = null;
+
         private SolidColorBrush _拍線色 = null;
+
         private void _小節線拍線を描画する( DeviceContext1 dc, double 現在の演奏時刻sec )
         {
             // 小節線・拍線 と チップ は描画階層（奥行き）が異なるので、別々のメソッドに分ける。
@@ -934,6 +967,7 @@ namespace DTXMania.ステージ.演奏
 
             } );
         }
+
 
         // 演奏状態
 
@@ -1000,7 +1034,6 @@ namespace DTXMania.ステージ.演奏
 
             return ( 指定時間sec * _1秒あたりのピクセル数 * speed );
         }
-
 
         private void _チップのヒット処理を行う( チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec )
         {

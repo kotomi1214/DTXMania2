@@ -12,15 +12,20 @@ namespace DTXMania.ステージ.演奏
     {
         /// <summary>
         ///		カウント値の配列。
+        /// </summary>
+        /// <remarks>
         ///		インデックスが小さいほど曲の前方に位置する。
         ///		カウント値の値域は 0～12。今のところは 0 で非表示、1 で水色、2～12で黄色表示。
-        /// </summary>
+        /// </remarks>
         public int[] カウントマップ { get; protected set; } = null;
 
         /// <summary>
+        ///     カウント値の配列の最大要素数（定数）。
+        /// </summary>
+        /// <remarks>
         ///		全曲の最大カウントを 768 とするので、
         ///		カウントマップリストの要素数は 768÷12 = 64 個が最大となる。
-        /// </summary>
+        /// </remarks>
         public const int カウントマップの最大要素数 = 768 / 12;
 
 
@@ -45,6 +50,7 @@ namespace DTXMania.ステージ.演奏
                     this._最後にカウント値を設定したときの成績.Add( judge, 0 );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -139,7 +145,9 @@ namespace DTXMania.ステージ.演奏
 
 
         private int[] _過去最大のカウントマップ = null;
+
         private float _最後にカウント値を設定した位置 = 0f;
+
         private Dictionary<判定種別, int> _最後にカウント値を設定したときの成績 = null;
     }
 }

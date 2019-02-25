@@ -26,6 +26,7 @@ namespace DTXMania.ステージ
                 演奏.BASIC.レーンフレーム.初期化する();
             }
         }
+
         public void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -65,6 +66,7 @@ namespace DTXMania.ステージ
                 this.現在のアイキャッチ = this._アイキャッチリスト.ElementAt( 0 ).Value;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

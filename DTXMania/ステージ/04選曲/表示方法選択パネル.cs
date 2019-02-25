@@ -16,11 +16,13 @@ namespace DTXMania.ステージ.選曲
             全曲,
             評価順,
         }
+
         public 表示方法 現在の表示方法
         {
             get;
             protected set;
         }
+
 
         public 表示方法選択パネル()
         {
@@ -34,6 +36,7 @@ namespace DTXMania.ステージ.選曲
                     this.子Activityを追加する( p.画像 = new テクスチャ( p.vpath ) );
             }
         }
+
         protected override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -50,6 +53,7 @@ namespace DTXMania.ステージ.選曲
                 this._横方向差分移動ストーリーボード.Schedule( animation.Timer.Time );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -62,6 +66,7 @@ namespace DTXMania.ステージ.選曲
                 this._横方向差分割合 = null;
             }
         }
+
         public void 進行描画する( DeviceContext1 dc )
         {
             // パネルを合計８枚表示する。（左隠れ１枚 ＋ 表示６枚 ＋ 右隠れ１枚）
@@ -79,13 +84,17 @@ namespace DTXMania.ステージ.選曲
                 表示元の位置 = ( 表示元の位置 + 1 ) % this._パネルs.Count;
             }
         }
+
         public void 次のパネルを選択する()
         {
-
+            // todo: 実装する
         }
+
         public void 前のパネルを選択する()
         {
+            // todo: 実装する
         }
+
 
         private class Panel
         {
@@ -103,6 +112,7 @@ namespace DTXMania.ステージ.選曲
         ///     左:-1.0 ～ 中央:0.0 ～ +1.0:右。
         /// </summary>
         private Variable _横方向差分割合 = null;
+
         private Storyboard _横方向差分移動ストーリーボード = null;
 
         /// <summary>
@@ -110,6 +120,7 @@ namespace DTXMania.ステージ.選曲
         ///     0 ～ <see cref="_パネルs"/>.Count-1。
         /// </summary>
         private int _表示開始位置 = 0;
+
 
         private int _指定した表示方法が選択位置に来る場合の表示開始位置を返す( 表示方法 表示方法 )
         {

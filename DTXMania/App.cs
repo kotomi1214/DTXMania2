@@ -78,6 +78,7 @@ namespace DTXMania
         public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
 
         public static bool ウィンドウがアクティブである { get; set; } = false;    // DirectInput 用。
+
         public static bool ウィンドウがアクティブではない
         {
             get => !( App.ウィンドウがアクティブである );

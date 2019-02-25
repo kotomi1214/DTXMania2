@@ -36,6 +36,7 @@ namespace DTXMania.ステージ.演奏
                 this._拡大率X = 1.0f;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -85,9 +86,13 @@ namespace DTXMania.ステージ.演奏
 
 
         private string _前回表示した名前;
+
         private TextFormat _TextFormat;
+
         private TextLayout _TextLayout;
+
         private SolidColorBrush _文字色;
+
         private float _拡大率X = 1.0f;
     }
 }

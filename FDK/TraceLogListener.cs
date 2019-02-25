@@ -21,6 +21,7 @@ namespace FDK
 
         public override void Write( string message )
             => this._streamWriter?.Write( this.SanitizeUsername( message ) );
+
         public override void WriteLine( string message )
             => this._streamWriter?.WriteLine( this.SanitizeUsername( message ) );
 

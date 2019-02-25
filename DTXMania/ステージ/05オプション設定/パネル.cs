@@ -33,10 +33,10 @@ namespace DTXMania.ステージ.オプション設定
 
         public パネル( string パネル名, Action<パネル> 値の変更処理 = null, Color4? ヘッダ色 = null )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )   --> 数が多いので抑制
             {
                 this.パネル名 = パネル名;
-                this.ヘッダ色 = ( ヘッダ色.HasValue ) ? ヘッダ色.Value : ヘッダ色種別.青;
+                this.ヘッダ色 = ( ヘッダ色.HasValue ) ? ヘッダ色.Value : ヘッダ色種別.青;  // 既定値は青
                 this._値の変更処理 = 値の変更処理;
 
                 this.子Activityを追加する( this._パネル名画像 = new 文字列画像() { 表示文字列 = this.パネル名, フォントサイズpt = 34f, 前景色 = Color4.White } );
@@ -67,7 +67,6 @@ namespace DTXMania.ステージ.オプション設定
                 this._パネルの高さ割合 = null;
             }
         }
-
 
         public void フェードインを開始する( double 遅延sec, double 速度倍率 = 1.0 )
         {

@@ -26,6 +26,7 @@ namespace DTXMania.ステージ.選曲
             {
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -35,8 +36,10 @@ namespace DTXMania.ステージ.選曲
 
         public void リセットする()
         {
-            this._カウンタ = new LoopCounter( 0, 2300, 1 ); // 2秒ごとに300ms のループ
+            // 0～2000ms: 非表示、2000～2300ms: 表示 のループ
+            this._カウンタ = new LoopCounter( 0, 2300, 1 );
         }
+
         public void 進行描画する( DeviceContext1 dc )
         {
             if( null == this._カウンタ )
@@ -58,7 +61,9 @@ namespace DTXMania.ステージ.選曲
             }
         }
 
+
         private テクスチャ _ランナー画像 = null;
+
         private LoopCounter _カウンタ = null;
     }
 }

@@ -250,7 +250,6 @@ namespace DTXMania.ステージ.演奏.EXPERT
         }
         private Dictionary<表示レーン種別, 振動パラメータ> _振動パラメータ = null;
 
-
         protected enum パーツ
         {
             LeftCymbalStand,

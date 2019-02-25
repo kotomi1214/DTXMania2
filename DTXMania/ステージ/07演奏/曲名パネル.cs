@@ -73,13 +73,19 @@ namespace DTXMania.ステージ.演奏
 
 
         private テクスチャ _パネル = null;
+
         private 文字列画像 _曲名画像 = null;
+
         private 文字列画像 _サブタイトル画像 = null;
 
         private readonly Vector3 _サムネイル画像表示位置dpx = new Vector3( 1477f, 19f, 0f );
+
         private readonly Vector3 _サムネイル画像表示サイズdpx = new Vector3( 91f, 91f, 0f );
+
         private readonly Vector2 _曲名表示位置dpx = new Vector2( 1576f + 4f, 43f + 10f );
+
         private readonly Vector2 _曲名表示サイズdpx = new Vector2( 331f - 8f - 4f, 70f - 10f );
+
 
         private void _サムネイルを描画する()
         {
@@ -106,6 +112,7 @@ namespace DTXMania.ステージ.演奏
 
             サムネイル画像.描画する( 変換行列 );
         }
+
         private void _曲名を描画する( DeviceContext1 dc )
         {
             // 拡大率を計算して描画する。
@@ -116,6 +123,7 @@ namespace DTXMania.ステージ.演奏
                 this._曲名表示位置dpx.Y,
                 X方向拡大率: ( this._曲名画像.画像サイズdpx.Width <= this._曲名表示サイズdpx.X ) ? 1f : this._曲名表示サイズdpx.X / this._曲名画像.画像サイズdpx.Width );
         }
+
         private void _サブタイトルを描画する( DeviceContext1 dc )
         {
             // 拡大率を計算して描画する。

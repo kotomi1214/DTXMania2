@@ -16,6 +16,7 @@ namespace DTXMania.曲
             this.タイトル = "<< 戻る";
             this.親ノード = null;
         }
+
         public BackNode( Node 親ノード )
             : this()
         {

@@ -20,6 +20,7 @@ namespace DTXMania.ステージ.曲読み込み
             完了,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
@@ -122,12 +123,19 @@ namespace DTXMania.ステージ.曲読み込み
 
 
         private bool _初めての進行描画 = true;
+
         private 舞台画像 _舞台画像 = null;
+
         private 画像 _注意文 = null;
+
         private 文字列画像 _曲名画像 = null;
+
         private 文字列画像 _サブタイトル画像 = null;
+
         private プレビュー画像 _プレビュー画像 = null;
+
         private 難易度 _難易度 = null;
+
 
         private void _曲名を描画する( DeviceContext1 dc )
         {
@@ -142,6 +150,7 @@ namespace DTXMania.ステージ.曲読み込み
                 表示位置dpx.Y,
                 X方向拡大率: ( this._曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._曲名画像.画像サイズdpx.Width );
         }
+
         private void _サブタイトルを描画する( DeviceContext1 dc )
         {
             var 表示位置dpx = new Vector2( 782f, 520f );
@@ -155,6 +164,7 @@ namespace DTXMania.ステージ.曲読み込み
                 表示位置dpx.Y,
                 X方向拡大率: ( this._サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._サブタイトル画像.画像サイズdpx.Width );
         }
+
         private void _スコアを読み込む()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

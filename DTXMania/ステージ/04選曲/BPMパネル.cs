@@ -6,7 +6,6 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 using DTXMania.曲;
-using DTXMania.設定;
 using DTXMania.データベース.曲;
 
 namespace DTXMania.ステージ.選曲
@@ -28,6 +27,7 @@ namespace DTXMania.ステージ.選曲
             {
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -70,13 +70,15 @@ namespace DTXMania.ステージ.選曲
             this._BPMパネル.描画する( 領域.X - 5f, 領域.Y - 4f );
 
 
-            bool 表示可能ノードである = ( this._現在表示しているノード is MusicNode );
+            bool 表示可能ノードである = ( this._現在表示しているノード is MusicNode );   // 現状、BPMを表示できるノードは MusicNode のみ。
 
             if( 表示可能ノードである )
             {
-                if( 10.0 >= Math.Abs( this._最大BPM - this._最小BPM ) )
+                // BPM を表示する。
+
+                if( 10.0 >= Math.Abs( this._最大BPM - this._最小BPM ) ) // 差が10以下なら同一値とみなす。
                 {
-                    // (A) 「最小値」だけ描画。差が10以下なら同一値とみなす。
+                    // (A) 「最小値」だけ描画。
                     this._パラメータ文字.描画する( dc, 領域.X + 120f, 領域.Y, this._最小BPM.ToString( "0" ).PadLeft( 3 ) );
                 }
                 else
@@ -89,9 +91,13 @@ namespace DTXMania.ステージ.選曲
 
 
         private テクスチャ _BPMパネル = null;
+
         private 画像フォント _パラメータ文字 = null;
+
         private MusicNode _現在表示しているノード = null;
+
         private double _最小BPM;
+
         private double _最大BPM;
     }
 }

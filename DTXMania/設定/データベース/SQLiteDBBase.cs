@@ -112,6 +112,7 @@ namespace DTXMania.データベース
 
 
         protected VariablePath _DBファイルパス;
+
         protected string _DB接続文字列;
 
 

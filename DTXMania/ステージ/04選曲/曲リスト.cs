@@ -535,7 +535,6 @@ namespace DTXMania.ステージ.選曲
             this._選択ノードの表示オフセットのストーリーボード.Schedule( am.Timer.Time );
         }
 
-
         private void 曲ツリー_フォーカスノードが変更された( object sender, (Node 選択されたNode, Node 選択が解除されたNode) e )
         {
             // (1) 選択解除曲のプレビュー音声を止める。

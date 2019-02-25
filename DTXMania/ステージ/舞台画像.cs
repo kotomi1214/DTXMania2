@@ -17,7 +17,9 @@ namespace DTXMania.ステージ
     class 舞台画像 : Activity
     {
         public Size2F サイズ => this._背景画像.サイズ;
+
         public bool ぼかしと縮小を適用中 { get; protected set; } = false;
+
 
         public 舞台画像( string 背景画像ファイル名 = null, string 背景黒幕付き画像ファイル名 = null )
         {
@@ -55,6 +57,7 @@ namespace DTXMania.ステージ
                 this._初めての進行描画 = true;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -119,6 +122,7 @@ namespace DTXMania.ステージ
                 this.ぼかしと縮小を適用中 = true;
             }
         }
+
         public void ぼかしと縮小を解除する( double 完了までの最大時間sec = 1.0 )
         {
             Debug.Assert( this.活性化している );
@@ -243,19 +247,30 @@ namespace DTXMania.ステージ
             }
         }
 
+
         private bool _初めての進行描画 = true;
+
         private 画像 _背景画像 = null;
+
         private 画像 _背景黒幕付き画像 = null;
+
         private GaussianBlur _ガウスぼかしエフェクト = null;
+
         private GaussianBlur _ガウスぼかしエフェクト黒幕付き用 = null;
+
         private Scale _拡大エフェクト = null;
+
         private Scale _拡大エフェクト黒幕付き用 = null;
+
         private Crop _クリッピングエフェクト = null;
+
         private Crop _クリッピングエフェクト黒幕付き用 = null;
+
         /// <summary>
         ///		くっきり＆拡大: 0 ～ 1 :ぼかし＆縮小
         /// </summary>
         private Variable _ぼかしと縮小割合 = null;
+
         private Storyboard _ストーリーボード = null;
     }
 }

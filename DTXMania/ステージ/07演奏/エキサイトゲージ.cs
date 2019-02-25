@@ -26,7 +26,7 @@ namespace DTXMania.ステージ.演奏
             {
                 var dc = グラフィックデバイス.Instance.D2DDeviceContext;
 
-                this._通常ブラシ = new SolidColorBrush( dc, new Color4( 0xfff9b200 ) );
+                this._通常ブラシ = new SolidColorBrush( dc, new Color4( 0xfff9b200 ) );      // ABGR
                 this._DANGERブラシ = new SolidColorBrush( dc, new Color4( 0xff0000ff ) );
                 this._MAXブラシ = new SolidColorBrush( dc, new Color4( 0xff00c9f4 ) );
 
@@ -36,6 +36,7 @@ namespace DTXMania.ステージ.演奏
                 this._初めての進行描画 = true;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -127,12 +128,19 @@ namespace DTXMania.ステージ.演奏
 
 
         private bool _初めての進行描画 = true;
+
         private テクスチャ _ゲージ枠通常 = null;
+
         private テクスチャ _ゲージ枠DANGER = null;
-        private SolidColorBrush _通常ブラシ = null;  // 青
+
+        private SolidColorBrush _通常ブラシ = null;    // 青
+
         private SolidColorBrush _DANGERブラシ = null;  // 赤
-        private SolidColorBrush _MAXブラシ = null; // 橙
+
+        private SolidColorBrush _MAXブラシ = null;     // 橙
+
         private Variable _ゲージ量 = null;
+
         private Storyboard _ゲージ量のストーリーボード = null;
     }
 }

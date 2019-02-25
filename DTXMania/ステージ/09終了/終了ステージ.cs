@@ -16,7 +16,9 @@ namespace DTXMania.ステージ.終了
             開始音終了待ち,
             確定,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
+
 
         public 終了ステージ()
         {
@@ -35,6 +37,7 @@ namespace DTXMania.ステージ.終了
                 this.現在のフェーズ = フェーズ.開始;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -77,6 +80,7 @@ namespace DTXMania.ステージ.終了
 
 
         private 画像 _背景画像 = null;
+
         private Counter _カウンタ = null;
     }
 }

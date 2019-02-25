@@ -14,6 +14,7 @@ namespace DTXMania.ステージ.演奏.BASIC
     {
         public const float ヒット判定バーの中央Y座標dpx = 847f;
 
+
         public ヒットバー()
         {
             this.子Activityを追加する( this._ヒットバー画像 = new テクスチャ( @"$(System)images\演奏\ヒットバー.png" ) );
@@ -22,6 +23,7 @@ namespace DTXMania.ステージ.演奏.BASIC
         protected override void On活性化()
         {
         }
+
         protected override void On非活性化()
         {
         }

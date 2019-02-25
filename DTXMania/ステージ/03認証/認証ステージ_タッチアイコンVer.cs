@@ -21,11 +21,13 @@ namespace DTXMania.ステージ.認証
             確定,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ
         {
             get;
             protected set;
         }
+
 
         public 認証ステージ_タッチアイコンVer()
         {
@@ -36,6 +38,7 @@ namespace DTXMania.ステージ.認証
                 this.子Activityを追加する( this._確認できませんでした = new 文字列画像() { 表示文字列 = "確認できませんでした。", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.ドロップシャドウ } );
             }
         }
+
         protected override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -44,12 +47,14 @@ namespace DTXMania.ステージ.認証
                 this._初めての進行描画 = true;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
             }
         }
+
         public override void 進行描画する( DeviceContext1 dc )
         {
             if( this._初めての進行描画 )
@@ -113,13 +118,21 @@ namespace DTXMania.ステージ.認証
             }
         }
 
+
         private bool _初めての進行描画 = true;
+
         private 舞台画像 _舞台画像 = null;
+
         private 画像 _タッチアイコン = null;
+
         private 文字列画像 _確認できませんでした = null;
+
         private Counter _表示フェーズカウンタ = null;
+
         private Counter _待機フェーズカウンタ = null;
+
         private readonly Matrix3x2 _タッチアイコン表示行列 = Matrix3x2.Translation( 960f - 128f, 540f - 128f );
+
         private readonly Matrix3x2 _確認できませんでした表示行列 = Matrix3x2.Translation( 960f - 180f, 540f - 200f );
     }
 }

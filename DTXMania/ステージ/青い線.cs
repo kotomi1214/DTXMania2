@@ -15,6 +15,7 @@ namespace DTXMania.ステージ
     {
         public float 太さdpx { get; protected set; } = 26f;
 
+
         public 青い線()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -46,6 +47,7 @@ namespace DTXMania.ステージ
 					} );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -121,7 +123,9 @@ namespace DTXMania.ステージ
             } );
         }
 
+
         private LinearGradientBrush _線グラブラシ = null;
+
         private GradientStopCollection _線グラ頂点集合 = null;
     }
 }

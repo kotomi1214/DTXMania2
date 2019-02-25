@@ -239,6 +239,7 @@ namespace DTXMania.ステージ.演奏.EXPERT
 
         private const float _チップの最終調整倍率 = 1.2f;
 
+
         private void _単画チップを１つ描画する( 表示レーン種別 lane, RectangleF 転送元矩形, float 上位置, float 大きさ0to1 )
         {
             float X倍率 = 1f;

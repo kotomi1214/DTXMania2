@@ -223,15 +223,25 @@ namespace DTXMania.ステージ.結果
         private bool _初めての進行描画 = true;
 
         private 成績 _結果 = null;
+
         private 舞台画像 _背景 = null;
+
         private 画像 _曲名パネル = null;
+
         private 文字列画像 _曲名画像 = null;
+
         private 文字列画像 _サブタイトル画像 = null;
+
         private 演奏パラメータ結果 _演奏パラメータ結果 = null;
+
         private ランク _ランク = null;
+
         private SolidColorBrush _黒マスクブラシ = null;
+
         private SolidColorBrush _プレビュー枠ブラシ = null;
+
         private readonly Vector3 _プレビュー画像表示位置dpx = new Vector3( 668f, 194f, 0f );
+
         private readonly Vector3 _プレビュー画像表示サイズdpx = new Vector3( 574f, 574f, 0f );
 
 

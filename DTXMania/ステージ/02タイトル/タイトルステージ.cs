@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SharpDX;
-using SharpDX.Animation;
-using SharpDX.DirectInput;
 using SharpDX.Direct2D1;
-using SharpDX.Direct2D1.Effects;
 using FDK;
 using DTXMania.アイキャッチ;
 
@@ -21,7 +18,9 @@ namespace DTXMania.ステージ.タイトル
             確定,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
+
 
         public タイトルステージ()
         {
@@ -88,15 +87,21 @@ namespace DTXMania.ステージ.タイトル
 
                         if( App.入力管理.確定キーが入力された() )
                         {
-                            Log.Info( $"確定キーが入力されました。フェードアウトを開始します。" );
+                            #region " 確定 "
+                            //----------------
                             App.システムサウンド.再生する( 設定.システムサウンド種別.タイトルステージ_確定音 );
                             App.ステージ管理.アイキャッチを選択しクローズする( nameof( シャッター ) );
                             this.現在のフェーズ = フェーズ.フェードアウト;
+                            //----------------
+                            #endregion
                         }
                         else if( App.入力管理.キャンセルキーが入力された() )
                         {
-                            Log.Info( $"キャンセルキーが入力されました。" );
+                            #region " キャンセル "
+                            //----------------
                             this.現在のフェーズ = フェーズ.キャンセル;
+                            //----------------
+                            #endregion
                         }
                     }
                     //----------------
@@ -126,7 +131,6 @@ namespace DTXMania.ステージ.タイトル
                         if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.クローズ完了 )
                         {
                             this.現在のフェーズ = フェーズ.確定;
-                            Log.Info( $"フェードアウトが完了しました。" );
                         }
                     }
                     //----------------
@@ -141,9 +145,13 @@ namespace DTXMania.ステージ.タイトル
 
 
         private 舞台画像 _舞台画像 = null;
+
         private 画像 _タイトルロゴ = null;
+
         private Brush _帯ブラシ = null;
+
         private 文字列画像 _パッドを叩いてください = null;
+
 
         private void _帯メッセージを描画する( DeviceContext1 dc )
         {

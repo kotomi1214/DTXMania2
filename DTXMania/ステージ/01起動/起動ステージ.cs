@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
@@ -25,6 +24,7 @@ namespace DTXMania.ステージ.起動
             確定,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
@@ -181,8 +181,11 @@ namespace DTXMania.ステージ.起動
 
 
         private 画像フォント _コンソールフォント = null;
+
         private List<string> _コンソール表示内容 = null;
+
         private Task _構築タスク = null;
+
         private long _ファイル検出数 = 0;
     }
 }
