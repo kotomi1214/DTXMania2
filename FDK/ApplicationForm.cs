@@ -41,6 +41,7 @@ namespace FDK
                         this.FormBorderStyle = FormBorderStyle.None;
                         this.WindowState = FormWindowState.Maximized;
 
+                        Cursor.Hide();
                         this.IsFullscreen = true;
                     }
                     else
