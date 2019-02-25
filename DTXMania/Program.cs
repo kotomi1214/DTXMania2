@@ -14,6 +14,7 @@ namespace DTXMania
     static class Program
     {
         public static App App { get; private set; }
+
         public const int ログファイルの最大保存日数 = 30;
         public static string ログファイル名 = "";
 

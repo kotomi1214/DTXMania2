@@ -217,6 +217,9 @@ namespace FDK
         /// </summary>
         private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
 
+        /// <summary>
+        ///     ユーザによるフォームのリサイズ終了イベント。
+        /// </summary>
         private void _UserResize( object sender, EventArgs e )
         {
             this.FormWindowState = this.WindowState;

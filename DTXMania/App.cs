@@ -7,11 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceModel;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
-using SharpDX.Windows;
 using FDK;
 using SSTFormat.v4;
 using DTXMania.ステージ;
@@ -80,9 +77,7 @@ namespace DTXMania
         /// </summary>
         public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
 
-
         public static bool ウィンドウがアクティブである { get; set; } = false;    // DirectInput 用。
-
         public static bool ウィンドウがアクティブではない
         {
             get => !( App.ウィンドウがアクティブである );
@@ -194,6 +189,7 @@ namespace DTXMania
                 #endregion
 
                 App.入力管理 = new 入力管理( this.Handle ) {
+                    // 外部アクション接続
                     キーバインディングを取得する = () => App.システム設定.キーバインディング,
                     キーバインディングを保存する = () => App.システム設定.保存する(),
                 };
@@ -202,7 +198,7 @@ namespace DTXMania
                 App.ステージ管理 = new ステージ管理();
 
                 App.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
-                App.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）
+                App.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
 
                 App.サウンドタイマ = new SoundTimer( App.サウンドデバイス );
 
@@ -216,6 +212,7 @@ namespace DTXMania
                 App.曲ツリー = new 曲ツリー();
 
                 App.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
+                    // 外部アクション接続
                     ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App.サウンドデバイス, path, App.ユーザ管理.ログオン中のユーザ.再生速度 ),
                 };
 
@@ -513,7 +510,6 @@ namespace DTXMania
                     #endregion
                     break;
             }
-
         }
 
 
