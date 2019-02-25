@@ -189,6 +189,7 @@
     <Compile Include="カウンタ\QPCTimer.cs" />
     <Compile Include="カウンタ\TimeGetTime.cs" />
     <Compile Include="カウンタ\アニメーション管理.cs" />
+    <Compile Include="カウンタ\キーリピート.cs" />
     <Compile Include="カウンタ\定間隔進行.cs" />
     <Compile Include="カウンタ\経過時間測定.cs" />
     <Compile Include="シリアライズ\XML\SerializableDictionary.cs" />
