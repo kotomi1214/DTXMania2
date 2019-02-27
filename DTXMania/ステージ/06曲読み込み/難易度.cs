@@ -27,6 +27,7 @@ namespace DTXMania.ステージ.曲読み込み
                 this._見出し用TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "Century Gothic", 50f );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -106,7 +107,9 @@ namespace DTXMania.ステージ.曲読み込み
 
 
         private 画像フォント _数字画像 = null;
+
         //private string _難易度文字列 = "5.00";
+
         private TextFormat _見出し用TextFormat = null;
     }
 }

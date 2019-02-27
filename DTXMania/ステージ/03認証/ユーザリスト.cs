@@ -19,11 +19,7 @@ namespace DTXMania.ステージ.認証
         ///		現在選択中のユーザ。
         ///		0 ～ <see cref="App.ユーザ管理.ユーザリスト.Count"/>-1。
         /// </summary>
-        public int 選択中のユーザ
-        {
-            get;
-            protected set;
-        } = 0;
+        public int 選択中のユーザ { get; protected set; } = 0;
 
 
         public ユーザリスト()
@@ -71,6 +67,7 @@ namespace DTXMania.ステージ.認証
                 this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -143,10 +140,15 @@ namespace DTXMania.ステージ.認証
             }
         }
 
+
         private Dictionary<PlayMode, 画像> _ユーザパネル = null;
+
         private Dictionary<PlayMode, 画像> _ユーザパネル光彩付き = null;
+
         private Dictionary<PlayMode, 画像> _ユーザ肩書きパネル = null;
+
         private LoopCounter _光彩アニメカウンタ = null;
+
         private 文字列画像 _ユーザ名 = null;
     }
 }

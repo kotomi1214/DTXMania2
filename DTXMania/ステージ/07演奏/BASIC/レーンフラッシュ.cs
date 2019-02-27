@@ -49,6 +49,7 @@ namespace DTXMania.ステージ.演奏.BASIC
                 }
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -88,8 +89,8 @@ namespace DTXMania.ステージ.演奏.BASIC
         private Dictionary<表示レーン種別, レーンContext> _レーンtoレーンContext = null;
 
         private テクスチャ _レーンフラッシュ画像 = null;
-        private Dictionary<string, RectangleF> _レーンフラッシュの矩形リスト = null;
 
+        private Dictionary<string, RectangleF> _レーンフラッシュの矩形リスト = null;
 
         private class YAMLマップ
         {

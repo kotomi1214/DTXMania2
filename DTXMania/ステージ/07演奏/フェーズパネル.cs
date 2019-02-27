@@ -52,6 +52,7 @@ namespace DTXMania.ステージ.演奏
                 this._初めての進行描画 = true;
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -88,12 +89,16 @@ namespace DTXMania.ステージ.演奏
                 転送元矩形: 右三角矩形 );
         }
 
-        private bool _初めての進行描画 = true;
-        private float _現在位置 = 0.0f;
-        private テクスチャ _演奏位置カーソル画像 = null;
-        private Dictionary<string, RectangleF> _演奏位置カーソルの矩形リスト = null;
-        private LoopCounter _左右三角アニメ用カウンタ = null;
 
+        private bool _初めての進行描画 = true;
+
+        private float _現在位置 = 0.0f;
+
+        private テクスチャ _演奏位置カーソル画像 = null;
+
+        private Dictionary<string, RectangleF> _演奏位置カーソルの矩形リスト = null;
+
+        private LoopCounter _左右三角アニメ用カウンタ = null;
 
         private class YAMLマップ
         {

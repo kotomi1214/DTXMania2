@@ -33,6 +33,7 @@ namespace DTXMania.ステージ.演奏
             this.ヒット済みである = false;
             this.発声済みである = false;
         }
+
         public void ヒット済みの状態にする()
         {
             this.可視 = false;
@@ -45,6 +46,7 @@ namespace DTXMania.ステージ.演奏
         {
             return (チップの演奏状態) this.MemberwiseClone();
         }
+
         object ICloneable.Clone()
         {
             return this.Clone();

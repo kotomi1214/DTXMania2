@@ -58,9 +58,6 @@ namespace FDK
             this._スワップチェーンを解放する();
             this._スワップチェーンに依存しないグラフィックリソースを解放する();
 
-            this.UIFramework.Dispose();
-            this.UIFramework = null;
-
             SharpDX.MediaFoundation.MediaManager.Shutdown();
         }
 
@@ -91,6 +88,8 @@ namespace FDK
         public FDK.アニメーション管理 Animation { get; private set; } = null;
 
         public SharpDX.Direct3D11.Device D3DDevice { get; protected set; }
+
+        public SharpDX.DXGI.Output DXGIOutput { get; protected set; }
         //----------------
         #endregion
 
@@ -107,8 +106,6 @@ namespace FDK
         public SharpDX.Direct3D11.DepthStencilState D3DDepthStencilState { get; private set; } = null;
 
         public SharpDX.Mathematics.Interop.RawViewportF[] D3DViewPort { get; } = new SharpDX.Mathematics.Interop.RawViewportF[ 1 ];
-
-        public FDK.UI.Framework UIFramework { get; private set; } = null;
         //----------------
         #endregion
 
@@ -391,6 +388,12 @@ namespace FDK
 
                 // DXGIデバイスマネージャに D3Dデバイスを登録する。MediaFoundationで必須。
                 this.DXGIDeviceManager.ResetDevice( this.D3DDevice );
+
+                // 既定のDXGI出力を取得する。
+                using( var dxgiAdapter = dxgiDevice.Adapter )
+                {
+                    this.DXGIOutput = dxgiAdapter.Outputs[ 0 ];
+                }
             }
 
             テクスチャ.全インスタンスで共有するリソースを作成する();
@@ -403,6 +406,9 @@ namespace FDK
             this.Animation = null;
 
             テクスチャ.全インスタンスで共有するリソースを解放する();
+
+            this.DXGIOutput?.Dispose();
+            this.DXGIOutput = null;
 
             this.DCompTarget.Root = null;
 
@@ -584,17 +590,9 @@ namespace FDK
                 //----------------
                 #endregion
             }
-
-            if( null == this.UIFramework )
-                this.UIFramework = new UI.Framework();
-            this.UIFramework.活性化する();
-            this.UIFramework.Root.可視 = false;
         }
         private void _スワップチェーンに依存するグラフィックリソースを解放する()
         {
-            this.UIFramework?.非活性化する();
-            //this._UIFramework = null; --> Activityツリーは破棄しない。
-
             if( null != this.D3DDevice )
             {
                 this.D3DDevice.ImmediateContext.ClearState();

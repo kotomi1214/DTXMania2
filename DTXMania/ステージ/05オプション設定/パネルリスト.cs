@@ -151,9 +151,11 @@ namespace DTXMania.ステージ.オプション設定
 
 
         private パネル_フォルダ _ルートパネルフォルダ = null;
+
         private パネル_フォルダ _現在のパネルフォルダ = null;
 
         private 青い線 _青い線 = null;
+
         private パッド矢印 _パッド矢印 = null;
     }
 }

@@ -38,6 +38,7 @@ namespace DTXMania.ステージ.演奏
                 }
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -134,10 +135,15 @@ namespace DTXMania.ステージ.演奏
 
 
         protected const float _dr = 78f;       // 割合(%)までのXオフセット[dpx]
+
         protected const float _dp = 131f;      // "%" 文字までのXオフセット[dpx]
+
         protected const float _改行幅dpx = 40f;
+
         protected 画像フォント _パラメータ文字 = null;
+
         protected 画像 _判定種別文字 = null;
+
         protected Dictionary<string, RectangleF> _判定種別文字の矩形リスト = null;
 
 
@@ -152,7 +158,6 @@ namespace DTXMania.ステージ.演奏
             this._パラメータ文字.不透明度 = 不透明度;
             this._パラメータ文字.描画する( dc, x, y, 判定数文字列 );
         }
-
 
         private class YAMLマップ
         {

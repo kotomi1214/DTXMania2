@@ -130,7 +130,7 @@ namespace FDK
                                 離された = true,
                             } );
 
-                        this._現在のキーの押下状態[ (int) k.Key ] = true;
+                        this._現在のキーの押下状態[ (int) k.Key ] = false;
                         //-----------------
                         #endregion
                     }

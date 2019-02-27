@@ -108,10 +108,19 @@ namespace DTXMania.ステージ.演奏
 
             // (3) スコアを加算する。
             {
-                double 基礎点 = 1000000.0 / ( 1275.0 + 50.0 * ( this.総ノーツ数 - 50 ) );
-                int コンボ数 = Math.Min( this.Combo, 50 );
+                if( this.総ノーツ数 == this._判定toヒット数[ 判定種別.PERFECT ] )
+                {
+                    // Excellent（最後のチップまですべてPERFECT）の場合、スコアは100万点ジャストに調整する。
+                    this.Score = 100 * 10000;
+                }
+                else
+                {
+                    // それ以外は通常の加点。
+                    double 基礎点 = 1000000.0 / ( 1275.0 + 50.0 * ( this.総ノーツ数 - 50 ) );
+                    int コンボ数 = Math.Min( this.Combo, 50 );
 
-                this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ judge ] );
+                    this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ judge ] );
+                }
             }
 
             // (4) 達成率を更新する。
@@ -175,8 +184,11 @@ namespace DTXMania.ステージ.演奏
 
 
         private Dictionary<判定種別, int> _判定toヒット数 = null;
+
         private Dictionary<判定種別, int> _判定toヒット数Auto含まない = null;
+
         private Dictionary<判定種別, int> _最後にスコアを更新したときの判定toヒット数 = null;
+
         private readonly Dictionary<判定種別, double> _判定値表 = new Dictionary<判定種別, double>() {
             { 判定種別.PERFECT, 1.0 },
             { 判定種別.GREAT,   0.5 },
@@ -184,7 +196,9 @@ namespace DTXMania.ステージ.演奏
             { 判定種別.OK,      0.0 },
             { 判定種別.MISS,    0.0 },
         };
+
         private double _オプション補正 = 1.0;
+
         private double _譜面レベル = 5.0;
 
 

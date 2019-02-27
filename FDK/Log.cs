@@ -23,11 +23,7 @@ namespace FDK
             {
                 // (1) Log用に名前を設定
                 var ID = Log.GetCurrentThreadId();
-
-                if( Log._IDto名前.ContainsKey( ID ) )
-                    Log._IDto名前.Remove( ID );
-
-                Log._IDto名前.Add( ID, 名前 );
+                Log._IDto名前[ ID ] = 名前;
 
                 // (2) デバッグ用に名前を設定
                 System.Threading.Thread.CurrentThread.Name = 名前;
@@ -39,6 +35,7 @@ namespace FDK
             lock( Log._スレッド間同期 )
             {
                 Log._一定時間が経過していたら区切り線を表示する();
+
                 Trace.WriteLine( $"{tagINFO} {Log._日時とスレッドID} {Log._インデックスを返す( Log._深さ )}{出力}" );
             }
         }
@@ -48,6 +45,7 @@ namespace FDK
             lock( Log._スレッド間同期 )
             {
                 Log._一定時間が経過していたら区切り線を表示する();
+
                 Trace.WriteLine( $"{tagWARNING} {Log._日時とスレッドID} {出力}" );
             }
         }
@@ -57,6 +55,7 @@ namespace FDK
             lock( Log._スレッド間同期 )
             {
                 Log._一定時間が経過していたら区切り線を表示する();
+
                 Trace.WriteLine( $"{tagERROR} {Log._日時とスレッドID} {出力}" );
             }
         }
@@ -74,6 +73,7 @@ namespace FDK
             lock( Log._スレッド間同期 )
             {
                 Log._一定時間が経過していたら区切り線を表示する();
+
                 Log.Info( "" );
                 Log.Info( $"======== {ヘッダ出力} ========" );
             }

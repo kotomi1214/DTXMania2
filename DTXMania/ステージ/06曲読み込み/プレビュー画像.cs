@@ -24,6 +24,7 @@ namespace DTXMania.ステージ.曲読み込み
             {
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -56,6 +57,7 @@ namespace DTXMania.ステージ.曲読み込み
 
 
         private readonly Vector3 _プレビュー画像表示位置dpx = new Vector3( 150f, 117f, 0f );
+
         private readonly Vector3 _プレビュー画像表示サイズdpx = new Vector3( 576f, 576f, 0f );
     }
 }

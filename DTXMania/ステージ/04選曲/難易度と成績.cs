@@ -32,6 +32,7 @@ namespace DTXMania.ステージ.選曲
                 this._見出し用TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "Century Gothic", 16f );
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -129,13 +130,15 @@ namespace DTXMania.ステージ.選曲
 
 
         private 画像フォント _数字画像 = null;
+
         private Node _現在表示しているノード = null;
+
         private TextFormat _見出し用TextFormat = null;
+
 
         private void _難易度パネルを１つ描画する( DeviceContext1 dc, Matrix3x2 trans, float 基点X, float 基点Y, string 難易度ラベル, float 難易度値, Brush 文字ブラシ, Brush 見出し背景ブラシ, Brush 数値背景ブラシ )
         {
             dc.Transform = trans;
-
 
             dc.FillRectangle( new RectangleF( 基点X, 基点Y, 157f, 20f ), 見出し背景ブラシ );
             dc.FillRectangle( new RectangleF( 基点X, 基点Y + 20f, 157f, 66f ), 数値背景ブラシ );

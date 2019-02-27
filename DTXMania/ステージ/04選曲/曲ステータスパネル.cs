@@ -27,6 +27,7 @@ namespace DTXMania.ステージ.選曲
             {
                 var dc = グラフィックデバイス.Instance.D2DDeviceContext;
 
+                // 色ブラシを作成。
                 this._色 = new Dictionary<表示レーン種別, SolidColorBrush>() {
                     { 表示レーン種別.LeftCymbal,   new SolidColorBrush( dc, new Color4( 0xff7b1fff ) ) },
                     { 表示レーン種別.HiHat,        new SolidColorBrush( dc, new Color4( 0xffffc06a ) ) },
@@ -40,10 +41,12 @@ namespace DTXMania.ステージ.選曲
                 };
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                // 色ブラシを解放。
                 foreach( var kvp in this._色 )
                     kvp.Value.Dispose();
             }
@@ -52,8 +55,7 @@ namespace DTXMania.ステージ.選曲
         public void 描画する( DeviceContext1 dc )
         {
             var 領域dpx = new RectangleF( 320f, 532f, 239f, 505f );
-
-
+            
             if( App.曲ツリー.フォーカス曲ノード != this._現在表示しているノード )
             {
                 #region " フォーカスノードが変更されたので情報を更新する。"
@@ -89,16 +91,15 @@ namespace DTXMania.ステージ.選曲
                 #endregion
             }
 
-
             this._背景画像.描画する( 領域dpx.X, 領域dpx.Y );
 
 
-            bool 表示可能ノードである = ( this._現在表示しているノード is MusicNode );
+            bool 表示可能ノードである = ( this._現在表示しているノード is MusicNode );   // 現状、曲ステータスを表示できるノードは MusicNode のみ。
 
             if( 表示可能ノードである )
             {
-                #region " Total Notes を表示する。"
-                //----------------
+                // Total Notes を表示する。
+
                 if( null != this._ノーツ数 )
                 {
                     グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
@@ -129,8 +130,6 @@ namespace DTXMania.ステージ.選曲
 
                     } );
                 }
-                //----------------
-                #endregion
             }
         }
 

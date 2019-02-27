@@ -171,6 +171,7 @@ namespace DTXMania.ステージ
         };
 
         private readonly int _多重度 = 4;
+
         private Dictionary<(チップ種別 chipType, int サブチップID), ドラムサウンド情報> _チップtoコンテキスト = null;
 
         private readonly object _Sound利用権 = new object();

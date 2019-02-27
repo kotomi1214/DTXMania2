@@ -6,6 +6,7 @@ using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
+using FDK.カウンタ;
 using SSTFormat.v4;
 using DTXMania.アイキャッチ;
 using DTXMania.曲;
@@ -23,6 +24,7 @@ namespace DTXMania.ステージ.選曲
             確定_設定,
             キャンセル,
         }
+
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
@@ -198,7 +200,8 @@ namespace DTXMania.ステージ.選曲
                             App.曲ツリー.フォーカスノード?.プレビュー音声を停止する();
                             App.システムサウンド.再生する( 設定.システムサウンド種別.取消音 );
 
-                            if( App.曲ツリー.フォーカスノード.親ノード != App.曲ツリー.ルートノード )
+                            if( App.曲ツリー.フォーカスノード != null &&
+                                App.曲ツリー.フォーカスノード.親ノード != App.曲ツリー.ルートノード )
                             {
                                 this._曲リスト.BOXから出る();
                             }
@@ -210,7 +213,8 @@ namespace DTXMania.ステージ.選曲
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.上移動キーが入力された() )
+                    else if( キーリピート.処理を反復実行する( SharpDX.DirectInput.Key.Up, App.入力管理.上移動キーが押されている() ) ||
+                        App.入力管理.上移動キーが入力された() )
                     {
                         #region " 上移動 "
                         //----------------
@@ -225,7 +229,8 @@ namespace DTXMania.ステージ.選曲
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.下移動キーが入力された() )
+                    else if( キーリピート.処理を反復実行する( SharpDX.DirectInput.Key.Down, App.入力管理.下移動キーが押されている() ) ||
+                        App.入力管理.下移動キーが入力された() )
                     {
                         #region " 下移動 "
                         //----------------
@@ -240,7 +245,8 @@ namespace DTXMania.ステージ.選曲
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.左移動キーが入力された() )
+                    else if( キーリピート.処理を反復実行する( SharpDX.DirectInput.Key.Left, App.入力管理.左移動キーが押されている() ) ||
+                        App.入力管理.左移動キーが入力された() )
                     {
                         #region " 左移動 "
                         //----------------
@@ -249,7 +255,8 @@ namespace DTXMania.ステージ.選曲
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.右移動キーが入力された() )
+                    else if( キーリピート.処理を反復実行する( SharpDX.DirectInput.Key.Right, App.入力管理.右移動キーが押されている() ) ||
+                        App.入力管理.右移動キーが入力された() )
                     {
                         #region " 右移動 "
                         //----------------

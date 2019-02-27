@@ -273,6 +273,7 @@ namespace DTXMania.曲
             this.ルートノード.子ノードリスト.Clear();
         }
 
+
         // 難易度
 
         public void 難易度アンカをひとつ増やす()
@@ -344,6 +345,7 @@ namespace DTXMania.曲
             return 最も近いレベル;
         }
 
+        
         // フォーカス
 
         /// <summary>

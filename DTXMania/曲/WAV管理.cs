@@ -107,7 +107,7 @@ namespace DTXMania.曲
 
             if( 発声前に消音する && muteGroupType != 消音グループ種別.Unknown )
             {
-                // 発生時に指定された消音グループ種別に属するWAVサウンドをすべて停止する。
+                // 発声時に指定された消音グループ種別に属するWAVサウンドをすべて停止する。
                 var 停止するWavContexts = this._WAV情報リスト.Where( ( kvp ) => ( kvp.Value.最後に発声したときの消音グループ種別 == muteGroupType ) );
 
                 foreach( var kvp in 停止するWavContexts )

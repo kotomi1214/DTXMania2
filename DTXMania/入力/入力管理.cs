@@ -284,6 +284,11 @@ namespace DTXMania.入力
                     ドラム入力種別.Tom1,
                     ドラム入力種別.Tom1_Rim } );
         }
+        public bool 上移動キーが押されている()
+        {
+            return
+                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Up );
+        }
 
         /// <summary>
         ///		現在の<see cref="ポーリング結果"/>に、下移動キーとみなせるドラム入力イベントが含まれているかを確認する。
@@ -296,6 +301,11 @@ namespace DTXMania.入力
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom2,
                     ドラム入力種別.Tom2_Rim } );
+        }
+        public bool 下移動キーが押されている()
+        {
+            return
+                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Down );
         }
 
         /// <summary>
@@ -311,6 +321,11 @@ namespace DTXMania.入力
                     ドラム入力種別.Snare_ClosedRim,
                     ドラム入力種別.Snare_OpenRim } );
         }
+        public bool 左移動キーが押されている()
+        {
+            return
+                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Left );
+        }
 
         /// <summary>
         ///		現在の<see cref="ポーリング結果"/>に、右移動キーとみなせるドラム入力イベントが含まれているかを確認する。
@@ -323,6 +338,11 @@ namespace DTXMania.入力
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom3,
                     ドラム入力種別.Tom3_Rim } );
+        }
+        public bool 右移動キーが押されている()
+        {
+            return
+                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Right );
         }
 
         /// <summary>
@@ -485,6 +505,7 @@ namespace DTXMania.入力
         private IntPtr _hWindow;
 
         private bool _入力履歴を記録中である = true;
+
         private bool _入力履歴の記録を中断している
         {
             get

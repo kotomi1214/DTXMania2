@@ -16,11 +16,13 @@ namespace DTXMania.ステージ.オプション設定
             get => !( this.OFFである );
             set => this.OFFである = !value;
         }
+
         public bool OFFである
         {
             get => ( 0 == this.現在選択されている選択肢の番号 );
             set => this.現在選択されている選択肢の番号 = ( value ) ? 0 : 1;
         }
+
 
         public パネル_ONOFFトグル( string パネル名, bool 初期状態はON, Action<パネル> 値の変更処理 = null )
             : base( パネル名, new[] { "OFF", "ON" }, ( 初期状態はON ) ? 1 : 0, 値の変更処理 )

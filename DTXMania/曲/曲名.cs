@@ -53,6 +53,7 @@ namespace DTXMania.曲
             this._subtitleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, this._subtitleFontColor );
             this._backBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, this._backColor );
         }
+
         protected override void On非活性化()
         {
             this._backBrush?.Dispose();
@@ -142,18 +143,31 @@ namespace DTXMania.曲
 
 
         private string _前回のタイトル = null;
+
         private string _前回のサブタイトル = null;
+
         private TextFormat _textFormat = null;
+
         private string _fontName;
+
         private Color4 _titleFontColor;
+
         private Color4 _subtitleFontColor;
+
         private Color4 _backColor;
+
         private FontWeight _fontWeight;
+
         private FontStyle _fontStyle;
+
         private float _fontSizePt;
+
         private TextAlignment _textAlignment;
+
         private Brush _titleFontBrush = null;
+
         private Brush _subtitleFontBrush = null;
+
         private Brush _backBrush = null;
    }
 }

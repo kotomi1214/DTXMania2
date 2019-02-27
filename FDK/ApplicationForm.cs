@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 
@@ -39,9 +41,7 @@ namespace FDK
                         this.FormBorderStyle = FormBorderStyle.None;
                         this.WindowState = FormWindowState.Maximized;
 
-                        if( !( グラフィックデバイス.Instance.UIFramework.Root.可視 ) )
-                            Cursor.Hide();
-
+                        Cursor.Hide();
                         this.IsFullscreen = true;
                     }
                     else
@@ -87,11 +87,6 @@ namespace FDK
 			PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
 
             this.UserResized += this._UserResize;
-            this.Click += this._Click;
-            this.MouseDown += this._MouseDown;
-            this.MouseUp += this._MouseUp;
-            this.MouseMove += this._MouseMove;
-            this.KeyDown += this._KeyDown;
 
             this._初期化完了 = true;
         }
@@ -114,30 +109,64 @@ namespace FDK
         }
 
         /// <summary>
+        ///     描画処理。
+        /// </summary>
+        public virtual void 描画する()
+        {
+            //
+            // 以下はサンプル。派生クラスで適宜オーバーライドすること。
+            //
+
+            var gd = グラフィックデバイス.Instance;
+
+            // アニメーションを進行する。
+            gd.Animation.進行する();
+
+            // 全面を黒で塗りつぶすだけのサンプル。
+            gd.D2DDeviceContext.BeginDraw();
+            gd.D2DDeviceContext.Clear( Color4.Black );
+            gd.D2DDeviceContext.EndDraw();
+        }
+
+        /// <summary>
+        ///     進行処理。（描画以外の処理。）
+        /// </summary>
+        public virtual void 進行する()
+        {
+            //
+            // 描画以外の反復処理があれば、これをオーバーライドすること。
+            //
+        }
+
+
+        /// <summary>
         ///		メインループ。
-        ///		派生クラスでオーバーライドすること。
         /// </summary>
         public virtual void Run()
         {
             SharpDX.Windows.RenderLoop.Run( this, () => {
 
-                var gd = グラフィックデバイス.Instance;
-
+                // 最小化されてたら何もしない。
                 if( this.FormWindowState == FormWindowState.Minimized )
                     return;
 
-                // アニメーションを進行する。
-                gd.Animation.進行する();
+                if( Interlocked.Read( ref this._PresentNow ) == 0 )
+                {
+                    this.描画する();
 
-                // 現在のUIツリーを描画する。
-                gd.UIFramework.描画する( gd.D2DDeviceContext );
+                    // SwapChain を表示するタスクを起動。
+                    Interlocked.Increment( ref this._PresentNow );        // 1: 表示開始
+                    Task.Run( () => {
+                        グラフィックデバイス.Instance.DXGIOutput.WaitForVerticalBlank();
+                        グラフィックデバイス.Instance.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                        Interlocked.Decrement( ref this._PresentNow );    // 0: 表示完了
+                    } );
 
-                // 全面を黒で塗りつぶすだけのサンプル。
-                gd.D2DDeviceContext.BeginDraw();
-                gd.D2DDeviceContext.Clear( Color4.Black );
-                gd.D2DDeviceContext.EndDraw();
-
-                gd.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                }
+                else
+                {
+                    this.進行する();
+                }
 
             } );
         }
@@ -165,6 +194,32 @@ namespace FDK
 
         protected FormWindowState FormWindowState = FormWindowState.Normal;
 
+        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
+        {
+            // スワップチェーンの作成直後に呼び出される。
+            // 派生クラスで実装すること。
+        }
+        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
+        {
+            // スワップチェーンの破棄直前に呼び出される。
+            // 派生クラスで実装すること。
+        }
+
+        /// <summary>
+        ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
+        /// </summary>
+        private long _PresentNow = 0;
+
+        /// <summary>
+        ///		ウィンドウを全画面モードにする直前に取得し、
+        ///		再びウィンドウモードに戻して状態を復元する時に参照する。
+        ///		（<see cref="全画面モード"/> を参照。）
+        /// </summary>
+        private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
+
+        /// <summary>
+        ///     ユーザによるフォームのリサイズ終了イベント。
+        /// </summary>
         private void _UserResize( object sender, EventArgs e )
         {
             this.FormWindowState = this.WindowState;
@@ -192,63 +247,5 @@ namespace FDK
                 this.スワップチェーンに依存するグラフィックリソースを作成する();
             }
         }
-        private void _MouseDown( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseDown( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _Click( object sender, EventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.Click( sender, new FDK.UI.UIEventArgs( gd.D2DDeviceContext, マウス位置dpx ) );
-        }
-        private void _MouseUp( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseUp( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _MouseMove( object sender, MouseEventArgs e )
-        {
-            var gd = グラフィックデバイス.Instance;
-
-            var マウス位置px = this.PointToClient( Cursor.Position );
-            var マウス位置dpx = new Vector2( マウス位置px.X * gd.拡大率PXtoDPX横, マウス位置px.Y * gd.拡大率PXtoDPX縦 );
-
-            gd.UIFramework.MouseMove( sender, new FDK.UI.UIMouseEventArgs( gd.D2DDeviceContext, マウス位置dpx, e ) );
-        }
-        private void _KeyDown( object sender, KeyEventArgs e )
-        {
-            グラフィックデバイス.Instance.UIFramework.KeyDown( sender, e );
-        }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
-        {
-            // スワップチェーンの作成直後に呼び出される。
-            // 派生クラスで実装すること。
-        }
-        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
-        {
-            // スワップチェーンの破棄直前に呼び出される。
-            // 派生クラスで実装すること。
-        }
-
-        /// <summary>
-        ///		ウィンドウを全画面モードにする直前に取得し、
-        ///		再びウィンドウモードに戻して状態を復元する時に参照する。
-        ///		（<see cref="全画面モード"/> を参照。）
-        /// </summary>
-        private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
     }
 }

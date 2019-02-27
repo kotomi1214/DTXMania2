@@ -40,11 +40,7 @@ namespace FDK
 
         public static void フォルダ変数を追加または更新する( string 変数名, string 置換するパス文字列 )
         {
-            if( Folder._フォルダ変数toパス.ContainsKey( 変数名 ) )
-            {
-                Folder._フォルダ変数toパス.Remove( 変数名 );
-            }
-            Folder._フォルダ変数toパス.Add( 変数名, 置換するパス文字列 );
+            Folder._フォルダ変数toパス[ 変数名 ] = 置換するパス文字列;
         }
 
         public static void フォルダ変数を削除する( string 変数名 )
@@ -77,9 +73,9 @@ namespace FDK
             }
         }
 
-        public static string 絶対パスに含まれるフォルダ変数を展開して返す( string path )
+        public static string 絶対パスに含まれるフォルダ変数を展開して返す( string 絶対パス )
         {
-            if( null == path )
+            if( null == 絶対パス )
                 return null;
 
             foreach( var kvp in Folder._フォルダ変数toパス )
@@ -87,15 +83,15 @@ namespace FDK
                 if( kvp.Value.Nullまたは空である() )
                     continue;
 
-                path = path.Replace( "$(" + kvp.Key + ")", kvp.Value );
+                絶対パス = 絶対パス.Replace( "$(" + kvp.Key + ")", kvp.Value );
             }
 
-            return path;
+            return 絶対パス;
         }
 
-        public static string 絶対パスをフォルダ変数付き絶対パスに変換して返す( string path )
+        public static string 絶対パスをフォルダ変数付き絶対パスに変換して返す( string 絶対パス )
         {
-            if( null == path )
+            if( null == 絶対パス )
                 return null;
 
             foreach( var kvp in Folder._フォルダ変数toパス )
@@ -103,10 +99,10 @@ namespace FDK
                 if( kvp.Value.Nullまたは空である() )
                     continue;
 
-                path = path.Replace( kvp.Value, "$(" + kvp.Key + ")" );
+                絶対パス = 絶対パス.Replace( kvp.Value, "$(" + kvp.Key + ")" );
             }
 
-            return path;
+            return 絶対パス;
         }
 
 

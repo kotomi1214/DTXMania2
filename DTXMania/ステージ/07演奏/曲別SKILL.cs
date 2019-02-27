@@ -25,6 +25,7 @@ namespace DTXMania.ステージ.演奏
             {
             }
         }
+
         protected override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -74,6 +75,7 @@ namespace DTXMania.ステージ.演奏
 
 
         private 画像フォント _数字画像 = null;
+
         private 画像 _ロゴ画像 = null;
     }
 }
