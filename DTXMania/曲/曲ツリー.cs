@@ -14,9 +14,6 @@ namespace DTXMania.曲
     /// </summary>
     class 曲ツリー : Activity, IDisposable
     {
-        private string[] _対応する拡張子 = { ".sstf", ".dtx", ".gda", ".g2d", "bms", "bme" };
-
-        
         // プロパティ
 
         /// <summary>
@@ -126,6 +123,7 @@ namespace DTXMania.曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._曲ツリーの構築 = new 曲ツリーの構築();
             }
         }
 
@@ -169,118 +167,9 @@ namespace DTXMania.曲
             }
         }
 
-        /// <remarks>
-        ///		追加されたノードは、ここでは活性化されない。
-        /// </remarks>
-        /// <param name="ファイル検出">ファイルを検出するたびに呼び出されるアクション。引数には、set.def または曲ファイルのパスが格納される。</param>
-        public void 曲を検索して親ノードに追加する( Node 親ノード, VariablePath フォルダパス, Action<VariablePath> ファイル検出 = null )
+        public void 曲の検索を開始する( VariablePath フォルダパス )
         {
-            if( !( Directory.Exists( フォルダパス.変数なしパス ) ) )
-            {
-                Log.WARNING( $"指定されたフォルダが存在しません。無視します。[{フォルダパス.変数付きパス}]" );
-                return;
-            }
-
-            Log.Info( $"曲検索: {フォルダパス.変数付きパス}" );
-
-            var dirInfo = new DirectoryInfo( フォルダパス.変数なしパス );
-
-
-            // (1) 曲ファイルを列挙。
-
-            var setDefPath = Path.Combine( フォルダパス.変数なしパス, @"set.def" );
-
-            if( File.Exists( setDefPath ) )
-            {
-                #region " (A) このフォルダに set.def がある → その内容でSetノード（任意個）を作成する。"
-                //----------------
-                ファイル検出?.Invoke( new VariablePath( setDefPath ) );
-
-                var setDef = SetDef.復元する( setDefPath );
-
-                foreach( var block in setDef.Blocks )
-                {
-                    var setNode = new SetNode( block, フォルダパス, 親ノード );
-
-                    if( 0 < setNode.子ノードリスト.Count ) // L1～L5のいずれかが有効であるときのみ登録する。
-                        親ノード.子ノードリスト.Add( setNode );
-                }
-                //----------------
-                #endregion
-            }
-            else
-            {
-                #region " (B) set.def がない → このフォルダにあるすべての曲ファイルを検索して、曲ノードを作成する。"
-                //----------------
-                var fileInfos = dirInfo.GetFiles( "*.*", SearchOption.TopDirectoryOnly )
-                    .Where( ( fileInfo ) => _対応する拡張子.Any( 拡張子名 => ( Path.GetExtension( fileInfo.Name ).ToLower() == 拡張子名 ) ) );
-
-                foreach( var fileInfo in fileInfos )
-                {
-                    var vpath = new VariablePath( fileInfo.FullName );
-                    ファイル検出?.Invoke( vpath );
-
-                    try
-                    {
-                        var music = new MusicNode( vpath, 親ノード );
-                        親ノード.子ノードリスト.Add( music );
-                    }
-                    catch
-                    {
-                        Log.ERROR( $"MusicNode の生成に失敗しました。[{vpath.変数付きパス}]" );
-                    }
-                }
-                //----------------
-                #endregion
-            }
-
-
-            // (2) このフォルダのすべてのサブフォルダについて...
-
-            foreach( var subDirInfo in dirInfo.GetDirectories() )
-            {
-                var DTXFILES = "dtxfiles.";
-                var boxDefPath = new VariablePath( Path.Combine( subDirInfo.FullName, @"box.def" ) );
-
-                if( subDirInfo.Name.ToLower().StartsWith( DTXFILES ) )
-                {
-                    #region " (A) 'dtxfiles.' で始まるフォルダの場合 → BOXノードとして扱う。"
-                    //----------------
-                    var boxNode = new BoxNode( subDirInfo.Name.Substring( DTXFILES.Length ), 親ノード );
-                    親ノード.子ノードリスト.Add( boxNode );
-
-                    var backNode = new BackNode( boxNode );
-                    boxNode.子ノードリスト.Add( backNode );
-
-                    // BOXノードを親として、サブフォルダへ再帰。
-                    this.曲を検索して親ノードに追加する( boxNode, subDirInfo.FullName, ファイル検出 );
-                    //----------------
-                    #endregion
-                }
-                else if( File.Exists( boxDefPath.変数なしパス ) )
-                {
-                    #region " (B) box.def を含むフォルダの場合 → BOXノードとして扱う。 "
-                    //----------------
-                    var boxNode = new BoxNode( boxDefPath, 親ノード );
-                    親ノード.子ノードリスト.Add( boxNode );
-
-                    var backNode = new BackNode( boxNode );
-                    boxNode.子ノードリスト.Add( backNode );
-
-                    // BOXノードを親として、サブフォルダへ再帰。
-                    this.曲を検索して親ノードに追加する( boxNode, subDirInfo.FullName, ファイル検出 );
-                    //----------------
-                    #endregion
-                }
-                else
-                {
-                    #region " (C) その他のフォルダの場合 → そのままサブフォルダへ再帰。"
-                    //----------------
-                    this.曲を検索して親ノードに追加する( 親ノード, subDirInfo.FullName, ファイル検出 );
-                    //----------------
-                    #endregion
-                }
-            }
+            this._曲ツリーの構築.検索フォルダを追加する( フォルダパス, this.ルートノード );
         }
 
         public void すべてのノードを削除する()
@@ -407,6 +296,8 @@ namespace DTXMania.曲
             this.フォーカスリスト.SelectItem( index );
         }
 
+
+        private 曲ツリーの構築 _曲ツリーの構築 = null;
 
         private void フォーカスリスト_SelectionChanged( object sender, (Node 選択されたItem, Node 選択が解除されたItem) e )
         {
