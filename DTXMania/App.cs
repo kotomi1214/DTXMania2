@@ -329,7 +329,7 @@ namespace DTXMania
             #endregion
 
             // Windows Animation を進行。
-            gd.Animation.進行する();
+            gd.Animation.進行する();    // 必ずメイン(UI)スレッドから呼び出すこと。
 
             // 現在のステージを進行＆描画。
             App.ステージ管理.現在のステージ.進行描画する( gd.D2DDeviceContext );

@@ -222,45 +222,48 @@ namespace DTXMania.曲
                 var 旧フォーカスリスト = this.フォーカスリスト;    // 初回は null 。
                 this.フォーカスリスト = 親ノード.子ノードリスト;   // 常に非 null。（先のAssertで保証されている。）
 
-                if( 旧フォーカスリスト == this.フォーカスリスト )
+                lock( 親ノード.子ノードリスト排他 )
                 {
-                    // (A) フォーカスリストが変わらない場合 → 必要あればフォーカスノードを変更する。
-
-                    if( null != ノード )
+                    if( 旧フォーカスリスト == this.フォーカスリスト )
                     {
-                        // (A-a) ノードの指定がある（非null）なら、それを選択する。
-                        this.フォーカスリスト.SelectItem( ノード );
+                        // (A) フォーカスリストが変わらない場合 → 必要あればフォーカスノードを変更する。
+
+                        if( null != ノード )
+                        {
+                            // (A-a) ノードの指定がある（非null）なら、それを選択する。
+                            this.フォーカスリスト.SelectItem( ノード );
+                        }
+                        else
+                        {
+                            // (A-b) ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
+                        }
                     }
                     else
                     {
-                        // (A-b) ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
-                    }
-                }
-                else
-                {
-                    // (B) フォーカスリストが変更される場合
+                        // (B) フォーカスリストが変更される場合
 
-                    Log.Info( "フォーカスリストが変更されました。" );
+                        Log.Info( "フォーカスリストが変更されました。" );
 
-                    if( this.活性化している )
-                    {
-                        if( null != 旧フォーカスリスト ) // 初回は null 。
+                        if( this.活性化している )
                         {
-                            旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
-                            foreach( var node in 旧フォーカスリスト )
-                                node.非活性化する();
+                            if( null != 旧フォーカスリスト ) // 初回は null 。
+                            {
+                                旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
+                                foreach( var node in 旧フォーカスリスト )
+                                    node.非活性化する();
+                            }
+
+                            foreach( var node in this.フォーカスリスト )
+                                node.活性化する();
+
+                            if( null != ノード )
+                                this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
+
+                            this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
+
+                            // 手動でイベントを発火。
+                            this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
                         }
-
-                        foreach( var node in this.フォーカスリスト )
-                            node.活性化する();
-
-                        if( null != ノード )
-                            this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
-
-                        this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
-
-                        // 手動でイベントを発火。
-                        this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
                     }
                 }
             }
