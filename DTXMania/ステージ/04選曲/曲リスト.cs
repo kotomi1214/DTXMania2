@@ -53,7 +53,7 @@ namespace DTXMania.ステージ.選曲
                     else
                     {
                         // (B) なんらかのノードを選択中なら、それを継続して使用する（フォーカスノードをリセットしない）。
-                        tree.フォーカスノード.プレビュー音声を再生する();
+                        tree.フォーカスノード?.プレビュー音声を再生する();
                     }
                 }
                 //----------------
@@ -457,25 +457,23 @@ namespace DTXMania.ステージ.選曲
             }
             //----------------
             #endregion
+
             #region " サブタイトル文字列 "
             //----------------
             if( ノード == App.曲ツリー.フォーカスノード )  // フォーカスノードのみ表示する。
             {
                 var サブタイトル画像 = (文字列画像) null;
 
-                // ノードが SetNode なら難易度アンカに応じた MusicNode が対象。
-                if( ノード is SetNode setnode )
-                {
-                    ノード = App.曲ツリー.現在の難易度に応じた曲ノードを返す( setnode );
-                }
+                // ノードが SetNode ならユーザ希望難易度に応じた MusicNode が対象。
+                var node = ( ノード is SetNode setnode ) ? App.曲ツリー.フォーカス曲ノード : ノード;
 
                 // サブタイトル画像を取得する。未生成かつ指定があるなら生成する。
-                if( !( this._ノードtoサブタイトル画像.ContainsKey( ノード ) ) )
+                if( !( this._ノードtoサブタイトル画像.ContainsKey( node ) ) )
                 {
-                    if( ノード.サブタイトル.Nullでも空でもない() )
+                    if( node.サブタイトル.Nullでも空でもない() )
                     {
                         サブタイトル画像 = new 文字列画像() {
-                            表示文字列 = ノード.サブタイトル,
+                            表示文字列 = node.サブタイトル,
                             フォント名 = "HGMaruGothicMPRO", // "メイリオ",
                             フォント幅 = FontWeight.Regular,
                             フォントスタイル = FontStyle.Normal,
@@ -487,7 +485,7 @@ namespace DTXMania.ステージ.選曲
                         };
                         サブタイトル画像.活性化する();
 
-                        this._ノードtoサブタイトル画像.Add( ノード, サブタイトル画像 );
+                        this._ノードtoサブタイトル画像.Add( node, サブタイトル画像 );
                     }
                     else
                     {
@@ -497,7 +495,7 @@ namespace DTXMania.ステージ.選曲
                 }
                 else
                 {
-                    サブタイトル画像 = this._ノードtoサブタイトル画像[ ノード ];
+                    サブタイトル画像 = this._ノードtoサブタイトル画像[ node ];
                 }
 
                 // 拡大率を計算して描画する。

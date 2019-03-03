@@ -85,20 +85,35 @@ namespace DTXMania.ステージ.選曲
 
                     if( 表示可能ノードである )
                     {
+                        var 難易度リスト = new (string ラベル, float 値)[ 5 ];
+
+                        if( node is SetNode setNode )
+                        {
+                            for( int i = 0; i < 5; i++ )
+                                難易度リスト[ i ] = (setNode.MusicNodes[ i ]?.難易度ラベル ?? "", setNode.MusicNodes[ i ]?.難易度 ?? 0f);
+                        }
+                        else
+                        {
+                            for( int i = 0; i < 5; i++ )
+                                難易度リスト[ i ] = ("", 0f);
+
+                            難易度リスト[ 3 ] = (node.難易度ラベル, node.難易度);
+                        }
+
                         // ULTIMATE 相当
-                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 13f, node.難易度[ 4 ].label, node.難易度[ 4 ].level, 白ブラシ, ULTIMATE色ブラシ, 黒ブラシ );
+                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 13f, 難易度リスト[ 4 ].ラベル, 難易度リスト[ 4 ].値, 白ブラシ, ULTIMATE色ブラシ, 黒ブラシ );
 
                         // MASTER 相当
-                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 114f, node.難易度[ 3 ].label, node.難易度[ 3 ].level, 白ブラシ, MASTER色ブラシ, 黒ブラシ );
+                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 114f, 難易度リスト[ 3 ].ラベル, 難易度リスト[ 3 ].値, 白ブラシ, MASTER色ブラシ, 黒ブラシ );
 
                         // EXTREME 相当
-                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 215f, node.難易度[ 2 ].label, node.難易度[ 2 ].level, 白ブラシ, EXTREME色ブラシ, 黒ブラシ );
+                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 215f, 難易度リスト[ 2 ].ラベル, 難易度リスト[ 2 ].値, 白ブラシ, EXTREME色ブラシ, 黒ブラシ );
 
                         // ADVANCED 相当
-                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 316f, node.難易度[ 1 ].label, node.難易度[ 1 ].level, 白ブラシ, ADVANCED色ブラシ, 黒ブラシ );
+                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 316f, 難易度リスト[ 1 ].ラベル, 難易度リスト[ 1 ].値, 白ブラシ, ADVANCED色ブラシ, 黒ブラシ );
 
                         // BASIC 相当
-                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 417f, node.難易度[ 0 ].label, node.難易度[ 0 ].level, 白ブラシ, BASIC色ブラシ, 黒ブラシ );
+                        this._難易度パネルを１つ描画する( dc, pretrans, 領域dpx.X + 156f, 領域dpx.Y + 417f, 難易度リスト[ 0 ].ラベル, 難易度リスト[ 0 ].値, 白ブラシ, BASIC色ブラシ, 黒ブラシ );
                     }
                 }
                 //----------------

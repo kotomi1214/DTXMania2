@@ -18,29 +18,33 @@ namespace DTXMania.曲
     /// </remarks>
     abstract partial class Node : FDK.Activity
     {
-        // タイトルとサブタイトル
+        // プロパティ
 
         /// <summary>
         ///		ノードのタイトル。
         ///		曲名、BOX名など。
         /// </summary>
-        public string タイトル { get; set; } = "(no title)";
+        public virtual string タイトル { get; set; } = "(no title)";
 
         /// <summary>
         ///		ノードのサブタイトル。
         ///		制作者名など。
         /// </summary>
-        public string サブタイトル { get; set; } = "";
+        public virtual string サブタイトル { get; set; } = "";
 
-
-        // 難易度とラベル [5]
-   
         /// <summary>
-        ///		難易度ラベルとその値（0.00～9.99）。
-        ///		必要あれば、派生クラスで設定すること。
-        ///		なお、配列は5要素で固定とする（0:BASIC～4:ULTIMATE）
+        ///     難易度ラベル。半角英数字。
         /// </summary>
-        public (string label, float level)[] 難易度 { get; } = new (string, float)[ 5 ];
+        public virtual string 難易度ラベル { get; set; } = "";
+
+        /// <summary>
+        ///     難易度。0.00～9.99。
+        /// </summary>
+        public virtual float 難易度
+        {
+            get => this._難易度;
+            set => this._難易度 = ( 0.00f > value || 9.99f < value ) ? throw new ArgumentOutOfRangeException() : value;
+        }
 
 
         // 曲ツリー関連
@@ -111,6 +115,26 @@ namespace DTXMania.曲
         public static Size2F 全体サイズ => new Size2F( 314f, 220f );
 
         /// <summary>
+        ///		ノードを表す画像の既定画像。
+        /// </summary>
+        /// <remarks>
+        ///		初回アクセス時に生成される。
+        /// </remarks>
+        public static テクスチャ 既定のノード画像
+        {
+            get
+            {
+                if( null == _既定のノード画像 )
+                {
+                    _既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
+                    _既定のノード画像.活性化する();
+                }
+
+                return _既定のノード画像;
+            }
+        }
+
+        /// <summary>
         ///		ノードを表す画像。
         ///		null にすると、既定のノード画像が使用される。
         ///		派生クラスで、適切な画像を割り当てること。
@@ -120,15 +144,6 @@ namespace DTXMania.曲
         ///		詳細は<see cref="SetNode.ノード画像"/>を参照のこと。
         /// </remarks>
         public virtual テクスチャ ノード画像 { get; protected set; } = null;
-
-        /// <summary>
-        ///		ノードを表す画像の既定画像。static。
-        /// </summary>
-        /// <remarks>
-        ///		<see cref="ノード画像"/>が null の再に、代わりに表示される。
-        ///		static であり、全ノードで１つのインスタンスを共有する。
-        /// </remarks>
-        public static テクスチャ 既定のノード画像 { get; protected set; } = null;
 
 
         // プレビュー音声関連
@@ -150,14 +165,6 @@ namespace DTXMania.曲
 
         public Node()
         {
-            this.難易度 = new(string, float)[]{
-                ( "", 0.00f ),
-                ( "", 0.00f ),
-                ( "", 0.00f ),
-                ( "", 0.00f ),
-                ( "", 0.00f ),
-            };
-
             //this.子を追加する( this._ノード画像 );	--> 派生クラスのコンストラクタで追加することができる。
             this.子Activityを追加する( this._曲名テクスチャ = new 曲名() );
             this.子Activityを追加する( this._プレビュー音声 = new PreviewSound() );
@@ -165,24 +172,11 @@ namespace DTXMania.曲
 
         protected override void On活性化()
         {
-            // 全インスタンスで共有する static メンバが未生成なら生成する。
-            if( null == Node.既定のノード画像 )
-            {
-                Node.既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
-                Node.既定のノード画像.活性化する();
-            }
         }
 
         protected override void On非活性化()
         {
             this.プレビュー音声を停止する();
-
-            // 全インスタンスで共有する static メンバが生成な済みなら解放する。
-            if( null != Node.既定のノード画像 )
-            {
-                Node.既定のノード画像.非活性化する();
-                Node.既定のノード画像 = null;
-            }
         }
 
         public virtual void 進行描画する( DeviceContext1 dc, Matrix ワールド変換行列, bool キャプション表示 = true )
@@ -211,5 +205,9 @@ namespace DTXMania.曲
         protected 曲名 _曲名テクスチャ = null;
 
         private PreviewSound _プレビュー音声;  // null なら未使用
+
+        private float _難易度 = 0.0f;
+
+        private static テクスチャ _既定のノード画像 = null;  // めんどくさいので破棄はしない。
     }
 }

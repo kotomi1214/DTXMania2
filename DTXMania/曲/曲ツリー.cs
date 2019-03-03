@@ -16,6 +16,8 @@ namespace DTXMania.曲
     {
         private string[] _対応する拡張子 = { ".sstf", ".dtx", ".gda", ".g2d", "bms", "bme" };
 
+        
+        // プロパティ
 
         /// <summary>
         ///		曲ツリーのルートを表すノード。
@@ -31,17 +33,31 @@ namespace DTXMania.曲
         ///		<see cref="フォーカスリスト"/>の<see cref="SelectableList{T}.SelectedIndex"/>で変更できる。
         ///	</remarks>
         public Node フォーカスノード
-            =>  ( null == this.フォーカスリスト ) ? null :              // フォーカスリストが未設定なら null。
-                ( 0 > this.フォーカスリスト.SelectedIndex ) ? null :    // フォーカスリストが空なら null。
-                this.フォーカスリスト[ this.フォーカスリスト.SelectedIndex ];
+        {
+            get
+            {
+                if( null == this.フォーカスリスト )
+                    return null;    // 未設定。
+
+                if( 0 > this.フォーカスリスト.SelectedIndex )
+                    return null;    // リストが空。
+
+                return this.フォーカスリスト[ this.フォーカスリスト.SelectedIndex ];
+            }
+        }
 
         /// <summary>
-        ///		現在選択されているノードが対応している、現在の難易度アンカに一番近い難易度（0:BASIC～4:ULTIMATE）の MusicNode を返す。
+        ///	    <see cref="フォーカスノード"/> が存在するノードリスト。
+        ///	    変更するには、変更先のリスト内の任意のノードを選択すること。
+        /// </summary>
+        public SelectableList<Node> フォーカスリスト { get; protected set; } = null;
+
+        /// <summary>
+        ///		現在選択されているノードから曲ノードを取得して返す。
         /// </summary>
         /// <remarks>
-        ///		難易度アンカはどのノードを選択しても不変である。
-        ///		<see cref="フォーカスノード"/>が<see cref="SetNode"/>型である場合は、それが保有する難易度（最大５つ）の中で、
-        ///		現在の難易度アンカに一番近い難易度の <see cref="MusicNode"/> が返される。
+        ///		<see cref="フォーカスノード"/>が<see cref="SetNode"/>型である場合は、それが保有する難易度の中で、
+        ///		現在の <see cref="ユーザ希望難易度"/> に一番近い難易度の <see cref="MusicNode"/> が返される。
         ///		それ以外の場合は常に null が返される。
         /// </remarks>
         public MusicNode フォーカス曲ノード
@@ -54,7 +70,7 @@ namespace DTXMania.曲
                 }
                 if( this.フォーカスノード is SetNode setnode )
                 {
-                    return this.現在の難易度に応じた曲ノードを返す( setnode );
+                    return setnode.MusicNodes[ this.フォーカス難易度 ];
                 }
                 else
                 {
@@ -64,7 +80,7 @@ namespace DTXMania.曲
         }
 
         /// <summary>
-        ///		現在選択されているノードが対応している、現在の <see cref="_難易度アンカ"/> に一番近い難易度（0:BASIC～4:ULTIMATE）を返す。
+        ///		現在選択されているノードが対応している、現在の <see cref="ユーザ希望難易度"/> に一番近い難易度（0:BASIC～4:ULTIMATE）を返す。
         /// </summary>
         public int フォーカス難易度
         {
@@ -76,7 +92,7 @@ namespace DTXMania.曲
                 }
                 else if( this.フォーカスノード is SetNode setnode )
                 {
-                    return this.現在の難易度アンカに最も近い難易度レベルを返す( setnode );
+                    return setnode.ユーザ希望難易度に最も近い難易度レベルを返す( this.ユーザ希望難易度 );
                 }
                 else
                 {
@@ -86,10 +102,12 @@ namespace DTXMania.曲
         }
 
         /// <summary>
-        ///		フォーカスノードが存在するノードリスト。
-        ///		変更するには、変更先のリスト内の任意のノードを選択すること。
+        ///     ユーザが希望している難易度。
         /// </summary>
-        public SelectableList<Node> フォーカスリスト { get; protected set; } = null;
+        public int ユーザ希望難易度 { get; protected set; } = 3;
+
+
+        // イベント
 
         /// <summary>
         ///     フォーカスノードが変更された場合に発生するイベント。
@@ -124,7 +142,7 @@ namespace DTXMania.曲
                         node.活性化する();
                 }
 
-                //this._難易度アンカ = 3;		-> 初期化せず、前回の値を継承する。
+                //this.ユーザ希望難易度 = 3;	-> 初期化せず、前回の値を継承する。
             }
         }
 
@@ -280,69 +298,16 @@ namespace DTXMania.曲
         {
             for( int i = 0; i < 5; i++ )   // 最大でも5回まで
             {
-                this._難易度アンカ = ( this._難易度アンカ + 1 ) % 5;
+                this.ユーザ希望難易度 = ( this.ユーザ希望難易度 + 1 ) % 5;
 
                 if( this.フォーカスノード is SetNode setnode )
                 {
-                    if( null != setnode.MusicNodes[ this._難易度アンカ ] )
+                    if( null != setnode.MusicNodes[ this.ユーザ希望難易度 ] )
                         return; // その難易度に対応する曲ノードがあればOK。
                 }
 
                 // なければ次のアンカへ。
             }
-        }
-
-        /// <summary>
-        ///		指定された SetNode が保持する、現在の難易度アンカに一番近い難易度（0:BASIC～4:ULTIMATE）の MusicNode を返す。
-        /// </summary>
-        /// <remarks>
-        ///		難易度アンカはどのノードを選択しても不変である。
-        ///		<see cref="フォーカスノード"/>が<see cref="SetNode"/>型である場合は、それが保有する難易度（最大５つ）の中で、
-        ///		現在の難易度アンカに一番近い難易度の <see cref="MusicNode"/> が返される。
-        ///		それ以外の場合は常に null が返される。
-        /// </remarks>
-        public MusicNode 現在の難易度に応じた曲ノードを返す( SetNode setNode )
-            => setNode.MusicNodes[ this.現在の難易度アンカに最も近い難易度レベルを返す( setNode ) ];
-
-        public int 現在の難易度アンカに最も近い難易度レベルを返す( SetNode setnode )
-        {
-            if( null == setnode )
-                return this._難易度アンカ;
-
-            if( null != setnode.MusicNodes[ this._難易度アンカ ] )
-                return this._難易度アンカ;    // 難易度ぴったりの曲があった
-
-            // 現在のアンカレベルから、難易度上向きに検索開始。
-
-            int 最も近いレベル = this._難易度アンカ;
-            for( int i = 0; i < 5; i++ )
-            {
-                if( null != setnode.MusicNodes[ 最も近いレベル ] )
-                    break;  // 曲があった。
-
-                // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
-                最も近いレベル = ( 最も近いレベル + 1 ) % 5;
-            }
-
-            // 見つかった曲がアンカより下のレベルだった場合……
-            // アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
-
-            if( 最も近いレベル < this._難易度アンカ )
-            {
-                // 現在のアンカレベルから、難易度下向きに検索開始。
-
-                最も近いレベル = this._難易度アンカ;
-                for( int i = 0; i < 5; i++ )
-                {
-                    if( null != setnode.MusicNodes[ 最も近いレベル ] )
-                        break;  // 曲があった。
-
-                    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
-                    最も近いレベル = ( ( 最も近いレベル - 1 ) + 5 ) % 5;
-                }
-            }
-
-            return 最も近いレベル;
         }
 
         
@@ -365,21 +330,21 @@ namespace DTXMania.曲
 
                 // 必要あればフォーカスリストを変更。
 
-                var 旧フォーカスリスト = this.フォーカスリスト;  // 初回は null 。
-                this.フォーカスリスト = 親ノード.子ノードリスト;   // 常に非null。（先のAssertで保証されている。）
+                var 旧フォーカスリスト = this.フォーカスリスト;    // 初回は null 。
+                this.フォーカスリスト = 親ノード.子ノードリスト;   // 常に非 null。（先のAssertで保証されている。）
 
                 if( 旧フォーカスリスト == this.フォーカスリスト )
                 {
-                    // (A) フォーカスリストが変更されない場合；必要あればフォーカスノードを変更。
+                    // (A) フォーカスリストが変わらない場合 → 必要あればフォーカスノードを変更する。
 
                     if( null != ノード )
                     {
-                        // ノードの指定がある（非null）なら、それを選択する。
+                        // (A-a) ノードの指定がある（非null）なら、それを選択する。
                         this.フォーカスリスト.SelectItem( ノード );
                     }
                     else
                     {
-                        // ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
+                        // (A-b) ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
                     }
                 }
                 else
@@ -441,12 +406,6 @@ namespace DTXMania.曲
 
             this.フォーカスリスト.SelectItem( index );
         }
-
-
-        /// <summary>
-        ///     ユーザが希望している難易度。
-        /// </summary>
-        private int _難易度アンカ = 3;
 
 
         private void フォーカスリスト_SelectionChanged( object sender, (Node 選択されたItem, Node 選択が解除されたItem) e )
