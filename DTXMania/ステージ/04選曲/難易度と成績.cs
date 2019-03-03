@@ -74,11 +74,11 @@ namespace DTXMania.ステージ.選曲
                 using( var 黒ブラシ = new SolidColorBrush( dc, Color4.Black ) )
                 using( var 黒透過ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var 白ブラシ = new SolidColorBrush( dc, Color4.White ) )
-                using( var ULTIMATE色ブラシ = new SolidColorBrush( dc, Node.難易度色[ 4 ] ) )
-                using( var MASTER色ブラシ = new SolidColorBrush( dc, Node.難易度色[ 3 ] ) )
-                using( var EXTREME色ブラシ = new SolidColorBrush( dc, Node.難易度色[ 2 ] ) )
-                using( var ADVANCED色ブラシ = new SolidColorBrush( dc, Node.難易度色[ 1 ] ) )
-                using( var BASIC色ブラシ = new SolidColorBrush( dc, Node.難易度色[ 0 ] ) )
+                using( var ULTIMATE色ブラシ = new SolidColorBrush( dc, Node.LevelColor[ 4 ] ) )
+                using( var MASTER色ブラシ = new SolidColorBrush( dc, Node.LevelColor[ 3 ] ) )
+                using( var EXTREME色ブラシ = new SolidColorBrush( dc, Node.LevelColor[ 2 ] ) )
+                using( var ADVANCED色ブラシ = new SolidColorBrush( dc, Node.LevelColor[ 1 ] ) )
+                using( var BASIC色ブラシ = new SolidColorBrush( dc, Node.LevelColor[ 0 ] ) )
                 {
                     // 背景
                     dc.FillRectangle( 領域dpx, 黒透過ブラシ );

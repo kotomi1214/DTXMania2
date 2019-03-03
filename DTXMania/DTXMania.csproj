@@ -441,6 +441,8 @@
     <None Include="System\sounds\presets\default\選曲ステージ_曲決定音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="曲\Node\Node.PreviewSound.cs" />
+    <Compile Include="曲\Node\Node.LevelColor.cs" />
     <None Include="設定\ベストプラクティス：DataContractのバージョン管理.md" />
   </ItemGroup>
   <ItemGroup>

@@ -69,7 +69,7 @@ namespace DTXMania.ステージ.曲読み込み
 
                 var pretrans = dc.Transform;
 
-                using( var 見出し背景ブラシ = new SolidColorBrush( dc, Node.難易度色[ anker ] ) )
+                using( var 見出し背景ブラシ = new SolidColorBrush( dc, Node.LevelColor[ anker ] ) )
                 using( var 黒ブラシ = new SolidColorBrush( dc, Color4.Black ) )
                 using( var 黒透過ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var 白ブラシ = new SolidColorBrush( dc, Color4.White ) )

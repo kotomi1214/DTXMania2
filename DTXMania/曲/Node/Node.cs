@@ -16,24 +16,9 @@ namespace DTXMania.曲
     /// <remarks>
     ///		曲ツリーを構成するすべてのノードは、このクラスを継承する。
     /// </remarks>
-    abstract class Node : FDK.Activity
+    abstract partial class Node : FDK.Activity
     {
-        // static 定数
-
-        /// <summary>
-        ///		難易度それぞれのカラー。
-        ///		具体的には難易度ラベルの背景の色。
-        /// </summary>
-        public static IReadOnlyDictionary<int, Color4> 難易度色 { get; protected set; } = new Dictionary<int, Color4>() {
-            [ 0 ] = new Color4( 0xfffe9551 ),   // BASIC 相当
-            [ 1 ] = new Color4( 0xff00aaeb ),   // ADVANCED 相当
-            [ 2 ] = new Color4( 0xff7d5cfe ),   // EXTREME 相当
-            [ 3 ] = new Color4( 0xfffe55c6 ),   // MASTER 相当
-            [ 4 ] = new Color4( 0xff2b28ff ),   // ULTIMATE 相当
-        };
-
-
-        // プロパティ
+        // タイトルとサブタイトル
 
         /// <summary>
         ///		ノードのタイトル。
@@ -47,6 +32,9 @@ namespace DTXMania.曲
         /// </summary>
         public string サブタイトル { get; set; } = "";
 
+
+        // 難易度とラベル [5]
+   
         /// <summary>
         ///		難易度ラベルとその値（0.00～9.99）。
         ///		必要あれば、派生クラスで設定すること。
@@ -145,66 +133,20 @@ namespace DTXMania.曲
 
         // プレビュー音声関連
 
+        public virtual string プレビュー音声ファイルの絶対パス { get; protected set; } = null;
+
         public void プレビュー音声を再生する()
         {
-            if( this.プレビュー音声ファイルの絶対パス?.Nullまたは空である() ?? true )
-                return;
-
-            // 一定期間ごとに Tick イベントを呼び出すタイマを作成。
-
-            this._プレビュー音声再生タイマ?.Dispose();
-            this._プレビュー音声再生タイマ = new System.Windows.Forms.Timer() {
-                Interval = 500, // ミリ秒
-            };
-
-            // Tick イベントでは、プレビュー音声を読み込んで再生する。
-
-            this._プレビュー音声再生タイマ.Tick += ( sender, e ) => { // このタスクはGUIスレッドで処理される（非同期ではない）。
-
-                this._プレビュー音声を生成する();
-                this._プレビュー音声?.Play( ループ再生する: true );
-
-                this._プレビュー音声再生タイマ.Stop();    // 実行停止。２回目以降の Tick はない。
-            };
-
-            this._プレビュー音声再生タイマ.Start();
+            this._プレビュー音声.再生する( this.プレビュー音声ファイルの絶対パス );
         }
 
         public void プレビュー音声を停止する()
         {
-            this._プレビュー音声再生タイマ?.Stop();
-            this._プレビュー音声再生タイマ?.Dispose();
-            this._プレビュー音声再生タイマ = null;
-
-            this._プレビュー音声?.Stop();
-        }
-
-        public virtual string プレビュー音声ファイルの絶対パス { get; protected set; } = null;
-
-        protected CSCore.ISampleSource _プレビュー音声ソース = null;  // 未対応、または生成に失敗した場合は null。
-
-        protected Sound _プレビュー音声 = null;    // 未使用なら null。
-
-        private System.Windows.Forms.Timer _プレビュー音声再生タイマ = null;
-
-
-        protected void _プレビュー音声を生成する()
-        {
-            if( null != this._プレビュー音声 )
-                return; // 生成済み
-
-            if( this.プレビュー音声ファイルの絶対パス.Nullまたは空である() )
-                return; // 指定なし
-
-            if( null == this._プレビュー音声ソース )  // 未生成の場合
-                this._プレビュー音声ソース = SampleSourceFactory.Create( App.サウンドデバイス, new VariablePath( this.プレビュー音声ファイルの絶対パス ).変数なしパス, 1.0 );   // プレビューは常に再生速度 = 1.0
-
-            if( null != this._プレビュー音声ソース )
-                this._プレビュー音声 = new Sound( App.サウンドデバイス, this._プレビュー音声ソース );
+            this._プレビュー音声.停止する();
         }
 
 
-        // メソッド
+        // Activity
 
         public Node()
         {
@@ -218,6 +160,7 @@ namespace DTXMania.曲
 
             //this.子を追加する( this._ノード画像 );	--> 派生クラスのコンストラクタで追加することができる。
             this.子Activityを追加する( this._曲名テクスチャ = new 曲名() );
+            this.子Activityを追加する( this._プレビュー音声 = new PreviewSound() );
         }
 
         protected override void On活性化()
@@ -233,12 +176,6 @@ namespace DTXMania.曲
         protected override void On非活性化()
         {
             this.プレビュー音声を停止する();
-
-            this._プレビュー音声?.Dispose();
-            this._プレビュー音声 = null;
-
-            this._プレビュー音声ソース?.Dispose();
-            this._プレビュー音声ソース = null;
 
             // 全インスタンスで共有する static メンバが生成な済みなら解放する。
             if( null != Node.既定のノード画像 )
@@ -272,5 +209,7 @@ namespace DTXMania.曲
 
 
         protected 曲名 _曲名テクスチャ = null;
+
+        private PreviewSound _プレビュー音声;  // null なら未使用
     }
 }
