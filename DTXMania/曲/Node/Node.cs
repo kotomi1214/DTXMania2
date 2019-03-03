@@ -24,26 +24,72 @@ namespace DTXMania.曲
         ///		ノードのタイトル。
         ///		曲名、BOX名など。
         /// </summary>
-        public virtual string タイトル { get; set; } = "(no title)";
+        public virtual string タイトル
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._タイトル;
+            }
+            set
+            {
+                lock( this._読み書き排他 )
+                    this._タイトル = value;
+            }
+        }
 
         /// <summary>
         ///		ノードのサブタイトル。
         ///		制作者名など。
         /// </summary>
-        public virtual string サブタイトル { get; set; } = "";
+        public virtual string サブタイトル
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._サブタイトル;
+            }
+            set
+            {
+                lock( this._読み書き排他 )
+                    this._サブタイトル = value;
+            }
+        }
 
         /// <summary>
         ///     難易度ラベル。半角英数字。
         /// </summary>
-        public virtual string 難易度ラベル { get; set; } = "";
+        public virtual string 難易度ラベル
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._難易度ラベル;
+            }
+            set
+            {
+                lock( this._読み書き排他 )
+                    this._難易度ラベル = value;
+            }
+        }
 
         /// <summary>
         ///     難易度。0.00～9.99。
         /// </summary>
         public virtual float 難易度
         {
-            get => this._難易度;
-            set => this._難易度 = ( 0.00f > value || 9.99f < value ) ? throw new ArgumentOutOfRangeException() : value;
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._難易度;
+            }
+            set
+            {
+                var 値 = ( 0.00f > value || 9.99f < value ) ? throw new ArgumentOutOfRangeException() : value;
+
+                lock( this._読み書き排他 )
+                    this._難易度 = 値;
+            }
         }
 
 
@@ -52,7 +98,19 @@ namespace DTXMania.曲
         /// <summary>
         ///		曲ツリー階層において、親となるノード。
         /// </summary>
-        public Node 親ノード { get; set; } = null;
+        public Node 親ノード
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._親ノード;
+            }
+            set
+            {
+                lock( this._読み書き排他 )
+                    this._親ノード = value;
+            }
+        }
 
         /// <summary>
         ///		曲ツリー階層において、このノードが持つ子ノードのリスト。
@@ -71,15 +129,18 @@ namespace DTXMania.曲
         {
             get
             {
-                var index = this.親ノード.子ノードリスト.IndexOf( this );
-                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+                lock( this._読み書き排他 )
+                {
+                    var index = this.親ノード.子ノードリスト.IndexOf( this );
+                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
 
-                index = index - 1;
+                    index = index - 1;
 
-                if( 0 > index )
-                    index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
+                    if( 0 > index )
+                        index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
 
-                return this.親ノード.子ノードリスト[ index ];
+                    return this.親ノード.子ノードリスト[ index ];
+                }
             }
         }
 
@@ -93,15 +154,18 @@ namespace DTXMania.曲
         {
             get
             {
-                var index = this.親ノード.子ノードリスト.IndexOf( this );
-                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+                lock( this._読み書き排他 )
+                {
+                    var index = this.親ノード.子ノードリスト.IndexOf( this );
+                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
 
-                index = index + 1;
+                    index = index + 1;
 
-                if( this.親ノード.子ノードリスト.Count <= index )
-                    index = 0;      // 末尾なら、先頭へ。
+                    if( this.親ノード.子ノードリスト.Count <= index )
+                        index = 0;      // 末尾なら、先頭へ。
 
-                return this.親ノード.子ノードリスト[ index ];
+                    return this.親ノード.子ノードリスト[ index ];
+                }
             }
         }
 
@@ -143,21 +207,47 @@ namespace DTXMania.曲
         ///		<see cref="SetNode"/> の場合のみ、扱いが異なる。
         ///		詳細は<see cref="SetNode.ノード画像"/>を参照のこと。
         /// </remarks>
-        public virtual テクスチャ ノード画像 { get; protected set; } = null;
+        public virtual テクスチャ ノード画像
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._ノード画像;
+            }
+            protected set
+            {
+                lock( this._読み書き排他 )
+                    this._ノード画像 = value;
+            }
+        }
 
 
         // プレビュー音声関連
 
-        public virtual string プレビュー音声ファイルの絶対パス { get; protected set; } = null;
+        public virtual string プレビュー音声ファイルの絶対パス
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._プレビュー音声ファイルの絶対パス;
+            }
+            protected set
+            {
+                lock( this._読み書き排他 )
+                    this._プレビュー音声ファイルの絶対パス = value;
+            }
+        }
 
         public void プレビュー音声を再生する()
         {
-            this._プレビュー音声.再生する( this.プレビュー音声ファイルの絶対パス );
+            lock( this._読み書き排他 )
+                this._プレビュー音声.再生する( this.プレビュー音声ファイルの絶対パス );
         }
 
         public void プレビュー音声を停止する()
         {
-            this._プレビュー音声.停止する();
+            lock( this._読み書き排他 )
+                this._プレビュー音声.停止する();
         }
 
 
@@ -181,26 +271,45 @@ namespace DTXMania.曲
 
         public virtual void 進行描画する( DeviceContext1 dc, Matrix ワールド変換行列, bool キャプション表示 = true )
         {
-            // (1) ノード画像を描画する。
-            if( null != this.ノード画像 )
+            lock( this._読み書き排他 )
             {
-                this.ノード画像.描画する( ワールド変換行列 );
-            }
-            else
-            {
-                Node.既定のノード画像.描画する( ワールド変換行列 );
-            }
+                // (1) ノード画像を描画する。
+                if( null != this.ノード画像 )
+                {
+                    this.ノード画像.描画する( ワールド変換行列 );
+                }
+                else
+                {
+                    Node.既定のノード画像.描画する( ワールド変換行列 );
+                }
 
-            // (2) キャプションを描画する。
-            if( キャプション表示 )
-            {
-                ワールド変換行列 *= Matrix.Translation( 0f, 0f, 1f );    // ノード画像よりZ方向手前にほんのり移動
-                this._曲名テクスチャ.タイトル = this.タイトル;
-                this._曲名テクスチャ.サブタイトル = this.サブタイトル;
-                this._曲名テクスチャ.描画する( ワールド変換行列, 不透明度0to1: 1f, new RectangleF( 0f, 138f, Node.全体サイズ.Width, Node.全体サイズ.Height - 138f + 27f ) );
+                // (2) キャプションを描画する。
+                if( キャプション表示 )
+                {
+                    ワールド変換行列 *= Matrix.Translation( 0f, 0f, 1f );    // ノード画像よりZ方向手前にほんのり移動
+                    this._曲名テクスチャ.タイトル = this.タイトル;
+                    this._曲名テクスチャ.サブタイトル = this.サブタイトル;
+                    this._曲名テクスチャ.描画する( ワールド変換行列, 不透明度0to1: 1f, new RectangleF( 0f, 138f, Node.全体サイズ.Width, Node.全体サイズ.Height - 138f + 27f ) );
+                }
             }
         }
 
+
+        // private
+
+        protected readonly object _読み書き排他 = new object();
+
+        private string _タイトル = "(no title)";
+
+        private string _サブタイトル = "";
+
+        private string _難易度ラベル = "";
+
+        private Node _親ノード = null;
+
+        private テクスチャ _ノード画像 = null;
+
+        private string _プレビュー音声ファイルの絶対パス = "";
 
         protected 曲名 _曲名テクスチャ = null;
 

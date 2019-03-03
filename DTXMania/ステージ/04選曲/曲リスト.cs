@@ -273,14 +273,9 @@ namespace DTXMania.ステージ.選曲
             var ノード画像 = ノード.ノード画像 ?? Node.既定のノード画像;
             bool 選択ノードである = ( 4 == 行番号 );
 
-            if( null == ノード画像 )
-                return;
-
-            // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
-
             var 実数行番号 = 行番号 + ( this._曲リスト全体のY軸移動オフセット / 100f );
-
             var ノード左上dpx = new Vector3(
+                // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
                 this._曲リストの基準左上隅座標dpx.X + ( ( 選択ノードである ) ? (float) this._選択ノードの表示オフセットdpx.Value : 0f ),
                 this._曲リストの基準左上隅座標dpx.Y + ( 実数行番号 * _ノードの高さdpx ),
                 0f );
@@ -365,56 +360,59 @@ namespace DTXMania.ステージ.選曲
             //----------------
             #endregion
 
-            #region " サムネイル画像 "
+            #region " ノード画像を縮小したサムネイル画像 "
             //----------------
-            if( ノード is BoxNode )
+            if( null != ノード画像 )
             {
-                #region " BOXノードのサムネイル画像 → 少し小さく表示する（涙 "
-                //----------------
-                var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
+                if( ノード is BoxNode )
+                {
+                    #region " BOXノードのサムネイル画像 → 少し小さく表示する（涙 "
+                    //----------------
+                    var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
-                var サムネイル表示中央dpx = new Vector3(
-                    グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
-                    0f );
+                    var サムネイル表示中央dpx = new Vector3(
+                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        0f );
 
-                var 変換行列 =
-                    Matrix.Scaling(
-                        this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
-                        this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
-                        0f ) *
-                    Matrix.Scaling( 0.9f ) *                            // ちょっと小さく
-                    Matrix.Translation( サムネイル表示中央dpx - 4f );   // ちょっと下へ
+                    var 変換行列 =
+                        Matrix.Scaling(
+                            this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
+                            this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
+                            0f ) *
+                        Matrix.Scaling( 0.9f ) *                            // ちょっと小さく
+                        Matrix.Translation( サムネイル表示中央dpx - 4f );   // ちょっと下へ
 
-                ノード.進行描画する( dc, 変換行列, キャプション表示: false );
-                //----------------
-                #endregion
-            }
-            else if( ノード is BackNode )
-            {
-                // BACKノードはサムネイル画像なし
-            }
-            else
-            {
-                #region " 既定のサムネイル画像 "
-                //----------------
-                var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
+                    ノード.進行描画する( dc, 変換行列, キャプション表示: false );
+                    //----------------
+                    #endregion
+                }
+                else if( ノード is BackNode )
+                {
+                    // BACKノードはサムネイル画像なし
+                }
+                else
+                {
+                    #region " 既定のサムネイル画像 "
+                    //----------------
+                    var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
-                var サムネイル表示中央dpx = new Vector3(
-                    グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
-                    0f );
+                    var サムネイル表示中央dpx = new Vector3(
+                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        0f );
 
-                var 変換行列 =
-                    Matrix.Scaling(
-                        this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
-                        this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
-                        0f ) *
-                    Matrix.Translation( サムネイル表示中央dpx );
+                    var 変換行列 =
+                        Matrix.Scaling(
+                            this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
+                            this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
+                            0f ) *
+                        Matrix.Translation( サムネイル表示中央dpx );
 
-                ノード.進行描画する( dc, 変換行列, キャプション表示: false );
-                //----------------
-                #endregion
+                    ノード.進行描画する( dc, 変換行列, キャプション表示: false );
+                    //----------------
+                    #endregion
+                }
             }
             //----------------
             #endregion

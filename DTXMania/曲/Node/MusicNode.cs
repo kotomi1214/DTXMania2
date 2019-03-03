@@ -25,7 +25,20 @@ namespace DTXMania.曲
         /// <summary>
         ///		この曲ノードに対応する曲ファイルのハッシュ値。
         /// </summary>
-        public string 曲ファイルハッシュ { get; protected set; } = null;
+        public string 曲ファイルハッシュ
+        {
+            get
+            {
+                lock( this._読み書き排他 )
+                    return this._曲ファイルハッシュ;
+            }
+            protected set
+            {
+                lock( this._読み書き排他 )
+                    this._曲ファイルハッシュ = value;
+            }
+        }
+
 
 
         /// <summary>
@@ -33,36 +46,44 @@ namespace DTXMania.曲
         /// </summary>
         public MusicNode( VariablePath 曲ファイルの絶対パス, Node 親ノード )
         {
-            this.親ノード = 親ノード;
-            this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
-
-            // （まだ存在してなければ）曲DBに追加する。
-            曲DB.曲を追加または更新する( this.曲ファイルの絶対パス, App.ユーザ管理.ログオン中のユーザ );
-
-            // 追加後、改めて曲DBから情報を取得する。
-            using( var songdb = new SongDB() )
+            lock( this._読み書き排他 )
             {
-                var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+                this.親ノード = 親ノード;
+                this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
 
-                if( null == song )
-                    return;
+                // （まだ存在してなければ）曲DBに追加する。
+                曲DB.曲を追加または更新する( this.曲ファイルの絶対パス, App.ユーザ管理.ログオン中のユーザ );
 
-                this.タイトル = song.Title;
-                this.サブタイトル = "";
-                this.サブタイトル = song.Artist;
-                this.曲ファイルハッシュ = song.HashId;
-                this.難易度ラベル = "FREE";
-                this.難易度 = (float) song.Level;
-
-                if( song.PreImage.Nullでも空でもない() )
+                // 追加後、改めて曲DBから情報を取得する。
+                using( var songdb = new SongDB() )
                 {
-                    var プレビュー画像ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage );
-                    this.子Activityを追加する( this.ノード画像 = new テクスチャ( プレビュー画像ファイルの絶対パス ) );
-                }
+                    var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
 
-                if( song.PreSound.Nullでも空でもない() )
-                    this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+                    if( null == song )
+                        return;
+
+                    this.タイトル = song.Title;
+                    this.サブタイトル = "";
+                    this.サブタイトル = song.Artist;
+                    this.曲ファイルハッシュ = song.HashId;
+                    this.難易度ラベル = "FREE";
+                    this.難易度 = (float) song.Level;
+
+                    if( song.PreImage.Nullでも空でもない() )
+                    {
+                        var プレビュー画像ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage );
+                        this.子Activityを追加する( this.ノード画像 = new テクスチャ( プレビュー画像ファイルの絶対パス ) );
+                    }
+
+                    if( song.PreSound.Nullでも空でもない() )
+                        this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+                }
             }
         }
+
+
+        // private 
+
+        private string _曲ファイルハッシュ = null;
     }
 }
