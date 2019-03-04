@@ -290,7 +290,6 @@
     <Compile Include="ステージ\04選曲\難易度と成績.cs" />
     <Compile Include="ステージ\青い線.cs" />
     <Compile Include="ステージ\04選曲\選曲ステージ.cs" />
-    <Compile Include="曲\曲ツリーの構築.cs" />
     <Compile Include="設定\システムサウンド.cs" />
     <Compile Include="設定\システムサウンド種別.cs" />
     <Compile Include="設定\データベース\ユーザ\old\Record01.cs" />
