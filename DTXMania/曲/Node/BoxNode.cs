@@ -10,9 +10,6 @@ namespace DTXMania.曲
     /// <summary>
     ///		BOXを表すノード。
     /// </summary>
-    /// <remarks>
-    ///		このインスタンスの<see cref="SST.曲.Node.子ノードリスト"/>メンバに、このBOXに含まれるノードが含まれる。
-    /// </remarks>
     class BoxNode : Node
     {
         public BoxNode()

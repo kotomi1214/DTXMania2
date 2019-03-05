@@ -27,13 +27,10 @@ namespace DTXMania.曲
         /// </summary>
         public string 曲ファイルハッシュ { get; protected set; } = null;
 
+
         /// <summary>
-        ///		この曲ノードに対応する動画ファイル。
-        ///		曲ファイルからの相対パス。
+        ///     指定されたファイルをもとに、初期化する。
         /// </summary>
-        public VariablePath 動画ファイルパス { get; protected set; } = null;
-
-
         public MusicNode( VariablePath 曲ファイルの絶対パス, Node 親ノード )
         {
             this.親ノード = 親ノード;
@@ -54,7 +51,8 @@ namespace DTXMania.曲
                 this.サブタイトル = "";
                 this.サブタイトル = song.Artist;
                 this.曲ファイルハッシュ = song.HashId;
-                this.難易度[ 3 ] = ("FREE", (float) song.Level);       // [3]:MASTER相当。set.def 内にある MusicNode でも同じ。
+                this.難易度ラベル = "FREE";
+                this.難易度 = (float) song.Level;
 
                 if( song.PreImage.Nullでも空でもない() )
                 {

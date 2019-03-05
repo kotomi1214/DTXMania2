@@ -9,7 +9,6 @@ namespace FDK
     ///		FPS（１秒間の進行処理回数）と VPS（１秒間の描画処理回数）を計測する。
     /// </summary>
     /// <remarks>
-    ///		計測するだけで、表示はしない。
     ///		FPSをカウントする() を呼び出さないと、VPS も更新されないので注意。
     /// </remarks>
     public class FPS : Activity

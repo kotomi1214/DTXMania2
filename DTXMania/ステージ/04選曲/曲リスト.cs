@@ -33,32 +33,6 @@ namespace DTXMania.ステージ.選曲
             {
                 App.曲ツリー.フォーカスノードが変更された += this.曲ツリー_フォーカスノードが変更された;
 
-                #region " フォーカスノードを初期化する。"
-                //----------------
-                {
-                    var tree = App.曲ツリー;
-
-                    if( null == tree.フォーカスノード )
-                    {
-                        // (A) 未選択なら、ルートノードの先頭ノードをフォーカスする。
-                        if( 0 < tree.ルートノード.子ノードリスト.Count )
-                        {
-                            tree.フォーカスする( tree.ルートノード.子ノードリスト[ 0 ] );
-                        }
-                        else
-                        {
-                            // ルートノードに子がないないなら null のまま。
-                        }
-                    }
-                    else
-                    {
-                        // (B) なんらかのノードを選択中なら、それを継続して使用する（フォーカスノードをリセットしない）。
-                        tree.フォーカスノード.プレビュー音声を再生する();
-                    }
-                }
-                //----------------
-                #endregion
-
                 this._カーソル位置 = 4;
                 this._曲リスト全体のY軸移動オフセット = 0;
 
@@ -167,15 +141,18 @@ namespace DTXMania.ステージ.選曲
             if( null == 描画するノード )
                 return;
 
-            // 表示する最上行のノードまで戻る。
-            for( int i = 0; i < this._カーソル位置; i++ )
-                描画するノード = 描画するノード.前のノード;
-
-            // 10行描画。
-            for( int i = 0; i < 10; i++ )
+            lock( 描画するノード.子ノードリスト排他 )   // リスト描画中は lock
             {
-                this._ノードを描画する( dc, i, 描画するノード );
-                描画するノード = 描画するノード.次のノード;
+                // 表示する最上行のノードまで戻る。
+                for( int i = 0; i < this._カーソル位置; i++ )
+                    描画するノード = 描画するノード.前のノード;
+
+                // 10行描画。
+                for( int i = 0; i < 10; i++ )
+                {
+                    this._ノードを描画する( dc, i, 描画するノード );
+                    描画するノード = 描画するノード.次のノード;
+                }
             }
         }
 
@@ -273,14 +250,9 @@ namespace DTXMania.ステージ.選曲
             var ノード画像 = ノード.ノード画像 ?? Node.既定のノード画像;
             bool 選択ノードである = ( 4 == 行番号 );
 
-            if( null == ノード画像 )
-                return;
-
-            // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
-
             var 実数行番号 = 行番号 + ( this._曲リスト全体のY軸移動オフセット / 100f );
-
             var ノード左上dpx = new Vector3(
+                // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
                 this._曲リストの基準左上隅座標dpx.X + ( ( 選択ノードである ) ? (float) this._選択ノードの表示オフセットdpx.Value : 0f ),
                 this._曲リストの基準左上隅座標dpx.Y + ( 実数行番号 * _ノードの高さdpx ),
                 0f );
@@ -365,56 +337,62 @@ namespace DTXMania.ステージ.選曲
             //----------------
             #endregion
 
-            #region " サムネイル画像 "
+            #region " ノード画像を縮小したサムネイル画像 "
             //----------------
-            if( ノード is BoxNode )
+            if( null != ノード画像 )
             {
-                #region " BOXノードのサムネイル画像 → 少し小さく表示する（涙 "
-                //----------------
-                var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
+                if( ノード is BoxNode )
+                {
+                    #region " BOXノードのサムネイル画像 → 少し小さく表示する（涙 "
+                    //----------------
+                    var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
-                var サムネイル表示中央dpx = new Vector3(
-                    グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
-                    0f );
+                    var サムネイル表示中央dpx = new Vector3(
+                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        0f );
 
-                var 変換行列 =
-                    Matrix.Scaling(
-                        this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
-                        this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
-                        0f ) *
-                    Matrix.Scaling( 0.9f ) *                            // ちょっと小さく
-                    Matrix.Translation( サムネイル表示中央dpx - 4f );   // ちょっと下へ
+                    var 変換行列 =
+                        Matrix.Scaling(
+                            this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
+                            this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
+                            0f ) *
+                        Matrix.Scaling( 0.9f ) *                            // ちょっと小さく
+                        Matrix.Translation( サムネイル表示中央dpx - 4f );   // ちょっと下へ
 
-                ノード.進行描画する( dc, 変換行列, キャプション表示: false );
-                //----------------
-                #endregion
-            }
-            else if( ノード is BackNode )
-            {
-                // BACKノードはサムネイル画像なし
-            }
-            else
-            {
-                #region " 既定のサムネイル画像 "
-                //----------------
-                var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
+                    ノード.進行描画する( dc, 変換行列, キャプション表示: false );
+                    //----------------
+                    #endregion
+                }
+                else if( ノード is BackNode )
+                {
+                    // BACKノードはサムネイル画像なし
+                }
+                else
+                {
+                    #region " 既定のサムネイル画像 "
+                    //----------------
+                    if( ノード.活性化していない )  // 後から検索追加された曲ノードは活性化されていない場合がある。
+                        ノード.活性化する();
 
-                var サムネイル表示中央dpx = new Vector3(
-                    グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
-                    0f );
+                    var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
-                var 変換行列 =
-                    Matrix.Scaling(
-                        this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
-                        this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
-                        0f ) *
-                    Matrix.Translation( サムネイル表示中央dpx );
+                    var サムネイル表示中央dpx = new Vector3(
+                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        0f );
 
-                ノード.進行描画する( dc, 変換行列, キャプション表示: false );
-                //----------------
-                #endregion
+                    var 変換行列 =
+                        Matrix.Scaling(
+                            this._サムネイル表示サイズdpx.X / ノード画像.サイズ.Width,
+                            this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height,
+                            0f ) *
+                        Matrix.Translation( サムネイル表示中央dpx );
+
+                    ノード.進行描画する( dc, 変換行列, キャプション表示: false );
+                    //----------------
+                    #endregion
+                }
             }
             //----------------
             #endregion
@@ -457,25 +435,23 @@ namespace DTXMania.ステージ.選曲
             }
             //----------------
             #endregion
+
             #region " サブタイトル文字列 "
             //----------------
             if( ノード == App.曲ツリー.フォーカスノード )  // フォーカスノードのみ表示する。
             {
                 var サブタイトル画像 = (文字列画像) null;
 
-                // ノードが SetNode なら難易度アンカに応じた MusicNode が対象。
-                if( ノード is SetNode setnode )
-                {
-                    ノード = App.曲ツリー.現在の難易度に応じた曲ノードを返す( setnode );
-                }
+                // ノードが SetNode ならユーザ希望難易度に応じた MusicNode が対象。
+                var node = ( ノード is SetNode setnode ) ? App.曲ツリー.フォーカス曲ノード : ノード;
 
                 // サブタイトル画像を取得する。未生成かつ指定があるなら生成する。
-                if( !( this._ノードtoサブタイトル画像.ContainsKey( ノード ) ) )
+                if( !( this._ノードtoサブタイトル画像.ContainsKey( node ) ) )
                 {
-                    if( ノード.サブタイトル.Nullでも空でもない() )
+                    if( node.サブタイトル.Nullでも空でもない() )
                     {
                         サブタイトル画像 = new 文字列画像() {
-                            表示文字列 = ノード.サブタイトル,
+                            表示文字列 = node.サブタイトル,
                             フォント名 = "HGMaruGothicMPRO", // "メイリオ",
                             フォント幅 = FontWeight.Regular,
                             フォントスタイル = FontStyle.Normal,
@@ -487,7 +463,7 @@ namespace DTXMania.ステージ.選曲
                         };
                         サブタイトル画像.活性化する();
 
-                        this._ノードtoサブタイトル画像.Add( ノード, サブタイトル画像 );
+                        this._ノードtoサブタイトル画像.Add( node, サブタイトル画像 );
                     }
                     else
                     {
@@ -497,7 +473,7 @@ namespace DTXMania.ステージ.選曲
                 }
                 else
                 {
-                    サブタイトル画像 = this._ノードtoサブタイトル画像[ ノード ];
+                    サブタイトル画像 = this._ノードtoサブタイトル画像[ node ];
                 }
 
                 // 拡大率を計算して描画する。

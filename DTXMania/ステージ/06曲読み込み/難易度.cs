@@ -49,27 +49,13 @@ namespace DTXMania.ステージ.曲読み込み
             var anker = App.曲ツリー.フォーカス難易度;
 
 
-            // 難易度のラベルと値を取得する。
-
-            (string label, float level) 難易度;
-            if( node.親ノード is SetNode )
-            {
-                // 親が SetNode なら、難易度はそっちから取得する。
-                難易度 = node.親ノード.難易度[ anker ];
-            }
-            else
-            {
-                難易度 = node.難易度[ anker ];
-            }
-
-
             // 難易度のラベルと値を描画する。
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 
-                using( var 見出し背景ブラシ = new SolidColorBrush( dc, Node.難易度色[ anker ] ) )
+                using( var 見出し背景ブラシ = new SolidColorBrush( dc, Node.LevelColor[ anker ] ) )
                 using( var 黒ブラシ = new SolidColorBrush( dc, Color4.Black ) )
                 using( var 黒透過ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var 白ブラシ = new SolidColorBrush( dc, Color4.White ) )
@@ -82,10 +68,10 @@ namespace DTXMania.ステージ.曲読み込み
                     this._見出し用TextFormat.TextAlignment = TextAlignment.Trailing;
                     var 見出し文字領域 = 見出し描画領域;
                     見出し文字領域.Width -= 8f;    // 右マージン
-                    dc.DrawText( 難易度.label, this._見出し用TextFormat, 見出し文字領域, 白ブラシ );
+                    dc.DrawText( node.難易度ラベル, this._見出し用TextFormat, 見出し文字領域, 白ブラシ );
 
                     // 小数部を描画する。
-                    var 数値文字列 = 難易度.level.ToString( "0.00" ).PadLeft( 1 );
+                    var 数値文字列 = node.難易度.ToString( "0.00" ).PadLeft( 1 );
                     dc.Transform =
                         Matrix3x2.Scaling( 2.2f, 2.2f ) *
                         Matrix3x2.Translation( 数値描画領域.X + 175f, 数値描画領域.Y ) *

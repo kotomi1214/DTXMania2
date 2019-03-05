@@ -120,7 +120,7 @@ namespace FDK
             var gd = グラフィックデバイス.Instance;
 
             // アニメーションを進行する。
-            gd.Animation.進行する();
+            gd.Animation.進行する();    // 必ずメイン(UI)スレッドから呼び出すこと。
 
             // 全面を黒で塗りつぶすだけのサンプル。
             gd.D2DDeviceContext.BeginDraw();
