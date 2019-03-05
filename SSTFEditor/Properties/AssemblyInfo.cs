@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
 [assembly: AssemblyProduct( "SSTFEditor" )]
-[assembly: AssemblyCopyright( "Copyright © 2009 2018 ＦＲＯＭ／くまかみ工房" )]
+[assembly: AssemblyCopyright( "Copyright © 2009 2019 ＦＲＯＭ／くまかみ工房" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
