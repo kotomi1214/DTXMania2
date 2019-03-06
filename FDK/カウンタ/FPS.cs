@@ -48,7 +48,8 @@ namespace FDK
         ///		FPSをカウントUPして、「現在のFPS, 現在のVPS」プロパティに現在の値をセットする。
         ///		VPSはカウントUPされない。
         /// </summary>
-        public void FPSをカウントしプロパティを更新する()
+        /// <returns>現在のFPS/VPSを更新したらtrue。</returns>
+        public bool FPSをカウントしプロパティを更新する()
         {
             lock( this._スレッド間同期 )
             {
@@ -59,6 +60,8 @@ namespace FDK
                     this._vps用カウンタ = 0;
                     this._定間隔進行 = new 定間隔進行();
                     this._定間隔進行.経過時間の計測を開始する();
+
+                    return false;
                 }
                 else
                 {
@@ -74,6 +77,8 @@ namespace FDK
                         this._vps用カウンタ = 0;
 
                     } );
+
+                    return ( 0 == this._fps用カウンタ );
                 }
             }
         }
