@@ -213,6 +213,21 @@ namespace FDK
         }
 
 
+        // ゲームモード
+
+        /// <summary>
+        ///     ゲームモードが有効である場合はtrueを、そうでなければfalseを返す。
+        /// </summary>
+        public static bool ゲームモードである
+        {
+            get
+            {
+                HasExpandedResources( out bool bHas );
+                return bHas;
+            }
+        }
+
+
         // シリアライズ
 
         /// <summary>
@@ -284,5 +299,8 @@ namespace FDK
 
         [DllImport( "Avrt.dll" )]
         public static extern bool AvRevertMmThreadCharacteristics( IntPtr avrtHandle );
+
+        [DllImport( "gamemode.dll" )]
+        public static extern int HasExpandedResources( out bool bHas );
     }
 }
