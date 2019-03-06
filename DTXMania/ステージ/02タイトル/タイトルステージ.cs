@@ -29,6 +29,7 @@ namespace DTXMania.ステージ.タイトル
                 this.子Activityを追加する( this._舞台画像 = new 舞台画像() );
                 this.子Activityを追加する( this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" ) );
                 this.子Activityを追加する( this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り } );
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
@@ -66,6 +67,9 @@ namespace DTXMania.ステージ.タイトル
         {
             App.入力管理.すべての入力デバイスをポーリングする();
 
+            this._システム情報.VPSをカウントする();
+            this._システム情報.FPSをカウントしプロパティを更新する();
+
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示:
@@ -82,6 +86,8 @@ namespace DTXMania.ステージ.タイトル
                             ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
 
                         this._帯メッセージを描画する( dc );
+
+                        this._システム情報.描画する( dc );
 
                         // 入力
 
@@ -132,6 +138,11 @@ namespace DTXMania.ステージ.タイトル
                         {
                             this.現在のフェーズ = フェーズ.確定;
                         }
+
+
+                        // システム情報描画
+
+                        this._システム情報.描画する( dc );
                     }
                     //----------------
                     #endregion
@@ -151,6 +162,8 @@ namespace DTXMania.ステージ.タイトル
         private Brush _帯ブラシ = null;
 
         private 文字列画像 _パッドを叩いてください = null;
+
+        private システム情報 _システム情報 = null;
 
 
         private void _帯メッセージを描画する( DeviceContext1 dc )

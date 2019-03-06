@@ -34,6 +34,7 @@ namespace DTXMania.ステージ.オプション設定
                 this.子Activityを追加する( this._舞台画像 = new 舞台画像() );
                 this.子Activityを追加する( this._パネルリスト = new パネルリスト() );
                 //this.子を追加する( this._ルートパネルフォルダ = new パネル_フォルダ( "Root", null, null ) ); --> 活性化のたびに、子パネルとまとめて動的に追加する。
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
@@ -729,6 +730,9 @@ namespace DTXMania.ステージ.オプション設定
                 this._初めての進行描画 = false;
             }
 
+            this._システム情報.VPSをカウントする();
+            this._システム情報.FPSをカウントしプロパティを更新する();
+
             this._舞台画像.進行描画する( dc );
             this._パネルリスト.進行描画する( dc, 613f, 0f );
 
@@ -774,6 +778,8 @@ namespace DTXMania.ステージ.オプション設定
                 case フェーズ.キャンセル:
                     break;
             }
+
+            this._システム情報.描画する( dc );
 
 
             // (3) フェーズ別の入力。
@@ -875,5 +881,7 @@ namespace DTXMania.ステージ.オプション設定
 
         // 以下、コード内で参照が必要になるパネルのホルダ。
         private List<パネル_ONOFFトグル> _パネル_自動演奏_ONOFFトグルリスト = null;
+
+        private システム情報 _システム情報 = null;
     }
 }

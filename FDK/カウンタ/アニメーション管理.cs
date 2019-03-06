@@ -9,37 +9,30 @@ namespace FDK
 {
     public class アニメーション管理 : IDisposable
     {
-        public Manager Manager
-            => this._Manager;
-        public Timer Timer
-            => this._Timer;
-        public TransitionLibrary TrasitionLibrary
-            => this._TrasitionLibrary;
+        public Manager Manager { get; private set; } = null;
+        public Timer Timer { get; private set; } = null;
+        public TransitionLibrary TrasitionLibrary { get; private set; } = null;
 
         public アニメーション管理()
         {
-            this._Manager = new Manager();
-            this._Timer = new Timer();
-            this._TrasitionLibrary = new TransitionLibrary();
+            this.Manager = new Manager();
+            this.Timer = new Timer();
+            this.TrasitionLibrary = new TransitionLibrary();
         }
         public void 進行する()
         {
-            this._Manager.Update( this._Timer.Time );
+            this.Manager.Update( this.Timer.Time );
         }
         public void Dispose()
         {
-            this._TrasitionLibrary?.Dispose();
-            this._TrasitionLibrary = null;
+            this.TrasitionLibrary?.Dispose();
+            this.TrasitionLibrary = null;
 
-            this._Timer?.Dispose();
-            this._Timer = null;
+            this.Timer?.Dispose();
+            this.Timer = null;
 
-            this._Manager?.Dispose();
-            this._Manager = null;
+            this.Manager?.Dispose();
+            this.Manager = null;
         }
-
-        private Manager _Manager = null;
-        private Timer _Timer = null;
-        private TransitionLibrary _TrasitionLibrary = null;
     }
 }

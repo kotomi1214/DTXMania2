@@ -17,7 +17,6 @@ namespace DTXMania.ステージ.起動
     {
         public enum フェーズ
         {
-            開始,
             曲ツリー構築中,
             ドラムサウンド構築中,
             開始音終了待ち,
@@ -52,7 +51,7 @@ namespace DTXMania.ステージ.起動
                     $"",
                 };
 
-                this.現在のフェーズ = フェーズ.開始;
+                this.現在のフェーズ = フェーズ.ドラムサウンド構築中;
             }
         }
 
@@ -74,8 +73,25 @@ namespace DTXMania.ステージ.起動
 
             switch( this.現在のフェーズ )
             {
-                case フェーズ.開始:
-                    #region " 曲検索タスクを起動し、構築中フェーズへ遷移する。"
+                case フェーズ.ドラムサウンド構築中:
+                    #region " ドラムサウンドを構築する。"
+                    //----------------
+                    {
+                        this._コンソール表示内容.Add( $"Loading and decoding sounds ..." );
+
+                        App.ドラムサウンド.初期化する();
+
+                        this._コンソール表示内容.RemoveAt( this._コンソール表示内容.Count - 1 );
+                        this._コンソール表示内容.Add( $"Loading and decoding sounds ... done." );
+
+                        this.現在のフェーズ = フェーズ.曲ツリー構築中;
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case フェーズ.曲ツリー構築中:
+                    #region " 曲検索タスクを起動する。"
                     //----------------
                     if( App.ビュアーモードである )
                     {
@@ -86,70 +102,15 @@ namespace DTXMania.ステージ.起動
                         App.曲ツリー.非活性化する();
                         App.曲ツリー = new 曲.曲ツリー();
                         App.曲ツリー.活性化する();
-                        App.曲ツリー.非活性化する();
-                        this._ファイル検出数 = 0;
 
-                        this._構築タスク = Task.Factory.StartNew( () => {
-
-                            // 曲ツリーを構築する。
-
-                            foreach( var varpath in App.システム設定.曲検索フォルダ )
-                            {
-                                App.曲ツリー.曲を検索して親ノードに追加する( App.曲ツリー.ルートノード, varpath, ( vpath ) => {
-                                    Interlocked.Increment( ref this._ファイル検出数 );
-                                } );
-                            }
-
-                            // 構築終了。
-                        } );
+                        // 曲ツリーの構築を開始。
+                        foreach( var varpath in App.システム設定.曲検索フォルダ )
+                            App.曲ツリー.曲の検索を開始する( varpath );
                     }
 
                     this._コンソール表示内容.Add( "" );
 
-                    this.現在のフェーズ = フェーズ.曲ツリー構築中;
-                    //----------------
-                    #endregion
-                    break;
-
-                case フェーズ.曲ツリー構築中:
-                    #region " 曲ツリー構築タスクの進捗情報を画面に表示する。"
-                    //----------------
-                    if( App.ビュアーモードである )
-                    {
-                        // ビュアーモードならスキップ。
-                        this._コンソール表示内容.Add( $"Loading and decoding sounds ..." );
-                        this.現在のフェーズ = フェーズ.ドラムサウンド構築中;
-                    }
-                    else
-                    {
-                        // 構築タスクの進捗表示。
-                        this._コンソール表示内容.RemoveAt( this._コンソール表示内容.Count - 1 );
-                        this._コンソール表示内容.Add( $"Enumerating and loading score properties from file ... {Interlocked.Read( ref this._ファイル検出数 )}" );
-
-                        // 構築タスクが完了したら、次のフェーズへ遷移する。
-                        if( this._構築タスク.IsCompleted || this._構築タスク.IsCanceled )
-                        {
-                            App.曲ツリー.活性化する();
-
-                            this._コンソール表示内容.Add( $"Loading and decoding sounds ..." );
-                            this.現在のフェーズ = フェーズ.ドラムサウンド構築中;
-                        }
-                    }
-                    //----------------
-                    #endregion
-                    break;
-
-                case フェーズ.ドラムサウンド構築中:
-                    #region " ドラムサウンドを構築する。"
-                    //----------------
-                    {
-                        App.ドラムサウンド.初期化する();
-
-                        this._コンソール表示内容.RemoveAt( this._コンソール表示内容.Count - 1 );
-                        this._コンソール表示内容.Add( $"Loading and decoding sounds ... done." );
-
-                        this.現在のフェーズ = フェーズ.開始音終了待ち;
-                    }
+                    this.現在のフェーズ = フェーズ.開始音終了待ち;
                     //----------------
                     #endregion
                     break;
@@ -158,7 +119,9 @@ namespace DTXMania.ステージ.起動
                     #region " 起動ステージ_開始音 が終了するまで待つ。"
                     //----------------
                     if( !App.システムサウンド.再生中( 設定.システムサウンド種別.起動ステージ_開始音 ) )
+                    {
                         this.現在のフェーズ = フェーズ.確定; // 再生が終わったのでフェーズ遷移。
+                    }
                     //----------------
                     #endregion
                     break;
@@ -183,9 +146,5 @@ namespace DTXMania.ステージ.起動
         private 画像フォント _コンソールフォント = null;
 
         private List<string> _コンソール表示内容 = null;
-
-        private Task _構築タスク = null;
-
-        private long _ファイル検出数 = 0;
     }
 }

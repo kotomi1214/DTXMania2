@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -120,12 +121,14 @@ namespace FDK
             var gd = グラフィックデバイス.Instance;
 
             // アニメーションを進行する。
-            gd.Animation.進行する();
+            gd.Animation.進行する();    // 必ずメイン(UI)スレッドから呼び出すこと。
 
             // 全面を黒で塗りつぶすだけのサンプル。
             gd.D2DDeviceContext.BeginDraw();
             gd.D2DDeviceContext.Clear( Color4.Black );
             gd.D2DDeviceContext.EndDraw();
+
+            // SwapChain の Present は呼び出し元で行うので不要。
         }
 
         /// <summary>
@@ -144,9 +147,11 @@ namespace FDK
         /// </summary>
         public virtual void Run()
         {
-            SharpDX.Windows.RenderLoop.Run( this, () => {
+            this.Show();
 
-                // 最小化されてたら何もしない。
+            // 1フレーム分の処理（進行または描画）を定義する。
+            var action = new Action( () => {
+
                 if( this.FormWindowState == FormWindowState.Minimized )
                     return;
 
@@ -169,6 +174,62 @@ namespace FDK
                 }
 
             } );
+
+            long bAction実行中 = 0;
+            var hWnd = this.Handle; // QueueTimer のコールバック内で this. を使うとフォームの破棄時に ObjectDisposedException が発生するため、ローカル変数に退避してこれを参照する。
+
+            using( var qtimer = new カウンタ.QueueTimer( 1, 1, () => {
+
+                // 1msごとに、フォームに WM_APP_TICK メッセージを送信する。
+
+                if( 0 == Interlocked.Read( ref bAction実行中 ) )
+                {
+                    PostMessage( hWnd, WM_APP_TICK, IntPtr.Zero, IntPtr.Zero );
+                }
+                else
+                {
+                    // Action が実行中の場合は送信しない。
+                }
+
+            } ) )
+            {
+                // メッセージディスパッチループ。
+
+                int bRet;
+                while( !this.IsDisposed && ( bRet = GetMessage( out NativeMessage msg, this.Handle, 0, 0 ) ) != 0 )     // 戻り値 0: WM_QUIT
+                {
+                    if( 0 > bRet )  // 戻り値 -1: Error
+                    {
+                        throw new InvalidOperationException( String.Format( System.Globalization.CultureInfo.InvariantCulture,
+                            "An error happened in rendering loop while processing windows messages. Error: {0}",
+                            Marshal.GetLastWin32Error() ) );
+                    }
+                    else
+                    {
+                        var message = new Message() {
+                            HWnd = msg.handle,
+                            LParam = msg.lParam,
+                            Msg = (int) msg.msg,
+                            WParam = msg.wParam
+                        };
+
+                        if( !Application.FilterMessage( ref message ) )
+                        {
+                            // WM_APP_TICK メッセージが来たら、1フレーム分の処理（進行または描画）を実行する。
+                            if( msg.msg == WM_APP_TICK )
+                            {
+                                Interlocked.Increment( ref bAction実行中 );   // 1:実行中
+                                action();
+                                Interlocked.Decrement( ref bAction実行中 );   // 0:完了
+                                continue;
+                            }
+
+                            TranslateMessage( ref msg );
+                            DispatchMessage( ref msg );
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -247,5 +308,33 @@ namespace FDK
                 this.スワップチェーンに依存するグラフィックリソースを作成する();
             }
         }
+
+
+        private const int WM_APP = 0x8000;
+        private const int WM_APP_TICK = WM_APP + 1;
+
+        [StructLayout( LayoutKind.Sequential )]
+        public struct NativeMessage
+        {
+            public IntPtr handle;
+            public uint msg;
+            public IntPtr wParam;
+            public IntPtr lParam;
+            public uint time;
+            public SharpDX.Mathematics.Interop.RawPoint p;
+        }
+
+        [return: MarshalAs( UnmanagedType.Bool )]
+        [DllImport( "user32.dll", SetLastError = true, CharSet = CharSet.Auto )]
+        static extern bool PostMessage( IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam );
+
+        [DllImport( "user32.dll", EntryPoint = "GetMessage" )]
+        public static extern int GetMessage( out NativeMessage lpMsg, IntPtr hWnd, int wMsgFilterMin, int wMsgFilterMax );
+
+        [DllImport( "user32.dll", EntryPoint = "TranslateMessage" )]
+        public static extern int TranslateMessage( ref NativeMessage lpMsg );
+
+        [DllImport( "user32.dll", EntryPoint = "DispatchMessage" )]
+        public static extern int DispatchMessage( ref NativeMessage lpMsg );
     }
 }

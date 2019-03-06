@@ -9,7 +9,6 @@ namespace FDK
     ///		FPS（１秒間の進行処理回数）と VPS（１秒間の描画処理回数）を計測する。
     /// </summary>
     /// <remarks>
-    ///		計測するだけで、表示はしない。
     ///		FPSをカウントする() を呼び出さないと、VPS も更新されないので注意。
     /// </remarks>
     public class FPS : Activity
@@ -49,7 +48,8 @@ namespace FDK
         ///		FPSをカウントUPして、「現在のFPS, 現在のVPS」プロパティに現在の値をセットする。
         ///		VPSはカウントUPされない。
         /// </summary>
-        public void FPSをカウントしプロパティを更新する()
+        /// <returns>現在のFPS/VPSを更新したらtrue。</returns>
+        public bool FPSをカウントしプロパティを更新する()
         {
             lock( this._スレッド間同期 )
             {
@@ -60,6 +60,8 @@ namespace FDK
                     this._vps用カウンタ = 0;
                     this._定間隔進行 = new 定間隔進行();
                     this._定間隔進行.経過時間の計測を開始する();
+
+                    return false;
                 }
                 else
                 {
@@ -75,6 +77,8 @@ namespace FDK
                         this._vps用カウンタ = 0;
 
                     } );
+
+                    return ( 0 == this._fps用カウンタ );
                 }
             }
         }

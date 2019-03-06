@@ -52,6 +52,7 @@ namespace DTXMania.ステージ.曲読み込み
                 } );
                 this.子Activityを追加する( this._プレビュー画像 = new プレビュー画像() );
                 this.子Activityを追加する( this._難易度 = new 難易度() );
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
@@ -91,6 +92,9 @@ namespace DTXMania.ステージ.曲読み込み
                 this._初めての進行描画 = false;
             }
 
+            this._システム情報.VPSをカウントする();
+            this._システム情報.FPSをカウントしプロパティを更新する();
+
             this._舞台画像.進行描画する( dc );
             this._注意文.描画する( dc, 0f, 760f );
             this._プレビュー画像.描画する( dc );
@@ -102,6 +106,7 @@ namespace DTXMania.ステージ.曲読み込み
             {
                 case フェーズ.フェードイン:
                     App.ステージ管理.現在のアイキャッチ.進行描画する( dc );
+                    this._システム情報.描画する( dc );
 
                     if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.オープン完了 )
                     {
@@ -110,6 +115,8 @@ namespace DTXMania.ステージ.曲読み込み
                     break;
 
                 case フェーズ.表示:
+                    this._システム情報.描画する( dc );
+
                     this._スコアを読み込む();
                     App.入力管理.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
                     this.現在のフェーズ = フェーズ.完了;
@@ -117,6 +124,7 @@ namespace DTXMania.ステージ.曲読み込み
 
                 case フェーズ.完了:
                 case フェーズ.キャンセル:
+                    this._システム情報.描画する( dc );
                     break;
             }
         }
@@ -135,6 +143,8 @@ namespace DTXMania.ステージ.曲読み込み
         private プレビュー画像 _プレビュー画像 = null;
 
         private 難易度 _難易度 = null;
+
+        private システム情報 _システム情報 = null;
 
 
         private void _曲名を描画する( DeviceContext1 dc )

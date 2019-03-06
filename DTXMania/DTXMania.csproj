@@ -159,14 +159,14 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
-    <Reference Include="System.Data.SQLite, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Core.1.0.109.2\lib\net46\System.Data.SQLite.dll</HintPath>
+    <Reference Include="System.Data.SQLite, Version=1.0.110.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Core.1.0.110.0\lib\net46\System.Data.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.EF6, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.109.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
+    <Reference Include="System.Data.SQLite.EF6, Version=1.0.110.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.EF6.1.0.110.0\lib\net46\System.Data.SQLite.EF6.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SQLite.Linq, Version=1.0.109.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.109.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
+    <Reference Include="System.Data.SQLite.Linq, Version=1.0.110.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Data.SQLite.Linq.1.0.110.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System.Memory, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.2\lib\netstandard2.0\System.Memory.dll</HintPath>
@@ -191,7 +191,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="YamlDotNet, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.5.3.0\lib\net45\YamlDotNet.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.5.4.0\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -233,6 +233,7 @@
     <Compile Include="ステージ\07演奏\演奏ステージ_ビュアーモード.cs" />
     <Compile Include="ステージ\08結果\ランク.cs" />
     <Compile Include="ステージ\08結果\ランク種別.cs" />
+    <Compile Include="ステージ\システム情報.cs" />
     <Compile Include="ステージ\ステージ.cs" />
     <Compile Include="ステージ\ステージ管理.cs" />
     <Compile Include="ステージ\02タイトル\タイトルステージ.cs" />
@@ -311,14 +312,14 @@
     <Compile Include="入力\ドラム入力種別.cs" />
     <Compile Include="入力\入力管理.cs" />
     <Compile Include="曲\AVI管理.cs" />
-    <Compile Include="曲\BackNode.cs" />
+    <Compile Include="曲\Node\BackNode.cs" />
     <Compile Include="曲\BoxDef.cs" />
-    <Compile Include="曲\BoxNode.cs" />
-    <Compile Include="曲\MusicNode.cs" />
-    <Compile Include="曲\Node.cs" />
-    <Compile Include="曲\RootNode.cs" />
+    <Compile Include="曲\Node\BoxNode.cs" />
+    <Compile Include="曲\Node\MusicNode.cs" />
+    <Compile Include="曲\Node\Node.cs" />
+    <Compile Include="曲\Node\RootNode.cs" />
     <Compile Include="曲\SetDef.cs" />
-    <Compile Include="曲\SetNode.cs" />
+    <Compile Include="曲\Node\SetNode.cs" />
     <Compile Include="曲\WAV管理.cs" />
     <Compile Include="曲\曲名.cs" />
     <Compile Include="曲\曲ツリー.cs" />
@@ -441,6 +442,8 @@
     <None Include="System\sounds\presets\default\選曲ステージ_曲決定音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="曲\Node\Node.PreviewSound.cs" />
+    <Compile Include="曲\Node\Node.LevelColor.cs" />
     <None Include="設定\ベストプラクティス：DataContractのバージョン管理.md" />
   </ItemGroup>
   <ItemGroup>
@@ -882,11 +885,11 @@
     </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>このプロジェクトは、このコンピューター上にない NuGet パッケージを参照しています。それらのパッケージをダウンロードするには、[NuGet パッケージの復元] を使用します。詳細については、http://go.microsoft.com/fwlink/?LinkID=322105 を参照してください。見つからないファイルは {0} です。</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets'))" />
+    <Error Condition="!Exists('..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Data.SQLite.Core.1.0.110.0\build\net46\System.Data.SQLite.Core.targets'))" />
   </Target>
-  <Import Project="..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets" Condition="Exists('..\packages\System.Data.SQLite.Core.1.0.109.2\build\net46\System.Data.SQLite.Core.targets')" />
 </Project>
