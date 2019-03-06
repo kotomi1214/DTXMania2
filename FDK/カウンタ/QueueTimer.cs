@@ -22,6 +22,8 @@ namespace FDK.カウンタ
         /// <param name="callbackAction">タイマーが呼び出すコールバック処理。</param>
         public QueueTimer( uint dueTime, uint period, Action callbackAction )
         {
+            this._callbackAction = callbackAction;
+
             // タイマーキューを生成。
             this._hTimerQueue = CreateTimerQueue();
             if( _hTimerQueue == IntPtr.Zero )
