@@ -47,6 +47,7 @@ namespace DTXMania.ステージ.選曲
 					"Song not found...\n" +
 					"Hit BDx2 (in default SPACEx2) to select song folders."
                 } );
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
 
                 // 外部接続。
                 this._難易度と成績.青い線を取得する = () => this._青い線;
@@ -117,8 +118,11 @@ namespace DTXMania.ステージ.選曲
                 this._初めての進行描画 = false;
             }
 
-            
+
             // 進行描画
+
+            this._システム情報.VPSをカウントする();
+            this._システム情報.FPSをカウントしプロパティを更新する();
 
             if( null != App.曲ツリー.フォーカスノード )
             {
@@ -150,7 +154,7 @@ namespace DTXMania.ステージ.選曲
                 this._SongNotFound.描画する( dc, 1150f, 400f );
             }
 
-        
+
             // 入力
 
             App.入力管理.すべての入力デバイスをポーリングする();
@@ -160,6 +164,7 @@ namespace DTXMania.ステージ.選曲
                 case フェーズ.フェードイン:
 
                     App.ステージ管理.現在のアイキャッチ.進行描画する( dc );
+                    this._システム情報.描画する( dc );
 
                     if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.オープン完了 )
                     {
@@ -168,6 +173,8 @@ namespace DTXMania.ステージ.選曲
                     break;
 
                 case フェーズ.表示:
+
+                    this._システム情報.描画する( dc );
 
                     if( App.入力管理.確定キーが入力された() )
                     {
@@ -297,6 +304,7 @@ namespace DTXMania.ステージ.選曲
                 case フェーズ.フェードアウト:
 
                     App.ステージ管理.現在のアイキャッチ.進行描画する( dc );
+                    this._システム情報.描画する( dc );
 
                     if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.クローズ完了 )
                     {
@@ -312,6 +320,8 @@ namespace DTXMania.ステージ.選曲
 
 
         private bool _初めての進行描画 = true;
+
+        private システム情報 _システム情報 = null;
 
         private 舞台画像 _舞台画像 = null;
 

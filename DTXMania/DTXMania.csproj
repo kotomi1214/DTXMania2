@@ -233,6 +233,7 @@
     <Compile Include="ステージ\07演奏\演奏ステージ_ビュアーモード.cs" />
     <Compile Include="ステージ\08結果\ランク.cs" />
     <Compile Include="ステージ\08結果\ランク種別.cs" />
+    <Compile Include="ステージ\システム情報.cs" />
     <Compile Include="ステージ\ステージ.cs" />
     <Compile Include="ステージ\ステージ管理.cs" />
     <Compile Include="ステージ\02タイトル\タイトルステージ.cs" />

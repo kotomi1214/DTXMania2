@@ -69,7 +69,7 @@ namespace DTXMania.ステージ.演奏
                 this.子Activityを追加する( this._達成率表示 = new 達成率表示() );
                 this.子Activityを追加する( this._曲別SKILL = new 曲別SKILL() );
                 this.子Activityを追加する( this._エキサイトゲージ = new エキサイトゲージ() );
-                this.子Activityを追加する( this._FPS = new FPS() );
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
                 this.子Activityを追加する( this._数字フォント中グレー48x64 = new 画像フォント(
                    @"$(System)images\数字フォント中ホワイト48x64.png",
                    @"$(System)images\数字フォント中48x64矩形リスト.yaml",
@@ -206,7 +206,7 @@ namespace DTXMania.ステージ.演奏
 
                 // 高速進行
 
-                this._FPS.FPSをカウントしプロパティを更新する();
+                this._システム情報.FPSをカウントしプロパティを更新する();
 
                 switch( this.現在のフェーズ )
                 {
@@ -815,8 +815,8 @@ namespace DTXMania.ステージ.演奏
 
                         this._判定文字列.進行描画する();
 
-                        this._FPS.VPSをカウントする();
-                        this._FPS.描画する( dc, 0f, 0f );
+                        this._システム情報.VPSをカウントする();
+                        this._システム情報.描画する( dc );
 
                         if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
                         {
@@ -857,7 +857,7 @@ namespace DTXMania.ステージ.演奏
 
         private 曲名パネル _曲名パネル = null;
 
-        private FPS _FPS = null;
+        private システム情報 _システム情報 = null;
 
         private BASIC.レーンフレーム _レーンフレームBASIC = null;
 

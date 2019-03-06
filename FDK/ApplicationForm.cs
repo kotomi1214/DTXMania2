@@ -127,6 +127,8 @@ namespace FDK
             gd.D2DDeviceContext.BeginDraw();
             gd.D2DDeviceContext.Clear( Color4.Black );
             gd.D2DDeviceContext.EndDraw();
+
+            // SwapChain の Present は呼び出し元で行うので不要。
         }
 
         /// <summary>
@@ -204,7 +206,12 @@ namespace FDK
                     }
                     else
                     {
-                        var message = new Message() { HWnd = msg.handle, LParam = msg.lParam, Msg = (int) msg.msg, WParam = msg.wParam };
+                        var message = new Message() {
+                            HWnd = msg.handle,
+                            LParam = msg.lParam,
+                            Msg = (int) msg.msg,
+                            WParam = msg.wParam
+                        };
 
                         if( !Application.FilterMessage( ref message ) )
                         {

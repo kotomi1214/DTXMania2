@@ -61,6 +61,7 @@ namespace DTXMania.ステージ.結果
                 } );
                 this.子Activityを追加する( this._演奏パラメータ結果 = new 演奏パラメータ結果() );
                 this.子Activityを追加する( this._ランク = new ランク() );
+                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
@@ -121,6 +122,9 @@ namespace DTXMania.ステージ.結果
                 this._初めての進行描画 = false;
             }
 
+            this._システム情報.VPSをカウントする();
+            this._システム情報.FPSをカウントしプロパティを更新する();
+
             this._背景.進行描画する( dc );
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
                 dc.FillRectangle( new RectangleF( 0f, 36f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
@@ -131,7 +135,6 @@ namespace DTXMania.ステージ.結果
             this._サブタイトルを描画する( dc );
             this._演奏パラメータ結果.描画する( dc, 1317f, 716f, this._結果 );
             this._ランク.進行描画する( this._結果.ランク );
-
 
             // 入力
 
@@ -217,10 +220,14 @@ namespace DTXMania.ステージ.結果
                 case フェーズ.確定:
                     break;
             }
+
+            this._システム情報.描画する( dc );
         }
 
 
         private bool _初めての進行描画 = true;
+
+        private システム情報 _システム情報 = null;
 
         private 成績 _結果 = null;
 
