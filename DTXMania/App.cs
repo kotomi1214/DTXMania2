@@ -554,6 +554,12 @@ namespace DTXMania
             base.OnResizeEnd( e );
         }
 
+        protected override void OnInput( in Message msg )
+        {
+            App.入力管理.WM_INPUTを処理する( msg );
+
+            base.OnInput( msg );
+        }
 
         private bool _Dispose済み = false;
 

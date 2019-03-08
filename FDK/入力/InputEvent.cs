@@ -48,12 +48,14 @@ namespace FDK
         public int Velocity { get; set; }
 
         /// <summary>
-        ///     コントロールチェンジの番号。
+        ///     MIDIコントロールチェンジの番号。
+        ///     未使用なら 0 。
         /// </summary>
         public int Control { get; set; }
 
         /// <summary>
         ///     その他の情報。デバイス依存。
+        ///     未使用なら null 。
         /// </summary>
         public string Extra { get; set; }
 

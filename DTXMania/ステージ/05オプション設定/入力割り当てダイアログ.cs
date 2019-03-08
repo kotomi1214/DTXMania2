@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using SharpDX.DirectInput;
 using FDK;
 using DTXMania.設定;
 using DTXMania.入力;
@@ -75,7 +74,7 @@ namespace DTXMania.ステージ.オプション設定
 
 						// 初期メッセージを出力。
 
-						this.listView入力リスト.Items.Add( $"KEYBOARD \"{入力管理.Keyboard.DeviceName}\" の受付を開始しました。" );
+						this.listView入力リスト.Items.Add( $"HID Keyboard の受付を開始しました。" );
 						for( int i = 0; i < 入力管理.MidiIn.DeviceName.Count; i++ )
 							this.listView入力リスト.Items.Add( $"MIDI IN [{i}] \"{入力管理.MidiIn.DeviceName[ i ]}\" の受付を開始しました。" );
 						this.listView入力リスト.Items.Add( "" );
@@ -92,17 +91,17 @@ namespace DTXMania.ステージ.オプション設定
 
 							#region " キーボードをポーリングし、入力値を入力リストへ出力。"
 							//----------------
-							入力管理.Keyboard.ポーリングする();
+							入力管理.HIDKeyboard.ポーリングする();
 
-							for( int i = 0; i < 入力管理.Keyboard.入力イベントリスト.Count; i++ )
+							for( int i = 0; i < 入力管理.HIDKeyboard.入力イベントリスト.Count; i++ )
 							{
-								var inputEvent = 入力管理.Keyboard.入力イベントリスト[ i ];
+								var inputEvent = 入力管理.HIDKeyboard.入力イベントリスト[ i ];
 
 								if( inputEvent.押された )
 								{
 									var item = new ListViewItem入力リスト用( InputDeviceType.Keyboard, inputEvent );
 
-									if( inputEvent.Key == (int) Key.Escape )    // 割り当てされてほしくないキーはここへ。
+									if( inputEvent.Key == (int) Keys.Escape )    // 割り当てされてほしくないキーはここへ。
 									{
 										item.割り当て可能 = false;
 									}
@@ -273,7 +272,7 @@ namespace DTXMania.ステージ.オプション設定
                 switch( deviceType )
                 {
                     case InputDeviceType.Keyboard:
-                        this.Text = $"Keyboard, {inputEvent.Key}, '{( (Key) inputEvent.Key ).ToString()}'";
+                        this.Text = $"Keyboard, {inputEvent.Key}, '{( (Keys) inputEvent.Key ).ToString()}'";
                         break;
 
                     case InputDeviceType.MidiIn:
@@ -326,7 +325,7 @@ namespace DTXMania.ステージ.オプション設定
                 switch( deviceType )
                 {
                     case InputDeviceType.Keyboard:
-                        this.Text = $"Keyboard, {idKey.key}, '{( (Key) idKey.key ).ToString()}'";
+                        this.Text = $"Keyboard, {idKey.key}, '{( (Keys) idKey.key ).ToString()}'";
                         break;
 
                     case InputDeviceType.MidiIn:

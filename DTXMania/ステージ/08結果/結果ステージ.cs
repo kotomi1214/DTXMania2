@@ -5,7 +5,6 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
-using SharpDX.DirectInput;
 using FDK;
 using DTXMania.曲;
 using DTXMania.設定;

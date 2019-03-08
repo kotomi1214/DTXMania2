@@ -215,17 +215,24 @@ namespace FDK
 
                         if( !Application.FilterMessage( ref message ) )
                         {
-                            // WM_APP_TICK メッセージが来たら、1フレーム分の処理（進行または描画）を実行する。
-                            if( msg.msg == WM_APP_TICK )
+                            switch( msg.msg )
                             {
-                                Interlocked.Increment( ref bAction実行中 );   // 1:実行中
-                                action();
-                                Interlocked.Decrement( ref bAction実行中 );   // 0:完了
-                                continue;
-                            }
+                                case WM_APP_TICK:
+                                    // 1フレーム分の処理（進行または描画）を実行する。
+                                    Interlocked.Increment( ref bAction実行中 );   // 1:実行中
+                                    action();
+                                    Interlocked.Decrement( ref bAction実行中 );   // 0:完了
+                                    break;
 
-                            TranslateMessage( ref msg );
-                            DispatchMessage( ref msg );
+                                case WM_INPUT:
+                                    this.OnInput( in message );
+                                    break;
+
+                                default:
+                                    TranslateMessage( ref msg );
+                                    DispatchMessage( ref msg );
+                                    break;
+                            }
                         }
                     }
                 }
@@ -255,6 +262,10 @@ namespace FDK
 
         protected FormWindowState FormWindowState = FormWindowState.Normal;
 
+        protected virtual void OnInput( in Message msg )
+        {
+        }
+
         protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
         {
             // スワップチェーンの作成直後に呼び出される。
@@ -265,6 +276,7 @@ namespace FDK
             // スワップチェーンの破棄直前に呼び出される。
             // 派生クラスで実装すること。
         }
+
 
         /// <summary>
         ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
@@ -310,6 +322,7 @@ namespace FDK
         }
 
 
+        private const int WM_INPUT = 0x00FF;
         private const int WM_APP = 0x8000;
         private const int WM_APP_TICK = WM_APP + 1;
 

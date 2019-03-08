@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Runtime.Serialization;
-using SharpDX.DirectInput;
+using System.Windows.Forms;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using FDK;
@@ -72,7 +72,7 @@ namespace DTXMania.設定
         public Dictionary<int, string> MIDIデバイス番号toデバイス名 { get; protected set; }
 
         /// <summary>
-        ///		キーボードの入力（DirectInputのKey値）からドラム入力へのマッピング用 Dictionary 。
+        ///		キーボードの入力（<see cref="System.Windows.Forms.Keys"/>）からドラム入力へのマッピング用 Dictionary 。
         /// </summary>
         [Description( "キーボードの入力割り当て（デバイスID,キーID: ドラム入力種別）" )]
         public Dictionary<IdKey, ドラム入力種別> キーボードtoドラム { get; protected set; }
@@ -99,19 +99,19 @@ namespace DTXMania.設定
             this.MIDIデバイス番号toデバイス名 = new Dictionary<int, string>();
 
             this.キーボードtoドラム = new Dictionary<IdKey, ドラム入力種別>() {
-                { new IdKey( 0, (int) Key.Q ),      ドラム入力種別.LeftCrash },
-                { new IdKey( 0, (int) Key.Return ), ドラム入力種別.LeftCrash },
-                { new IdKey( 0, (int) Key.A ),      ドラム入力種別.HiHat_Open },
-                { new IdKey( 0, (int) Key.Z ),      ドラム入力種別.HiHat_Close },
-                { new IdKey( 0, (int) Key.S ),      ドラム入力種別.HiHat_Foot },
-                { new IdKey( 0, (int) Key.X ),      ドラム入力種別.Snare },
-                { new IdKey( 0, (int) Key.C ),      ドラム入力種別.Bass },
-                { new IdKey( 0, (int) Key.Space ),  ドラム入力種別.Bass },
-                { new IdKey( 0, (int) Key.V ),      ドラム入力種別.Tom1 },
-                { new IdKey( 0, (int) Key.B ),      ドラム入力種別.Tom2 },
-                { new IdKey( 0, (int) Key.N ),      ドラム入力種別.Tom3 },
-                { new IdKey( 0, (int) Key.M ),      ドラム入力種別.RightCrash },
-                { new IdKey( 0, (int) Key.K ),      ドラム入力種別.Ride },
+                { new IdKey( 0, (int) Keys.Q ),      ドラム入力種別.LeftCrash },
+                { new IdKey( 0, (int) Keys.Return ), ドラム入力種別.LeftCrash },
+                { new IdKey( 0, (int) Keys.A ),      ドラム入力種別.HiHat_Open },
+                { new IdKey( 0, (int) Keys.Z ),      ドラム入力種別.HiHat_Close },
+                { new IdKey( 0, (int) Keys.S ),      ドラム入力種別.HiHat_Foot },
+                { new IdKey( 0, (int) Keys.X ),      ドラム入力種別.Snare },
+                { new IdKey( 0, (int) Keys.C ),      ドラム入力種別.Bass },
+                { new IdKey( 0, (int) Keys.Space ),  ドラム入力種別.Bass },
+                { new IdKey( 0, (int) Keys.V ),      ドラム入力種別.Tom1 },
+                { new IdKey( 0, (int) Keys.B ),      ドラム入力種別.Tom2 },
+                { new IdKey( 0, (int) Keys.N ),      ドラム入力種別.Tom3 },
+                { new IdKey( 0, (int) Keys.M ),      ドラム入力種別.RightCrash },
+                { new IdKey( 0, (int) Keys.K ),      ドラム入力種別.Ride },
             };
 
             this.MIDItoドラム = new Dictionary<IdKey, ドラム入力種別>() {

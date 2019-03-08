@@ -25,7 +25,7 @@ namespace DTXMania
 
 
         // メインエントリ。
-        [STAThread]
+        [MTAThread] // STAThread にすると60秒で ContextSwitchDeadlock 例外が発生するっぽい
         static void Main( string[] args )
         {
             Application.EnableVisualStyles();

@@ -23,6 +23,8 @@ namespace FDK.カウンタ
         /// </returns>
         public static bool 処理を反復実行する( int キー番号, bool 押下中 )
         {
+            return false;
+
             // 初めて使用するキー番号であるか、または前回の呼び出しから1000ms以上経過しているなら、リセットする。
 
             if( !( KeyContextMap.ContainsKey( キー番号 ) ) ||
@@ -77,8 +79,6 @@ namespace FDK.カウンタ
 
             return 押下処理を実行すべき;
         }
-        public static bool 処理を反復実行する( SharpDX.DirectInput.Key キー番号, bool 押下中 )
-            => 処理を反復実行する( (int) キー番号, 押下中 );
 
         private class KeyContext
         {
