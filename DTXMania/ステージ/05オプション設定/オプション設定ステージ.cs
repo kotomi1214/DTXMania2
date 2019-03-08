@@ -812,8 +812,7 @@ namespace DTXMania.ステージ.オプション設定
                         //----------------
                         #endregion
                     }
-                    else if( キーリピート.処理を反復実行する( (int) System.Windows.Forms.Keys.Up, App.入力管理.上移動キーが押されている() ) ||
-                        App.入力管理.上移動キーが入力された() )
+                    else if( App.入力管理.上移動キーが入力された() )
                     {
                         #region " 上移動 "
                         //----------------
@@ -823,8 +822,7 @@ namespace DTXMania.ステージ.オプション設定
                         //----------------
                         #endregion
                     }
-                    else if( キーリピート.処理を反復実行する( (int) System.Windows.Forms.Keys.Down, App.入力管理.下移動キーが押されている() ) ||
-                        App.入力管理.下移動キーが入力された() )
+                    else if( App.入力管理.下移動キーが入力された() )
                     {
                         #region " 下移動 "
                         //----------------
@@ -834,8 +832,7 @@ namespace DTXMania.ステージ.オプション設定
                         //----------------
                         #endregion
                     }
-                    else if( キーリピート.処理を反復実行する( (int) System.Windows.Forms.Keys.Left, App.入力管理.左移動キーが押されている() ) ||
-                        App.入力管理.左移動キーが入力された() ) 
+                    else if( App.入力管理.左移動キーが入力された() ) 
                     {
                         #region " 左移動 "
                         //----------------
@@ -845,8 +842,7 @@ namespace DTXMania.ステージ.オプション設定
                         //----------------
                         #endregion
                     }
-                    else if( キーリピート.処理を反復実行する( (int) System.Windows.Forms.Keys.Right, App.入力管理.右移動キーが押されている() ) ||
-                        App.入力管理.右移動キーが入力された() )
+                    else if( App.入力管理.右移動キーが入力された() )
                     {
                         #region " 右移動 "
                         //----------------
