@@ -22,7 +22,7 @@ namespace DTXMania.設定
         /// <summary>
         ///     このクラスのバージョン。
         /// </summary>
-        public int Version = 1;
+        public int Version = 2;
 
         /// <remarks>
         ///		キーバインディングは全ユーザで共通。
@@ -82,11 +82,22 @@ namespace DTXMania.設定
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
                     config = deserializer.Deserialize<システム設定>( yaml );
 
-                    if( 1 != config.Version )
+                    switch( config.Version )
                     {
-                        Log.ERROR( $"未対応のバージョンです。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
-                        config = new システム設定();
-                        config.保存する();
+                        case 1:
+                            Log.ERROR( $"バージョン 2 を新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
+                            config = new システム設定();
+                            config.保存する();
+                            break;
+
+                        case 2:
+                            break;  // 現行バージョン
+
+                        default:
+                            Log.ERROR( $"未対応のバージョンです。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
+                            config = new システム設定();
+                            config.保存する();
+                            break;
                     }
                 }
                 catch( FileNotFoundException )
