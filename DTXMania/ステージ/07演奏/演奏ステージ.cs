@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
-using SharpDX.DirectInput;
 using FDK;
 using SSTFormat.v4;
 using DTXMania.設定;
@@ -568,7 +568,7 @@ namespace DTXMania.ステージ.演奏
 
                         // 入力(2) 演奏以外の操作（※演奏中なのでドラム入力は無視。）
 
-                        if( App.入力管理.Keyboard.キーが押された( 0, Key.Escape ) )
+                        if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Escape ) )
                         {
                             #region " ESC → 演奏中断 "
                             //----------------
@@ -582,7 +582,7 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             #endregion
                         }
-                        if( App.入力管理.Keyboard.キーが押された( 0, Key.Up ) )
+                        if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Up ) )
                         {
                             #region " 上 → 譜面スクロールを加速 "
                             //----------------
@@ -591,7 +591,7 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             #endregion
                         }
-                        if( App.入力管理.Keyboard.キーが押された( 0, Key.Down ) )
+                        if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Down ) )
                         {
                             #region " 下 → 譜面スクロールを減速 "
                             //----------------

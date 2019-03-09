@@ -23,9 +23,9 @@ namespace DTXMania.入力
         public Action キーバインディングを保存する = null;    // 外部依存アクション
 
         /// <summary>
-        ///     キーボードデバイス。
+        ///     HIDキーボードデバイス。
         /// </summary>
-        public Keyboard Keyboard { get; protected set; } = null;
+        public HIDKeyboard HIDKeyboard { get; protected set; } = null;
 
         /// <summary>
         ///     MIDI入力デバイス。
@@ -44,7 +44,7 @@ namespace DTXMania.入力
 
 
         /// <summary>
-        ///		コンストラクタ。個々の入力デバイスを生成する。
+        ///		コンストラクタ。
         /// </summary>
         /// <param name="hWindow">ウィンドウハンドル。キーボードのAcquireに使用する。</param>
         ///	<param name="最大入力履歴数">１つのシーケンスの最大入力サイズ。</param>
@@ -67,7 +67,7 @@ namespace DTXMania.入力
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.Keyboard = new Keyboard( this._hWindow );
+                this.HIDKeyboard = new HIDKeyboard();
                 this.MidiIn = new MidiIn();
                 this.ポーリング結果.Clear();
                 this._入力履歴 = new List<ドラム入力イベント>( this._最大入力履歴数 );
@@ -159,9 +159,14 @@ namespace DTXMania.入力
                 this.MidiIn?.Dispose();
                 this.MidiIn = null;
 
-                this.Keyboard?.Dispose();
-                this.Keyboard = null;
+                this.HIDKeyboard?.Dispose();
+                this.HIDKeyboard = null;
             }
+        }
+
+        public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
+        {
+            this.HIDKeyboard.WM_INPUTを処理する( wmInputMsg );
         }
 
         /// <summary>
@@ -186,10 +191,9 @@ namespace DTXMania.入力
 
             if( App.ウィンドウがアクティブである )
             {
-
-                // キーボード
+                // HIDキーボード
                 this._入力デバイスをポーリングする(
-                    this.Keyboard,
+                    this.HIDKeyboard,
                     キーバインディング.キーボードtoドラム,
                     入力履歴を記録する );
 
@@ -266,7 +270,7 @@ namespace DTXMania.入力
         public bool キャンセルキーが入力された()
         {
             return
-                this.Keyboard.キーが押された( 0, SharpDX.DirectInput.Key.Escape ) ||
+                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Escape ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom3,
                     ドラム入力種別.Tom3_Rim } );
@@ -279,7 +283,7 @@ namespace DTXMania.入力
         public bool 上移動キーが入力された()
         {
             return
-                this.Keyboard.キーが押された( 0, SharpDX.DirectInput.Key.Up ) ||
+                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom1,
                     ドラム入力種別.Tom1_Rim } );
@@ -287,7 +291,7 @@ namespace DTXMania.入力
         public bool 上移動キーが押されている()
         {
             return
-                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Up );
+                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Up );
         }
 
         /// <summary>
@@ -297,7 +301,7 @@ namespace DTXMania.入力
         public bool 下移動キーが入力された()
         {
             return
-                this.Keyboard.キーが押された( 0, SharpDX.DirectInput.Key.Down ) ||
+                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom2,
                     ドラム入力種別.Tom2_Rim } );
@@ -305,7 +309,7 @@ namespace DTXMania.入力
         public bool 下移動キーが押されている()
         {
             return
-                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Down );
+                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Down );
         }
 
         /// <summary>
@@ -315,7 +319,7 @@ namespace DTXMania.入力
         public bool 左移動キーが入力された()
         {
             return
-                this.Keyboard.キーが押された( 0, SharpDX.DirectInput.Key.Left ) ||
+                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Snare,
                     ドラム入力種別.Snare_ClosedRim,
@@ -324,7 +328,7 @@ namespace DTXMania.入力
         public bool 左移動キーが押されている()
         {
             return
-                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Left );
+                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Left );
         }
 
         /// <summary>
@@ -334,7 +338,7 @@ namespace DTXMania.入力
         public bool 右移動キーが入力された()
         {
             return
-                this.Keyboard.キーが押された( 0, SharpDX.DirectInput.Key.Right ) ||
+                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom3,
                     ドラム入力種別.Tom3_Rim } );
@@ -342,7 +346,7 @@ namespace DTXMania.入力
         public bool 右移動キーが押されている()
         {
             return
-                this.Keyboard.キーが押されている( 0, SharpDX.DirectInput.Key.Right );
+                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Right );
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ namespace FDK.カウンタ
         ///     キーを押しっぱなしにした際の自動反復入力をシミュレートする。
         /// </summary>
         /// <remarks>
+        ///     （※DirectInput用。WM_INPUTの場合は勝手にやってくれるので不要。）
         ///     このメソッドは、呼び出された回数に応じた値を返す。
         ///     初めてこのメソッドを呼び出した場合、trueが返される（押下処理をすぐに実行すべき）。
         ///     ２回目に呼び出した場合、押下処理は１回目から 200ms の間隔が開くまで false が返されたのち、true が返される。
@@ -77,8 +78,6 @@ namespace FDK.カウンタ
 
             return 押下処理を実行すべき;
         }
-        public static bool 処理を反復実行する( SharpDX.DirectInput.Key キー番号, bool 押下中 )
-            => 処理を反復実行する( (int) キー番号, 押下中 );
 
         private class KeyContext
         {
