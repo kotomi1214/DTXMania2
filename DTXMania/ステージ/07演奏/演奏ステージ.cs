@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -577,23 +578,54 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             #endregion
                         }
+
                         if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Up ) )
                         {
-                            #region " 上 → 譜面スクロールを加速 "
-                            //----------------
-                            const double 最大倍率 = 8.0;
-                            App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
-                            //----------------
-                            #endregion
+                            if( App.入力管理.HIDKeyboard.キーが押されている( 0, Keys.ShiftKey ) )
+                            {
+                                #region " Shift+上 → BGMAdjust 増加 "
+                                //----------------
+                                App.演奏曲ノード.BGMAdjust += 10; // ms
+
+                                App.WAV管理.すべてのBGMの再生位置を移動する( +10.0 / 1000.0 );  // sec
+
+                                this._BGMAdjustをデータベースに保存する( App.演奏曲ノード );
+                                //----------------
+                                #endregion
+                            }
+                            else
+                            {
+                                #region " 上 → 譜面スクロールを加速 "
+                                //----------------
+                                const double 最大倍率 = 8.0;
+                                App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
+                                //----------------
+                                #endregion
+                            }
                         }
                         if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Down ) )
                         {
-                            #region " 下 → 譜面スクロールを減速 "
-                            //----------------
-                            const double 最小倍率 = 0.5;
-                            App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
-                            //----------------
-                            #endregion
+                            if( App.入力管理.HIDKeyboard.キーが押されている( 0, Keys.ShiftKey ) )
+                            {
+                                #region " Shift+下 → BGMAdjust 減少 "
+                                //----------------
+                                App.演奏曲ノード.BGMAdjust -= 10; // ms
+
+                                App.WAV管理.すべてのBGMの再生位置を移動する( -10.0 / 1000.0 );  // sec
+
+                                this._BGMAdjustをデータベースに保存する( App.演奏曲ノード );
+                                //----------------
+                                #endregion
+                            }
+                            else
+                            {
+                                #region " 下 → 譜面スクロールを減速 "
+                                //----------------
+                                const double 最小倍率 = 0.5;
+                                App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
+                                //----------------
+                                #endregion
+                            }
                         }
                         if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                         {
@@ -811,7 +843,8 @@ namespace DTXMania.ステージ.演奏
                         this._判定文字列.進行描画する();
 
                         this._システム情報.VPSをカウントする();
-                        this._システム情報.描画する( dc );
+                        this._システム情報.描画する( dc,
+                            $"BGMAdjust: {App.演奏曲ノード.BGMAdjust}" );
 
                         if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
                         {
@@ -1126,6 +1159,23 @@ namespace DTXMania.ステージ.演奏
                     new RectangleF( 0f, 0f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height ),
                     不透明度,
                     BitmapInterpolationMode.Linear );
+            } );
+        }
+
+        private void _BGMAdjustをデータベースに保存する( 曲.MusicNode musicNode )
+        {
+            Task.Run( () => {
+                using( var songdb = new データベース.曲.SongDB() )
+                {
+                    var 曲レコード = songdb.Songs.Where( ( song ) => ( song.HashId == musicNode.曲ファイルハッシュ ) ).SingleOrDefault();
+
+                    if( null != 曲レコード )
+                    {
+                        曲レコード.BGMAdjust = musicNode.BGMAdjust;  // 更新
+
+                        songdb.DataContext.SubmitChanges(); // 更新完了
+                    }
+                }
             } );
         }
 

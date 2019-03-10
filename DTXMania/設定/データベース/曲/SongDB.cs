@@ -12,14 +12,15 @@ namespace DTXMania.データベース.曲
     using Song01 = old.Song01;
     using Song02 = old.Song02;
     using Song03 = old.Song03;
-    using Song = Song04;    // 最新バージョンを指定(1/2)。
+    using Song04 = old.Song04;
+    using Song = Song05;    // 最新バージョンを指定(1/2)。
 
     /// <summary>
     ///		曲データベースに対応するエンティティクラス。
     /// </summary>
     class SongDB : SQLiteDBBase
     {
-        public const long VERSION = 4;  // 最新バージョンを指定(2/2)。
+        public const long VERSION = 5;  // 最新バージョンを指定(2/2)。
 
         public static readonly VariablePath 曲DBファイルパス = @"$(AppData)SongDB.sqlite3";
 
@@ -215,6 +216,35 @@ namespace DTXMania.データベース.曲
                             // 失敗。
                             transaction.Rollback();
                             Log.ERROR( $"Songs テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン+1}]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 4:
+                    #region " 4 → 5 "
+                    //----------------
+                    // 変更点：
+                    // ・BGMAdjust カラムを追加。
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // データベースにカラム BGMAdjust を追加する。
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Songs ADD COLUMN BGMAdjust INTEGER NOT NULL DEFAILT 0" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( $"Songs テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            Log.ERROR( $"Songs テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                     }
                     //----------------

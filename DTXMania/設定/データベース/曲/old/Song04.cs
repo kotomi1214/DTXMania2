@@ -4,7 +4,7 @@ using System.Data.Linq.Mapping;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania.データベース.曲
+namespace DTXMania.データベース.曲.old
 {
     /// <summary>
     ///		曲テーブルのエンティティクラス。
