@@ -7,6 +7,9 @@ using SharpDX.Multimedia;
 
 namespace FDK
 {
+    /// <summary>
+    ///     Raw Input で HID キーボードの入力を扱う。
+    /// </summary>
     public class HIDKeyboard : IInputDevice, IDisposable
     {
         public InputDeviceType 入力デバイス種別 => InputDeviceType.Keyboard;
@@ -19,6 +22,7 @@ namespace FDK
         /// </summary>
         public HIDKeyboard()
         {
+            // 登録したいデバイス（ここでは１個）
             var devs = new RawInputDevice[] {
                 new RawInputDevice {
                     usUsagePage = UsagePage.Generic,
@@ -28,6 +32,7 @@ namespace FDK
                 }
             };
 
+            // デバイスを登録。
             RegisterRawInputDevices( devs, 1, Marshal.SizeOf<RawInputDevice>() );
         }
 
@@ -39,14 +44,18 @@ namespace FDK
         /// <summary>
         ///     キーボードHID からの WM_INPUT のコールバック。
         /// </summary>
+        /// <remarks>
+        ///     ウィンドウメッセージループで WM_INPUT を受信した場合は、このコールバックを呼び出すこと。
+        /// </remarks>
         public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
         {
             var rawInput = new RawInput();
             int csSize = Marshal.SizeOf<RawInput>();
 
+            // データ取得。
             if( 0 > GetRawInputData( wmInputMsg.LParam, DataType.Input, out rawInput, ref csSize, Marshal.SizeOf<RawInputHeader>() ) )
             {
-                //Debug.WriteLine( "WM_INPUt でのデータ取得に失敗しました。" );
+                //Debug.WriteLine( "WM_INPUT でのデータ取得に失敗しました。" );
                 return;
             }
             if( rawInput.Header.Type != DeviceType.Keyboard )
@@ -57,11 +66,12 @@ namespace FDK
 
             var keyboard = rawInput.Data.Keyboard;
 
+            // InputEvent 作成。
             var inputEvent = new InputEvent() {
-                DeviceID = 0,       // 固定
+                DeviceID = 0,         // 固定
                 Key = keyboard.VKey,  // 仮想キーコード(VK_*)
                 押された = ( ScanCodeFlags.Make == ( keyboard.Flags & ScanCodeFlags.Break ) ),
-                Velocity = 255,     // 固定
+                Velocity = 255,       // 固定
                 TimeStamp = Stopwatch.GetTimestamp(),
                 Extra = keyboard.ExtraInformation.ToString( "X8" ),
             };
@@ -92,7 +102,9 @@ namespace FDK
 
         public bool キーが押された( int deviceID, int key, out InputEvent ev )
         {
-            ev = this.入力イベントリスト.Find( ( item ) => ( item.Key == key && item.押された ) );
+            lock( this._一時入力イベントリスト )
+                ev = this.入力イベントリスト.Find( ( item ) => ( item.Key == key && item.押された ) );
+
             return ( null != ev );
         }
 
@@ -104,7 +116,8 @@ namespace FDK
 
         public bool キーが押されている( int deviceID, int key )
         {
-            return ( this._現在のキーの押下状態.TryGetValue( key, out bool 押されている ) ) ? 押されている : false;
+            lock( this._一時入力イベントリスト )
+                return ( this._現在のキーの押下状態.TryGetValue( key, out bool 押されている ) ) ? 押されている : false;
         }
 
         public bool キーが押されている( int deviceID, System.Windows.Forms.Keys key )
@@ -115,7 +128,9 @@ namespace FDK
 
         public bool キーが離された( int deviceID, int key, out InputEvent ev )
         {
-            ev = this.入力イベントリスト.Find( ( item ) => ( item.Key == key && item.離された ) );
+            lock( this._一時入力イベントリスト )
+                ev = this.入力イベントリスト.Find( ( item ) => ( item.Key == key && item.離された ) );
+
             return ( null != ev );
         }
 
@@ -127,7 +142,8 @@ namespace FDK
 
         public bool キーが離されている( int deviceID, int key )
         {
-            return ( this._現在のキーの押下状態.TryGetValue( key, out bool 押されている ) ) ? !( 押されている ) : true;
+            lock( this._一時入力イベントリスト )
+                return ( this._現在のキーの押下状態.TryGetValue( key, out bool 押されている ) ) ? !( 押されている ) : true;
         }
 
         public bool キーが離されている( int deviceID, System.Windows.Forms.Keys key )

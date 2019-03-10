@@ -321,7 +321,8 @@
     <Compile Include="曲\曲名.cs" />
     <Compile Include="曲\曲ツリー.cs" />
     <Compile Include="曲\難易度種別.cs" />
-    <Compile Include="設定\データベース\曲\Song04.cs" />
+    <Compile Include="設定\データベース\曲\old\Song04.cs" />
+    <Compile Include="設定\データベース\曲\Song05.cs" />
     <Compile Include="設定\データベース\曲\SongDB.cs" />
     <Compile Include="設定\データベース\SQLiteDBBase.cs" />
     <Compile Include="設定\データベース\ユーザ\Record06.cs" />
@@ -369,6 +370,7 @@
     <Compile Include="App.IDTXManiaService.cs">
       <SubType>Form</SubType>
     </Compile>
+    <None Include="ClassDiagram1.cd" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

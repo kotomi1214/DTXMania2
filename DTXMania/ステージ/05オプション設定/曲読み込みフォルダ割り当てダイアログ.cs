@@ -131,9 +131,9 @@ namespace DTXMania.ステージ.オプション設定
 				AllowNonFileSystemItems = false,
 			} )
 			{
-				// ダイアログを表示。
-				if( dialog.ShowDialog( this.Handle ) == CommonFileDialogResult.Ok )
-				{
+                // ダイアログを表示。
+                if( dialog.ShowDialog( this.Handle ) == CommonFileDialogResult.Ok )
+                {
 					// 選択されたフォルダを曲読み込みフォルダリストに追加する。
 					foreach( var name in dialog.FileNames )
 					{

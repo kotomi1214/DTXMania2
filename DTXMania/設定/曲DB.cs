@@ -11,7 +11,7 @@ using DTXMania.データベース.ユーザ;
 using DTXMania.データベース.曲;
 using DTXMania.ステージ.演奏;
 
-using Song = DTXMania.データベース.曲.Song04;
+using Song = DTXMania.データベース.曲.Song05;
 using Record = DTXMania.データベース.ユーザ.Record06;
 
 namespace DTXMania.設定
@@ -82,6 +82,7 @@ namespace DTXMania.設定
                                     PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "",
                                     Artist = score.アーティスト名,
                                     PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "",
+                                    BGMAdjust = 0,
                                 } );
 
                             songdb.DataContext.SubmitChanges();
@@ -123,6 +124,7 @@ namespace DTXMania.設定
                             song.PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "";
                             song.Artist = score.アーティスト名;
                             song.PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "";
+                            song.BGMAdjust = song.BGMAdjust;
 
                             songdb.DataContext.SubmitChanges();
 
@@ -171,6 +173,7 @@ namespace DTXMania.設定
                             record.PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "";
                             record.Artist = score.アーティスト名;
                             record.PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "";
+                            record.BGMAdjust = record.BGMAdjust;
 
                             if( hash != record.HashId )
                             {

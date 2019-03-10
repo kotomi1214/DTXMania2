@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -377,11 +378,6 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離 ) => {
 
-                                // ユーザ入力については、判定位置調整を適用する。（自動ヒットについては適用しない。）
-
-                                ヒット判定バーと描画との時間sec += ( App.システム設定.判定位置調整ms / 1000.0 );
-                                ヒット判定バーと発声との時間sec += ( App.システム設定.判定位置調整ms / 1000.0 );
-
                                 #region " チップにヒットしている入力を探す。"
                                 //----------------
                                 var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ chip.チップ種別 ];
@@ -582,23 +578,54 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             #endregion
                         }
+
                         if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Up ) )
                         {
-                            #region " 上 → 譜面スクロールを加速 "
-                            //----------------
-                            const double 最大倍率 = 8.0;
-                            App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
-                            //----------------
-                            #endregion
+                            if( App.入力管理.HIDKeyboard.キーが押されている( 0, Keys.ShiftKey ) )
+                            {
+                                #region " Shift+上 → BGMAdjust 増加 "
+                                //----------------
+                                App.演奏曲ノード.BGMAdjust += 10; // ms
+
+                                App.WAV管理.すべてのBGMの再生位置を移動する( +10.0 / 1000.0 );  // sec
+
+                                this._BGMAdjustをデータベースに保存する( App.演奏曲ノード );
+                                //----------------
+                                #endregion
+                            }
+                            else
+                            {
+                                #region " 上 → 譜面スクロールを加速 "
+                                //----------------
+                                const double 最大倍率 = 8.0;
+                                App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
+                                //----------------
+                                #endregion
+                            }
                         }
                         if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Down ) )
                         {
-                            #region " 下 → 譜面スクロールを減速 "
-                            //----------------
-                            const double 最小倍率 = 0.5;
-                            App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
-                            //----------------
-                            #endregion
+                            if( App.入力管理.HIDKeyboard.キーが押されている( 0, Keys.ShiftKey ) )
+                            {
+                                #region " Shift+下 → BGMAdjust 減少 "
+                                //----------------
+                                App.演奏曲ノード.BGMAdjust -= 10; // ms
+
+                                App.WAV管理.すべてのBGMの再生位置を移動する( -10.0 / 1000.0 );  // sec
+
+                                this._BGMAdjustをデータベースに保存する( App.演奏曲ノード );
+                                //----------------
+                                #endregion
+                            }
+                            else
+                            {
+                                #region " 下 → 譜面スクロールを減速 "
+                                //----------------
+                                const double 最小倍率 = 0.5;
+                                App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
+                                //----------------
+                                #endregion
+                            }
                         }
                         if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                         {
@@ -816,7 +843,8 @@ namespace DTXMania.ステージ.演奏
                         this._判定文字列.進行描画する();
 
                         this._システム情報.VPSをカウントする();
-                        this._システム情報.描画する( dc );
+                        this._システム情報.描画する( dc,
+                            $"BGMAdjust: {App.演奏曲ノード.BGMAdjust}" );
 
                         if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
                         {
@@ -1005,25 +1033,44 @@ namespace DTXMania.ステージ.演奏
         private void _描画範囲内のすべてのチップに対して( double 現在の演奏時刻sec, Action<チップ, int, double, double, double> 適用する処理 )
         {
             var スコア = App.演奏スコア;
+
             if( null == スコア )
                 return;
 
+            // 描画開始チップから後方のチップに向かって……
+
             for( int i = this._描画開始チップ番号; ( 0 <= i ) && ( i < スコア.チップリスト.Count ); i++ )
             {
+                var ユーザ設定 = App.ユーザ管理.ログオン中のユーザ;
                 var チップ = スコア.チップリスト[ i ];
+                var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ チップ.チップ種別 ];
+                var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
+
 
                 // ヒット判定バーとチップの間の、時間 と 距離 を算出。→ いずれも、負数ならバー未達、0でバー直上、正数でバー通過。
+
                 double ヒット判定バーと描画との時間sec = 現在の演奏時刻sec - チップ.描画時刻sec;
                 double ヒット判定バーと発声との時間sec = 現在の演奏時刻sec - チップ.発声時刻sec;
+                if( !AutoPlay )
+                {
+                    // ユーザ入力については、判定位置調整を適用する。（自動ヒットについては適用しない。）
+                    ヒット判定バーと描画との時間sec += ( App.システム設定.判定位置調整ms / 1000.0 );
+                    ヒット判定バーと発声との時間sec += ( App.システム設定.判定位置調整ms / 1000.0 );
+                }
                 double 倍率 = this._譜面スクロール速度.補間付き速度;
                 double ヒット判定バーとの距離dpx = this._指定された時間secに対応する符号付きピクセル数を返す( 倍率, ヒット判定バーと描画との時間sec );
 
-                // 終了判定。
+
+                // 演奏終了？
+
                 bool チップは画面上端より上に出ている = ( ( ヒット判定位置Ydpx + ヒット判定バーとの距離dpx ) < -40.0 );   // -40 はチップが隠れるであろう適当なマージン。
+
                 if( チップは画面上端より上に出ている )
                     break;
 
-                // 処理実行。開始判定（描画開始チップ番号の更新）もこの中で。
+
+                // 適用する処理を呼び出す。開始判定（描画開始チップ番号の更新）もこの中で。
+
                 適用する処理( チップ, i, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx );
             }
         }
@@ -1112,6 +1159,23 @@ namespace DTXMania.ステージ.演奏
                     new RectangleF( 0f, 0f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height ),
                     不透明度,
                     BitmapInterpolationMode.Linear );
+            } );
+        }
+
+        private void _BGMAdjustをデータベースに保存する( 曲.MusicNode musicNode )
+        {
+            Task.Run( () => {
+                using( var songdb = new データベース.曲.SongDB() )
+                {
+                    var 曲レコード = songdb.Songs.Where( ( song ) => ( song.HashId == musicNode.曲ファイルハッシュ ) ).SingleOrDefault();
+
+                    if( null != 曲レコード )
+                    {
+                        曲レコード.BGMAdjust = musicNode.BGMAdjust;  // 更新
+
+                        songdb.DataContext.SubmitChanges(); // 更新完了
+                    }
+                }
             } );
         }
 

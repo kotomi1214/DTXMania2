@@ -27,6 +27,11 @@ namespace DTXMania.曲
         /// </summary>
         public string 曲ファイルハッシュ { get; protected set; } = null;
 
+        /// <summary>
+        ///     この曲のBGMの再生タイミングを、この時間[ms]分だけ前後にずらす。（負数で早める、正数で遅める）
+        /// </summary>
+        public int BGMAdjust { get; set; } = 0;
+
 
         /// <summary>
         ///     指定されたファイルをもとに、初期化する。
@@ -62,6 +67,8 @@ namespace DTXMania.曲
 
                 if( song.PreSound.Nullでも空でもない() )
                     this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+
+                this.BGMAdjust = song.BGMAdjust;
             }
         }
     }

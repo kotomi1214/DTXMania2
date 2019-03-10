@@ -117,6 +117,9 @@ namespace DTXMania.曲
 
             // 発声する。
 
+            if( this._WAV情報リスト[ WAV番号 ].BGMである )        // BGM なら BGMAdjust を適用する
+                再生開始時刻sec += App.演奏曲ノード.BGMAdjust / 1000.0;
+
             this._WAV情報リスト[ WAV番号 ].発声する( muteGroupType, 音量, 再生開始時刻sec );
         }
 
@@ -124,6 +127,22 @@ namespace DTXMania.曲
         {
             foreach( var kvp in this._WAV情報リスト )
                 kvp.Value.発声を停止する();
+        }
+
+        public void 再生位置を移動する( int WAV番号, double 移動量sec )
+        {
+            if( !this._WAV情報リスト.ContainsKey( WAV番号 ) )
+                return;
+
+            this._WAV情報リスト[ WAV番号 ].再生位置を移動する( 移動量sec );
+        }
+
+        public void すべてのBGMの再生位置を移動する( double 移動量sec )
+        {
+            var BGMs = this._WAV情報リスト.Where( ( kvp ) => kvp.Value.BGMである );
+
+            foreach( var kvp in BGMs )
+                kvp.Value.再生位置を移動する( 移動量sec );
         }
 
 
@@ -177,7 +196,6 @@ namespace DTXMania.曲
                 }
             }
 
-
             /// <summary>
             ///     多重度の数だけ Sound を生成する。ただしソースは共通。
             /// </summary>
@@ -203,6 +221,7 @@ namespace DTXMania.曲
                 this.Sounds[ this._次に再生するSound番号 ].Play( 再生開始時刻sec );
 
                 // サウンドローテーション。
+                this._現在再生中のSound番号 = this._次に再生するSound番号;
                 this._次に再生するSound番号 = ( this._次に再生するSound番号 + 1 ) % this.Sounds.Length;
             }
 
@@ -212,6 +231,18 @@ namespace DTXMania.曲
                     sound.Stop();
             }
 
+            public void 再生位置を移動する( double 移動量sec )
+            {
+                if( 0 > this._現在再生中のSound番号 )
+                    return;
+
+                var sound = this.Sounds[ this._現在再生中のSound番号 ];
+
+                sound.Position += sound.秒ToFrame( 移動量sec ) * sound.WaveFormat.Channels;
+            }
+
+
+            private int _現在再生中のSound番号 = -1;
 
             private int _次に再生するSound番号 = 0;
         }

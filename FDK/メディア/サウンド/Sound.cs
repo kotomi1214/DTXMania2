@@ -156,7 +156,7 @@ namespace FDK
             }
         }
 
-        internal long 秒ToFrame( double 時間sec )
+        public long 秒ToFrame( double 時間sec )
         {
             if( null == this._BaseSampleSource )
                 return 0;
@@ -165,7 +165,7 @@ namespace FDK
             return (long) ( 時間sec * wf.SampleRate + 0.5 ); // +0.5 で四捨五入ができる
         }
 
-        internal double FrameTo秒( long 時間frame )
+        public double FrameTo秒( long 時間frame )
         {
             if( null == this._BaseSampleSource )
                 return 0;

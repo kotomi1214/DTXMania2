@@ -60,6 +60,8 @@ namespace DTXMania.曲
 
             public void 停止する()
             {
+                Interlocked.Increment( ref _再生番号 );     // +1
+
                 this._再生タイマ?.Dispose(); // タイマは停止するが、すでに Tick コールバックが始まってたら、そちらは止まらない。
                 this._再生タイマ = null;
 
