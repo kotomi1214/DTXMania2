@@ -37,11 +37,6 @@ namespace DTXMania.設定
         /// </remarks>
         public List<VariablePath> 曲検索フォルダ { get; protected set; } = null;
 
-        /// <summary>
-        ///     1～10?
-        /// </summary>
-        public int 入力発声スレッドのスリープ量ms { get; set; }
-
         public Point ウィンドウ表示位置Viewerモード用 { get; set; }
 
         public Size ウィンドウサイズViewerモード用 { get; set; }
@@ -62,7 +57,6 @@ namespace DTXMania.設定
         {
             this.キーバインディング = new キーバインディング();
             this.曲検索フォルダ = new List<VariablePath>() { @"$(Exe)" };
-            this.入力発声スレッドのスリープ量ms = 2;
             this.ウィンドウ表示位置Viewerモード用 = new Point( 100, 100 );
             this.ウィンドウサイズViewerモード用 = new Size( 640, 360 );
             this.判定位置調整ms = 0;
@@ -119,9 +113,6 @@ namespace DTXMania.設定
                 // パスの指定がなければ、とりあえず exe のあるフォルダを検索対象にする。
                 if( 0 == config.曲検索フォルダ.Count )
                     config.曲検索フォルダ.Add( @"$(Exe)" );
-
-                // 値の範囲チェック。
-                config.入力発声スレッドのスリープ量ms = Math.Max( 1, Math.Min( 10, config.入力発声スレッドのスリープ量ms ) );
 
                 return config;
             }
