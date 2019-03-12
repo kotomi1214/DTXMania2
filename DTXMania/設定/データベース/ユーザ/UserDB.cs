@@ -25,8 +25,17 @@ namespace DTXMania.データベース.ユーザ
             => base.DataContext.GetTable<Record>();
 
         public UserDB()
-            : base( ユーザDBファイルパス, VERSION )
         {
+            try
+            {
+                this.Open( ユーザDBファイルパス, VERSION );
+            }
+            catch( Exception e )
+            {
+                Log.WARNING( $"エラーが発生したので、新しく作り直します。[{e.Message}]" );
+                App.ユーザデータベースを初期化する();
+                this.Open( ユーザDBファイルパス, VERSION );
+            }
         }
 
 

@@ -117,7 +117,8 @@ namespace DTXMania
 
         public static void 曲データベースを初期化する()
         {
-            App.曲ツリー.非活性化する();
+            if( null != App.曲ツリー && App.曲ツリー.活性化している )
+                App.曲ツリー.非活性化する();
 
             var vpath = データベース.曲.SongDB.曲DBファイルパス;
             try
@@ -132,7 +133,7 @@ namespace DTXMania
 
         public static void ユーザデータベースを初期化する()
         {
-            App.ユーザ管理.Dispose();
+            App.ユーザ管理?.Dispose();
 
             var vpath = データベース.ユーザ.UserDB.ユーザDBファイルパス;
             try
