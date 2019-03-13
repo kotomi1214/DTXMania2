@@ -30,6 +30,14 @@ namespace DTXMania
 
         public static bool ビュアーモードである { get; protected set; }
 
+        public static bool ウィンドウがアクティブである { get; set; } = false;
+
+        public static bool ウィンドウがアクティブではない
+        {
+            get => !( App.ウィンドウがアクティブである );
+            set => App.ウィンドウがアクティブである = !( value );
+        }
+
         public static Random 乱数 { get; protected set; }
 
         public static システム設定 システム設定 { get; protected set; }
@@ -48,7 +56,13 @@ namespace DTXMania
 
         public static ユーザ管理 ユーザ管理 { get; protected set; }
 
-        
+        /// <summary>
+        ///     <see cref="WAV管理"/> で使用される、サウンドのサンプルストリームインスタンスをキャッシュ管理する。
+        /// </summary>
+        public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
+
+        #region " 演奏ごとのパラメータ "
+        //----------------
         public static 曲ツリー 曲ツリー { get; set; }            // ビュアーモード時は未使用。
 
         public static MusicNode ビュアー用曲ノード { get; set; } // ビュアーモード時のみ使用。
@@ -71,19 +85,8 @@ namespace DTXMania
         ///     <see cref="演奏スコア"/>  に対応して生成されたAVI動画インスタンスの管理。
         /// </summary>
         public static AVI管理 AVI管理 { get; set; }
-
-        /// <summary>
-        ///     <see cref="WAV管理"/> で使用される、サウンドのサンプルストリームインスタンスをキャッシュ管理する。
-        /// </summary>
-        public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
-
-        public static bool ウィンドウがアクティブである { get; set; } = false;    // DirectInput 用。
-
-        public static bool ウィンドウがアクティブではない
-        {
-            get => !( App.ウィンドウがアクティブである );
-            set => App.ウィンドウがアクティブである = !( value );
-        }
+        //----------------
+        #endregion
 
         /// <summary>
         ///		true なら全画面モード、false ならウィンドウモード。
@@ -117,7 +120,8 @@ namespace DTXMania
 
         public static void 曲データベースを初期化する()
         {
-            App.曲ツリー.非活性化する();
+            if( null != App.曲ツリー && App.曲ツリー.活性化している )
+                App.曲ツリー.非活性化する();
 
             var vpath = データベース.曲.SongDB.曲DBファイルパス;
             try
@@ -132,7 +136,7 @@ namespace DTXMania
 
         public static void ユーザデータベースを初期化する()
         {
-            App.ユーザ管理.Dispose();
+            App.ユーザ管理?.Dispose();
 
             var vpath = データベース.ユーザ.UserDB.ユーザDBファイルパス;
             try
@@ -149,11 +153,64 @@ namespace DTXMania
         }
 
 
-        /// <summary>
-        ///     コンストラクタ；アプリの初期化
-        /// </summary>
-        public App( bool ビュアーモードである )
+        public App()
             : base( 設計画面サイズ: new SizeF( 1920f, 1080f ), 物理画面サイズ: new SizeF( 1280f, 720f ), 深度ステンシルを使う: false )
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+            }
+        }
+
+        /// <summary>
+        ///     WCFサービスの存在チェック、起動など。
+        /// </summary>
+        /// <param name="options">コマンドラインオプション。</param>
+        /// <returns>true ならアプリを起動可能。false なら起動せず終了する。</returns>
+        public bool WCFサービスをチェックする( CommandLineOptions options )
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                App.ビュアーモードである = ( options.再生開始 || options.再生停止 );
+                App.サービスメッセージキュー = new ServiceMessageQueue();   // WCFサービス用
+
+                // WCFサービスホストを起動する。
+                this._wcfServiceHost = null;
+                try
+                {
+                    this._WCFサービスホストを起動する( out this._wcfServiceHost );
+
+                    Log.Info( $"WCF サービスの受付を開始しました。[{endPointUri}]" );
+                }
+                catch( AddressAlreadyInUseException )   // 既に起動されている。
+                {
+                    if( ビュアーモードである )
+                    {
+                        // ビュアーモードなら OK。既に別のWCFサービスが立ち上がっているので、そのサービスでオプションを処理して、終了する。
+                        this._WCFサービスを取得する( out var factory, out var service, out var serviceChannel );
+                        this._WCFサービスでオプションを処理する( service, options );
+                        this._WCFサービスを解放する( factory, service, serviceChannel );
+                        return false;
+                    }
+                    else
+                    {
+                        // 通常モードなら二重起動で NG。
+                        MessageBox.Show( "DTXMania はすでに起動しています。多重起動はできません。", "DTXMania Runtime Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
+                        return false;
+                    }
+                }
+
+                // ビュアーモードなら、オプションを自分で処理する。
+                if( ビュアーモードである )
+                    _WCFサービスでオプションを処理する( Program.App, options );
+
+                return true;
+            }
+        }
+
+        /// <summary>
+        ///     アプリの初期化。
+        /// </summary>
+        protected override void OnLoad( EventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -161,7 +218,6 @@ namespace DTXMania
                 SharpDX.Configuration.EnableReleaseOnFinalizer = true;          // ファイナライザの実行中、未解放のCOMを見つけたら解放を試みる。
                 SharpDX.Configuration.EnableTrackingReleaseOnFinalizer = true;  // その際には Trace にメッセージを出力する。
 #endif
-                App.ビュアーモードである = ビュアーモードである;
 
                 var exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
                 VariablePath.フォルダ変数を追加または更新する( "Exe", $@"{exePath}\" );
@@ -223,28 +279,28 @@ namespace DTXMania
                 App.WAV管理 = null;
                 App.AVI管理 = null;
 
-                // WCFサービス用
-                App.サービスメッセージキュー = new ServiceMessageQueue();
-
                 // 活性化
                 this._グローバルリソースを活性化する();
 
                 // ビュアーモードでは常にウィンドウモードで起動。
-                base.全画面モード = (App.ビュアーモードである)  ? false : App.ユーザ管理.ログオン中のユーザ.全画面モードである;
+                base.全画面モード = ( App.ビュアーモードである ) ? false : App.ユーザ管理.ログオン中のユーザ.全画面モードである;
 
                 // 最初のステージへ遷移する。
                 App.ステージ管理.ステージを遷移する( App.ステージ管理.最初のステージ名 );
+
+
+                base.OnLoad( e );   // メインループの開始処理を含むので、最後に呼び出すこと。
             }
         }
 
         /// <summary>
         ///     アプリの終了処理を行う。
         /// </summary>
-        protected override void Dispose( bool disposing )
+        protected override void OnClosing( CancelEventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( disposing && !( this._Dispose済み ) )
+                if( !this._Dispose済み )
                 {
                     this._Dispose済み = true;
 
@@ -287,9 +343,11 @@ namespace DTXMania
 
                     App.システム設定.保存する();
                     App.システム設定 = null;
+
+                    this._WCFサービスホストを終了する( _wcfServiceHost );
                 }
 
-                base.Dispose( disposing );
+                base.OnClosing( e );
             }
         }
 
@@ -513,7 +571,6 @@ namespace DTXMania
             }
         }
 
-
         protected override void OnKeyDown( KeyEventArgs e )
         {
             // F11 キーで、全画面／ウィンドウモードを切り替える。
@@ -561,6 +618,7 @@ namespace DTXMania
             base.OnInput( msg );
         }
 
+
         private bool _Dispose済み = false;
 
 
@@ -602,7 +660,89 @@ namespace DTXMania
                 // ユーザ設定を保存する。念のため。
                 App.ユーザ管理.ログオン中のユーザ?.保存する();
 
+                // フォームを閉じる。
                 this.Close();
+            }
+        }
+
+
+        // WCFサービス
+
+        public static readonly string serviceUri = "net.pipe://localhost/DTXMania";
+
+        public static readonly string endPointName = "Viewer";
+
+        public static readonly string endPointUri = $"{serviceUri}/{endPointName}";
+
+        private ServiceHost _wcfServiceHost;
+
+
+        private void _WCFサービスホストを起動する( out ServiceHost serviceHost )
+        {
+            // アプリのWCFサービスホストを生成する。
+            serviceHost = new ServiceHost( Program.App, new Uri( serviceUri ) );
+
+            // 名前付きパイプにバインドしたエンドポイントをサービスホストへ追加する。
+            serviceHost.AddServiceEndpoint(
+                typeof( IDTXManiaService ),                                 // 公開するインターフェース
+                new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ),   // 名前付きパイプ
+                endPointName );                                             // 公開するエンドポイント
+
+            // WCFサービスの受付を開始する。
+            serviceHost.Open();
+        }
+
+        private void _WCFサービスホストを終了する( ServiceHost serviceHost )
+        {
+            serviceHost.Close( new TimeSpan( 0, 0, 2 ) );   // 最大2sec待つ
+        }
+
+        private bool _WCFサービスを取得する( out ChannelFactory<IDTXManiaService> factory, out IDTXManiaService service, out IClientChannel serviceChannel )
+        {
+            const int 最大リトライ回数 = 1;
+
+            for( int retry = 1; retry <= 最大リトライ回数; retry++ )
+            {
+                try
+                {
+                    var binding = new NetNamedPipeBinding( NetNamedPipeSecurityMode.None );
+                    factory = new ChannelFactory<IDTXManiaService>( binding );
+                    service = factory.CreateChannel( new EndpointAddress( endPointUri ) );
+                    serviceChannel = service as IClientChannel; // サービスとチャンネルは同じインスタンス。
+                    serviceChannel.Open();
+
+                    return true;    // 取得成功。
+                }
+                catch
+                {
+                    // 取得失敗。少し待ってからリトライする。
+                    if( 最大リトライ回数 != retry )
+                        System.Threading.Thread.Sleep( 500 );
+                    continue;
+                }
+            }
+
+            serviceChannel = null;
+            service = null;
+            factory = null;
+            return false;   // 取得失敗。
+        }
+
+        private void _WCFサービスを解放する( ChannelFactory<IDTXManiaService> factory, IDTXManiaService service, IClientChannel serviceChannel )
+        {
+            serviceChannel?.Close();
+            factory?.Close();
+        }
+
+        private void _WCFサービスでオプションを処理する( IDTXManiaService service, CommandLineOptions options )
+        {
+            if( options.再生開始 )
+            {
+                service.ViewerPlay( options.Filename, options.再生開始小節番号, options.ドラム音を発声する );
+            }
+            else if( options.再生停止 )
+            {
+                service.ViewerStop();
             }
         }
     }

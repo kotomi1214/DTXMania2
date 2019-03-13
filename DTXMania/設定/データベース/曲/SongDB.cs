@@ -29,10 +29,18 @@ namespace DTXMania.データベース.曲
 
 
         public SongDB()
-            : base( 曲DBファイルパス, VERSION )
         {
+            try
+            {
+                this.Open( 曲DBファイルパス, VERSION );
+            }
+            catch( Exception e )
+            {
+                Log.WARNING( $"エラーが発生したので、新しく作り直します。[{e.Message}]" );
+                App.曲データベースを初期化する();
+                this.Open( 曲DBファイルパス, VERSION );
+            }
         }
-
 
         protected override void テーブルがなければ作成する()
         {

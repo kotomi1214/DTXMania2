@@ -14,15 +14,9 @@ namespace SSTFEditor
             this.Form = form;
         }
 
-        public void クリアする()
-        {
-            this.アイテムリスト.Clear();
-            this.Form = null;
-        }
-
         public void 現在選択されているチップをボードにコピーする()
         {
-            this.クリアする();
+            this.アイテムリスト.Clear();
 
             foreach( 描画用チップ chip in this.Form.譜面.SSTFormatScore.チップリスト )
             {

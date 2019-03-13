@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
@@ -69,6 +70,7 @@ namespace FDK
             }
         }
 
+
         /// <summary>
         ///		初期化処理。
         /// </summary>
@@ -90,23 +92,6 @@ namespace FDK
             this.UserResized += this._UserResize;
 
             this._初期化完了 = true;
-        }
-
-        /// <summary>
-        ///		終了処理。
-        /// </summary>
-        protected override void Dispose( bool disposing )
-        {
-            if( disposing && this._初期化完了 )
-            {
-                this._初期化完了 = false;
-
-                PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
-
-                グラフィックデバイス.インスタンスを解放する();
-            }
-
-            base.Dispose( disposing );
         }
 
         /// <summary>
@@ -141,16 +126,13 @@ namespace FDK
             //
         }
 
-
         /// <summary>
-        ///		メインループ。
+        ///     開始処理。
+        ///     キュータイマーを生成し、WM_APP_TICK の定期送信を開始する。
         /// </summary>
-        public virtual void Run()
+        protected override void OnLoad( EventArgs e )
         {
-            this.Show();
-
-            // 1フレーム分の処理（進行または描画）を定義する。
-            var action = new Action( () => {
+            this._1フレーム分のアクション = new Action( () => {
 
                 if( this.FormWindowState == FormWindowState.Minimized )
                     return;
@@ -175,69 +157,70 @@ namespace FDK
 
             } );
 
-            long bAction実行中 = 0;
-            var hWnd = this.Handle; // QueueTimer のコールバック内で this. を使うとフォームの破棄時に ObjectDisposedException が発生するため、ローカル変数に退避してこれを参照する。
+            this._hWnd = this.Handle; // QueueTimer (Win32)のコールバック内で this. を使うとフォームの破棄時に ObjectDisposedException が発生するため、ローカル変数に退避してこれを参照する。
+            this._Action実行中 = 0;
 
-            using( var qtimer = new カウンタ.QueueTimer( 1, 1, () => {
+            // タイマ生成、再生開始。
+            this._queueTimer = new カウンタ.QueueTimer( 1, 1, () => {
 
                 // 1msごとに、フォームに WM_APP_TICK メッセージを送信する。
 
-                if( 0 == Interlocked.Read( ref bAction実行中 ) )
+                if( 0 == Interlocked.Read( ref this._Action実行中 ) )
                 {
-                    PostMessage( hWnd, WM_APP_TICK, IntPtr.Zero, IntPtr.Zero );
+                    PostMessage( this._hWnd, WM_APP_TICK, IntPtr.Zero, IntPtr.Zero );
                 }
                 else
                 {
                     // Action が実行中の場合は送信しない。
                 }
 
-            } ) )
-            {
-                // メッセージディスパッチループ。
+            } );
 
-                int bRet;
-                while( !this.IsDisposed && ( bRet = GetMessage( out NativeMessage msg, this.Handle, 0, 0 ) ) != 0 )     // 戻り値 0: WM_QUIT
-                {
-                    if( 0 > bRet )  // 戻り値 -1: Error
-                    {
-                        throw new InvalidOperationException( String.Format( System.Globalization.CultureInfo.InvariantCulture,
-                            "An error happened in rendering loop while processing windows messages. Error: {0}",
-                            Marshal.GetLastWin32Error() ) );
-                    }
-                    else
-                    {
-                        var message = new Message() {
-                            HWnd = msg.handle,
-                            LParam = msg.lParam,
-                            Msg = (int) msg.msg,
-                            WParam = msg.wParam
-                        };
-
-                        if( !Application.FilterMessage( ref message ) )
-                        {
-                            switch( msg.msg )
-                            {
-                                case WM_APP_TICK:
-                                    // 1フレーム分の処理（進行または描画）を実行する。
-                                    Interlocked.Increment( ref bAction実行中 );   // 1:実行中
-                                    action();
-                                    Interlocked.Decrement( ref bAction実行中 );   // 0:完了
-                                    break;
-
-                                case WM_INPUT:
-                                    this.OnInput( in message );
-                                    break;
-
-                                default:
-                                    TranslateMessage( ref msg );
-                                    DispatchMessage( ref msg );
-                                    break;
-                            }
-                        }
-                    }
-                }
-            }
+            base.OnLoad( e );
         }
+
+        /// <summary>
+        ///     終了処理。
+        /// </summary>
+        protected override void OnClosing( CancelEventArgs e )
+        {
+            // WM_APP_TICK の定期送信を停止する。
+            this._queueTimer?.Dispose();
+
+            if( this._初期化完了 )
+            {
+                this._初期化完了 = false;
+
+                PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
+
+                グラフィックデバイス.インスタンスを解放する();
+            }
+
+            base.OnClosing( e );
+        }
+
+        /// <summary>
+        ///     独自のメッセージハンドリング。
+        /// </summary>
+        protected override void WndProc( ref Message m )
+        {
+            switch( m.Msg )
+            {
+                case WM_APP_TICK:
+                    // 1フレーム分の処理（進行または描画）を実行する。
+                    Interlocked.Increment( ref this._Action実行中 );   // 1:実行中
+                    this._1フレーム分のアクション();
+                    Interlocked.Decrement( ref this._Action実行中 );   // 0:完了
+                    break;
+
+                case WM_INPUT:
+                    this.OnInput( in m );
+                    break;
+            }
+
+            base.WndProc( ref m );
+        }
+
 
         /// <summary>
         ///		コンストラクタでの初期化が終わっていれば true。
@@ -262,6 +245,7 @@ namespace FDK
 
         protected FormWindowState FormWindowState = FormWindowState.Normal;
 
+
         protected virtual void OnInput( in Message msg )
         {
         }
@@ -271,6 +255,7 @@ namespace FDK
             // スワップチェーンの作成直後に呼び出される。
             // 派生クラスで実装すること。
         }
+
         protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
         {
             // スワップチェーンの破棄直前に呼び出される。
@@ -278,17 +263,26 @@ namespace FDK
         }
 
 
+        private IntPtr _hWnd;
+
+        private Action _1フレーム分のアクション = null;
+
+        private long _Action実行中 = 0;
+
+        private カウンタ.QueueTimer _queueTimer = null;
+
         /// <summary>
         ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
         /// </summary>
         private long _PresentNow = 0;
-
+        
         /// <summary>
         ///		ウィンドウを全画面モードにする直前に取得し、
         ///		再びウィンドウモードに戻して状態を復元する時に参照する。
         ///		（<see cref="全画面モード"/> を参照。）
         /// </summary>
         private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
+
 
         /// <summary>
         ///     ユーザによるフォームのリサイズ終了イベント。
@@ -321,33 +315,15 @@ namespace FDK
             }
         }
 
+        
+        // Win32
 
         private const int WM_INPUT = 0x00FF;
         private const int WM_APP = 0x8000;
         private const int WM_APP_TICK = WM_APP + 1;
 
-        [StructLayout( LayoutKind.Sequential )]
-        public struct NativeMessage
-        {
-            public IntPtr handle;
-            public uint msg;
-            public IntPtr wParam;
-            public IntPtr lParam;
-            public uint time;
-            public SharpDX.Mathematics.Interop.RawPoint p;
-        }
-
         [return: MarshalAs( UnmanagedType.Bool )]
         [DllImport( "user32.dll", SetLastError = true, CharSet = CharSet.Auto )]
         static extern bool PostMessage( IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam );
-
-        [DllImport( "user32.dll", EntryPoint = "GetMessage" )]
-        public static extern int GetMessage( out NativeMessage lpMsg, IntPtr hWnd, int wMsgFilterMin, int wMsgFilterMax );
-
-        [DllImport( "user32.dll", EntryPoint = "TranslateMessage" )]
-        public static extern int TranslateMessage( ref NativeMessage lpMsg );
-
-        [DllImport( "user32.dll", EntryPoint = "DispatchMessage" )]
-        public static extern int DispatchMessage( ref NativeMessage lpMsg );
     }
 }

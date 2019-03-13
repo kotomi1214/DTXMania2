@@ -31,7 +31,11 @@ namespace DTXMania.データベース
         public DataContext DataContext { get; protected set; } = null;
 
 
-        public SQLiteDBBase( VariablePath DBファイルパス, long Version )
+        public SQLiteDBBase()
+        {
+        }
+
+        public virtual void Open( VariablePath DBファイルパス, long Version )
         {
             if( 0 == Version )
                 throw new Exception( "Version = 0 は予約されています。" );
