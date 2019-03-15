@@ -351,7 +351,7 @@ namespace DTXMania.曲
                         while( this._検索フォルダキュー.TryDequeue( out var item ) )
                         {
                             // フォルダを検索し、ツリーを構築する。
-                            Log.Info( $"検索中: {item.path.変数なしパス}" );
+                            Log.Info( $"検索中: {item.path.変数付きパス}" );
                             this._構築する( item.parent, item.path );
                         }
                     }
