@@ -29,6 +29,8 @@ namespace DTXMania.曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._一時停止中の動画のリスト = null;
+
                 foreach( var kvp in this._動画リスト )
                     kvp.Value.Dispose();
 
@@ -63,10 +65,36 @@ namespace DTXMania.曲
             this._動画リスト[ AVI番号 ] = new Video( 動画ファイルの絶対パス, 再生速度 );
         }
 
+        public void 再生中の動画をすべて一時停止する()
+        {
+            this._一時停止中の動画のリスト.Clear();
+
+            foreach( var kvp in this._動画リスト )
+            {
+                var video = kvp.Value;
+
+                if( video.再生中 )
+                {
+                    video.一時停止する();
+                    this._一時停止中の動画のリスト.Add( video );
+                }
+            }
+        }
+
+        public void 一時停止中の動画をすべて再開する()
+        {
+            foreach( var video in this._一時停止中の動画のリスト )
+            {
+                video.再開する();
+            }
+        }
+
 
         /// <summary>
         ///		全AVIのリスト。[key: WAV番号]
         /// </summary>
         private Dictionary<int, Video> _動画リスト = null;
+
+        private List<Video> _一時停止中の動画のリスト = new List<Video>();
     }
 }

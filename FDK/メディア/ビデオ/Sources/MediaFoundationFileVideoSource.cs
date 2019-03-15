@@ -121,13 +121,14 @@ namespace FDK
                 return;
 
             this._デコードキャンセル = new CancellationTokenSource();
-            this._デコード起動完了通知 = new ManualResetEvent( false );
+            this._デコード起動完了通知 = new ManualResetEventSlim( false );
+            this._一時停止解除通知 = new ManualResetEventSlim( true );
 
             // (1) デコードタスク起動、デコード開始。
             this._デコードタスク = Task.Factory.StartNew( this._デコードタスクエントリ, (再生開始時刻sec, this.再生速度), this._デコードキャンセル.Token );
 
             // (2) デコードから完了通知がくるまでブロック。
-            this._デコード起動完了通知.WaitOne();
+            this._デコード起動完了通知.Wait();
         }
 
         /// <summary>
@@ -143,13 +144,34 @@ namespace FDK
                 // (2) デコードタスクがキューでブロックしてたら解除する。
                 this._FrameQueue.Cancel();
 
-                // (3) デコードタスクが終了するまで待つ。
+                // (3) デコードタスクが一時停止中でブロックしてたら解除する。
+                this._一時停止解除通知.Set();
+
+                // (4) デコードタスクが終了するまで待つ。
                 if( !( this._デコードタスク.Wait( 5000 ) ) )   // 最大5秒
                     Log.ERROR( $"デコードタスクの終了がタイムアウトしました。" );
 
                 this._デコードタスク = null;
             }
         }
+
+        /// <summary>
+        ///     デコードを一時停止する。
+        /// </summary>
+        public void Pause()
+        {
+            this._一時停止解除通知.Reset();
+        }
+
+        /// <summary>
+        ///     デコードを再開する。
+        ///     <see cref="Pause"/>で停止しているときのみ有効。
+        /// </summary>
+        public void Resume()
+        {
+            this._一時停止解除通知.Set();   // 解除
+        }
+
 
         /// <summary>
         ///     次に読みだされるフレームがあれば、その表示予定時刻[100ns単位]を返す。
@@ -216,7 +238,9 @@ namespace FDK
 
         private CancellationTokenSource _デコードキャンセル = null;
 
-        private ManualResetEvent _デコード起動完了通知 = null;
+        private ManualResetEventSlim _デコード起動完了通知 = null;
+
+        private ManualResetEventSlim _一時停止解除通知 = null;
 
 
         private void _デコードタスクエントリ( object obj引数 )
@@ -262,12 +286,15 @@ namespace FDK
 
             while( true )
             {
+                // キャンセル通知があれば、ループを抜けてタスクを終了。
                 if( this._デコードキャンセル.Token.IsCancellationRequested )
                 {
                     Log.Info( $"キャンセル通知を受信しました。" );
                     break;
                 }
 
+                // 一時停止中なら、解除通知がくるまでここでタスクをブロック。
+                this._一時停止解除通知.Wait();
 
                 if( !this._サンプルをひとつデコードしてフレームをキューへ格納する( 再生速度 ) )
                     break;  // エラーまたは再生終了

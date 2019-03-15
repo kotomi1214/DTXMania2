@@ -42,6 +42,18 @@ namespace FDK
             throw new NotImplementedException();
         }
 
+        public void Pause()
+        {
+            // todo: 実装する
+            throw new NotImplementedException();
+        }
+
+        public void Resume()
+        {
+            // todo: 実装する
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///     次に読みだされるフレームがあれば、その表示予定時刻[100ns単位]を返す。
         ///     フレームがなければ、ブロックせずにすぐ 負数 を返す。

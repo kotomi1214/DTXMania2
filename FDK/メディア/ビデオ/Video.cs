@@ -72,6 +72,18 @@ namespace FDK
             this.再生中 = false;
         }
 
+        public void 一時停止する()
+        {
+            this._再生タイマ?.一時停止する();
+            this._VideoSource?.Pause();
+        }
+
+        public void 再開する()
+        {
+            this._再生タイマ?.再開する();
+            this._VideoSource?.Resume();
+        }
+
         public void 描画する( DeviceContext1 dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
         {
             if( null == this._VideoSource )
@@ -177,7 +189,7 @@ namespace FDK
                 }
                 else
                 {
-                    if( 次の次のフレームの表示予定時刻100ns <= this._再生タイマ.現在のリアルタイムカウント100ns )
+                    if( 次の次のフレームの表示予定時刻100ns <= this._再生タイマ.現在のキャプチャカウント100ns )
                     {
                         // (B) 次の次のフレームが存在し、かつ表示予定時刻を過ぎてる場合　→　次のフレームは破棄してさらに次へ。
                         次のフレーム.Dispose();

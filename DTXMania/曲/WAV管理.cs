@@ -36,6 +36,8 @@ namespace DTXMania.曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._一時停止中の音声のリスト = null;
+
                 foreach( var kvp in this._WAV情報リスト )
                     kvp.Value.Dispose();
 
@@ -144,6 +146,34 @@ namespace DTXMania.曲
             foreach( var kvp in BGMs )
                 kvp.Value.再生位置を移動する( 移動量sec );
         }
+
+        public void 再生中の音声をすべて一時停止する()
+        {
+            this._一時停止中の音声のリスト.Clear();
+
+            foreach( var kvp in this._WAV情報リスト )
+            {
+                foreach( var sound in kvp.Value.Sounds )
+                {
+                    if( sound.再生中である )
+                    {
+                        sound.Pause();
+                        this._一時停止中の音声のリスト.Add( sound );
+                    }
+                }
+            }
+        }
+
+        public void 一時停止中の音声をすべて再開する()
+        {
+            foreach( var sound in this._一時停止中の音声のリスト )
+            {
+                sound.Resume();
+            }
+        }
+
+
+        private List<Sound> _一時停止中の音声のリスト = new List<Sound>();
 
 
         private readonly int _既定の多重度;

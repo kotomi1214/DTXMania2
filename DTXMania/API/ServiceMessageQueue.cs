@@ -30,7 +30,7 @@ namespace DTXMania.API
         {
             if( this._メッセージキュー.TryDequeue( out ServiceMessage msg ) )
             {
-                Log.Info( "サービスメッセージを取得しました。" );
+                Log.Info( $"サービスメッセージを取得しました。[{msg.種別}]" );
                 return msg;
             }
             else

@@ -36,5 +36,16 @@ namespace FDK
         ///     デコードを終了する。
         /// </summary>
         void Stop();
+
+        /// <summary>
+        ///     デコードを一時停止する。
+        /// </summary>
+        void Pause();
+
+        /// <summary>
+        ///     デコードを再開する。
+        ///     <see cref="Pause"/>で停止しているときのみ有効。
+        /// </summary>
+        void Resume();
     }
 }

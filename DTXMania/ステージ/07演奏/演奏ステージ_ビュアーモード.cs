@@ -84,6 +84,9 @@ namespace DTXMania.ステージ.演奏
 
                 //this._演奏状態を初期化する();
 
+                // マウスクリックイベント登録
+                Program.App.MouseDown += this.App_MouseDown;
+
                 this._ビュアーモード時にドラムサウンドを発声する = true;
                 this.現在のフェーズ = フェーズ.クリア;
             }
@@ -93,6 +96,9 @@ namespace DTXMania.ステージ.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                // マウスクリックイベント登録解除
+                Program.App.MouseDown -= this.App_MouseDown;
+
                 this._演奏状態を終了する();
 
                 #region " 現在の譜面スクロール速度をDBに保存。"
@@ -173,6 +179,10 @@ namespace DTXMania.ステージ.演奏
                 }
             }
 
+            // その他。
+
+            this._一時停止中 = false;
+
             this._初めての進行描画 = true;
         }
 
@@ -180,8 +190,8 @@ namespace DTXMania.ステージ.演奏
         {
             this._描画開始チップ番号 = -1;
 
-            //App.WAV管理?.Dispose();	
-            //App.WAV管理 = null;
+            App.WAV管理?.Dispose();	
+            App.WAV管理 = null;
             App.AVI管理?.Dispose();
             App.AVI管理 = null;
             this.現在のフェーズ = フェーズ.クリア;
@@ -876,9 +886,11 @@ namespace DTXMania.ステージ.演奏
 
         private Dictionary<チップ, チップの演奏状態> _チップの演奏状態 = null;
 
+        private bool _一時停止中 = false;
+
+
         private double _演奏開始からの経過時間secを返す()
             => App.サウンドタイマ.現在時刻sec;
-
 
         /// <summary>
         ///		<see cref="_描画開始チップ番号"/> から画面上端にはみ出すまでの間の各チップに対して、指定された処理を適用する。
@@ -1100,6 +1112,32 @@ namespace DTXMania.ステージ.演奏
             App.サウンドタイマ.リセットする( 演奏開始時刻sec );
 
             return;
+        }
+
+        // マウス右クリック　→　一時停止／再開する。
+        private void App_MouseDown( object sender, MouseEventArgs e )
+        {
+            if( e.Button == MouseButtons.Right )
+            {
+                if( !this._一時停止中 )
+                {
+                    this._一時停止中 = true;
+
+                    App.サウンドタイマ.一時停止する();
+
+                    App.AVI管理?.再生中の動画をすべて一時停止する();
+                    App.WAV管理?.再生中の音声をすべて一時停止する();
+                }
+                else
+                {
+                    this._一時停止中 = false;
+
+                    App.AVI管理?.一時停止中の動画をすべて再開する();
+                    App.WAV管理?.一時停止中の音声をすべて再開する();
+
+                    App.サウンドタイマ.再開する();
+                }
+            }
         }
 
 
