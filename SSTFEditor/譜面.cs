@@ -613,6 +613,7 @@ namespace SSTFEditor
             g.DrawRectangle( this.チップの太枠ペン, チップ描画領域 );
         }
 
+        // 小節番号 → grid
         public int 小節先頭の譜面内絶対位置gridを返す( int 小節番号 )
         {
             if( 0 > 小節番号 )
@@ -626,6 +627,36 @@ namespace SSTFEditor
             return 高さgrid;
         }
 
+        // grid → 小節番号, grid
+        public (int 小節番号, int 小節の先頭位置grid) 譜面内絶対位置gridに位置する小節の情報を返す( int 譜面内絶対位置grid )
+        {
+            if( 0 > 譜面内絶対位置grid )
+                throw new ArgumentOutOfRangeException( "譜面内絶対位置grid が負数です。" );
+
+            var result = (小節番号: 0, 小節の先頭位置grid: -1);
+
+            int n = 0;
+            int back = 0;
+            int i = 0;
+            while( true )       // 最大譜面番号を超えてどこまでもチェック。
+            {
+                back = n;
+                n += this.小節長をグリッドで返す( i );
+
+                if( 譜面内絶対位置grid < n )
+                {
+                    result.小節の先頭位置grid = back;
+                    result.小節番号 = i;
+                    break;
+                }
+
+                i++;
+            }
+
+            return result;
+        }
+
+        // Xpx → 編集レーン種別
         public 編集レーン種別 譜面パネル内X座標pxにある編集レーンを返す( int 譜面パネル内X座標px )
         {
             int レーン番号 = 譜面パネル内X座標px / this.チップサイズpx.Width;
@@ -639,6 +670,7 @@ namespace SSTFEditor
             return 編集レーン種別.Unknown;
         }
 
+        // 編集レーン → Xpx
         public int 編集レーンのX座標pxを返す( 編集レーン種別 lane )
         {
             if( lane == 編集レーン種別.Unknown )
@@ -647,16 +679,19 @@ namespace SSTFEditor
             return this.dicレーン番号[ lane ] * this.チップサイズpx.Width;
         }
 
+        // Ypx → 小節番号
         public int 譜面パネル内Y座標pxにおける小節番号を返す( int 譜面パネル内Y座標px )
         {
             return this.譜面パネル内Y座標pxにおける小節番号とその小節の譜面内絶対位置gridを返す( 譜面パネル内Y座標px ).小節番号;
         }
 
+        // Ypx → grid
         public int 譜面パネル内Y座標pxにおける小節の譜面内絶対位置gridを返す( int 譜面パネル内Y座標px )
         {
             return this.譜面パネル内Y座標pxにおける小節番号とその小節の譜面内絶対位置gridを返す( 譜面パネル内Y座標px ).小節の譜面内絶対位置grid;
         }
 
+        // Ypx → 小節番号, grid
         public (int 小節番号, int 小節の譜面内絶対位置grid) 譜面パネル内Y座標pxにおける小節番号とその小節の譜面内絶対位置gridを返す( int 譜面パネル内Y座標px )
         {
             int 譜面パネル内Y座標に対応する譜面内絶対位置grid =
@@ -687,12 +722,14 @@ namespace SSTFEditor
             }
         }
 
+        // Ypx → grid
         public int 譜面パネル内Y座標pxにおける譜面内絶対位置gridを返す( int 譜面パネル内Y座標px )
         {
             int 譜面パネル底辺からの高さpx = this.Form.譜面パネルサイズ.Height - 譜面パネル内Y座標px;
             return this.譜面表示下辺の譜面内絶対位置grid + ( 譜面パネル底辺からの高さpx * this.Form.GRID_PER_PIXEL );
         }
 
+        // Ypx → grid
         public int 譜面パネル内Y座標pxにおける譜面内絶対位置gridをガイド幅単位で返す( int 譜面パネル内Y座標px )
         {
             int 最高解像度での譜面内絶対位置grid = this.譜面パネル内Y座標pxにおける譜面内絶対位置gridを返す( 譜面パネル内Y座標px );
@@ -701,40 +738,14 @@ namespace SSTFEditor
             return 対応する小節の譜面内絶対位置grid + 対応する小節の小節先頭からの相対位置grid;
         }
 
+        // grid → Ypx
         public int 譜面内絶対位置gridにおける対象領域内のY座標pxを返す( int 譜面内絶対位置grid, Size 対象領域サイズpx )
         {
-            int 対象領域内の高さgrid = 譜面内絶対位置grid - this.譜面表示下辺の譜面内絶対位置grid;
+            int 対象領域内の高さgrid = Math.Abs( 譜面内絶対位置grid - this.譜面表示下辺の譜面内絶対位置grid );
             return ( 対象領域サイズpx.Height - ( 対象領域内の高さgrid / this.Form.GRID_PER_PIXEL ) );
         }
-
-        public (int 小節番号, int 小節の先頭位置grid) 譜面内絶対位置gridに位置する小節の情報を返す( int 譜面内絶対位置grid )
-        {
-            if( 0 > 譜面内絶対位置grid )
-                throw new ArgumentOutOfRangeException( "譜面内絶対位置grid が負数です。" );
-
-            var result = (小節番号: 0, 小節の先頭位置grid: -1);
-
-            int n = 0;
-            int back = 0;
-            int i = 0;
-            while( true )       // 最大譜面番号を超えてどこまでもチェック。
-            {
-                back = n;
-                n += this.小節長をグリッドで返す( i );
-
-                if( 譜面内絶対位置grid < n )
-                {
-                    result.小節の先頭位置grid = back;
-                    result.小節番号 = i;
-                    break;
-                }
-
-                i++;
-            }
-
-            return result;
-        }
-
+        
+        // grid → BPM
         public double 譜面内絶対位置gridにおけるBPMを返す( int 譜面内絶対位置grid )
         {
             double bpm = スコア.初期BPM;
@@ -749,6 +760,13 @@ namespace SSTFEditor
             }
 
             return bpm;
+        }
+
+        // 小節長 → grid
+        public int 小節長をグリッドで返す( int 小節番号 )
+        {
+            double この小節の倍率 = this.SSTFormatScore.小節長倍率を取得する( 小節番号 );
+            return (int) ( this.Form.GRID_PER_PART * この小節の倍率 );
         }
 
         public 描画用チップ 譜面パネル内座標pxに存在するチップがあれば返す( int x, int y )
@@ -770,12 +788,6 @@ namespace SSTFEditor
             }
 
             return null;
-        }
-
-        public int 小節長をグリッドで返す( int 小節番号 )
-        {
-            double この小節の倍率 = this.SSTFormatScore.小節長倍率を取得する( 小節番号 );
-            return (int) ( this.Form.GRID_PER_PART * この小節の倍率 );
         }
 
         public void 現在のガイド間隔を変更する( int n分 )

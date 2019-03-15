@@ -88,6 +88,8 @@ namespace SSTFEditor
 
         public Size 譜面パネルサイズ => this.pictureBox譜面パネル.ClientSize;
 
+        public Rectangle 譜面パネル領域 => this.pictureBox譜面パネル.ClientRectangle;
+
         public チップ種別 現在のチップ種別
         {
             get
