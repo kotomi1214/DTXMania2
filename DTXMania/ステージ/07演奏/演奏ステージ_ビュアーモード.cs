@@ -184,6 +184,7 @@ namespace DTXMania.ステージ.演奏
             //App.WAV管理 = null;
             App.AVI管理?.Dispose();
             App.AVI管理 = null;
+            this.現在のフェーズ = フェーズ.クリア;
         }
 
         public override void 高速進行する()
