@@ -102,7 +102,8 @@ namespace FDK
                 }
                 else
                 {
-                    throw new Exception( $"このサンプルソースの再生位置を変更することができません。既定の位置から再生を開始します。" );
+                    //Log.WARNING( $"このサンプルソースの再生位置を変更することができません。既定の位置から再生を開始します。" );
+                    this._Position = 0;
                 }
 
                 this.IsLoop = ループ再生する;
@@ -163,10 +164,11 @@ namespace FDK
 
         public void Pause()
         {
-            this.Stop();
+            if( this.再生中ではない )
+                return;
 
-            // 停止位置を保存。
-            this._PausedPosition = this._Position;
+            // 停止。
+            this.Stop();
             this.IsPaused = true;
         }
 
@@ -175,10 +177,10 @@ namespace FDK
             if( this.IsPaused )
             {
                 // 停止位置から再生。
-                this.Play( this._PausedPosition, this.IsLoop );
-
+                this.Play(
+                    this.Position / this.WaveFormat.Channels,   // position → frame
+                    this.IsLoop );
                 this.IsPaused = false;
-                this._PausedPosition = 0;
             }
         }
 
@@ -208,11 +210,5 @@ namespace FDK
         private long _Position = 0;
 
         private float _Volume = 1.0f;
-
-        /// <summary>
-        ///     一時停止したときの位置。
-        ///     <see cref="IsPaused"/> が true のときのみ有効。
-        /// </summary>
-        private long _PausedPosition = 0;
     }
 }
