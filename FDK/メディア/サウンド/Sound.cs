@@ -57,6 +57,11 @@ namespace FDK
 
         public bool IsLoop { get; set; } = false;
 
+        /// <summary>
+        ///     一時停止中なら true
+        /// </summary>
+        public bool IsPaused { get; set; } = false;
+
 
         public Sound( SoundDevice device, ISampleSource sampleSource )
             : this( device )
@@ -156,6 +161,27 @@ namespace FDK
             }
         }
 
+        public void Pause()
+        {
+            this.Stop();
+
+            // 停止位置を保存。
+            this._PausedPosition = this._Position;
+            this.IsPaused = true;
+        }
+
+        public void Resume()
+        {
+            if( this.IsPaused )
+            {
+                // 停止位置から再生。
+                this.Play( this._PausedPosition, this.IsLoop );
+
+                this.IsPaused = false;
+                this._PausedPosition = 0;
+            }
+        }
+
         public long 秒ToFrame( double 時間sec )
         {
             if( null == this._BaseSampleSource )
@@ -182,5 +208,11 @@ namespace FDK
         private long _Position = 0;
 
         private float _Volume = 1.0f;
+
+        /// <summary>
+        ///     一時停止したときの位置。
+        ///     <see cref="IsPaused"/> が true のときのみ有効。
+        /// </summary>
+        private long _PausedPosition = 0;
     }
 }
