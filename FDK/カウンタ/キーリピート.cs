@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace FDK.カウンタ
+namespace FDK
 {
     public static class キーリピート
     {

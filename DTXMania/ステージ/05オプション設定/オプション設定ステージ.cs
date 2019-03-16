@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using SharpDX.Direct2D1;
 using FDK;
-using FDK.カウンタ;
 using DTXMania.設定;
 
 namespace DTXMania.ステージ.オプション設定

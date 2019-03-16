@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 
-namespace FDK.カウンタ
+namespace FDK
 {
     /// <summary>
     ///     一定時間ごとにコールバックを呼び出す。

@@ -161,7 +161,7 @@ namespace FDK
             this._Action実行中 = 0;
 
             // タイマ生成、再生開始。
-            this._queueTimer = new カウンタ.QueueTimer( 1, 1, () => {
+            this._queueTimer = new QueueTimer( 1, 1, () => {
 
                 // 1msごとに、フォームに WM_APP_TICK メッセージを送信する。
 
@@ -269,7 +269,7 @@ namespace FDK
 
         private long _Action実行中 = 0;
 
-        private カウンタ.QueueTimer _queueTimer = null;
+        private QueueTimer _queueTimer = null;
 
         /// <summary>
         ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
