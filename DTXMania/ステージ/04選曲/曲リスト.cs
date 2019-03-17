@@ -492,7 +492,7 @@ namespace DTXMania.ステージ.選曲
             #endregion
         }
 
-        private void _選択ノードのオフセットアニメをリセットする( アニメーション管理 am )
+        private void _選択ノードのオフセットアニメをリセットする( WindowsAnimation am )
         {
             this._選択ノードの表示オフセットdpx?.Dispose();
             this._選択ノードの表示オフセットdpx = new Variable( am.Manager, initialValue: 0.0 );

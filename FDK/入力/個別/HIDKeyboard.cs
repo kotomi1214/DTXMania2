@@ -22,8 +22,10 @@ namespace FDK
         /// </summary>
         public HIDKeyboard()
         {
-            // 登録したいデバイス（ここでは１個）
-            var devs = new RawInputDevice[] {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                // 登録したいデバイス（ここでは１個）
+                var devs = new RawInputDevice[] {
                 new RawInputDevice {
                     usUsagePage = UsagePage.Generic,
                     usUsage = UsageId.GenericKeyboard,
@@ -32,13 +34,17 @@ namespace FDK
                 }
             };
 
-            // デバイスを登録。
-            RegisterRawInputDevices( devs, 1, Marshal.SizeOf<RawInputDevice>() );
+                // デバイスを登録。
+                RegisterRawInputDevices( devs, 1, Marshal.SizeOf<RawInputDevice>() );
+            }
         }
 
         public void Dispose()
         {
-            // 特になし
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                // 特になし
+            }
         }
 
         /// <summary>

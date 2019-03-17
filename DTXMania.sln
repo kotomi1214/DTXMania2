@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MakeArchive", "MakeArchive\
 		{487B9AFD-05D4-41AE-9800-21E16B382BB7} = {487B9AFD-05D4-41AE-9800-21E16B382BB7}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDK33Test", "FDK33Test\FDK33Test.csproj", "{465D9AE1-09AF-4691-AAD6-75A52768E227}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -129,6 +131,18 @@ Global
 		{18DA0EC0-28E2-439B-A8AB-D67ACEF8935F}.RemoteDebug|Any CPU.Build.0 = Debug|Any CPU
 		{18DA0EC0-28E2-439B-A8AB-D67ACEF8935F}.RemoteDebug|x64.ActiveCfg = Debug|x64
 		{18DA0EC0-28E2-439B-A8AB-D67ACEF8935F}.RemoteDebug|x64.Build.0 = Debug|x64
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Debug|x64.Build.0 = Debug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Release|Any CPU.Build.0 = Release|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Release|x64.ActiveCfg = Release|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.Release|x64.Build.0 = Release|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.RemoteDebug|Any CPU.ActiveCfg = RemoteDebug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.RemoteDebug|Any CPU.Build.0 = RemoteDebug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.RemoteDebug|x64.ActiveCfg = Debug|Any CPU
+		{465D9AE1-09AF-4691-AAD6-75A52768E227}.RemoteDebug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

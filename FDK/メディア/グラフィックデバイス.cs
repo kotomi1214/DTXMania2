@@ -85,7 +85,7 @@ namespace FDK
 
         public SharpDX.Direct3D11.DeviceDebug D3DDeviceDebug { get; private set; } = null;
 
-        public FDK.アニメーション管理 Animation { get; private set; } = null;
+        public FDK.WindowsAnimation Animation { get; private set; } = null;
 
         public SharpDX.Direct3D11.Device D3DDevice { get; protected set; }
 
@@ -398,7 +398,7 @@ namespace FDK
 
             テクスチャ.全インスタンスで共有するリソースを作成する();
 
-            this.Animation = new アニメーション管理();
+            this.Animation = new WindowsAnimation();
         }
         private void _スワップチェーンに依存しないグラフィックリソースを解放する()
         {

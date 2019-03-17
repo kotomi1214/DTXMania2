@@ -164,6 +164,7 @@ namespace FDK
                                 Name = "WASAPI Playback",
                                 Priority = ThreadPriority.AboveNormal, // 標準よりやや上
                             };
+                            this._レンダリングスレッド.SetApartmentState( ApartmentState.MTA );   // マルチスレッドアパートメント
                             this._レンダリングスレッド.Start( 起動完了通知 );
 
                             // スレッドからの起動完了通知を待つ。
