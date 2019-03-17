@@ -9,7 +9,7 @@ using System.Runtime.Serialization;
 using System.Windows.Forms;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
-using FDK;
+using FDK32;
 using DTXMania.入力;
 
 namespace DTXMania.設定

@@ -75,7 +75,7 @@ namespace MakeArchive
             foreach( var file in files )
             {
                 var fullfile = Path.GetFullPath( file );    // ".." をなくしたパスにする
-                var destfile = FDK.Folder.絶対パスを相対パスに変換する( baseDir, fullfile );
+                var destfile = FDK32.Folder.絶対パスを相対パスに変換する( baseDir, fullfile );
 
                 yield return (fullfile, destfile);
             }

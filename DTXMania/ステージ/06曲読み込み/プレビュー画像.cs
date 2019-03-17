@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 using DTXMania.曲;
 
 namespace DTXMania.ステージ.曲読み込み

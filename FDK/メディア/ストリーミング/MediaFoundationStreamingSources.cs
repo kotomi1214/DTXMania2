@@ -30,7 +30,7 @@ namespace FDK
         public bool ループ再生する { get; set; } = false;
 
 
-        public static MediaFoundationStreamingSources CreateFromFile( VariablePath ファイルパス, WaveFormat soundDeviceFormat )
+        public static MediaFoundationStreamingSources CreateFromFile( DXGIDeviceManager dxgiDeviceManager, VariablePath ファイルパス, WaveFormat soundDeviceFormat )
         {
             var sources = new MediaFoundationStreamingSources();
 
@@ -39,7 +39,7 @@ namespace FDK
             using( var ビデオ属性 = new MediaAttributes() )
             {
                 // DXVAに対応しているGPUの場合には、それをデコードに利用するよう指定する。
-                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, グラフィックデバイス.Instance.DXGIDeviceManager );
+                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, dxgiDeviceManager );
 
                 // 追加のビデオプロセッシングを有効にする。
                 ビデオ属性.Set( SourceReaderAttributeKeys.EnableAdvancedVideoProcessing, true );  // 真偽値が bool だったり
@@ -127,7 +127,7 @@ namespace FDK
                 using( var 属性 = new MediaAttributes() )
                 {
                     // DXVAに対応しているGPUの場合には、それをデコードに利用するよう指定する。
-                    属性.Set( SourceReaderAttributeKeys.D3DManager, グラフィックデバイス.Instance.DXGIDeviceManager );
+                    属性.Set( SourceReaderAttributeKeys.D3DManager, グラフィックデバイス.Instance.MFDXGIDeviceManager );
 
                     // 追加のビデオプロセッシングを有効にする。
                     属性.Set( SourceReaderAttributeKeys.EnableAdvancedVideoProcessing, true );  // 真偽値が bool だったり

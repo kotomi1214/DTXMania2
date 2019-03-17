@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using CSCore;
 using YamlDotNet.RepresentationModel;
-using FDK;
+using FDK32;
 
 namespace DTXMania.設定
 {

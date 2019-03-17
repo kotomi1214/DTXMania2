@@ -10,7 +10,7 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 
 namespace SSTFEditor
@@ -3208,7 +3208,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxBGV.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxBGV.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         protected void textBoxBGM_TextChanged( object sender, EventArgs e )
@@ -3295,7 +3295,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxBGM.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxBGM.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         protected void textBoxプレビュー音声_TextChanged( object sender, EventArgs e )
@@ -3382,7 +3382,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxプレビュー音声.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxプレビュー音声.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         private void textBoxプレビュー画像_TextChanged( object sender, EventArgs e )
@@ -3471,7 +3471,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxプレビュー画像.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxプレビュー画像.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
 
             this._プレビュー画像を更新する();
         }

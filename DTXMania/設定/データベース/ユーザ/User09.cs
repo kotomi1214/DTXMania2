@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Linq.Mapping;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
+using FDK32;
 
 namespace DTXMania.データベース.ユーザ
 {

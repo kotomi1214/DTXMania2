@@ -1,12 +1,12 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FDK;
+using FDK32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-namespace FDK.Tests
+namespace FDK32.Tests
 {
     [TestClass()]
     public class キャッシュデータレンタルTests

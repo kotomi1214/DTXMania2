@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using SharpDX.Direct2D1.Effects;
-using FDK;
+using FDK32;
 
 namespace DTXMania.ステージ
 {

@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using FDK;
+using FDK32;
 using SSTFormatCurrent = SSTFormat.v4;
 using DTXMania.データベース.ユーザ;
 using DTXMania.データベース.曲;

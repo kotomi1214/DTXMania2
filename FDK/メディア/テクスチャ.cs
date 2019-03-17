@@ -51,7 +51,7 @@ namespace FDK
 
         protected override void On活性化()
         {
-            var d3dDevice = グラフィックデバイス.Instance.D3DDevice;
+            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
             Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
 
             #region " 定数バッファを生成する。"
@@ -143,7 +143,7 @@ namespace FDK
         /// <param name="転送元矩形">テクスチャ座標(値域0～1)で指定する。</param>
         public void 描画する( Matrix ワールド行列変換, float 不透明度0to1 = 1f, RectangleF? 転送元矩形 = null )
         {
-            var d3dDevice = グラフィックデバイス.Instance.D3DDevice;
+            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
             Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
 
             if( null == this.Texture )
@@ -165,11 +165,10 @@ namespace FDK
                 ワールド行列変換.Transpose();    // 転置
                 this._定数バッファの転送元データ.World = ワールド行列変換;
 
-                // ビュー変換行列
-                this._定数バッファの転送元データ.View = グラフィックデバイス.Instance.ビュー変換行列;  // 転置済み
-
-                // 射影変換行列
-                this._定数バッファの転送元データ.Projection = グラフィックデバイス.Instance.射影変換行列; // 転置済み
+                // ビュー変換行列と射影変換行列
+                グラフィックデバイス.Instance.平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 );
+                this._定数バッファの転送元データ.View = 転置済みビュー行列;
+                this._定数バッファの転送元データ.Projection = 転置済み射影行列;
 
                 // 描画元矩形（x,y,zは0～1で指定する（UV座標））
                 this._定数バッファの転送元データ.TexLeft = srcRect.Left / this.サイズ.Width;
@@ -216,7 +215,7 @@ namespace FDK
                 d3dDevice.ImmediateContext.GeometryShader.Set( null );
 
                 // ラスタライザ
-                d3dDevice.ImmediateContext.Rasterizer.SetViewports( グラフィックデバイス.Instance.D3DViewPort );
+                d3dDevice.ImmediateContext.Rasterizer.SetViewports( グラフィックデバイス.Instance.既定のD3D11ViewPort );
                 d3dDevice.ImmediateContext.Rasterizer.State = テクスチャ._RasterizerState;
 
                 // ピクセルシェーダ
@@ -226,12 +225,12 @@ namespace FDK
                 d3dDevice.ImmediateContext.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
 
                 // 出力マージャ
-                d3dDevice.ImmediateContext.OutputMerger.SetTargets( グラフィックデバイス.Instance.D3DDepthStencilView, グラフィックデバイス.Instance.D3DRenderTargetView );
+                d3dDevice.ImmediateContext.OutputMerger.SetTargets( グラフィックデバイス.Instance.既定のD3D11DepthStencilView, グラフィックデバイス.Instance.既定のD3D11RenderTargetView );
                 d3dDevice.ImmediateContext.OutputMerger.SetBlendState(
                     ( this.加算合成する ) ? テクスチャ._BlendState加算合成 : テクスチャ._BlendState通常合成,
                     new Color4( 0f, 0f, 0f, 0f ),
                     -1 );
-                d3dDevice.ImmediateContext.OutputMerger.SetDepthStencilState( グラフィックデバイス.Instance.D3DDepthStencilState, 0 );
+                d3dDevice.ImmediateContext.OutputMerger.SetDepthStencilState( グラフィックデバイス.Instance.既定のD3D11DepthStencilState, 0 );
             }
             //----------------
             #endregion
@@ -277,7 +276,7 @@ namespace FDK
 
         public static void 全インスタンスで共有するリソースを作成する()
         {
-            var d3dDevice = グラフィックデバイス.Instance.D3DDevice;
+            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
             Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
 
             var シェーダコンパイルのオプション =

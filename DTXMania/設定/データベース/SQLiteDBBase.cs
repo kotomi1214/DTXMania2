@@ -5,7 +5,7 @@ using System.Data.Linq.Mapping;
 using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
+using FDK32;
 
 namespace DTXMania.データベース
 {

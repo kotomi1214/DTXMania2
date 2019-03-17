@@ -1,10 +1,10 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FDK;
+using FDK32;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FDK.Tests
+namespace FDK32.Tests
 {
     [TestClass()]
     public class FDKUtilitiesTests
@@ -44,16 +44,16 @@ namespace FDK.Tests
 
             // 正常系。
 
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 1, 1 ), expected: 1 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 1, 2 ), expected: 1 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 3, 1 ), expected: 1 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 630, 300 ), expected: 30 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 0, 100 ), expected: 100 );  // 0 は OK
-            Assert.AreEqual( actual: FDK.FDKUtilities.最大公約数を返す( 200, 0 ), expected: 200 );  // 0 は OK
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 1, 1 ), expected: 1 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 1, 2 ), expected: 1 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 3, 1 ), expected: 1 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 630, 300 ), expected: 30 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 0, 100 ), expected: 100 );  // 0 は OK
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最大公約数を返す( 200, 0 ), expected: 200 );  // 0 は OK
 
             // 準正常系。
 
-            例外が出れば成功( () => { 結果 = FDK.FDKUtilities.最大公約数を返す( 1, -1 ); } );   // 負数はダメ
+            例外が出れば成功( () => { 結果 = FDK32.FDKUtilities.最大公約数を返す( 1, -1 ); } );   // 負数はダメ
         }
 
         [TestMethod()]
@@ -63,22 +63,22 @@ namespace FDK.Tests
 
             // 正常系。
 
-            Assert.AreEqual( actual: FDK.FDKUtilities.最小公倍数を返す( 1, 1 ), expected: 1 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最小公倍数を返す( 1, 2 ), expected: 2 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最小公倍数を返す( 3, 1 ), expected: 3 );
-            Assert.AreEqual( actual: FDK.FDKUtilities.最小公倍数を返す( 630, 300 ), expected: 6300 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最小公倍数を返す( 1, 1 ), expected: 1 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最小公倍数を返す( 1, 2 ), expected: 2 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最小公倍数を返す( 3, 1 ), expected: 3 );
+            Assert.AreEqual( actual: FDK32.FDKUtilities.最小公倍数を返す( 630, 300 ), expected: 6300 );
 
             // 準正常系。
 
-            例外が出れば成功( () => { 結果 = FDK.FDKUtilities.最小公倍数を返す( 1, 0 ); } );    // 0 はダメ
-            例外が出れば成功( () => { 結果 = FDK.FDKUtilities.最小公倍数を返す( 1, -1 ); } );   // 負数もダメ
+            例外が出れば成功( () => { 結果 = FDK32.FDKUtilities.最小公倍数を返す( 1, 0 ); } );    // 0 はダメ
+            例外が出れば成功( () => { 結果 = FDK32.FDKUtilities.最小公倍数を返す( 1, -1 ); } );   // 負数もダメ
         }
 
         [TestMethod()]
         public void 現在のメソッド名Test()
         {
             Assert.AreEqual(
-                actual: FDK.FDKUtilities.現在のメソッド名,
+                actual: FDK32.FDKUtilities.現在のメソッド名,
                 expected: typeof( FDKUtilitiesTests ).ToString() + @"." + nameof( 現在のメソッド名Test ) + @"()",
                 ignoreCase: false );
         }

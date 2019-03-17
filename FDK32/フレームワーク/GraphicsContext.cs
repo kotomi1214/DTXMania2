@@ -6,7 +6,7 @@ using System.Linq;
 using System.Windows.Forms;
 using SharpDX;
 
-namespace FDK
+namespace FDK32
 {
     /// <summary>
     ///     グラフィック関連のリソース。
@@ -35,7 +35,7 @@ namespace FDK
         /// <param name="描画先">描画先コントロール。スワップチェーンが作成される。</param>
         public static void 生成する( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow, IntPtr hControl )
         {
-            using( Log.Block( FDK.FDKUtilities.現在のメソッド名 ) )
+            using( Log.Block( FDK32.FDKUtilities.現在のメソッド名 ) )
             {
                 if( Instance.ContainsKey( hControl ) )
                     throw new InvalidOperationException( "指定された描画先に対応するグラフィックデバイスインスタンスはすでに生成済みです。" );
@@ -49,7 +49,7 @@ namespace FDK
         /// </summary>
         public static void 終了する()
         {
-            using( Log.Block( FDK.FDKUtilities.現在のメソッド名 ) )
+            using( Log.Block( FDK32.FDKUtilities.現在のメソッド名 ) )
             {
                 foreach( var kvp in Instance )
                     kvp.Value?.Dispose();

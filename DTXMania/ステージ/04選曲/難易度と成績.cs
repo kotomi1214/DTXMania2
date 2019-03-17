@@ -5,7 +5,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
-using FDK;
+using FDK32;
 using DTXMania.曲;
 
 namespace DTXMania.ステージ.選曲

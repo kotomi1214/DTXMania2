@@ -36,7 +36,7 @@ namespace FDK
                     PixelFormat = new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Premultiplied ),
                     BitmapOptions = BitmapOptions.Target | BitmapOptions.CannotDraw,
                 };
-                this._Bitmap = new Bitmap1( グラフィックデバイス.Instance.D2DDeviceContext, dxgiSurface, bmpProp );
+                this._Bitmap = new Bitmap1( グラフィックデバイス.Instance.既定のD2D1DeviceContext, dxgiSurface, bmpProp );
             }
         }
 
@@ -49,9 +49,9 @@ namespace FDK
             base.On非活性化();
         }
 
-        public void テクスチャへ描画する( Action<SharpDX.Direct2D1.DeviceContext1> 描画アクション )
+        public void テクスチャへ描画する( Action<SharpDX.Direct2D1.DeviceContext> 描画アクション )
         {
-            var dc = グラフィックデバイス.Instance.D2DDeviceContext;
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 

@@ -44,10 +44,10 @@ namespace FDK
                 // (B) 空のビットマップを生成する。
                 this._Bitmap?.Dispose();
                 this._Bitmap = new Bitmap1(
-                    グラフィックデバイス.Instance.D2DDeviceContext, 
+                    グラフィックデバイス.Instance.既定のD2D1DeviceContext, 
                     new Size2( (int) this._サイズ.Width, (int) this._サイズ.Height ),
                     new BitmapProperties1() {
-                        PixelFormat = new PixelFormat( グラフィックデバイス.Instance.D2DDeviceContext.PixelFormat.Format, AlphaMode.Premultiplied ),
+                        PixelFormat = new PixelFormat( グラフィックデバイス.Instance.既定のD2D1DeviceContext.PixelFormat.Format, AlphaMode.Premultiplied ),
                         BitmapOptions = BitmapOptions.Target,
                     } );
             }
@@ -68,9 +68,9 @@ namespace FDK
         /// </remarks>
         /// <param name="gd">グラフィックデバイス。</param>
         /// <param name="描画アクション">Bitmap に対して行いたい操作。</param>
-        public void 画像へ描画する( Action<DeviceContext1> 描画アクション )
+        public void 画像へ描画する( Action<DeviceContext> 描画アクション )
         {
-            var dc = グラフィックデバイス.Instance.D2DDeviceContext;
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 

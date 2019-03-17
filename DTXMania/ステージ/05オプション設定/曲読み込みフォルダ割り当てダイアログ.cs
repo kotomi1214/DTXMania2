@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using FDK;
+using FDK32;
 using DTXMania.入力;
 
 namespace DTXMania.ステージ.オプション設定

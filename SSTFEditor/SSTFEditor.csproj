@@ -243,9 +243,9 @@
       <Project>{736be388-5ec5-4bf9-838b-8580c9a8da9c}</Project>
       <Name>DTXMania</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FDK\FDK.csproj">
+    <ProjectReference Include="..\FDK32\FDK32.csproj">
       <Project>{0e35c4ac-6e28-4a09-a6ce-05d177800051}</Project>
-      <Name>FDK</Name>
+      <Name>FDK32</Name>
     </ProjectReference>
     <ProjectReference Include="..\SSTFormat\SSTFormat.csproj">
       <Project>{93b53767-a0a5-431c-9ec7-b23dbffb10ec}</Project>

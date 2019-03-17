@@ -5,7 +5,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 using DTXMania.ステージ;
 
 /*

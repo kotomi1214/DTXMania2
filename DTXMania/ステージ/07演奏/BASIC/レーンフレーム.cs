@@ -6,7 +6,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using YamlDotNet.Serialization;
-using FDK;
+using FDK32;
 
 namespace DTXMania.ステージ.演奏.BASIC
 {

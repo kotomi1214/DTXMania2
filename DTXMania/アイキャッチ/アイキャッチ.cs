@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
-using FDK;
+using FDK32;
 
 namespace DTXMania.アイキャッチ
 {

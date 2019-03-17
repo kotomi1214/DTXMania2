@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using SharpDX.Animation;
-using FDK;
+using FDK32;
 using SharpDX.Direct2D1;
 using DTXMania.ステージ.演奏;
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.入力;
 

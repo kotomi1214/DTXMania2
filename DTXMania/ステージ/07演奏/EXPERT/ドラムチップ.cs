@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using SharpDX;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 
 namespace DTXMania.ステージ.演奏.EXPERT

@@ -118,7 +118,7 @@ namespace FDK
                     {
                         // 5. DXGISurface → Bitmap
                         return new Bitmap(
-                            グラフィックデバイス.Instance.D2DDeviceContext,
+                            グラフィックデバイス.Instance.既定のD2D1DeviceContext,
                             dxgiSurface,
                             new BitmapProperties( new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Ignore ) ) );
                     }

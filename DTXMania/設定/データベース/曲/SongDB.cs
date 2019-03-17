@@ -4,7 +4,7 @@ using System.Data.Linq;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using FDK;
+using FDK32;
 using SSTFormatCurrent = SSTFormat.v4;
 
 namespace DTXMania.データベース.曲
@@ -206,12 +206,12 @@ namespace DTXMania.データベース.曲
                                 // PreImage フィールドを更新
                                 song.PreImage = score.プレビュー画像ファイル名;
                                 if( song.PreImage.Nullでも空でもない() && Path.IsPathRooted( song.PreImage ) )
-                                    song.PreImage = FDK.Folder.絶対パスを相対パスに変換する( Path.GetDirectoryName( song.Path ), song.PreImage );
+                                    song.PreImage = FDK32.Folder.絶対パスを相対パスに変換する( Path.GetDirectoryName( song.Path ), song.PreImage );
 
                                 // PreSound フィールドを更新。
                                 song.PreSound = score.プレビュー音声ファイル名;
                                 if( song.PreSound.Nullでも空でもない() && Path.IsPathRooted( song.PreSound ) )
-                                    song.PreSound = FDK.Folder.絶対パスを相対パスに変換する( Path.GetDirectoryName( song.Path ), song.PreSound );
+                                    song.PreSound = FDK32.Folder.絶対パスを相対パスに変換する( Path.GetDirectoryName( song.Path ), song.PreSound );
                             }
                             this.DataContext.SubmitChanges();
 

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CSCore;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.設定;
 

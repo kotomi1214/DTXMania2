@@ -17,8 +17,8 @@ namespace DTXMania.設定.Tests
             var keybindings = new キーバインディング();
 
             var sr = new YamlDotNet.Serialization.SerializerBuilder()
-                .WithTypeInspector( inner => new FDK.シリアライズ.YAML.CommentGatheringTypeInspector( inner ) )
-                .WithEmissionPhaseObjectGraphVisitor( args => new FDK.シリアライズ.YAML.CommentsObjectGraphVisitor( args.InnerVisitor ) )
+                .WithTypeInspector( inner => new FDK32.シリアライズ.YAML.CommentGatheringTypeInspector( inner ) )
+                .WithEmissionPhaseObjectGraphVisitor( args => new FDK32.シリアライズ.YAML.CommentsObjectGraphVisitor( args.InnerVisitor ) )
                 .Build();
 
             var yaml = sr.Serialize( keybindings.キーボードtoドラム );

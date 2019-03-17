@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 
 namespace DTXMania.ステージ.オプション設定
 {

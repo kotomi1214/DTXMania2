@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.設定;
 

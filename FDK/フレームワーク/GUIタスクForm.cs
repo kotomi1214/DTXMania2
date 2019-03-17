@@ -13,9 +13,9 @@ namespace FDK
     /// <summary>
     ///     GUIスレッドで実行されるフォーム。
     /// </summary>
-    public partial class GuiForm : Form
+    public partial class GUIタスクForm : Form
     {
-        public GuiForm( 進行描画タスク task = null )
+        public GUIタスクForm( 進行描画タスク task = null )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {

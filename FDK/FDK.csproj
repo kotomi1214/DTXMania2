@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{0E35C4AC-6E28-4A09-A6CE-05D177800051}</ProjectGuid>
+    <ProjectGuid>{8DF302D9-4BA8-4F0F-B673-CCF87ECEE30E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FDK</RootNamespace>
@@ -159,16 +159,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Activity.cs" />
-    <Compile Include="ApplicationForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Console.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="フレームワーク\GuiForm.cs">
+    <Compile Include="フレームワーク\GUIタスクForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="フレームワーク\GuiForm.Designer.cs">
-      <DependentUpon>GuiForm.cs</DependentUpon>
+    <Compile Include="フレームワーク\GUIタスクForm.Designer.cs">
+      <DependentUpon>GUIタスクForm.cs</DependentUpon>
     </Compile>
     <Compile Include="FDKUtilities.cs" />
     <Compile Include="Folder.cs" />
@@ -201,11 +198,10 @@
     <Compile Include="シリアライズ\YAML\CommentGatheringTypeInspector.cs" />
     <Compile Include="シリアライズ\YAML\CommentsObjectDescriptor.cs" />
     <Compile Include="シリアライズ\YAML\CommentsObjectGraphVisitor.cs" />
-    <Compile Include="フレームワーク\GraphicsContext.cs" />
+    <Compile Include="メディア\グラフィックデバイス.cs" />
     <Compile Include="メディア\DCEventArgs.cs" />
     <Compile Include="メディア\XML.cs" />
     <Compile Include="メディア\カスタムTextRenderer.cs" />
-    <Compile Include="メディア\グラフィックデバイス.cs" />
     <Compile Include="キャッシュデータレンタル.cs" />
     <Compile Include="メディア\サウンド\PolySound.cs" />
     <Compile Include="メディア\サウンド\Sources\MediaFoundationOnMemoryWaveSource.cs" />
@@ -247,9 +243,6 @@
     <Compile Include="フレームワーク\進行描画タスク.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ApplicationForm.resx">
-      <DependentUpon>ApplicationForm.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

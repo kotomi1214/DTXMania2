@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
-using FDK;
+using FDK32;
 using DTXMania.設定;
 using DTXMania.入力;
 

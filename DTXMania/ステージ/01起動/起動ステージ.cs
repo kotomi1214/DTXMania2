@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 
 namespace DTXMania.ステージ.起動
 {

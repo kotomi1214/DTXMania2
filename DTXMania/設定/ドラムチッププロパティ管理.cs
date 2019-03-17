@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
+using FDK32;
 using DTXMania.入力;
 using DTXMania.ステージ.演奏;
 using DTXMania.設定;

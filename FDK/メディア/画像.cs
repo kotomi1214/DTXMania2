@@ -220,7 +220,7 @@ namespace FDK
                 try
                 {
                     decoder = new BitmapDecoder(
-                        グラフィックデバイス.Instance.WicImagingFactory,
+                        グラフィックデバイス.Instance.WicImagingFactory2,
                         this._画像ファイルパス.変数なしパス,
                         SharpDX.IO.NativeFileAccess.Read,
                         DecodeOptions.CacheOnLoad );
@@ -252,7 +252,7 @@ namespace FDK
                 try
                 {
                     // WICイメージングファクトリから新しいコンバータを生成。
-                    converter = new FormatConverter( グラフィックデバイス.Instance.WicImagingFactory );
+                    converter = new FormatConverter( グラフィックデバイス.Instance.WicImagingFactory2 );
 
                     // コンバータに変換元フレームや変換後フォーマットなどを設定。
                     converter.Initialize(
@@ -278,7 +278,7 @@ namespace FDK
                     // WIC ビットマップを D2D ビットマップに変換する。
                     this._Bitmap?.Dispose();
                     this._Bitmap = Bitmap1.FromWicBitmap(
-                        グラフィックデバイス.Instance.D2DDeviceContext,
+                        グラフィックデバイス.Instance.既定のD2D1DeviceContext,
                         converter,
                         bitmapProperties1 );
                 }

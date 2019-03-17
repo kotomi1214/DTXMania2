@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 
 namespace DTXMania.曲
 {
@@ -16,7 +16,7 @@ namespace DTXMania.曲
     /// <remarks>
     ///		曲ツリーを構成するすべてのノードは、このクラスを継承する。
     /// </remarks>
-    abstract partial class Node : FDK.Activity
+    abstract partial class Node : FDK32.Activity
     {
         // プロパティ
 

@@ -6,7 +6,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 
 namespace DTXMania.ステージ.曲読み込み

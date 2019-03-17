@@ -23,18 +23,18 @@ namespace FDK
         /// <returns>Bitmap。使用後は解放すること。</returns>
         public static Bitmap 取得する()
         {
-            Debug.Assert( null != グラフィックデバイス.Instance.D3DDevice, "D3DDevice が取得されていません。" );
+            Debug.Assert( null != グラフィックデバイス.Instance.D3D11Device1, "D3DDevice が取得されていません。" );
 
             // バックバッファの情報を取得する。
             var backBufferDesc = new Texture2DDescription();
-            using( var backBuffer = グラフィックデバイス.Instance.SwapChain.GetBackBuffer<Texture2D>( 0 ) )
+            using( var backBuffer = グラフィックデバイス.Instance.DXGISwapChain1.GetBackBuffer<Texture2D>( 0 ) )
             {
                 backBufferDesc = backBuffer.Description;
             }
 
             // CPUがアクセス可能な Texture2D バッファをGPU上に作成する。
             var captureTexture = new Texture2D(
-                グラフィックデバイス.Instance.D3DDevice,
+                グラフィックデバイス.Instance.D3D11Device1,
                 new Texture2DDescription() {
                     ArraySize = 1,
                     BindFlags = BindFlags.None,
@@ -49,9 +49,9 @@ namespace FDK
                 } );
 
             // RenderTarget から Texture2D バッファに、GPU上で画像データをコピーする。
-            using( var resource = グラフィックデバイス.Instance.D3DRenderTargetView.Resource )
+            using( var resource = グラフィックデバイス.Instance.既定のD3D11RenderTargetView.Resource )
             {
-                グラフィックデバイス.Instance.D3DDevice.ImmediateContext.CopyResource( resource, captureTexture );
+                グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.CopyResource( resource, captureTexture );
             }
 
             var bitmap = (Bitmap) null;
@@ -61,14 +61,14 @@ namespace FDK
                 var dataRect = dxgiSurface.Map( SharpDX.DXGI.MapFlags.Read, out DataStream dataStream );
 
                 bitmap = new Bitmap(
-                    グラフィックデバイス.Instance.D2DDeviceContext,
+                    グラフィックデバイス.Instance.既定のD2D1DeviceContext,
                     new Size2( captureTexture.Description.Width, captureTexture.Description.Height ),
                     new DataPointer( dataStream.DataPointer, (int) dataStream.Length ),
                     dataRect.Pitch,
                     new BitmapProperties(
                         new PixelFormat( Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Ignore ),
-                        グラフィックデバイス.Instance.D2DDeviceContext.DotsPerInch.Width,
-                        グラフィックデバイス.Instance.D2DDeviceContext.DotsPerInch.Width ) );
+                        グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width,
+                        グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width ) );
 
                 dxgiSurface.Unmap();
             }

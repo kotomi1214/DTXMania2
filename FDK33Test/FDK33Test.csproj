@@ -93,7 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FDK\FDK.csproj">
-      <Project>{0e35c4ac-6e28-4a09-a6ce-05d177800051}</Project>
+      <Project>{8df302d9-4ba8-4f0f-b673-ccf87ecee30e}</Project>
       <Name>FDK</Name>
     </ProjectReference>
   </ItemGroup>

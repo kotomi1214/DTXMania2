@@ -6,7 +6,7 @@ using System.Linq;
 using System.ServiceModel;
 using System.Text;
 using System.Windows.Forms;
-using FDK;
+using FDK32;
 using DTXMania.API;
 
 namespace DTXMania
@@ -62,7 +62,7 @@ namespace DTXMania
                 {
                     // 利用法を表示して終了。
                     Log.WriteLine( options.Usage );               // ログと
-                    using( var console = new FDK.Console() )
+                    using( var console = new FDK32.Console() )
                         console.Out?.WriteLine( options.Usage );  // 標準出力の両方へ
                     return;
                 }

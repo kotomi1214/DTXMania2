@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using FDK;
+using FDK32;
 using DTXMania.データベース.曲;
 using SharpDX;
 

@@ -12,7 +12,7 @@ using SharpDX;
 
 namespace FDK
 {
-    public class ApplicationForm : SharpDX.Windows.RenderForm
+    public class ApplicationForm_ : SharpDX.Windows.RenderForm
     {
         /// <summary>
         ///		ウィンドウの表示モード（全画面 or ウィンドウ）を示す。
@@ -74,14 +74,14 @@ namespace FDK
         /// <summary>
         ///		初期化処理。
         /// </summary>
-        public ApplicationForm( SizeF 設計画面サイズ, SizeF 物理画面サイズ, bool 深度ステンシルを使う = true )
+        public ApplicationForm_( SizeF 設計画面サイズ, SizeF 物理画面サイズ, bool 深度ステンシルを使う = true )
         {
             this.SetStyle( ControlStyles.ResizeRedraw, true );
             this.ClientSize = 物理画面サイズ.ToSize();
             this.MinimumSize = new Size( 640, 360 );
             this.Text = "FDK.ApplicationForm";
 
-            グラフィックデバイス.インスタンスを生成する( 
+            グラフィックデバイス_.インスタンスを生成する( 
                 this.Handle, 
                 new Size2F( 設計画面サイズ.Width, 設計画面サイズ.Height ),
                 new Size2F( 物理画面サイズ.Width, 物理画面サイズ.Height ),
@@ -103,7 +103,7 @@ namespace FDK
             // 以下はサンプル。派生クラスで適宜オーバーライドすること。
             //
 
-            var gd = グラフィックデバイス.Instance;
+            var gd = グラフィックデバイス_.Instance;
 
             // アニメーションを進行する。
             gd.Animation.進行する();    // 必ずメイン(UI)スレッドから呼び出すこと。
@@ -144,8 +144,8 @@ namespace FDK
                     // SwapChain を表示するタスクを起動。
                     Interlocked.Increment( ref this._PresentNow );        // 1: 表示開始
                     Task.Run( () => {
-                        グラフィックデバイス.Instance.DXGIOutput.WaitForVerticalBlank();
-                        グラフィックデバイス.Instance.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                        グラフィックデバイス_.Instance.DXGIOutput.WaitForVerticalBlank();
+                        グラフィックデバイス_.Instance.SwapChain.Present( 1, SharpDX.DXGI.PresentFlags.None );
                         Interlocked.Decrement( ref this._PresentNow );    // 0: 表示完了
                     } );
 
@@ -193,7 +193,7 @@ namespace FDK
 
                 PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
 
-                グラフィックデバイス.インスタンスを解放する();
+                グラフィックデバイス_.インスタンスを解放する();
             }
 
             base.OnClosing( e );
@@ -309,7 +309,7 @@ namespace FDK
 
                 this.スワップチェーンに依存するグラフィックリソースを解放する();
 
-                グラフィックデバイス.Instance.サイズを変更する( this.ClientSize );
+                グラフィックデバイス_.Instance.サイズを変更する( this.ClientSize );
 
                 this.スワップチェーンに依存するグラフィックリソースを作成する();
             }

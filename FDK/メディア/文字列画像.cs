@@ -241,7 +241,7 @@ namespace FDK
 
         protected override void On活性化()
         {
-            this._TextRenderer = new カスタムTextRenderer( グラフィックデバイス.Instance.D2DFactory, Color.White, Color.Transparent );    // ビットマップの生成前に。
+            this._TextRenderer = new カスタムTextRenderer( グラフィックデバイス.Instance.D2D1Factory1, Color.White, Color.Transparent );    // ビットマップの生成前に。
 
             // 初期値として設計画面サイズを設定。
             if( this.レイアウトサイズdpx == Size2F.Zero )
@@ -353,7 +353,7 @@ namespace FDK
                 this.TextFormat.WordWrapping = this.WordWrapping;
 
                 // 行間は、プロパティではなくメソッドで設定する。
-                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( グラフィックデバイス.Instance.D2DDeviceContext.DotsPerInch.Width, this.フォントサイズpt );
+                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
                 this.Baseline = this.LineSpacing * 0.8f;    // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.TextFormat.SetLineSpacing( LineSpacingMethod.Uniform, this.LineSpacing, this.Baseline );
                 //----------------
@@ -385,7 +385,7 @@ namespace FDK
             {
                 #region " 古いビットマップレンダーターゲットを解放し、新しく生成する。"
                 //----------------
-                using( var target = グラフィックデバイス.Instance.D2DDeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
+                using( var target = グラフィックデバイス.Instance.既定のD2D1DeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
                 {
                     // D2DContext1.Target が設定済みであること。さもなきゃ例外も出さずに落ちる。
                     Debug.Assert( null != target );
@@ -404,7 +404,7 @@ namespace FDK
                 }
 
                 this._Bitmap?.Dispose();
-                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget( グラフィックデバイス.Instance.D2DDeviceContext, CompatibleRenderTargetOptions.None, this.画像サイズdpx );
+                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget( グラフィックデバイス.Instance.既定のD2D1DeviceContext, CompatibleRenderTargetOptions.None, this.画像サイズdpx );
                 //----------------
                 #endregion
 

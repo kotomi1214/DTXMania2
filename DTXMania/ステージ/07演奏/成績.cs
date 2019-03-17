@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
+using FDK32;
 using SSTFormatCurrent = SSTFormat.v4;
 using DTXMania.設定;
 using DTXMania.ステージ.結果;

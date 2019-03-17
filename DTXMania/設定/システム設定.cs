@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using FDK;
+using FDK32;
 
 namespace DTXMania.設定
 {
@@ -123,8 +123,8 @@ namespace DTXMania.設定
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 var serializer = new YamlDotNet.Serialization.SerializerBuilder()
-                    .WithTypeInspector( inner => new FDK.シリアライズ.YAML.CommentGatheringTypeInspector( inner ) )
-                    .WithEmissionPhaseObjectGraphVisitor( args => new FDK.シリアライズ.YAML.CommentsObjectGraphVisitor( args.InnerVisitor ) )
+                    .WithTypeInspector( inner => new FDK32.シリアライズ.YAML.CommentGatheringTypeInspector( inner ) )
+                    .WithEmissionPhaseObjectGraphVisitor( args => new FDK32.シリアライズ.YAML.CommentsObjectGraphVisitor( args.InnerVisitor ) )
                     .Build();
 
                 // ※ 値が既定値であるプロパティは出力されないので注意。

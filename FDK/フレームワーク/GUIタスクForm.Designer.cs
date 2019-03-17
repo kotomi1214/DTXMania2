@@ -1,6 +1,6 @@
 ﻿namespace FDK
 {
-    partial class GuiForm
+    partial class GUIタスクForm
     {
         /// <summary>
         /// Required designer variable.

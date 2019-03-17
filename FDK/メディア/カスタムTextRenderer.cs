@@ -93,9 +93,9 @@ namespace FDK
         }
 
 
-        public カスタムTextRenderer( Factory d2dFactory, Color4 既定の文字色, Color4 既定の背景色 )
+        public カスタムTextRenderer( SharpDX.Direct2D1.Factory1 d2d1Factory1, Color4 既定の文字色, Color4 既定の背景色 )
         {
-            this._wrFactory = new WeakReference<Factory>( d2dFactory );
+            this._wrFactory = new WeakReference<Factory>( d2d1Factory1 );
 
             this._既定の文字色 = 既定の文字色;
             this._既定の背景色 = 既定の背景色;
@@ -107,7 +107,6 @@ namespace FDK
 
             //base.Dispose();
         }
-
 
         /// <summary>
         ///     グリフ実行を描画する際に、<see cref="TextLayout.Draw"/> から呼び出されるコールバック。
@@ -161,7 +160,7 @@ namespace FDK
 
                     if( null == drawingEffect )
                     {
-                        drawingEffect = new DrawingEffect( グラフィックデバイス.Instance.D2DDeviceContext ) {
+                        drawingEffect = new DrawingEffect( グラフィックデバイス.Instance.既定のD2D1DeviceContext ) {
                             文字の色 = this._既定の文字色,
                             背景の色 = this._既定の背景色,
                         };
@@ -172,8 +171,8 @@ namespace FDK
                     #endregion
 
                     var renderTarget =
-                        drawingEffect.renderTarget ??                    // 指定されたレンダーターゲットを使う。
-                        グラフィックデバイス.Instance.D2DDeviceContext;  // 指定がなければ既定のDC。
+                        drawingEffect.renderTarget ??                           // 指定されたレンダーターゲットを使う。
+                        グラフィックデバイス.Instance.既定のD2D1DeviceContext;  // 指定がなければ既定のDC。
 
                     this._現在の変換行列 = renderTarget.Transform;
                     this._現在のDPI = renderTarget.DotsPerInch.Width;

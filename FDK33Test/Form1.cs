@@ -13,7 +13,7 @@ using FDK;
 
 namespace FDK33Test
 {
-    public partial class Form1 : GuiForm
+    public partial class Form1 : GUIタスクForm
     {
         public Form1()
             : base( new 進行描画タスク() )

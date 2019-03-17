@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using SharpDX.Direct3D11;
 using SSTFormat.v4;
-using FDK;
+using FDK32;
 using DTXMania.設定;
 using DTXMania.データベース.曲;
 

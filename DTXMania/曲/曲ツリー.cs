@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using FDK;
+using FDK32;
 
 namespace DTXMania.曲
 {

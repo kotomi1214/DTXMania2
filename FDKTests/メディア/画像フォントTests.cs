@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FDK;
+using FDK32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,7 +8,7 @@ using System.Linq;
 using SharpDX;
 using YamlDotNet.RepresentationModel;
 
-namespace FDK.Tests
+namespace FDK32.Tests
 {
     [TestClass()]
     public class 画像フォントTests

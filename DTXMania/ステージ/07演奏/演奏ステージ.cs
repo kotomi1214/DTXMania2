@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.設定;
 using DTXMania.データベース.ユーザ;

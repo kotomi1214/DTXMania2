@@ -94,12 +94,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FDK\FDK.csproj">
-      <Project>{0E35C4AC-6E28-4A09-A6CE-05D177800051}</Project>
-      <Name>FDK</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="メディア\テストファイル\パラメータ文字_小.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -114,6 +108,12 @@
     <None Include="メディア\テストファイル\パラメータ文字_小.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FDK32\FDK32.csproj">
+      <Project>{0e35c4ac-6e28-4a09-a6ce-05d177800051}</Project>
+      <Name>FDK32</Name>
+    </ProjectReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

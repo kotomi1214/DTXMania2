@@ -9,7 +9,7 @@ using System.Reflection;
 using System.ServiceModel;
 using System.Windows.Forms;
 using SharpDX;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.ステージ;
 using DTXMania.曲;

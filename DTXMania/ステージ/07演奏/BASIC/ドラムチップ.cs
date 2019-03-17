@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using FDK32;
 using SSTFormat.v4;
 using DTXMania.設定;
 
