@@ -187,9 +187,9 @@
     <Compile Include="カウンタ\FPS.cs" />
     <Compile Include="カウンタ\LoopCounter.cs" />
     <Compile Include="カウンタ\QPCTimer.cs" />
-    <Compile Include="カウンタ\QueueTimer.cs" />
+    <Compile Include="フレームワーク\QueueTimer.cs" />
     <Compile Include="カウンタ\TimeGetTime.cs" />
-    <Compile Include="カウンタ\WindowsAnimation.cs" />
+    <Compile Include="フレームワーク\アニメーション.cs" />
     <Compile Include="カウンタ\キーリピート.cs" />
     <Compile Include="カウンタ\定間隔進行.cs" />
     <Compile Include="カウンタ\経過時間測定.cs" />
@@ -198,7 +198,7 @@
     <Compile Include="シリアライズ\YAML\CommentGatheringTypeInspector.cs" />
     <Compile Include="シリアライズ\YAML\CommentsObjectDescriptor.cs" />
     <Compile Include="シリアライズ\YAML\CommentsObjectGraphVisitor.cs" />
-    <Compile Include="メディア\グラフィックデバイス.cs" />
+    <Compile Include="フレームワーク\グラフィックデバイス.cs" />
     <Compile Include="メディア\DCEventArgs.cs" />
     <Compile Include="メディア\XML.cs" />
     <Compile Include="メディア\カスタムTextRenderer.cs" />
@@ -210,7 +210,7 @@
     <Compile Include="メディア\サウンド\Sources\NVorbisOnStreamingSampleSource.cs" />
     <Compile Include="メディア\サウンド\SampleSourceFactory.cs" />
     <Compile Include="メディア\サウンド\Sound.cs" />
-    <Compile Include="メディア\サウンド\SoundDevice.cs" />
+    <Compile Include="フレームワーク\サウンドデバイス.cs" />
     <Compile Include="メディア\サウンド\SoundTimer.cs" />
     <Compile Include="メディア\サウンド\Sources\ResampledOnMemoryWaveSource.cs" />
     <Compile Include="メディア\サウンド\Sources\WavOnMemoryWaveSource.cs" />
@@ -224,7 +224,7 @@
     <Compile Include="メディア\ビデオ\Sources\IVideoSource.cs" />
     <Compile Include="メディア\ビデオ\Sources\MediaFoundationFileVideoSource.cs" />
     <Compile Include="メディア\ビデオ\Sources\VideoFrame.cs" />
-    <Compile Include="入力\個別\HIDKeyboard.cs" />
+    <Compile Include="フレームワーク\HIDキーボード.cs" />
     <Compile Include="同期\BlockingQueue.cs" />
     <Compile Include="メディア\ビデオ\Video.cs" />
     <Compile Include="メディア\描画可能テクスチャ.cs" />

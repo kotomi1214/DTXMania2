@@ -21,7 +21,7 @@ namespace FDK
             {
                 InitializeComponent();
 
-                this.キーボード = new HIDKeyboard();
+                this.キーボード = new HIDキーボード();
                 this.進行描画タスク = task ?? new 進行描画タスク();
             }
         }
@@ -29,7 +29,7 @@ namespace FDK
 
         protected 進行描画タスク 進行描画タスク;
 
-        protected HIDKeyboard キーボード;
+        protected HIDキーボード キーボード;
 
 
         protected override void OnLoad( EventArgs e )

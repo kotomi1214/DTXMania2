@@ -20,7 +20,7 @@ namespace FDK33Test
         {
             InitializeComponent();
 
-            this._サウンドデバイス = new SoundDevice( AudioClientShareMode.Shared );
+            this._サウンドデバイス = new サウンドデバイス( AudioClientShareMode.Shared );
             this._サウンドデバイス.レンダリングを開始する();
         }
 
@@ -31,6 +31,6 @@ namespace FDK33Test
             base.OnClosing( e );
         }
 
-        private SoundDevice _サウンドデバイス;
+        private サウンドデバイス _サウンドデバイス;
     }
 }

@@ -125,7 +125,10 @@ namespace FDK
             this._一時停止解除通知 = new ManualResetEventSlim( true );
 
             // (1) デコードタスク起動、デコード開始。
-            this._デコードタスク = Task.Factory.StartNew( this._デコードタスクエントリ, (再生開始時刻sec, this.再生速度), this._デコードキャンセル.Token );  // Task.Factory.StartNew は、Task.Run と同様に、マルチスレッドアパートメントになる。
+            this._デコードタスク = Task.Factory.StartNew(  // Task.Factory.StartNew は常に MTAThreaas
+                this._デコードタスクエントリ, 
+                (再生開始時刻sec, this.再生速度), 
+                this._デコードキャンセル.Token );
 
             // (2) デコードから完了通知がくるまでブロック。
             this._デコード起動完了通知.Wait();

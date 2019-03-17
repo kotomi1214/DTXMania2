@@ -54,9 +54,14 @@ namespace FDK
         protected Task タスク;
 
         /// <summary>
+        ///     WASAPI サウンドデバイス。
+        /// </summary>
+        protected サウンドデバイス サウンドデバイス;
+
+        /// <summary>
         ///     WindowsAnimation。
         /// </summary>
-        protected WindowsAnimation アニメーション;
+        protected アニメーション アニメーション;
 
 
         /// <summary>
@@ -162,7 +167,8 @@ namespace FDK
             Thread.CurrentThread.Name = "進行描画";
 
             グラフィックデバイス.インスタンスを生成する( hWindow, 物理画面サイズ, 設計画面サイズ );
-            this.アニメーション = new WindowsAnimation();
+            this.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
+            this.アニメーション = new アニメーション();
             this._Tick通知 = new AutoResetEvent( false );
             this._終了指示通知 = new ManualResetEventSlim( false );
             this._終了完了通知 = new ManualResetEventSlim( false );
@@ -184,6 +190,7 @@ namespace FDK
             this._タイマ?.Dispose();
 
             this.アニメーション?.Dispose();
+            this.サウンドデバイス?.Dispose();
             グラフィックデバイス.インスタンスを解放する();
 
             // 終了処理完了。

@@ -30,7 +30,7 @@ namespace FDK
         }
 
 
-        public PolySound( SoundDevice device, ISampleSource sampleSource, int 多重度 = 4 )
+        public PolySound( サウンドデバイス device, ISampleSource sampleSource, int 多重度 = 4 )
         {
             this.多重度 = 多重度;
             this.サウンドリスト = new Sound[ 多重度 ];

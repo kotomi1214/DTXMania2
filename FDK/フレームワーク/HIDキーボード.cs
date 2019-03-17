@@ -10,7 +10,7 @@ namespace FDK
     /// <summary>
     ///     Raw Input で HID キーボードの入力を扱う。
     /// </summary>
-    public class HIDKeyboard : IInputDevice, IDisposable
+    public class HIDキーボード : IInputDevice, IDisposable
     {
         public InputDeviceType 入力デバイス種別 => InputDeviceType.Keyboard;
 
@@ -20,7 +20,7 @@ namespace FDK
         /// <summary>
         ///     キーボードの Raw Input を登録し、受信を開始する。
         /// </summary>
-        public HIDKeyboard()
+        public HIDキーボード()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {

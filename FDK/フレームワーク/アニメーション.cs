@@ -7,13 +7,16 @@ using SharpDX.Animation;
 
 namespace FDK
 {
-    public class WindowsAnimation : IDisposable
+    /// <summary>
+    ///     Windows Animation API の wrapper。
+    /// </summary>
+    public class アニメーション : IDisposable
     {
         public Manager Manager { get; private set; } = null;
         public Timer Timer { get; private set; } = null;
         public TransitionLibrary TrasitionLibrary { get; private set; } = null;
 
-        public WindowsAnimation()
+        public アニメーション()
         {
             this.Manager = new Manager();
             this.Timer = new Timer();
