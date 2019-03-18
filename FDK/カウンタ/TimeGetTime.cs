@@ -51,22 +51,22 @@ namespace FDK
         #region " Win32 "
         //----------------
         [StructLayout( LayoutKind.Sequential )]
-        protected struct TimeCaps
+        public struct TimeCaps
         {
             public uint wPeriodMin;
             public uint wPeriodMax;
         }
         [DllImport( "winmm.dll" )]
-        protected static extern void timeBeginPeriod( uint x );
+        public static extern void timeBeginPeriod( uint x );
 
         [DllImport( "winmm.dll" )]
-        protected static extern void timeEndPeriod( uint x );
+        public static extern void timeEndPeriod( uint x );
 
         [DllImport( "winmm.dll" )]
-        protected static extern uint timeGetDevCaps( out TimeCaps timeCaps, uint size );
+        public static extern uint timeGetDevCaps( out TimeCaps timeCaps, uint size );
 
         [DllImport( "winmm.dll" )]
-        protected static extern uint timeGetTime();
+        public static extern uint timeGetTime();
         //----------------
         #endregion
     }

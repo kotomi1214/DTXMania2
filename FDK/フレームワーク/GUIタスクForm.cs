@@ -21,6 +21,8 @@ namespace FDK
             {
                 InitializeComponent();
 
+                TimeGetTime.timeBeginPeriod( 1 );
+
                 this.キーボードデバイス = new キーボードデバイス();
                 this.進行描画タスク = task ?? new 進行描画タスク();
             }
@@ -50,6 +52,8 @@ namespace FDK
             {
                 this.進行描画タスク.終了する();
                 this.キーボードデバイス?.Dispose();
+
+                TimeGetTime.timeEndPeriod( 1 );
 
                 base.OnClosing( e );
             }
