@@ -6,7 +6,7 @@ namespace FDK
 {
     using MIDIINHANDLE = System.UInt32;
 
-    public class MidiIn : IInputDevice, IDisposable
+    public class MIDI入力デバイス : IInputDevice, IDisposable
     {
         public InputDeviceType 入力デバイス種別 => InputDeviceType.MidiIn;
 
@@ -53,7 +53,7 @@ namespace FDK
         }
 
 
-        public MidiIn()
+        public MIDI入力デバイス()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
