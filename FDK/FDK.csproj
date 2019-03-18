@@ -159,6 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="フレームワーク\Activity.cs" />
+    <Compile Include="フレームワーク\画面モード.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />
     <Compile Include="ユーティリティ\Extensions.cs" />
     <Compile Include="フレームワーク\GUIタスクForm.cs">
