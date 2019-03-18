@@ -21,7 +21,7 @@ namespace FDK
             {
                 InitializeComponent();
 
-                this.キーボード = new HIDキーボード();
+                this.キーボードデバイス = new キーボードデバイス();
                 this.進行描画タスク = task ?? new 進行描画タスク();
             }
         }
@@ -29,7 +29,7 @@ namespace FDK
 
         protected 進行描画タスク 進行描画タスク;
 
-        protected HIDキーボード キーボード;
+        protected キーボードデバイス キーボードデバイス;
 
 
         protected override void OnLoad( EventArgs e )
@@ -49,7 +49,7 @@ namespace FDK
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this.進行描画タスク.終了する();
-                this.キーボード?.Dispose();
+                this.キーボードデバイス?.Dispose();
 
                 base.OnClosing( e );
             }
@@ -57,7 +57,7 @@ namespace FDK
 
         protected virtual void OnInput( in Message msg )
         {
-            this.キーボード.WM_INPUTを処理する( msg );
+            this.キーボードデバイス.WM_INPUTを処理する( msg );
         }
 
         protected override void WndProc( ref Message m )

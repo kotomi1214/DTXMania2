@@ -109,12 +109,6 @@ namespace FDK
         /// </summary>
         private ManualResetEventSlim _終了完了通知;
 
-        /// <summary>
-        ///     0 なら描画処理が可能、非 0 なら描画処理は不可（スワップチェーンの表示待機中のため）。
-        ///     Interlocked クラスを使ってアクセスすること。
-        /// </summary>
-        private long _ただいま表示中 = 0;
-
 
         /// <summary>
         ///     進行描画タスクの本体。
@@ -123,6 +117,7 @@ namespace FDK
         {
             // 初期化。
             this._タスクの起動処理を行う( 物理画面サイズ, 設計画面サイズ, hWindow, hControl );
+            var 表示タスク = new 表示タスク();
 
             // メインループ。
             while( this._Tick通知.WaitOne() ) // Tick 通知が来るまで待機。
@@ -131,22 +126,17 @@ namespace FDK
                 if( this._終了指示通知.IsSet )
                     break;
 
-                if( Interlocked.Read( ref this._ただいま表示中 ) == 0 )
-                {
-                    this.描画する();
-
-                    // SwapChain を表示するタスクを起動。
-                    Interlocked.Increment( ref this._ただいま表示中 );     // 1: 表示中
-                    Task.Run( () => {
-                        グラフィックデバイス.Instance.DXGIOutput1.WaitForVerticalBlank();
-                        グラフィックデバイス.Instance.DXGISwapChain1.Present( 1, SharpDX.DXGI.PresentFlags.None );
-                        Interlocked.Decrement( ref this._ただいま表示中 ); // 0: 表示完了
-                    } );
-                }
-                else
+                if( 表示タスク.ただいま表示中 )
                 {
                     this.アニメーション.進行する();
                     this.進行する();
+                }
+                else
+                {
+                    this.描画する();
+
+                    // 垂直帰線を待ってスワップチェーンを表示するタスクを開始する。
+                    表示タスク.表示開始();
                 }
             }
 
@@ -172,7 +162,6 @@ namespace FDK
             this._Tick通知 = new AutoResetEvent( false );
             this._終了指示通知 = new ManualResetEventSlim( false );
             this._終了完了通知 = new ManualResetEventSlim( false );
-            Interlocked.Exchange( ref this._ただいま表示中, 0 );
 
             // タイマを生成し、開始する。
             this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );

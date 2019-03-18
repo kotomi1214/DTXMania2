@@ -199,6 +199,7 @@
     <Compile Include="シリアライズ\YAML\CommentsObjectDescriptor.cs" />
     <Compile Include="シリアライズ\YAML\CommentsObjectGraphVisitor.cs" />
     <Compile Include="フレームワーク\グラフィックデバイス.cs" />
+    <Compile Include="フレームワーク\表示タスク.cs" />
     <Compile Include="メディア\DCEventArgs.cs" />
     <Compile Include="メディア\XML.cs" />
     <Compile Include="メディア\カスタムTextRenderer.cs" />
@@ -224,7 +225,7 @@
     <Compile Include="メディア\ビデオ\Sources\IVideoSource.cs" />
     <Compile Include="メディア\ビデオ\Sources\MediaFoundationFileVideoSource.cs" />
     <Compile Include="メディア\ビデオ\Sources\VideoFrame.cs" />
-    <Compile Include="フレームワーク\HIDキーボード.cs" />
+    <Compile Include="フレームワーク\キーボードデバイス.cs" />
     <Compile Include="同期\BlockingQueue.cs" />
     <Compile Include="メディア\ビデオ\Video.cs" />
     <Compile Include="メディア\描画可能テクスチャ.cs" />

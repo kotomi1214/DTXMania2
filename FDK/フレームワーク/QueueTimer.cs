@@ -63,9 +63,13 @@ namespace FDK
 
 
         private IntPtr _hTimerQueue;
+
         private IntPtr _hTimer;
+
         private UnmanagedTimerCallback _callback;
+
         private Action _callbackAction;
+
 
         /// <summary>
         ///     ネイティブからのコールバック関数。

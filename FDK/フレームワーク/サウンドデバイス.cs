@@ -314,16 +314,25 @@ namespace FDK
 
 
         private volatile PlaybackState _レンダリング状態 = PlaybackState.Stopped;
+
         private AudioClientShareMode _共有モード;
+
         private AudioClock _AudioClock = null;
+
         private AudioRenderClient _AudioRenderClient = null;
+
         private AudioClient _AudioClient = null;
+
         private MMDevice _MMDevice = null;
+
         private (long position, long qpcPosition) _最後のデバイス位置 = (0, 0);
 
         private Thread _レンダリングスレッド = null;
+
         private EventWaitHandle _レンダリングイベント = null;
+
         private readonly object _スレッド間同期 = new object();
+
 
         private void _AudioClientを初期化する( long 期間100ns )
         {

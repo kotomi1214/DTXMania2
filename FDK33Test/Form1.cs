@@ -19,18 +19,11 @@ namespace FDK33Test
             : base( new 進行描画タスク() )
         {
             InitializeComponent();
-
-            this._サウンドデバイス = new サウンドデバイス( AudioClientShareMode.Shared );
-            this._サウンドデバイス.レンダリングを開始する();
         }
 
         protected override void OnClosing( CancelEventArgs e )
         {
-            this._サウンドデバイス.レンダリングを停止する();
-
             base.OnClosing( e );
         }
-
-        private サウンドデバイス _サウンドデバイス;
     }
 }
