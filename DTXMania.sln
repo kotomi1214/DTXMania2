@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDK", "FDK\FDK.csproj", "{8
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDK32Tests", "FDK32Tests\FDK32Tests.csproj", "{49864666-A028-4877-92A4-8200FE9D3C7E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FDKTests", "FDKTests\FDKTests.csproj", "{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -143,6 +145,18 @@ Global
 		{49864666-A028-4877-92A4-8200FE9D3C7E}.RemoteDebug|Any CPU.Build.0 = Debug|Any CPU
 		{49864666-A028-4877-92A4-8200FE9D3C7E}.RemoteDebug|x64.ActiveCfg = Debug|x64
 		{49864666-A028-4877-92A4-8200FE9D3C7E}.RemoteDebug|x64.Build.0 = Debug|x64
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Debug|x64.Build.0 = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Release|x64.ActiveCfg = Release|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.Release|x64.Build.0 = Release|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.RemoteDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.RemoteDebug|Any CPU.Build.0 = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.RemoteDebug|x64.ActiveCfg = Debug|Any CPU
+		{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}.RemoteDebug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
