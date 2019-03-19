@@ -101,21 +101,23 @@ namespace FDK
 
         // Raw Input 
 
+        public キーボードデバイス キーボード { get; protected set; }
+
         private const int WM_INPUT = 0x00FF;
 
         /// <summary>
         ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
         /// </summary>
         /// <param name="msg">WM_INPUT のメッセージ。</param>
-        protected virtual void OnInput( in System.Windows.Forms.Message msg )
+        protected virtual void OnInput( in Message msg )
         {
-            // 派生クラスで実装する。
+            this.キーボード.WM_INPUTを処理する( msg );
         }
 
         /// <summary>
         ///     このフォームのウィンドウメッセージ処理。
         /// </summary>
-        protected override void WndProc( ref System.Windows.Forms.Message msg )
+        protected override void WndProc( ref Message msg )
         {
             switch( msg.Msg )
             {
@@ -171,40 +173,55 @@ namespace FDK
 
         private void _画面モードを変更する( 画面モード 新モード )
         {
-            switch( 新モード )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                case 画面モード.ウィンドウ:
+                switch( 新モード )
+                {
+                    case 画面モード.ウィンドウ:
 
-                    if( this._画面モード != 画面モード.ウィンドウ )
-                    {
-                        this._ウィンドウモードの情報のバックアップ.clientSize = this.ClientSize;
-                        this._ウィンドウモードの情報のバックアップ.formBorderStyle = this.FormBorderStyle;
+                        if( this._画面モード != 画面モード.ウィンドウ )
+                        {
+                            Log.Info( $"ウィンドウモードに切り替えます。" );
 
-                        // (参考) http://www.atmarkit.co.jp/ait/articles/0408/27/news105.html
-                        this.WindowState = FormWindowState.Normal;
-                        this.FormBorderStyle = FormBorderStyle.None;
-                        this.WindowState = FormWindowState.Maximized;
+                            this.WindowState = FormWindowState.Normal;
+                            this.ClientSize = this._ウィンドウモードの情報のバックアップ.clientSize;
+                            this.FormBorderStyle = this._ウィンドウモードの情報のバックアップ.formBorderStyle;
 
-                        Cursor.Hide();
+                            Cursor.Show();
 
-                        this._画面モード = 画面モード.ウィンドウ;
-                    }
-                    break;
+                            this._画面モード = 画面モード.ウィンドウ;
+                        }
+                        else
+                        {
+                            Log.WARNING( $"すでにウィンドウモードなので、何もしません。" );
+                        }
+                        break;
 
-                case 画面モード.全画面:
+                    case 画面モード.全画面:
 
-                    if( this._画面モード != 画面モード.全画面 )
-                    {
-                        // 正確には、「全画面(fullscreen)」ではなく「最大化(maximize)」。
-                        this.WindowState = FormWindowState.Normal;
-                        this.ClientSize = this._ウィンドウモードの情報のバックアップ.clientSize;
-                        this.FormBorderStyle = this._ウィンドウモードの情報のバックアップ.formBorderStyle;
+                        if( this._画面モード != 画面モード.全画面 )
+                        {
+                            Log.Info( $"全画面モードに切り替えます。" );
 
-                        Cursor.Show();
+                            this._ウィンドウモードの情報のバックアップ.clientSize = this.ClientSize;
+                            this._ウィンドウモードの情報のバックアップ.formBorderStyle = this.FormBorderStyle;
 
-                        this._画面モード = 画面モード.全画面;
-                    }
-                    break;
+                            // 正確には、「全画面(fullscreen)」ではなく「最大化(maximize)」。
+                            // 参考: http://www.atmarkit.co.jp/ait/articles/0408/27/news105.html
+                            this.WindowState = FormWindowState.Normal;
+                            this.FormBorderStyle = FormBorderStyle.None;
+                            this.WindowState = FormWindowState.Maximized;
+
+                            Cursor.Hide();
+
+                            this._画面モード = 画面モード.全画面;
+                        }
+                        else
+                        {
+                            Log.WARNING( $"すでに全画面モードなので、何もしません。" );
+                        }
+                        break;
+                }
             }
         }
 

@@ -23,16 +23,22 @@ namespace DTXMania
             : base( new DTXMania.進行描画() )
         {
             InitializeComponent();
+
+            this.キーボード = new キーボードデバイス();
         }
 
         private new 進行描画 進行描画 => (DTXMania.進行描画) base.進行描画;
 
-
-        // Raw Input
-
-        protected override void OnInput( in Message msg )
+        protected override void OnKeyDown( KeyEventArgs e )
         {
-            base.OnInput( msg );
+            // F11 キーで、全画面／ウィンドウモードを切り替える。
+            if( e.KeyCode == Keys.F11 )
+            {
+                this.画面モード = ( this.画面モード == 画面モード.ウィンドウ ) ? 画面モード.全画面 : 画面モード.ウィンドウ;
+                //App.ユーザ管理.ログオン中のユーザ.全画面モードである = App.全画面モード;
+            }
+
+            base.OnKeyDown( e );
         }
 
 
