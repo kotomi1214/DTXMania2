@@ -84,7 +84,7 @@ namespace FDK
             this._VideoSource?.Resume();
         }
 
-        public void 描画する( DeviceContext1 dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
         {
             if( null == this._VideoSource )
                 return;
@@ -96,7 +96,7 @@ namespace FDK
             this.描画する( dc, 変換行列2D, 不透明度0to1 );
         }
 
-        public void 描画する( DeviceContext1 dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( null == this._VideoSource )
                 return;
@@ -130,7 +130,7 @@ namespace FDK
             }
         }
 
-        public void 最後のフレームを再描画する( DeviceContext1 dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
+        public void 最後のフレームを再描画する( DeviceContext dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
         {
             if( null == this._VideoSource )
                 return;
@@ -142,7 +142,7 @@ namespace FDK
             this.最後のフレームを再描画する( dc, 変換行列2D, 不透明度0to1 );
         }
 
-        public void 最後のフレームを再描画する( DeviceContext1 dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        public void 最後のフレームを再描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( null == this._最後に描画したフレーム )
                 return;
@@ -164,7 +164,7 @@ namespace FDK
         private QPCTimer _再生タイマ = null;
 
 
-        private void _次のフレームを読み込んで描画する( DeviceContext1 dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        private void _次のフレームを読み込んで描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( null == this._VideoSource )
                 return;
@@ -211,7 +211,7 @@ namespace FDK
             this._最後に描画したフレーム = 次のフレーム;
         }
 
-        private void _フレームを描画する( DeviceContext1 dc, Matrix3x2 変換行列2D, float 不透明度0to1, VideoFrame 描画するフレーム )
+        private void _フレームを描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1, VideoFrame 描画するフレーム )
         {
             if( null == 描画するフレーム )
                 return;

@@ -45,7 +45,7 @@ namespace FDK
 
         /// <param name="基点のX位置">左揃えなら左端位置、右揃えなら右端位置のX座標。</param>
         /// <param name="右揃え">trueなら右揃え、falseなら左揃え。</param>
-        public void 描画する( DeviceContext1 dc, float 基点のX位置, float 上位置, string 表示文字列, bool 右揃え = false )
+        public void 描画する( DeviceContext dc, float 基点のX位置, float 上位置, string 表示文字列, bool 右揃え = false )
         {
             if( 表示文字列.Nullまたは空である() )
                 return;

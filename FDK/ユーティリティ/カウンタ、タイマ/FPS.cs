@@ -97,7 +97,7 @@ namespace FDK
             }
         }
 
-        public void 描画する( DeviceContext1 dc, float x = 0f, float y = 0f )
+        public void 描画する( DeviceContext dc, float x = 0f, float y = 0f )
         {
             Debug.Assert( this.活性化している );
 

@@ -79,7 +79,7 @@ namespace FDK
         ///		それが困る場合には、<paramref name="描画先矩形を整数境界に合わせる"/> に true を指定すること。
         ///		ただし、これを true にした場合、タイルのように並べて描画した場合に1pxずれる場合がある。この場合は false にすること。
         /// </remarks>
-        public virtual void 描画する( DeviceContext1 dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, RectangleF? 転送元矩形 = null, bool 描画先矩形を整数境界に合わせる = false, Matrix? 変換行列3D = null, LayerParameters1? レイヤーパラメータ = null )
+        public virtual void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, RectangleF? 転送元矩形 = null, bool 描画先矩形を整数境界に合わせる = false, Matrix? 変換行列3D = null, LayerParameters1? レイヤーパラメータ = null )
         {
             Debug.Assert( this.活性化している );
 
@@ -143,7 +143,7 @@ namespace FDK
         /// <param name="変換行列3D">射影行列。</param>
         /// <param name="不透明度0to1">不透明度。(0:透明～1:不透明)</param>
         /// <param name="転送元矩形">描画する画像範囲。</param>
-        public virtual void 描画する( DeviceContext1 dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f, RectangleF? 転送元矩形 = null, LayerParameters1? レイヤーパラメータ = null )
+        public virtual void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f, RectangleF? 転送元矩形 = null, LayerParameters1? レイヤーパラメータ = null )
         {
             Debug.Assert( this.活性化している );
 

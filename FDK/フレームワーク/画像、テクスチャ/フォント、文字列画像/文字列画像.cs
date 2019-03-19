@@ -270,7 +270,7 @@ namespace FDK
             this.TextFormat = null;
         }
 
-        public void 描画する( DeviceContext1 dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
+        public void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
         {
             var 変換行列2D =
                 Matrix3x2.Scaling( X方向拡大率, Y方向拡大率 ) *   // 拡大縮小
@@ -279,7 +279,7 @@ namespace FDK
             this.描画する( dc, 変換行列2D, 変換行列3D, 不透明度0to1 );
         }
 
-        public void 描画する( DeviceContext1 dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
         {
             Debug.Assert( this.活性化している );
 

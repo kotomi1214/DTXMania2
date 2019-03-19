@@ -159,15 +159,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="フレームワーク\Activity.cs" />
+    <Compile Include="フレームワーク\AppForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="フレームワーク\AppForm.Designer.cs">
+      <DependentUpon>AppForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="フレームワーク\画面モード.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />
     <Compile Include="ユーティリティ\Extensions.cs" />
-    <Compile Include="フレームワーク\GUIタスクForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="フレームワーク\GUIタスクForm.Designer.cs">
-      <DependentUpon>GUIタスクForm.cs</DependentUpon>
-    </Compile>
     <Compile Include="ユーティリティ\FDKUtilities.cs" />
     <Compile Include="ユーティリティ\ファイル、フォルダ\Folder.cs" />
     <Compile Include="ユーティリティ\コレクション\HookedDictionary.cs" />
@@ -240,7 +240,6 @@
     <Compile Include="フレームワーク\入力\個別\MIDI入力デバイス.cs" />
     <Compile Include="ユーティリティ\同期\QueueMemoryStream.cs" />
     <Compile Include="ユーティリティ\同期\TriStateEvent.cs" />
-    <Compile Include="フレームワーク\進行描画タスク.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -252,6 +251,9 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <Compile Include="フレームワーク\AppForm.進行描画.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="libbjxa.dll">
