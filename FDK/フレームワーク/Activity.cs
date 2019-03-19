@@ -7,62 +7,22 @@ namespace FDK
 {
     public class Activity
     {
-        /// <summary>
-        ///		子リストに Activity を登録すると、活性化と非活性化が親と連動するようになる。
-        /// </summary>
-        /// <remarks>
-        ///		子リストには静的・動的の２種類があり、それぞれ以下のように使い分ける。
-        /// 
-        ///		(A) メンバとして定義する静的な子の場合：
-        ///		　・子Activity の生成と子リストへの追加は、親Activity のコンストラクタで行う。
-        ///		　・子リストからの削除は不要。
-        ///	　
-        ///		(B) 活性化時に生成する動的な子の場合：
-        ///		　・子Activity の生成と子リストへの追加は、親Activity の On活性化() で行う。
-        ///		　・子リストからの削除は、親Activity の On非活性化() で行う。
-        /// </remarks>
-        public IReadOnlyList<Activity> 子Activityリスト
-            => this._子Activityリスト;
+
+        // 活性化と非活性化
+
 
         public bool 活性化している
         {
             get;
             private set;    // 派生クラスからも設定は禁止。
         } = false;
+
         public bool 活性化していない
         {
-            get
-                => !( this.活性化している );
-
-            // 派生クラスからも設定は禁止。
-            private set
-                => this.活性化している = !( value );
+            get => !( this.活性化している );
+            private set => this.活性化している = !( value );   // 派生クラスからも設定は禁止。
         }
 
-        public Activity 親Activity
-        {
-            get;
-            protected set;
-        } = null;
-
-        public void 子Activityを追加する( Activity 子 )
-        {
-            Debug.Assert( ( null == 子.親Activity ), "このActivityには、すでに親Activityが存在しています。" );
-
-            子.親Activity = this;
-            this._子Activityリスト.Add( 子 );
-        }
-        public void 子Activityを削除する( Activity 子 )
-        {
-            Debug.Assert( this._子Activityリスト.Contains( 子 ), "指定されたActivityは子リストに存在していません。" );
-
-            子.親Activity = null;
-            this._子Activityリスト.Remove( 子 );
-        }
-        public void 子Activityリストをクリアする()
-        {
-            this._子Activityリスト.Clear(); // Dispose はしない。
-        }
 
         /// <summary>
         ///		この Activity を初期化し、進行や描画を行える状態にする。
@@ -112,6 +72,52 @@ namespace FDK
         /// </summary>
         protected virtual void On非活性化()
         {
+        }
+
+
+
+        // Activity ツリー
+
+
+        /// <summary>
+        ///		子リストに Activity を登録すると、活性化と非活性化が親と連動するようになる。
+        /// </summary>
+        /// <remarks>
+        ///		子リストには静的・動的の２種類があり、それぞれ以下のように使い分ける。
+        /// 
+        ///		(A) メンバとして定義する静的な子の場合：
+        ///		　・子Activity の生成と子リストへの追加は、親Activity のコンストラクタで行う。
+        ///		　・子リストからの削除は不要。
+        ///	　
+        ///		(B) 活性化時に生成する動的な子の場合：
+        ///		　・子Activity の生成と子リストへの追加は、親Activity の On活性化() で行う。
+        ///		　・子リストからの削除は、親Activity の On非活性化() で行う。
+        /// </remarks>
+        public IReadOnlyList<Activity> 子Activityリスト
+            => this._子Activityリスト;
+
+        public Activity 親Activity { get; protected set; } = null;
+
+
+        public void 子Activityを追加する( Activity 子 )
+        {
+            Debug.Assert( ( null == 子.親Activity ), "このActivityには、すでに親Activityが存在しています。" );
+
+            子.親Activity = this;
+            this._子Activityリスト.Add( 子 );
+        }
+
+        public void 子Activityを削除する( Activity 子 )
+        {
+            Debug.Assert( this._子Activityリスト.Contains( 子 ), "指定されたActivityは子リストに存在していません。" );
+
+            子.親Activity = null;
+            this._子Activityリスト.Remove( 子 );
+        }
+
+        public void 子Activityリストをクリアする()
+        {
+            this._子Activityリスト.Clear(); // Dispose はしない。
         }
 
 

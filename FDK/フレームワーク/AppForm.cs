@@ -13,7 +13,9 @@ namespace FDK
 {
     public partial class AppForm : Form
     {
+        
         // 起動、終了
+
 
         public AppForm( 進行描画 work )
         {
@@ -32,7 +34,7 @@ namespace FDK
 
                 this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
 
-                this.進行描画.開始する( this.ClientSize, new Size( 1920, 1080 ), this.Handle );
+                this.進行描画.開始する( this, this.ClientSize, new Size( 1920, 1080 ), this.Handle );
             }
         }
 
@@ -49,7 +51,7 @@ namespace FDK
             }
         }
 
-
+        // 開始のトリガ
         protected override void OnLoad( EventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -59,6 +61,7 @@ namespace FDK
             }
         }
 
+        // 終了のトリガ
         protected override void OnClosing( CancelEventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -69,6 +72,9 @@ namespace FDK
         }
 
 
+        /// <summary>
+        ///     進行描画タスクのインスタンス。
+        /// </summary>
         protected 進行描画 進行描画;
 
         /// <summary>
@@ -99,7 +105,8 @@ namespace FDK
 
 
 
-        // Raw Input 
+        // Raw Input
+
 
         public キーボードデバイス キーボード { get; protected set; }
 
@@ -130,7 +137,9 @@ namespace FDK
         }
 
 
-        // フォームのサイズ変更
+
+        // フォームサイズの変更
+
 
         /// <summary>
         ///     ユーザによるフォームのサイズ変更が完了した。
@@ -163,7 +172,9 @@ namespace FDK
         }
 
 
+
         // 画面モードの変更
+
 
         public 画面モード 画面モード
         {

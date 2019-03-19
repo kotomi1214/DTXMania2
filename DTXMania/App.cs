@@ -13,10 +13,18 @@ namespace DTXMania
     [ServiceBehavior( InstanceContextMode = InstanceContextMode.Single )]   // WCFサービスインターフェースをシングルスレッドで呼び出す。
     partial class App : AppForm, IDTXManiaService
     {
+
+        // statc 
+
+
         public static int リリース番号
             => int.TryParse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ), out int release ) ? release : throw new Exception( "アセンブリのプロダクトバージョンに記載ミスがあります。" );
 
         public static bool ビュアーモードである { get; protected set; }
+
+
+
+        // 生成と終了
 
 
         public App()
@@ -42,7 +50,9 @@ namespace DTXMania
         }
 
 
+
         // IDTXManiaService
+
 
         /// <summary>
         ///		曲を読み込み、演奏を開始する。
@@ -69,7 +79,9 @@ namespace DTXMania
             => this.進行描画.GetSoundDelay();
 
 
+
         // WCF サービス
+
 
         public static readonly string serviceUri = "net.pipe://localhost/DTXMania";
         public static readonly string endPointName = "Viewer";

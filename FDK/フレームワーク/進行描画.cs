@@ -9,10 +9,25 @@ using System.Threading.Tasks;
 
 namespace FDK
 {
+    /// <summary>
+    ///     アプリの進行描画を受け持つ。
+    /// </summary>
+    /// <remarks>
+    ///     STAThread である <see cref="AppForm"/> とは異なり、MTAThread で動作する。
+    /// </remarks>
     public class 進行描画
     {
-        public void 開始する( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow )
+        public AppForm AppForm { get; protected set; }
+
+
+
+        // 開始、終了
+
+
+        public void 開始する( AppForm appForm, Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow )
         {
+            this.AppForm = AppForm;
+
             this._タスク = Task.Run( () => {
                 this._タスクエントリ( 物理画面サイズ, 設計画面サイズ, hWindow );
             } );
@@ -26,22 +41,48 @@ namespace FDK
         }
 
 
+        /// <summary>
+        ///     進行描画スレッドのインスタンス。
+        /// </summary>
+        private Task _タスク;
+
+        /// <summary>
+        ///     進行描画用タイマ。
+        ///     定間隔で <see cref="_Tick通知"/> を Set する。
+        /// </summary>
+        private QueueTimer _タイマ;
+
+        /// <summary>
+        ///     このイベントが Set されるごとに、進行または描画が１回行われる。
+        /// </summary>
+        private AutoResetEvent _Tick通知;
+
+        /// <summary>
+        ///     終了を指示するイベント。
+        ///     これを Set して <see cref="_Tick通知"/> を Set すると、進行描画タスクが終了処理を開始する。
+        /// </summary>
+        private ManualResetEventSlim _終了指示通知;
+
+        /// <summary>
+        ///     進行描画タスクが終了処理を完了すると Set される。
+        /// </summary>
+        private ManualResetEventSlim _終了完了通知;
+
+        private class 終了メッセージ : 通知メッセージ
+        {
+        }
+
+
+
+        // 進行、描画
+
+
         protected virtual void 進行する()
         {
             // 派生クラスで実装すること。
         }
 
         protected virtual void 描画する()
-        {
-            // 派生クラスで実装すること。
-        }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
-        {
-            // 派生クラスで実装すること。
-        }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
         {
             // 派生クラスで実装すること。
         }
@@ -115,46 +156,17 @@ namespace FDK
             this._タイマ?.Dispose();   // 進行用タイマを停止する。
 
             グラフィックデバイス.インスタンスを解放する();
+            this.AppForm = null;
 
             this._終了完了通知.Set();
             //----------------
             #endregion
         }
 
-        private class 終了メッセージ : 通知メッセージ
-        {
-        }
 
 
-        /// <summary>
-        ///     進行描画スレッドのインスタンス。
-        /// </summary>
-        private Task _タスク;
+        // スレッドメッセージとキュー
 
-        /// <summary>
-        ///     進行描画用タイマ。
-        ///     定間隔で <see cref="_Tick通知"/> を Set する。
-        /// </summary>
-        private QueueTimer _タイマ;
-
-        /// <summary>
-        ///     このイベントが Set されるごとに、進行または描画が１回行われる。
-        /// </summary>
-        private AutoResetEvent _Tick通知;
-
-        /// <summary>
-        ///     終了を指示するイベント。
-        ///     これを Set して <see cref="_Tick通知"/> を Set すると、進行描画タスクが終了処理を開始する。
-        /// </summary>
-        private ManualResetEventSlim _終了指示通知;
-
-        /// <summary>
-        ///     進行描画タスクが終了処理を完了すると Set される。
-        /// </summary>
-        private ManualResetEventSlim _終了完了通知;
-
-
-        // スレッドメッセージ
 
         protected abstract class 通知メッセージ
         {
@@ -181,7 +193,9 @@ namespace FDK
         }
 
 
-        // サイズ変更
+
+        // グラフィックリソースのサイズ変更
+
 
         /// <summary>
         ///		グラフィックリソースを、指定された物理画面サイズに合わせて変更する。
@@ -213,6 +227,16 @@ namespace FDK
 
             // 完了。
             msg.完了通知.Set();
+        }
+
+        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
+        {
+            // 派生クラスで実装すること。
+        }
+
+        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
+        {
+            // 派生クラスで実装すること。
         }
     }
 }

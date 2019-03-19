@@ -30,10 +30,8 @@ namespace FDK
         /// </summary>
         public bool 離された
         {
-            get
-                => !( this.押された );
-            set
-                => this.押された = !( value );
+            get => !( this.押された );
+            set => this.押された = !( value );
         }
 
         /// <summary>

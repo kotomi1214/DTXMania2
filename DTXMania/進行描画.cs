@@ -43,8 +43,10 @@ namespace DTXMania
         private FPS _fps = new FPS();
 
 
-        #region " IDTXManiaService の実装 "
-        //----------------
+
+        // IDTXManiaService の実装
+
+
         public AutoResetEvent ViewerPlay( string path, int startPart = 0, bool drumsSound = true )
         {
             var msg = new ViewerPlayメッセージ {
@@ -90,11 +92,9 @@ namespace DTXMania
 
         public float GetSoundDelay()    // 常に同期
         {
-            // undonw: GetSoundDelay の実装
+            // undone: GetSoundDelay の実装
             throw new NotImplementedException();
         }
-        //----------------
-        #endregion
-
+        
     }
 }
