@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace FDK.フレームワーク
+namespace FDK
 {
     public partial class AppForm : Form
     {

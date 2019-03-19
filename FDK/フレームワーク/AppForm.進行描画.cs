@@ -7,7 +7,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FDK.フレームワーク
+namespace FDK
 {
     public partial class AppForm
     {
