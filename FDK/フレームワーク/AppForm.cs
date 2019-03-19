@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,44 +15,61 @@ namespace FDK
     {
         // 起動、終了
 
-        public AppForm()
+        public AppForm( 進行描画 work )
         {
             InitializeComponent();
+
+            this.進行描画 = work;
         }
 
-        /// <summary>
-        ///     アプリを開始する。
-        /// </summary>
+        public virtual void 開始する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._未初期化 = false;
+                TimeGetTime.timeBeginPeriod( 1 );
+                PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
+
+                this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
+
+                this.進行描画.開始する( this.ClientSize, new Size( 1920, 1080 ), this.Handle );
+            }
+        }
+
+        public virtual void 終了する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.進行描画.終了する().WaitOne();  // 終了するまで待つ
+
+                PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
+                TimeGetTime.timeEndPeriod( 1 );
+
+                this._未初期化 = true;
+            }
+        }
+
+
         protected override void OnLoad( EventArgs e )
         {
-            this._未初期化 = false;
-
-            TimeGetTime.timeBeginPeriod( 1 );
-            PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
-
-            this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
-
-            this._進行描画 = new 進行描画( this, this.ClientSize, new Size( 1920, 1080 ), this.Handle );
-
-            base.OnLoad( e );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.開始する();
+                base.OnLoad( e );
+            }
         }
 
-        /// <summary>
-        ///     アプリを終了する。
-        /// </summary>
         protected override void OnClosing( CancelEventArgs e )
         {
-            this._未初期化 = true;
-
-            this._進行描画?.Dispose();
-            this._進行描画 = null;
-
-            PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
-            TimeGetTime.timeEndPeriod( 1 );
-
-            base.OnClosing( e );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.終了する();
+                base.OnClosing( e );
+            }
         }
 
+
+        protected 進行描画 進行描画;
 
         /// <summary>
         ///     起動直後は true, OnLoad されて false, OnClosing で true。
@@ -59,14 +77,9 @@ namespace FDK
         private bool _未初期化 = true;
 
         /// <summary>
-        ///     進行描画タスクのインスタンス。
-        /// </summary>
-        private AppForm.進行描画 _進行描画;
-
-        /// <summary>
         ///     このフォームと進行描画タスク間での排他用。
         /// </summary>
-        private readonly object _進行描画排他ロック = new object();
+        protected readonly object 進行描画排他ロック = new object();
 
         /// <summary>
         ///		フォーム生成時のパラメータを編集して返す。
@@ -85,6 +98,7 @@ namespace FDK
         }
 
 
+
         // Raw Input 
 
         private const int WM_INPUT = 0x00FF;
@@ -93,7 +107,7 @@ namespace FDK
         ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
         /// </summary>
         /// <param name="msg">WM_INPUT のメッセージ。</param>
-        protected virtual void OnInput( in Message msg )
+        protected virtual void OnInput( in System.Windows.Forms.Message msg )
         {
             // 派生クラスで実装する。
         }
@@ -101,16 +115,16 @@ namespace FDK
         /// <summary>
         ///     このフォームのウィンドウメッセージ処理。
         /// </summary>
-        protected override void WndProc( ref Message m )
+        protected override void WndProc( ref System.Windows.Forms.Message msg )
         {
-            switch( m.Msg )
+            switch( msg.Msg )
             {
                 case WM_INPUT:
-                    this.OnInput( m );
+                    this.OnInput( msg );
                     break;
             }
 
-            base.WndProc( ref m );
+            base.WndProc( ref msg );
         }
 
 
@@ -140,7 +154,7 @@ namespace FDK
             else
             {
                 // (D) スワップチェーンとその依存リソースを解放し、改めて作成しなおす。
-                this._進行描画.サイズを変更する( this.ClientSize ).WaitOne();   // 完了するまで待つ
+                this.進行描画.サイズを変更する( this.ClientSize ).WaitOne();   // 完了するまで待つ
             }
 
             base.OnResizeEnd( e );
@@ -201,28 +215,5 @@ namespace FDK
         ///		再びウィンドウモードに戻して状態を復元する時に参照する。
         /// </summary>
         private (Size clientSize, FormBorderStyle formBorderStyle) _ウィンドウモードの情報のバックアップ;
-
-
-        // 進行描画タスクからのメソッドデリゲート。これらのメソッドは、進行描画タスクから呼び出される。
-
-        protected virtual void 進行する()
-        {
-            // 派生クラスで実装すること。
-        }
-
-        protected virtual void 描画する()
-        {
-            // 派生クラスで実装すること。
-        }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを作成する()
-        {
-            // 派生クラスで実装すること。
-        }
-
-        protected virtual void スワップチェーンに依存するグラフィックリソースを解放する()
-        {
-            // 派生クラスで実装すること。
-        }
     }
 }

@@ -166,6 +166,7 @@
       <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
     <Compile Include="フレームワーク\画面モード.cs" />
+    <Compile Include="フレームワーク\進行描画.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />
     <Compile Include="ユーティリティ\Extensions.cs" />
     <Compile Include="ユーティリティ\FDKUtilities.cs" />
@@ -251,9 +252,6 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
-    <Compile Include="フレームワーク\AppForm.進行描画.cs">
-      <SubType>Form</SubType>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="libbjxa.dll">
