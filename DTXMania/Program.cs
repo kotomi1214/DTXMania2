@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,12 +19,22 @@ namespace DTXMania
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( false );
 
+#if DEBUG
+            SharpDX.Configuration.EnableReleaseOnFinalizer = true;          // ファイナライザの実行中、未解放のCOMを見つけたら解放を試みる。
+            SharpDX.Configuration.EnableTrackingReleaseOnFinalizer = true;  // その際には Trace にメッセージを出力する。
+#endif
+            // フォルダ変数を設定する。
+            var exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+            VariablePath.フォルダ変数を追加または更新する( "Exe", $@"{exePath}\" );
+            VariablePath.フォルダ変数を追加または更新する( "System", Path.Combine( exePath, @"System\" ) );
+            VariablePath.フォルダ変数を追加または更新する( "AppData", Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" ) );
+
             #region " %USERPROFILE%/AppData/DTXMania2 フォルダがなければ作成する。"
             //----------------
-            var AppDataフォルダ名 = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" );
+            var AppDataフォルダ名 = new VariablePath( "$(AppData)" );
 
-            if( !( Directory.Exists( AppDataフォルダ名 ) ) )
-                Directory.CreateDirectory( AppDataフォルダ名 );
+            if( !( Directory.Exists( AppDataフォルダ名.変数なしパス ) ) )
+                Directory.CreateDirectory( AppDataフォルダ名.変数なしパス );
             //----------------
             #endregion
 
@@ -32,7 +43,7 @@ namespace DTXMania
             Trace.AutoFlush = true;
 
             const int ログファイルの最大保存日数 = 30;
-            var ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
+            var ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名.変数なしパス, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
 
             // ログファイルをTraceリスナとして追加。
             // 以降、Trace（ならびにFDK.Logクラス）による出力は、このリスナ（＝ログファイル）にも出力される。

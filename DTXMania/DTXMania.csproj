@@ -171,7 +171,10 @@
     <Compile Include="WCF\IDTXManiaService.cs" />
     <Compile Include="WCF\ServiceMessage.cs" />
     <Compile Include="WCF\ServiceMessageQueue.cs" />
-    <Compile Include="進行描画.cs" />
+    <Compile Include="入力\ドラム入力種別.cs" />
+    <Compile Include="設定\システム設定.キーバインディング.cs" />
+    <Compile Include="設定\システム設定.cs" />
+    <Compile Include="App進行描画.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

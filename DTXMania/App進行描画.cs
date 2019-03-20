@@ -8,18 +8,27 @@ using FDK;
 
 namespace DTXMania
 {
-    class 進行描画 : FDK.進行描画
+    class App進行描画 : FDK.進行描画
     {
+        public static Random 乱数 { get; protected set; }
+
+        public static システム設定 システム設定 { get; set; }
+
+
 
         // 生成と終了
 
 
         protected override void On開始する()
         {
-            this._fps = new FPS();
+            App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
+
+            //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
 
             this.起動ステージ = new 起動ステージ();
             this.終了ステージ = new 終了ステージ();
+
+            this._fps = new FPS();
 
 
             // 最初のステージを設定し、活性化する。
@@ -32,8 +41,8 @@ namespace DTXMania
         {
             this.現在のステージ = null;
 
-            this.終了ステージ?.Dispose();
             this.起動ステージ?.Dispose();
+            this.終了ステージ?.Dispose();
 
             this._fps?.Dispose();
         }
