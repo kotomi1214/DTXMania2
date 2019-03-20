@@ -18,21 +18,22 @@ namespace DTXMania
         {
             this._fps = new FPS();
 
-
-            // ステージを生成。
-
             this.起動ステージ = new 起動ステージ();
             this.終了ステージ = new 終了ステージ();
 
 
-            // 最初のステージを設定。
+            // 最初のステージを設定し、活性化する。
 
-            this.現在のステージ = this.起動ステージ;
+            this.現在のステージ = this.終了ステージ;
+            this.終了ステージ.活性化する();
         }
 
         protected override void On終了する()
         {
             this.現在のステージ = null;
+
+            this.終了ステージ?.Dispose();
+            this.起動ステージ?.Dispose();
 
             this._fps?.Dispose();
         }
@@ -84,7 +85,7 @@ namespace DTXMania
         protected 終了ステージ 終了ステージ;
 
 
-        
+
         // サイズ変更
 
 

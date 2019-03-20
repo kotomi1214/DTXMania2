@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using System.Windows.Forms;
+using SharpDX;
 using FDK;
 using DTXMania.WCF;
 
@@ -22,6 +25,8 @@ namespace DTXMania
 
         public static bool ビュアーモードである { get; protected set; }
 
+        public static Random 乱数 { get; protected set; }
+
 
 
         // 生成と終了
@@ -32,7 +37,23 @@ namespace DTXMania
         {
             InitializeComponent();
 
+#if DEBUG
+            SharpDX.Configuration.EnableReleaseOnFinalizer = true;          // ファイナライザの実行中、未解放のCOMを見つけたら解放を試みる。
+            SharpDX.Configuration.EnableTrackingReleaseOnFinalizer = true;  // その際には Trace にメッセージを出力する。
+#endif
+
+            var exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+            VariablePath.フォルダ変数を追加または更新する( "Exe", $@"{exePath}\" );
+            VariablePath.フォルダ変数を追加または更新する( "System", Path.Combine( exePath, @"System\" ) );
+            VariablePath.フォルダ変数を追加または更新する( "AppData", Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" ) );
+
+            this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( App.ビュアーモードである ? " [Viewer Mode]" : "" );
+
             this.キーボード = new キーボードデバイス();
+
+            App.乱数 = new Random( DateTime.Now.Millisecond );
+
+
         }
 
         private new 進行描画 進行描画 => (DTXMania.進行描画) base.進行描画;

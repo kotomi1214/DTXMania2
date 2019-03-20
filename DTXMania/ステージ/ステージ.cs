@@ -22,6 +22,7 @@ namespace DTXMania
 
         public abstract void 非活性化する();
 
+        public bool 活性化中 { get; protected set; } = false;
 
 
         // 進行と描画
