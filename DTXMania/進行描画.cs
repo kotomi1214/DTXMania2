@@ -18,10 +18,15 @@ namespace DTXMania
         {
             this._fps = new FPS();
 
-            // ステージを生成する。
+
+            // ステージを生成。
+
             this.起動ステージ = new 起動ステージ();
+            this.終了ステージ = new 終了ステージ();
+
 
             // 最初のステージを設定。
+
             this.現在のステージ = this.起動ステージ;
         }
 
@@ -41,21 +46,32 @@ namespace DTXMania
 
         protected override void 進行する()
         {
-
-
-            // FPS 更新
             if( this._fps.FPSをカウントしプロパティを更新する() )
                 this._FPSが変更された();
 
-            base.進行する();
+            
+            // ステージを進行する。
+
+            this.現在のステージ?.進行する();
+
+            
+            // 進行結果により処理分岐。
+
+            switch( this.現在のステージ )
+            {
+                case 起動ステージ stage:
+                    break;
+            }
         }
 
         protected override void 描画する()
         {
-            // VPS 更新
             this._fps.VPSをカウントする();
 
-            base.描画する();
+
+            // ステージを描画する。
+
+            this.現在のステージ.描画する();
         }
 
 
@@ -64,6 +80,8 @@ namespace DTXMania
 
 
         protected 起動ステージ 起動ステージ;
+
+        protected 終了ステージ 終了ステージ;
 
 
         

@@ -8,9 +8,24 @@ namespace DTXMania
 {
     abstract class ステージ : IDisposable
     {
-        public virtual void Dispose()
-        {
-        }
+
+        // 生成と終了
+
+
+        public abstract void Dispose();
+
+
+
+        // 活性化と非活性化
+
+        public abstract void 活性化する();
+
+        public abstract void 非活性化する();
+
+
+
+        // 進行と描画
+
 
         public abstract void 進行する();
 

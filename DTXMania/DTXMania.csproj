@@ -106,6 +106,7 @@
       <DependentUpon>App.cs</DependentUpon>
     </Compile>
     <Compile Include="ステージ\01起動\起動ステージ.cs" />
+    <Compile Include="ステージ\09終了\終了ステージ.cs" />
     <Compile Include="ステージ\ステージ.cs" />
     <Compile Include="ユーティリティ\CommandLineOptions.cs" />
     <Compile Include="Program.cs" />

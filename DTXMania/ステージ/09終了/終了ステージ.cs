@@ -6,32 +6,19 @@ using FDK;
 
 namespace DTXMania
 {
-    class 起動ステージ : ステージ
+    class 終了ステージ : ステージ
     {
-        public enum フェーズ
-        {
-            曲ツリー構築中,
-            ドラムサウンド構築中,
-            開始音終了待ち,
-            確定,
-            キャンセル,
-        }
-
-        public フェーズ 現在のフェーズ { get; protected set; }
-
-
 
         // 生成と終了
 
 
-        public 起動ステージ()
+        public 終了ステージ()
         {
         }
 
         public override void Dispose()
         {
         }
-
 
 
         // 活性化と非活性化
