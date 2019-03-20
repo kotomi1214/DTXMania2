@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using FDK;
@@ -9,8 +10,40 @@ namespace DTXMania
 {
     class 進行描画 : FDK.進行描画
     {
+
+        // 生成と終了
+
+
+        protected override void On開始する()
+        {
+            this._fps = new FPS();
+
+            // ステージを生成する。
+            this.起動ステージ = new 起動ステージ();
+
+            // 最初のステージを設定。
+            this.現在のステージ = this.起動ステージ;
+        }
+
+        protected override void On終了する()
+        {
+            this.現在のステージ = null;
+
+            this._fps?.Dispose();
+        }
+
+
+
+        // 進行と描画
+
+
+        protected ステージ 現在のステージ;
+
         protected override void 進行する()
         {
+
+
+            // FPS 更新
             if( this._fps.FPSをカウントしプロパティを更新する() )
                 this._FPSが変更された();
 
@@ -19,10 +52,23 @@ namespace DTXMania
 
         protected override void 描画する()
         {
+            // VPS 更新
             this._fps.VPSをカウントする();
 
             base.描画する();
         }
+
+
+
+        // ステージ
+
+
+        protected 起動ステージ 起動ステージ;
+
+
+        
+        // サイズ変更
+
 
         protected override void スワップチェーンに依存するグラフィックリソースを作成する()
         {
@@ -35,18 +81,24 @@ namespace DTXMania
         }
 
 
+
+        // VPS, FPS
+
+
         private void _FPSが変更された()
         {
             Debug.WriteLine( $"{this._fps.現在のVPS}vps, {this._fps.現在のFPS}fps" );
         }
 
-        private FPS _fps = new FPS();
+        private FPS _fps;
 
 
 
         // IDTXManiaService の実装
 
 
+        #region " IDTXManiaService.ViewerPlay "
+        //----------------
         public AutoResetEvent ViewerPlay( string path, int startPart = 0, bool drumsSound = true )
         {
             var msg = new ViewerPlayメッセージ {
@@ -70,8 +122,11 @@ namespace DTXMania
             // undone: ViewerPlay の実装
             throw new NotImplementedException();
         }
+        //----------------
+        #endregion
 
-
+        #region " IDTXManiaService.ViewerStop "
+        //----------------
         public AutoResetEvent ViewerStop()
         {
             var msg = new ViewerStopメッセージ();
@@ -88,13 +143,17 @@ namespace DTXMania
             // undone: ViewerStop の実装
             throw new NotImplementedException();
         }
+        //----------------
+        #endregion
 
-
+        #region " IDTXManiaService.GetSoundDelay "
+        //----------------
         public float GetSoundDelay()    // 常に同期
         {
             // undone: GetSoundDelay の実装
             throw new NotImplementedException();
         }
-        
+        //----------------
+        #endregion
     }
 }

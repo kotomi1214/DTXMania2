@@ -4,7 +4,6 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
-using FDK;
 
 namespace FDK
 {
@@ -14,7 +13,7 @@ namespace FDK
     /// <remarks>
     ///		「表示文字列」メンバを設定/更新すれば、次回の描画時にビットマップが生成される。
     /// </remarks>
-    public class 文字列画像 : Activity
+    public class 文字列画像 : IDisposable
     {
         /// <summary>
         ///		このメンバを set すれば、次回の進行描画時に画像が更新される。
@@ -135,10 +134,12 @@ namespace FDK
             ///		前景色で描画。
             /// </summary>
             通常,
+
             /// <summary>
             ///		文字は前景色で、影は背景色で描画する。
             /// </summary>
             ドロップシャドウ,
+            
             /// <summary>
             ///		文字は前景色で、縁は背景色で描画する。
             /// </summary>
@@ -234,28 +235,30 @@ namespace FDK
         public Size2F 画像サイズdpx { get; protected set; } = Size2F.Zero;
 
 
+
+        // 生成と終了
+
+
         public 文字列画像()
         {
             // 必要なプロパティは呼び出し元で設定すること。
-        }
 
-        protected override void On活性化()
-        {
             this._TextRenderer = new カスタムTextRenderer( グラフィックデバイス.Instance.D2D1Factory1, Color.White, Color.Transparent );    // ビットマップの生成前に。
-
-            // 初期値として設計画面サイズを設定。
-            if( this.レイアウトサイズdpx == Size2F.Zero )
-                this.レイアウトサイズdpx = グラフィックデバイス.Instance.設計画面サイズ;
 
             this._ビットマップを更新せよ = true;
             this._TextFormatを更新せよ = true;
             this._TextLayoutを更新せよ = true;
 
+            if( this.レイアウトサイズdpx == Size2F.Zero )
+                this.レイアウトサイズdpx = グラフィックデバイス.Instance.設計画面サイズ; // 初期サイズとして設計画面サイズを設定。
+
+            // 画像を生成する。
+
             if( this.表示文字列.Nullでも空でもない() )
-                this._ビットマップを生成または更新する();
+                this.ビットマップを生成または更新する();
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             this._TextRenderer?.Dispose();
             this._TextRenderer = null;
@@ -270,72 +273,9 @@ namespace FDK
             this.TextFormat = null;
         }
 
-        public void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
-        {
-            var 変換行列2D =
-                Matrix3x2.Scaling( X方向拡大率, Y方向拡大率 ) *   // 拡大縮小
-                Matrix3x2.Translation( 左位置, 上位置 );          // 平行移動
-
-            this.描画する( dc, 変換行列2D, 変換行列3D, 不透明度0to1 );
-        }
-
-        public void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
-        {
-            Debug.Assert( this.活性化している );
-
-            if( this.表示文字列.Nullまたは空である() )
-                return;
-
-            if( this._ビットマップを更新せよ ||
-                this._TextFormatを更新せよ ||
-                this._TextLayoutを更新せよ )
-            {
-                this._ビットマップを生成または更新する();
-
-                this._ビットマップを更新せよ = false;
-                this._TextFormatを更新せよ = false;
-                this._TextLayoutを更新せよ = false;
-            }
-
-            if( null == this._Bitmap )
-                return;
-
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
-
-                var pretrans = dc.Transform;
-
-                // 変換行列とブレンドモードをD2Dレンダーターゲットに設定する。
-                dc.Transform =
-                    ( 変換行列2D ?? Matrix3x2.Identity ) *
-                    pretrans;
-
-                dc.PrimitiveBlend = ( 加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-
-                // D2Dレンダーターゲットに this.Bitmap を描画する。
-                using( var bmp = this._Bitmap.Bitmap )
-                {
-                    dc.DrawBitmap(
-                        bitmap: bmp,
-                        destinationRectangle: null,
-                        opacity: 不透明度0to1,
-                        interpolationMode: this.補正モード,
-                        sourceRectangle: this.転送元矩形,
-                        erspectiveTransformRef: 変換行列3D );
-                }
-
-            } );
-        }
+        protected SharpDX.Direct2D1.BitmapRenderTarget _Bitmap;
 
         public void ビットマップを生成または更新する()
-        {
-            // 外から呼び出す場合は、すでに活性化していなければならない。
-            Trace.Assert( this.活性化している );
-
-            this._ビットマップを生成または更新する();
-        }
-
-
-        protected void _ビットマップを生成または更新する()
         {
             if( this._TextFormatを更新せよ )
             {
@@ -344,18 +284,21 @@ namespace FDK
                 this.TextFormat?.Dispose();
                 this.TextFormat = new TextFormat(
                     グラフィックデバイス.Instance.DWriteFactory,
-                    this.フォント名, 
-                    this.フォント幅, 
+                    this.フォント名,
+                    this.フォント幅,
                     this.フォントスタイル,
-                    this.フォントサイズpt );
-                this.TextFormat.TextAlignment = this.TextAlignment;
-                this.TextFormat.ParagraphAlignment = this.ParagraphAlignment;
-                this.TextFormat.WordWrapping = this.WordWrapping;
+                    this.フォントサイズpt ) {
+                    TextAlignment = this.TextAlignment,
+                    ParagraphAlignment = this.ParagraphAlignment,
+                    WordWrapping = this.WordWrapping,
+                };
+                this.TextFormat.SetLineSpacing( LineSpacingMethod.Uniform, this.LineSpacing, this.Baseline );
 
                 // 行間は、プロパティではなくメソッドで設定する。
                 this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
-                this.Baseline = this.LineSpacing * 0.8f;    // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
-                this.TextFormat.SetLineSpacing( LineSpacingMethod.Uniform, this.LineSpacing, this.Baseline );
+
+                // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
+                this.Baseline = this.LineSpacing * 0.8f;
                 //----------------
                 #endregion
             }
@@ -371,12 +314,14 @@ namespace FDK
                     this.TextFormat,
                     this.レイアウトサイズdpx.Width,
                     this.レイアウトサイズdpx.Height );
-                //----------------
-                #endregion
+
+                // レイアウトが変わったのでサイズも更新すｒ。
 
                 this._表示文字列のサイズdpx = new Size2F(
                     this.TextLayout.Metrics.WidthIncludingTrailingWhitespace,
                     this.TextLayout.Metrics.Height );
+                //----------------
+                #endregion
             }
 
             if( this._ビットマップを更新せよ ||
@@ -385,30 +330,41 @@ namespace FDK
             {
                 #region " 古いビットマップレンダーターゲットを解放し、新しく生成する。"
                 //----------------
+                // D2DContext1.Target が設定済みでない場合、例外も出さずに落ちてしまうので、明示的に弾く。
                 using( var target = グラフィックデバイス.Instance.既定のD2D1DeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
-                {
-                    // D2DContext1.Target が設定済みであること。さもなきゃ例外も出さずに落ちる。
                     Debug.Assert( null != target );
-                }
 
-                this.画像サイズdpx =
-                    ( this.ParagraphAlignment != ParagraphAlignment.Near || this.TextAlignment != TextAlignment.Leading ) ?
-                    this.レイアウトサイズdpx :      // レイアウトにレイアウトサイズが必要
-                    this._表示文字列のサイズdpx;      // レイアウトサイズは不要
+                if( this.ParagraphAlignment != ParagraphAlignment.Near ||
+                    this.TextAlignment != TextAlignment.Leading )
+                {
+                    this.画像サイズdpx = this.レイアウトサイズdpx;       // レイアウトにレイアウトサイズが必要
+                }
+                else
+                {
+                    this.画像サイズdpx = this._表示文字列のサイズdpx;    // レイアウトサイズは不要
+                }
 
                 if( this.描画効果 == 効果.縁取り )
                 {
                     // 縁取りを使うなら少し画像サイズを (+16, +16) 増やす。
-                    this.画像サイズdpx = new Size2F( this.画像サイズdpx.Width + 16f, this.画像サイズdpx.Height + 16f );
-                    this._表示文字列のサイズdpx = new Size2F( this._表示文字列のサイズdpx.Width + 16f, this._表示文字列のサイズdpx.Height + 16f );    
+                    this.画像サイズdpx = new Size2F(
+                        this.画像サイズdpx.Width + 16f, 
+                        this.画像サイズdpx.Height + 16f );
+
+                    this._表示文字列のサイズdpx = new Size2F( 
+                        this._表示文字列のサイズdpx.Width + 16f, 
+                        this._表示文字列のサイズdpx.Height + 16f );
                 }
 
                 this._Bitmap?.Dispose();
-                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget( グラフィックデバイス.Instance.既定のD2D1DeviceContext, CompatibleRenderTargetOptions.None, this.画像サイズdpx );
+                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget(
+                    グラフィックデバイス.Instance.既定のD2D1DeviceContext, 
+                    CompatibleRenderTargetOptions.None,
+                    this.画像サイズdpx );
                 //----------------
                 #endregion
 
-                #region " ビットマップレンダーターゲットにテキストを描画する。"
+                #region " ビットマップレンダーターゲットをクリアし、テキストを描画する。"
                 //----------------
                 var rt = this._Bitmap;
 
@@ -417,7 +373,10 @@ namespace FDK
                     using( var 前景色ブラシ = new SolidColorBrush( this._Bitmap, this.前景色 ) )
                     using( var 背景色ブラシ = new SolidColorBrush( this._Bitmap, this.背景色 ) )
                     {
-                        rt.Transform = Matrix3x2.Identity;  // 等倍描画。
+                        rt.AntialiasMode = AntialiasMode.Aliased;
+                        rt.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
+                        rt.Transform = Matrix3x2.Identity;  // 等倍描画。(dpx to dpx)
+
                         rt.Clear( Color.Transparent );
 
                         switch( this.描画効果 )
@@ -455,14 +414,71 @@ namespace FDK
             }
         }
 
-        protected SharpDX.Direct2D1.BitmapRenderTarget _Bitmap = null;
-
 
         private bool _ビットマップを更新せよ = true;
 
         private bool _TextFormatを更新せよ = true;
 
         private bool _TextLayoutを更新せよ = true;
+
+
+        // 描画
+
+
+        public void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
+        {
+            var 変換行列2D =
+                Matrix3x2.Scaling( X方向拡大率, Y方向拡大率 ) *   // 拡大縮小
+                Matrix3x2.Translation( 左位置, 上位置 );          // 平行移動
+
+            this.描画する( dc, 変換行列2D, 変換行列3D, 不透明度0to1 );
+        }
+
+        public void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
+        {
+            if( this.表示文字列.Nullまたは空である() )
+                return;
+
+            if( this._ビットマップを更新せよ ||
+                this._TextFormatを更新せよ ||
+                this._TextLayoutを更新せよ )
+            {
+                this.ビットマップを生成または更新する();
+
+                this._ビットマップを更新せよ = false;
+                this._TextFormatを更新せよ = false;
+                this._TextLayoutを更新せよ = false;
+            }
+
+            if( null == this._Bitmap )
+                return;
+
+            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                dc.AntialiasMode = AntialiasMode.Aliased;
+                dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+                dc.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
+                dc.UnitMode = UnitMode.Pixels;
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
+                using( var bmp = this._Bitmap.Bitmap )
+                {
+                    dc.DrawBitmap(
+                        bitmap: bmp,
+                        destinationRectangle: null,
+                        opacity: 不透明度0to1,
+                        interpolationMode: this.補正モード,
+                        sourceRectangle: this.転送元矩形,
+                        erspectiveTransformRef: 変換行列3D );
+                }
+
+            } );
+        }
+
+
+        
+        // private 
+
 
         private string _表示文字列 = null;
 

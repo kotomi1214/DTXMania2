@@ -11,7 +11,7 @@ namespace FDK
     /// <remarks>
     ///		FPSをカウントする() を呼び出さないと、VPS も更新されないので注意。
     /// </remarks>
-    public class FPS : Activity
+    public class FPS : IDisposable
     {
         public int 現在のFPS
         {
@@ -35,14 +35,30 @@ namespace FDK
             }
         }
 
+
+
+        // 生成と終了
+
+
         public FPS()
         {
-            this.子Activityを追加する( this._FPSパラメータ = new 文字列画像() );
+            this._FPSパラメータ = new 文字列画像();
 
             this._初めてのFPS更新 = true;
             this._現在のFPS = 0;
             this._現在のVPS = 0;
         }
+
+        public virtual void Dispose()
+        {
+            this._FPSパラメータ?.Dispose();
+            this._FPSパラメータ = null;
+        }
+
+
+
+        // カウントと描画
+
 
         /// <summary>
         ///		FPSをカウントUPして、「現在のFPS, 現在のVPS」プロパティに現在の値をセットする。
@@ -99,21 +115,31 @@ namespace FDK
 
         public void 描画する( DeviceContext dc, float x = 0f, float y = 0f )
         {
-            Debug.Assert( this.活性化している );
-
             double FPSの周期ms = ( 0 < this._現在のFPS ) ? ( 1000.0 / this._現在のFPS ) : -1.0;
+
             this._FPSパラメータ.表示文字列 = $"VPS: {this._現在のVPS.ToString()} / FPS: {this._現在のFPS.ToString()} (" + FPSの周期ms.ToString( "0.000" ) + "ms)";
             this._FPSパラメータ.描画する( dc, x, y );
         }
 
 
+
+        // private
+
+
         private int _現在のFPS = 0;
+
         private int _現在のVPS = 0;
+
         private int _fps用カウンタ = 0;
+
         private int _vps用カウンタ = 0;
+
         private 定間隔進行 _定間隔進行 = null;
+
         private bool _初めてのFPS更新 = true;
+
         private 文字列画像 _FPSパラメータ = null;
+
         private readonly object _スレッド間同期 = new object();
     }
 }

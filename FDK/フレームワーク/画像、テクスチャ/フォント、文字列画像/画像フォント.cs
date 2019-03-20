@@ -11,7 +11,7 @@ namespace FDK
     /// <summary>
     ///		任意個の文字を格納した一枚の画像と、それぞれの文字領域の矩形リストから、文字列を連続するD2D画像で表示する。
     /// </summary>
-    public class 画像フォント : Activity
+    public class 画像フォント : IDisposable
     {
         /// <summary>
         ///		それぞれの文字矩形の幅に加算する補正値。
@@ -24,24 +24,55 @@ namespace FDK
         public float 不透明度 { get; set; } = 1f;
 
 
+
+        // 生成と終了
+
+
         public 画像フォント( VariablePath 文字盤の画像ファイルパス, VariablePath 文字盤設定ファイルパス, float 文字幅補正dpx = 0f, float 不透明度 = 1f )
         {
-            this.子Activityを追加する( this._文字盤 = new 画像( 文字盤の画像ファイルパス ) );
-
             this.文字幅補正dpx = 文字幅補正dpx;
             this.不透明度 = 不透明度;
 
-            var yaml = File.ReadAllText( 文字盤設定ファイルパス.変数なしパス );
-            var deserializer = new YamlDotNet.Serialization.Deserializer();
-            var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+            // 文字盤を生成する。
+            this._文字盤 = new 画像( 文字盤の画像ファイルパス );
 
-            this._矩形リスト = new Dictionary<string, RectangleF>();
-            foreach( var kvp in yamlMap.矩形リスト )
+            // 設定ファイルを読み込んで、矩形リストを生成する。
             {
-                if( 4 == kvp.Value.Length )
-                    this._矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                // yaml ファイルを読み込む。
+                var yaml = File.ReadAllText( 文字盤設定ファイルパス.変数なしパス );
+                var deserializer = new YamlDotNet.Serialization.Deserializer();
+                var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+
+                // 内容から矩形リストを作成。
+                this._矩形リスト = new Dictionary<string, RectangleF>();
+                foreach( var kvp in yamlMap.矩形リスト )
+                {
+                    if( 4 == kvp.Value.Length )
+                        this._矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                }
             }
         }
+
+        public virtual void Dispose()
+        {
+            this._文字盤?.Dispose();
+            this._文字盤 = null;
+        }
+
+
+        private 画像 _文字盤 = null;
+
+        internal protected Dictionary<string, RectangleF> _矩形リスト = null;
+
+        private class YAMLマップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
+        }
+
+
+
+        // 描画
+
 
         /// <param name="基点のX位置">左揃えなら左端位置、右揃えなら右端位置のX座標。</param>
         /// <param name="右揃え">trueなら右揃え、falseなら左揃え。</param>
@@ -49,6 +80,7 @@ namespace FDK
         {
             if( 表示文字列.Nullまたは空である() )
                 return;
+
 
             // 有効文字（矩形リストに登録されている文字）の矩形、文字数を抽出し、文字列全体のサイズを計算する。
 
@@ -60,6 +92,7 @@ namespace FDK
                 select ( this._矩形リスト[ ch.ToString() ] );
 
             int 有効文字数 = 有効文字矩形リスト.Count();
+
             if( 0 == 有効文字数 )
                 return;
 
@@ -89,17 +122,6 @@ namespace FDK
 
                 基点のX位置 += ( 文字矩形.Width + this.文字幅補正dpx );
             }
-        }
-
-        
-        private 画像 _文字盤 = null;
-
-        internal protected Dictionary<string, RectangleF> _矩形リスト = null;
-
-
-        private class YAMLマップ
-        {
-            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
     }
 }

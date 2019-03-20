@@ -14,40 +14,54 @@ namespace FDK
     /// </summary>
     public class 描画可能テクスチャ : テクスチャ
     {
+
+        // 生成と終了
+
+
+        /// <summary>
+        ///     指定した画像ファイルからテクスチャを作成する。
+        /// </summary>
         public 描画可能テクスチャ( VariablePath 画像ファイルパス )
             : base( 画像ファイルパス, BindFlags.RenderTarget | BindFlags.ShaderResource )
         {
         }
 
+        /// <summary>
+        ///     指定したサイズの、空のテクスチャを作成する。
+        /// </summary>
         public 描画可能テクスチャ( Size2F サイズ )
             : base( サイズ, BindFlags.RenderTarget | BindFlags.ShaderResource )
         {
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            // テクスチャを作成する。
-            base.On活性化();
+            this._Bitmap?.Dispose();
+            this._Bitmap = null;
 
-            // 作成したテクスチャとデータを共有するビットマップターゲットを作成する。
+            base.Dispose();
+        }
+
+
+        private Bitmap1 _Bitmap = null;
+
+        private Bitmap1 _作成したテクスチャとデータを共有するビットマップターゲットを作成する()
+        {
             using( var dxgiSurface = this.Texture.QueryInterfaceOrNull<SharpDX.DXGI.Surface1>() )
             {
                 var bmpProp = new BitmapProperties1() {
                     PixelFormat = new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Premultiplied ),
                     BitmapOptions = BitmapOptions.Target | BitmapOptions.CannotDraw,
                 };
-                this._Bitmap = new Bitmap1( グラフィックデバイス.Instance.既定のD2D1DeviceContext, dxgiSurface, bmpProp );
+
+                return new Bitmap1( グラフィックデバイス.Instance.既定のD2D1DeviceContext, dxgiSurface, bmpProp );
             }
         }
 
-        protected override void On非活性化()
-        {
-            this._Bitmap?.Dispose();
-            this._Bitmap = null;
 
-            // テクスチャを解放する。
-            base.On非活性化();
-        }
+
+        // 描画
+
 
         public void テクスチャへ描画する( Action<SharpDX.Direct2D1.DeviceContext> 描画アクション )
         {
@@ -55,28 +69,12 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                using( var originalTarget = dc.Target )
-                {
-                    try
-                    {
-                        dc.Target = this._Bitmap;
-                        dc.Transform = Matrix3x2.Identity;  // 等倍描画（dpx to dpx）
+                dc.Target = this._Bitmap;           // 描画先
+                dc.Transform = Matrix3x2.Identity;  // 等倍描画（dpx to dpx）
 
-                        描画アクション( dc );
-                    }
-                    finally
-                    {
-                        dc.Target = originalTarget;
-                    }
-                }
+                描画アクション( dc );
 
             } );
         }
-
-
-        /// <summary>
-        ///     テクスチャとメモリを共有するビットマップ。
-        /// </summary>
-        private Bitmap1 _Bitmap = null;
     }
 }

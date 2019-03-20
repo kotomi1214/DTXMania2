@@ -11,11 +11,6 @@ namespace FDK
     /// <summary>
     ///     グラフィック関連のリソース。
     /// </summary>
-    /// <remarks>
-    ///     DXGI 1.2+
-    ///     Direct3D 11.1+
-    ///     Direct2D 1.1+
-    /// </remarks>
     public class グラフィックデバイス : IDisposable
     {
 

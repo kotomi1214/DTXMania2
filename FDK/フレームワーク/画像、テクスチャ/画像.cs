@@ -11,12 +11,12 @@ namespace FDK
     /// <summary>
     ///		Direct2D の Bitmap を使って描画する画像。
     /// </summary>
-    public class 画像 : Activity
+    public class 画像 : IDisposable
     {
         /// <summary>
         ///		画像の生成に成功していれば true 。
         /// </summary>
-        public bool 生成成功 => ( null != this._Bitmap );
+        public bool 生成成功 => ( null != this.Bitmap );
         
         /// <summary>
         ///		画像の生成に失敗していれば true 。
@@ -29,7 +29,7 @@ namespace FDK
             {
                 if( this.生成成功 )
                 {
-                    return new Size2F( this._Bitmap.PixelSize.Width, this._Bitmap.PixelSize.Height );
+                    return new Size2F( this.Bitmap.PixelSize.Width, this.Bitmap.PixelSize.Height );
                 }
                 else
                 {
@@ -42,24 +42,141 @@ namespace FDK
 
         public bool 加算合成 { get; set; } = false;
 
-        public Bitmap1 Bitmap => this._Bitmap;
+        public Bitmap1 Bitmap { get; protected set; }
+
+        public VariablePath 画像ファイルパス { get; protected set; }
+
+
+
+        // 生成と終了
 
 
         public 画像( VariablePath 画像ファイルパス )
         {
-            this._画像ファイルパス = 画像ファイルパス;
+            this.画像ファイルパス = 画像ファイルパス;
+
+            if( 画像ファイルパス?.変数なしパス.Nullでも空でもない() ?? false )
+                this._Bitmapを生成する( this.画像ファイルパス );
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
-            this._Bitmapを生成する();
+            this.Bitmap?.Dispose();
+            this.Bitmap = null;
         }
 
-        protected override void On非活性化()
+        protected void _Bitmapを生成する( VariablePath 画像ファイルパス, BitmapProperties1 bitmapProperties1 = null )
         {
-            this._Bitmap?.Dispose();
-            this._Bitmap = null;
+            var decoder = (BitmapDecoder) null;
+            var sourceFrame = (BitmapFrameDecode) null;
+            var converter = (FormatConverter) null;
+
+            try
+            {
+                // 以下、生成に失敗しても例外は発生しない。ただ描画メソッドで表示されなくなるだけ。
+
+                #region " 画像ファイルパスの有効性を確認する。"
+                //-----------------
+                if( 画像ファイルパス.変数なしパス.Nullまたは空である() )
+                {
+                    Log.ERROR( $"画像ファイルパスが null または空文字列です。[{画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                if( false == System.IO.File.Exists( this.画像ファイルパス.変数なしパス ) )
+                {
+                    Log.ERROR( $"画像ファイルが存在しません。[{this.画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                //-----------------
+                #endregion
+
+                #region " 画像ファイルに対応できるデコーダを見つける。"
+                //-----------------
+                try
+                {
+                    decoder = new BitmapDecoder(
+                        グラフィックデバイス.Instance.WicImagingFactory2,
+                        画像ファイルパス.変数なしパス,
+                        SharpDX.IO.NativeFileAccess.Read,
+                        DecodeOptions.CacheOnLoad );
+                }
+                catch( SharpDXException e )
+                {
+                    Log.ERROR( $"画像ファイルに対応するコーデックが見つかりません。(0x{e.HResult:x8})[{画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                //-----------------
+                #endregion
+
+                #region " 最初のフレームをデコードし、取得する。"
+                //-----------------
+                try
+                {
+                    sourceFrame = decoder.GetFrame( 0 );
+                }
+                catch( SharpDXException e )
+                {
+                    Log.ERROR( $"画像ファイルの最初のフレームのデコードに失敗しました。(0x{e.HResult:x8})[{画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                //-----------------
+                #endregion
+
+                #region " 32bitPBGRA へのフォーマットコンバータを生成する。"
+                //-----------------
+                try
+                {
+                    // WICイメージングファクトリから新しいコンバータを生成。
+                    converter = new FormatConverter( グラフィックデバイス.Instance.WicImagingFactory2 );
+
+                    // コンバータに変換元フレームや変換後フォーマットなどを設定。
+                    converter.Initialize(
+                        sourceRef: sourceFrame,
+                        dstFormat: SharpDX.WIC.PixelFormat.Format32bppPBGRA,    // Premultiplied BGRA
+                        dither: BitmapDitherType.None,
+                        paletteRef: null,
+                        alphaThresholdPercent: 0.0,
+                        paletteTranslate: BitmapPaletteType.MedianCut );
+                }
+                catch( SharpDXException e )
+                {
+                    Log.ERROR( $"32bitPBGRA へのフォーマットコンバータの生成または初期化に失敗しました。(0x{e.HResult:x8})[{画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                //-----------------
+                #endregion
+
+                #region " コンバータを使って、フレームを WICビットマップ経由で D2D ビットマップに変換する。"
+                //-----------------
+                try
+                {
+                    // WIC ビットマップを D2D ビットマップに変換する。
+                    this.Bitmap?.Dispose();
+                    this.Bitmap = Bitmap1.FromWicBitmap(
+                        グラフィックデバイス.Instance.既定のD2D1DeviceContext,
+                        converter,
+                        bitmapProperties1 );
+                }
+                catch( SharpDXException e )
+                {
+                    Log.ERROR( $"Direct2D1.Bitmap1 への変換に失敗しました。(0x{e.HResult:x8})[{画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+                //-----------------
+                #endregion
+            }
+            finally
+            {
+                converter?.Dispose();
+                sourceFrame?.Dispose();
+                decoder?.Dispose();
+            }
         }
+
+
+
+        // 描画
+
 
         /// <summary>
         ///		画像を描画する。
@@ -81,14 +198,19 @@ namespace FDK
         /// </remarks>
         public virtual void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, RectangleF? 転送元矩形 = null, bool 描画先矩形を整数境界に合わせる = false, Matrix? 変換行列3D = null, LayerParameters1? レイヤーパラメータ = null )
         {
-            Debug.Assert( this.活性化している );
-
-            if( null == this._Bitmap )
+            if( null == this.Bitmap )
                 return;
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                転送元矩形 = 転送元矩形 ?? new RectangleF( 0f, 0f, this._Bitmap.PixelSize.Width, this._Bitmap.PixelSize.Height );
+                dc.AntialiasMode = AntialiasMode.Aliased;
+                dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
+                dc.UnitMode = UnitMode.Pixels;
+                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
+
+                転送元矩形 = 転送元矩形 ?? new RectangleF( 0f, 0f, this.Bitmap.PixelSize.Width, this.Bitmap.PixelSize.Height );
 
                 var 転送先矩形 = new RectangleF(
                     x: 左位置,
@@ -104,10 +226,6 @@ namespace FDK
                     転送先矩形.Height = (float) Math.Round( 転送先矩形.Height );
                 }
 
-                // ブレンドモードをD2Dレンダーターゲットに設定する。
-
-                dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-
 
                 // レイヤーパラメータの指定があれば、描画前に Layer を作成して、Push する。
 
@@ -120,7 +238,7 @@ namespace FDK
 
                 // D2Dレンダーターゲットに Bitmap を描画する。
                 dc.DrawBitmap(
-                    bitmap: this._Bitmap,
+                    bitmap: this.Bitmap,
                     destinationRectangle: 転送先矩形,
                     opacity: 不透明度0to1,
                     interpolationMode: this.補正モード,
@@ -145,21 +263,16 @@ namespace FDK
         /// <param name="転送元矩形">描画する画像範囲。</param>
         public virtual void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f, RectangleF? 転送元矩形 = null, LayerParameters1? レイヤーパラメータ = null )
         {
-            Debug.Assert( this.活性化している );
-
-            if( null == this._Bitmap )
+            if( null == this.Bitmap )
                 return;
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                var pretrans = dc.Transform;
-
-                // 変換行列とブレンドモードをD2Dレンダーターゲットに設定する。
-                dc.Transform =
-                    ( 変換行列2D ?? Matrix3x2.Identity ) *
-                    pretrans;
-
+                dc.AntialiasMode = AntialiasMode.Aliased;
+                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
+                dc.UnitMode = UnitMode.Pixels;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
                 using( var layer = new Layer( dc ) )
                 {
@@ -169,7 +282,7 @@ namespace FDK
 
                     // D2Dレンダーターゲットに this.Bitmap を描画する。
                     dc.DrawBitmap(
-                        bitmap: this._Bitmap,
+                        bitmap: this.Bitmap,
                         destinationRectangle: null,
                         opacity: 不透明度0to1,
                         interpolationMode: this.補正モード,
@@ -182,122 +295,6 @@ namespace FDK
                 }
 
             } );
-        }
-
-
-        protected VariablePath _画像ファイルパス = null;
-
-        protected Bitmap1 _Bitmap = null;
-
-
-        protected void _Bitmapを生成する( BitmapProperties1 bitmapProperties1 = null )
-        {
-            var decoder = (BitmapDecoder) null;
-            var sourceFrame = (BitmapFrameDecode) null;
-            var converter = (FormatConverter) null;
-
-            try
-            {
-                // 生成に失敗しても例外は発生しない。ただ描画メソッドで表示されなくなるだけ。
-
-                #region " 画像ファイルパスの有効性を確認する。"
-                //-----------------
-                if( this._画像ファイルパス.変数なしパス.Nullまたは空である() )
-                {
-                    Log.ERROR( $"画像ファイルパスが null または空文字列です。[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                if( false == System.IO.File.Exists( this._画像ファイルパス.変数なしパス ) )
-                {
-                    Log.ERROR( $"画像ファイルが存在しません。[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                //-----------------
-                #endregion
-
-                #region " 画像ファイルに対応できるデコーダを見つける。"
-                //-----------------
-                try
-                {
-                    decoder = new BitmapDecoder(
-                        グラフィックデバイス.Instance.WicImagingFactory2,
-                        this._画像ファイルパス.変数なしパス,
-                        SharpDX.IO.NativeFileAccess.Read,
-                        DecodeOptions.CacheOnLoad );
-                }
-                catch( SharpDXException e )
-                {
-                    Log.ERROR( $"画像ファイルに対応するコーデックが見つかりません。(0x{e.HResult:x8})[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                //-----------------
-                #endregion
-
-                #region " 最初のフレームをデコードし、取得する。"
-                //-----------------
-                try
-                {
-                    sourceFrame = decoder.GetFrame( 0 );
-                }
-                catch( SharpDXException e )
-                {
-                    Log.ERROR( $"画像ファイルの最初のフレームのデコードに失敗しました。(0x{e.HResult:x8})[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                //-----------------
-                #endregion
-
-                #region " 32bitPBGRA へのフォーマットコンバータを生成する。"
-                //-----------------
-                try
-                {
-                    // WICイメージングファクトリから新しいコンバータを生成。
-                    converter = new FormatConverter( グラフィックデバイス.Instance.WicImagingFactory2 );
-
-                    // コンバータに変換元フレームや変換後フォーマットなどを設定。
-                    converter.Initialize(
-                        sourceRef: sourceFrame,
-                        dstFormat: SharpDX.WIC.PixelFormat.Format32bppPBGRA,    // Premultiplied BGRA
-                        dither: BitmapDitherType.None,
-                        paletteRef: null,
-                        alphaThresholdPercent: 0.0,
-                        paletteTranslate: BitmapPaletteType.MedianCut );
-                }
-                catch( SharpDXException e )
-                {
-                    Log.ERROR( $"32bitPBGRA へのフォーマットコンバータの生成または初期化に失敗しました。(0x{e.HResult:x8})[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                //-----------------
-                #endregion
-
-                #region " コンバータを使って、フレームを WICビットマップ経由で D2D ビットマップに変換する。"
-                //-----------------
-                try
-                {
-                    // WIC ビットマップを D2D ビットマップに変換する。
-                    this._Bitmap?.Dispose();
-                    this._Bitmap = Bitmap1.FromWicBitmap(
-                        グラフィックデバイス.Instance.既定のD2D1DeviceContext,
-                        converter,
-                        bitmapProperties1 );
-                }
-                catch( SharpDXException e )
-                {
-                    Log.ERROR( $"Direct2D1.Bitmap1 への変換に失敗しました。(0x{e.HResult:x8})[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                //-----------------
-                #endregion
-
-                //Log.Info( $"{FDKUtilities.現在のメソッド名}: 画像を生成しました。[{変数付きファイルパス}]" );
-            }
-            finally
-            {
-                converter?.Dispose();
-                sourceFrame?.Dispose();
-                decoder?.Dispose();
-            }
         }
     }
 }

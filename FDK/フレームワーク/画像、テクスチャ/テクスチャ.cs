@@ -13,8 +13,12 @@ namespace FDK
     /// <summary>
     ///		Direct3D の D3DTexture を使って描画する画像。
     /// </summary>
-    public class テクスチャ : Activity
+    public class テクスチャ : IDisposable
     {
+
+        // プロパティ
+
+
         /// <summary>
         ///		0:透明～1:不透明
         /// </summary>
@@ -24,17 +28,41 @@ namespace FDK
 
         public Size2F サイズ { get; protected set; }
 
+        
+
+        // 生成と終了
+
 
         /// <summary>
         ///     指定した画像ファイルからテクスチャを作成する。
         /// </summary>
         public テクスチャ( VariablePath 画像ファイルパス, BindFlags bindFlags = BindFlags.ShaderResource )
         {
-            this._bindFlags = bindFlags;
+            this._画像ファイルパス = 画像ファイルパス;
+            this.ユーザ指定サイズ = Size2F.Zero;
 
-            // ↓ どちらかを選択的に指定すること。
-            this._画像ファイルパス = 画像ファイルパス;  // 選択
-            this.ユーザ指定サイズ = Size2F.Zero;        // 非選択
+            this._bindFlags = bindFlags;
+            this._定数バッファ = this._定数バッファを作成する();
+
+            // テクスチャとシェーダーリソースビューを生成する。
+
+            if( this._画像ファイルパス.変数なしパス.Nullでも空でもない() )
+            {
+                if( !System.IO.File.Exists( this._画像ファイルパス.変数なしパス ) )
+                {
+                    Log.ERROR( $"画像ファイルが存在しません。[{this._画像ファイルパス.変数付きパス}]" );
+                    return;
+                }
+
+                var テクスチャリソース = FDKUtilities.CreateShaderResourceViewFromFile(
+                    グラフィックデバイス.Instance.D3D11Device1,
+                    this._bindFlags,
+                    this._画像ファイルパス );
+
+                this._ShaderResourceView = テクスチャリソース.srv;
+                this.サイズ = テクスチャリソース.viewSize;
+                this.Texture = テクスチャリソース.texture;
+            }
         }
 
         /// <summary>
@@ -42,71 +70,31 @@ namespace FDK
         /// </summary>
         public テクスチャ( Size2F サイズ, BindFlags bindFlags = BindFlags.ShaderResource )
         {
+            this._画像ファイルパス = null;
+            this.ユーザ指定サイズ = サイズ;
+
             this._bindFlags = bindFlags;
+            this._定数バッファ = this._定数バッファを作成する();
 
-            // ↓ どちらかを選択的に指定すること。
-            this._画像ファイルパス = null;      // 非選択
-            this.ユーザ指定サイズ = サイズ;     // 選択
+            // テクスチャとシェーダーリソースビューを生成する。
+
+            if( ( 0f >= this.ユーザ指定サイズ.Width ) && ( 0f >= this.ユーザ指定サイズ.Height ) )
+            {
+                Log.ERROR( $"テクスチャサイズが不正です。[{this.ユーザ指定サイズ}]" );
+                return;
+            }
+
+            var テクスチャリソース = FDKUtilities.CreateShaderResourceView(
+                グラフィックデバイス.Instance.D3D11Device1,
+                this._bindFlags,
+                new Size2( (int) this.ユーザ指定サイズ.Width, (int) this.ユーザ指定サイズ.Height ) );
+
+            this._ShaderResourceView = テクスチャリソース.srv;
+            this.サイズ = this.ユーザ指定サイズ;
+            this.Texture = テクスチャリソース.texture;
         }
 
-        protected override void On活性化()
-        {
-            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
-            Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
-
-            #region " 定数バッファを生成する。"
-            //----------------
-            var cBufferDesc = new BufferDescription() {
-                Usage = ResourceUsage.Dynamic,              // 動的使用法
-                BindFlags = BindFlags.ConstantBuffer,       // 定数バッファ
-                CpuAccessFlags = CpuAccessFlags.Write,      // CPUから書き込む
-                OptionFlags = ResourceOptionFlags.None,
-                SizeInBytes = SharpDX.Utilities.SizeOf<ST定数バッファの転送元データ>(),   // バッファサイズ
-                StructureByteStride = 0,
-            };
-            this._ConstantBuffer = new SharpDX.Direct3D11.Buffer( d3dDevice, cBufferDesc );
-            //----------------
-            #endregion
-
-            #region " テクスチャとシェーダーリソースビューを生成する。"
-            //----------------
-            if( this._画像ファイルパス?.変数なしパス.Nullでも空でもない() ?? false )
-            {
-                // (A) 画像ファイルから生成する場合。
-                if( false == System.IO.File.Exists( this._画像ファイルパス.変数なしパス ) )
-                {
-                    Log.ERROR( $"画像ファイルが存在しません。[{this._画像ファイルパス.変数付きパス}]" );
-                    return;
-                }
-                var 戻り値 = FDKUtilities.CreateShaderResourceViewFromFile(
-                    d3dDevice,
-                    this._bindFlags,
-                    this._画像ファイルパス );
-                this._ShaderResourceView = 戻り値.srv;
-                this.サイズ = 戻り値.viewSize;
-                this.Texture = 戻り値.texture;
-            }
-            else if( ( 0f < this.ユーザ指定サイズ.Width ) && ( 0f < this.ユーザ指定サイズ.Height ) )
-            {
-                // (B) サイズを指定して空のテクスチャを生成する場合。
-                var 戻り値 = FDKUtilities.CreateShaderResourceView(
-                    d3dDevice,
-                    this._bindFlags,
-                    new Size2( (int) this.ユーザ指定サイズ.Width, (int) this.ユーザ指定サイズ.Height ) );
-                this._ShaderResourceView = 戻り値.srv;
-                this.Texture = 戻り値.texture;
-
-                this.サイズ = this.ユーザ指定サイズ;
-            }
-            else
-            {
-                throw new InvalidOperationException();
-            }
-            //----------------
-            #endregion
-        }
-
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             this._ShaderResourceView?.Dispose();
             this._ShaderResourceView = null;
@@ -114,9 +102,27 @@ namespace FDK
             this.Texture?.Dispose();
             this.Texture = null;
 
-            this._ConstantBuffer?.Dispose();
-            this._ConstantBuffer = null;
+            this._定数バッファ?.Dispose();
+            this._定数バッファ = null;
         }
+
+        private SharpDX.Direct3D11.Buffer _定数バッファを作成する()
+        {
+            return new SharpDX.Direct3D11.Buffer(
+                グラフィックデバイス.Instance.D3D11Device1,
+                new BufferDescription() {
+                    Usage = ResourceUsage.Dynamic,              // 動的使用法
+                    BindFlags = BindFlags.ConstantBuffer,       // 定数バッファ
+                    CpuAccessFlags = CpuAccessFlags.Write,      // CPUから書き込む
+                    OptionFlags = ResourceOptionFlags.None,
+                    SizeInBytes = SharpDX.Utilities.SizeOf<ST定数バッファの転送元データ>(),   // バッファサイズ
+                    StructureByteStride = 0,
+                } );
+        }
+
+
+
+        // 描画
 
 
         /// <summary>
@@ -143,9 +149,6 @@ namespace FDK
         /// <param name="転送元矩形">テクスチャ座標(値域0～1)で指定する。</param>
         public void 描画する( Matrix ワールド行列変換, float 不透明度0to1 = 1f, RectangleF? 転送元矩形 = null )
         {
-            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
-            Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
-
             if( null == this.Texture )
                 return;
 
@@ -183,75 +186,84 @@ namespace FDK
                 this._定数バッファの転送元データ.dummy3 = 0f;
 
                 // 定数バッファへ書き込む。
-                var dataBox = d3dDevice.ImmediateContext.MapSubresource(
-                    resourceRef: this._ConstantBuffer,
+                var dataBox = グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.MapSubresource(
+                    resourceRef: this._定数バッファ,
                     subresource: 0,
                     mapType: MapMode.WriteDiscard,
                     mapFlags: MapFlags.None );
                 SharpDX.Utilities.Write( dataBox.DataPointer, ref this._定数バッファの転送元データ );
-                d3dDevice.ImmediateContext.UnmapSubresource( this._ConstantBuffer, 0 );
+                グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.UnmapSubresource( this._定数バッファ, 0 );
             }
             //----------------
             #endregion
+
+            var dc = グラフィックデバイス.Instance.D3D11Device1.ImmediateContext;
 
             #region " 3Dパイプラインを設定する。"
             //----------------
             {
                 // 入力アセンブラ
-                d3dDevice.ImmediateContext.InputAssembler.InputLayout = null;
-                d3dDevice.ImmediateContext.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+                dc.InputAssembler.InputLayout = null;
+                dc.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 
                 // 頂点シェーダ
-                d3dDevice.ImmediateContext.VertexShader.Set( テクスチャ._VertexShader );
-                d3dDevice.ImmediateContext.VertexShader.SetConstantBuffers( 0, this._ConstantBuffer );
+                dc.VertexShader.Set( テクスチャ._VertexShader );
+                dc.VertexShader.SetConstantBuffers( 0, this._定数バッファ );
 
                 // ハルシェーダ
-                d3dDevice.ImmediateContext.HullShader.Set( null );
+                dc.HullShader.Set( null );
 
                 // ドメインシェーダ
-                d3dDevice.ImmediateContext.DomainShader.Set( null );
+                dc.DomainShader.Set( null );
 
                 // ジオメトリシェーダ
-                d3dDevice.ImmediateContext.GeometryShader.Set( null );
+                dc.GeometryShader.Set( null );
 
                 // ラスタライザ
-                d3dDevice.ImmediateContext.Rasterizer.SetViewports( グラフィックデバイス.Instance.既定のD3D11ViewPort );
-                d3dDevice.ImmediateContext.Rasterizer.State = テクスチャ._RasterizerState;
+                dc.Rasterizer.SetViewports( グラフィックデバイス.Instance.既定のD3D11ViewPort );
+                dc.Rasterizer.State = テクスチャ._RasterizerState;
 
                 // ピクセルシェーダ
-                d3dDevice.ImmediateContext.PixelShader.Set( テクスチャ._PixelShader );
-                d3dDevice.ImmediateContext.PixelShader.SetConstantBuffers( 0, this._ConstantBuffer );
-                d3dDevice.ImmediateContext.PixelShader.SetShaderResources( 0, 1, this._ShaderResourceView );
-                d3dDevice.ImmediateContext.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
+                dc.PixelShader.Set( テクスチャ._PixelShader );
+                dc.PixelShader.SetConstantBuffers( 0, this._定数バッファ );
+                dc.PixelShader.SetShaderResources( 0, 1, this._ShaderResourceView );
+                dc.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
 
                 // 出力マージャ
-                d3dDevice.ImmediateContext.OutputMerger.SetTargets( グラフィックデバイス.Instance.既定のD3D11DepthStencilView, グラフィックデバイス.Instance.既定のD3D11RenderTargetView );
-                d3dDevice.ImmediateContext.OutputMerger.SetBlendState(
+                dc.OutputMerger.SetTargets( グラフィックデバイス.Instance.既定のD3D11DepthStencilView, グラフィックデバイス.Instance.既定のD3D11RenderTargetView );
+                dc.OutputMerger.SetBlendState(
                     ( this.加算合成する ) ? テクスチャ._BlendState加算合成 : テクスチャ._BlendState通常合成,
                     new Color4( 0f, 0f, 0f, 0f ),
                     -1 );
-                d3dDevice.ImmediateContext.OutputMerger.SetDepthStencilState( グラフィックデバイス.Instance.既定のD3D11DepthStencilState, 0 );
+                dc.OutputMerger.SetDepthStencilState( グラフィックデバイス.Instance.既定のD3D11DepthStencilState, 0 );
             }
             //----------------
             #endregion
 
             // 頂点バッファとインデックスバッファを使わずに 4 つの頂点を描画する。
-            d3dDevice.ImmediateContext.Draw( vertexCount: 4, startVertexLocation: 0 );
+            dc.Draw( vertexCount: 4, startVertexLocation: 0 );
         }
 
 
+
+        // リソース
+
+
+        /// <summary>
+        ///     生成時に、サイズの指定があった場合、そのサイズ。
+        ///     <see cref="サイズ"/> と同一とは保証しない。
+        /// </summary>
         protected Size2F ユーザ指定サイズ;
-
-        protected Texture2D Texture = null;
-
 
         private VariablePath _画像ファイルパス = null;
 
-        private SharpDX.Direct3D11.Buffer _ConstantBuffer = null;
+        private BindFlags _bindFlags;
+
+        protected Texture2D Texture = null;
+
+        private SharpDX.Direct3D11.Buffer _定数バッファ = null;
 
         private ShaderResourceView _ShaderResourceView = null;
-
-        private BindFlags _bindFlags;
 
         private struct ST定数バッファの転送元データ
         {
@@ -272,12 +284,22 @@ namespace FDK
         private ST定数バッファの転送元データ _定数バッファの転送元データ;
 
 
+
         // 全インスタンス共通項目(static) 
+
+
+        private static bool _全インスタンスで共有するリソースを作成済み = false;
+
 
         public static void 全インスタンスで共有するリソースを作成する()
         {
+            if( _全インスタンスで共有するリソースを作成済み )
+                return;
+
+            _全インスタンスで共有するリソースを作成済み = true;
+
+
             var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
-            Debug.Assert( null != d3dDevice, "D3DDevice が取得されていません。" );
 
             var シェーダコンパイルのオプション =
                 ShaderFlags.Debug |
@@ -291,7 +313,7 @@ namespace FDK
                 // シェーダコードをコンパイルする。
                 using( var code = ShaderBytecode.Compile(
                     Properties.Resources.テクスチャ用シェーダコード,
-                    "VS", "vs_4_0", シェーダコンパイルのオプション ) )
+                    "VS", "vs_5_0", シェーダコンパイルのオプション ) )
                 {
                     // 頂点シェーダを生成する。
                     テクスチャ._VertexShader = new VertexShader( d3dDevice, code );
@@ -306,7 +328,7 @@ namespace FDK
                 // シェーダコードをコンパイルする。
                 using( var code = ShaderBytecode.Compile(
                     Properties.Resources.テクスチャ用シェーダコード,
-                    "PS", "ps_4_0", シェーダコンパイルのオプション ) )
+                    "PS", "ps_5_0", シェーダコンパイルのオプション ) )
                 {
                     // ピクセルシェーダを作成する。
                     テクスチャ._PixelShader = new PixelShader( d3dDevice, code );
@@ -412,6 +434,9 @@ namespace FDK
 
         public static void 全インスタンスで共有するリソースを解放する()
         {
+            if( !_全インスタンスで共有するリソースを作成済み )
+                return;
+
             テクスチャ._SamplerState?.Dispose();
             テクスチャ._SamplerState = null;
 
@@ -429,6 +454,8 @@ namespace FDK
 
             テクスチャ._VertexShader?.Dispose();
             テクスチャ._VertexShader = null;
+
+            _全インスタンスで共有するリソースを作成済み = false;
         }
 
 

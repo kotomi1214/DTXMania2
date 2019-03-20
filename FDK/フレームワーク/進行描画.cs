@@ -40,6 +40,16 @@ namespace FDK
             return msg.完了通知;
         }
 
+        protected virtual void On開始する()
+        {
+            // 追加処理があれば、派生クラスで実装する。
+        }
+
+        protected virtual void On終了する()
+        {
+            // 追加処理があれば、派生クラスで実装する。
+        }
+
 
         /// <summary>
         ///     進行描画スレッドのインスタンス。
@@ -102,6 +112,8 @@ namespace FDK
             this._終了指示通知 = new ManualResetEventSlim( false );
             this._終了完了通知 = new ManualResetEventSlim( false );
 
+            this.On開始する();  // 派生クラスでの開始処理
+
             this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );
             //----------------
             #endregion
@@ -154,6 +166,8 @@ namespace FDK
             #region " 終了 "
             //----------------
             this._タイマ?.Dispose();   // 進行用タイマを停止する。
+
+            this.On終了する();  // 派生クラスの終了。
 
             グラフィックデバイス.インスタンスを解放する();
             this.AppForm = null;

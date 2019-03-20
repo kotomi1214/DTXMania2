@@ -158,13 +158,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="フレームワーク\Activity.cs" />
     <Compile Include="フレームワーク\AppForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="フレームワーク\AppForm.Designer.cs">
       <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
+    <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
     <Compile Include="フレームワーク\画面モード.cs" />
     <Compile Include="フレームワーク\進行描画.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />
@@ -257,6 +257,9 @@
     <Content Include="libbjxa.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="_Activity廃止待ち\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
