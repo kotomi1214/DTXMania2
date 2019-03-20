@@ -38,6 +38,14 @@ namespace DTXMania
 
             App進行描画.システム設定 = システム設定.読み込む();
 
+            if( App.ビュアーモードである )
+            {
+                // 前回の位置とサイズを復元する。
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = App進行描画.システム設定.ウィンドウ表示位置Viewerモード用;
+                this.ClientSize = App進行描画.システム設定.ウィンドウサイズViewerモード用;
+            }
+
             this.キーボード = new キーボードデバイス();
         }
 

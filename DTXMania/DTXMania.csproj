@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RemoteDeubg|AnyCPU'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'RemoteDebug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>\\SURFACEPRO4\DTXMania2リモートデバッグ\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -67,9 +67,9 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RemoteDeubg|x64'">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'RemoteDebug|x64' ">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\RemoteDeubg\</OutputPath>
+    <OutputPath>bin\x64\RemoteDebug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
@@ -78,6 +78,18 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'Debug'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\cscore\DebugDll\CSCore.dll</HintPath>
+    </Reference>
+    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'Release'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\cscore\ReleaseDll\CSCore.dll</HintPath>
+    </Reference>
+    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'RemoteDebug'">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\cscore\DebugDll\CSCore.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -172,6 +184,8 @@
     <Compile Include="WCF\ServiceMessage.cs" />
     <Compile Include="WCF\ServiceMessageQueue.cs" />
     <Compile Include="入力\ドラム入力種別.cs" />
+    <Compile Include="設定\システムサウンド.cs" />
+    <Compile Include="設定\システムサウンド種別.cs" />
     <Compile Include="設定\システム設定.キーバインディング.cs" />
     <Compile Include="設定\システム設定.cs" />
     <Compile Include="App進行描画.cs" />
@@ -263,37 +277,37 @@
     <None Include="System\Images\演奏\演奏位置カーソル.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\カーソル移動音.ogg">
+    <None Include="System\Sounds\Presets\Default\カーソル移動音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\ステージクリア.ogg">
+    <None Include="System\Sounds\Presets\Default\ステージクリア.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\ステージ失敗.ogg">
+    <None Include="System\Sounds\Presets\Default\ステージ失敗.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\タイトルステージ_確定音.ogg">
+    <None Include="System\Sounds\Presets\Default\タイトルステージ_確定音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\フルコンボ.ogg">
+    <None Include="System\Sounds\Presets\Default\フルコンボ.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\取消音.ogg">
+    <None Include="System\Sounds\Presets\Default\取消音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\変更音.ogg">
+    <None Include="System\Sounds\Presets\Default\変更音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\歓声.ogg">
+    <None Include="System\Sounds\Presets\Default\歓声.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\決定音.ogg">
+    <None Include="System\Sounds\Presets\Default\決定音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\認証ステージ_ログイン音.ogg">
+    <None Include="System\Sounds\Presets\Default\認証ステージ_ログイン音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Sounds\Preset\Default\選曲ステージ_曲決定音.ogg">
+    <None Include="System\Sounds\Presets\Default\選曲ステージ_曲決定音.ogg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

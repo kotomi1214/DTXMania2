@@ -10,9 +10,19 @@ namespace DTXMania
 {
     class App進行描画 : FDK.進行描画
     {
+
+        // グローバルリソース(static)
+
+
         public static Random 乱数 { get; protected set; }
 
         public static システム設定 システム設定 { get; set; }
+
+        public static サウンドデバイス サウンドデバイス { get; protected set; }
+
+        public static SoundTimer サウンドタイマ { get; protected set; }
+
+        public static システムサウンド システムサウンド { get; protected set; }
 
 
 
@@ -22,8 +32,12 @@ namespace DTXMania
         protected override void On開始する()
         {
             App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
-
             //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
+            App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
+                音量 = 0.5f, // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
+            };
+            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
+            App進行描画.システムサウンド = new システムサウンド();
 
             this.起動ステージ = new 起動ステージ();
             this.終了ステージ = new 終了ステージ();
@@ -41,10 +55,14 @@ namespace DTXMania
         {
             this.現在のステージ = null;
 
+            this._fps?.Dispose();
+
             this.起動ステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
-            this._fps?.Dispose();
+            App進行描画.システムサウンド?.Dispose();
+            App進行描画.サウンドタイマ?.Dispose();
+            App進行描画.サウンドデバイス?.Dispose();
         }
 
 
