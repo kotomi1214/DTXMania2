@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.ServiceModel;
 using System.Windows.Forms;
 using SharpDX;
@@ -21,6 +22,9 @@ namespace DTXMania
 
         public static int リリース番号
             => int.TryParse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ), out int release ) ? release : throw new Exception( "アセンブリのプロダクトバージョンに記載ミスがあります。" );
+
+        public static T 属性<T>() where T : Attribute
+            => (T) Attribute.GetCustomAttribute( Assembly.GetExecutingAssembly(), typeof( T ) );
 
         public static bool ビュアーモードである { get; protected set; }
 
@@ -44,6 +48,12 @@ namespace DTXMania
                 this.StartPosition = FormStartPosition.Manual;
                 this.Location = App進行描画.システム設定.ウィンドウ表示位置Viewerモード用;
                 this.ClientSize = App進行描画.システム設定.ウィンドウサイズViewerモード用;
+            }
+            else
+            {
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = new System.Drawing.Point( 20, 20 );
+                this.ClientSize = new Size( 1024, 576 );
             }
 
             this.キーボード = new キーボードデバイス();

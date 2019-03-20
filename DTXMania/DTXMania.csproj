@@ -152,9 +152,18 @@
     <Compile Include="App.Designer.cs">
       <DependentUpon>App.cs</DependentUpon>
     </Compile>
+    <Compile Include="ステージ\アイキャッチ\GO.cs" />
+    <Compile Include="ステージ\アイキャッチ\アイキャッチ.cs" />
+    <Compile Include="ステージ\アイキャッチ\シャッター.cs" />
+    <Compile Include="ステージ\アイキャッチ\半回転黒フェード.cs" />
+    <Compile Include="ステージ\アイキャッチ\回転幕.cs" />
     <Compile Include="ステージ\01起動\起動ステージ.cs" />
+    <Compile Include="ステージ\02タイトル\タイトルステージ.cs" />
     <Compile Include="ステージ\09終了\終了ステージ.cs" />
+    <Compile Include="ステージ\システム情報.cs" />
     <Compile Include="ステージ\ステージ.cs" />
+    <Compile Include="ステージ\アイキャッチ管理.cs" />
+    <Compile Include="ステージ\舞台画像.cs" />
     <Compile Include="データベース\SQLiteDBBase.cs" />
     <Compile Include="データベース\ユーザ\old\Record01.cs" />
     <Compile Include="データベース\ユーザ\old\Record02.cs" />
@@ -184,9 +193,27 @@
     <Compile Include="WCF\IDTXManiaService.cs" />
     <Compile Include="WCF\ServiceMessage.cs" />
     <Compile Include="WCF\ServiceMessageQueue.cs" />
+    <Compile Include="ユーティリティ\Utilities.cs" />
     <Compile Include="入力\ドラム入力イベント.cs" />
     <Compile Include="入力\ドラム入力種別.cs" />
     <Compile Include="入力\入力管理.cs" />
+    <Compile Include="曲\AVI管理.cs" />
+    <Compile Include="曲\BoxDef.cs" />
+    <Compile Include="曲\Node\BackNode.cs" />
+    <Compile Include="曲\Node\BoxNode.cs" />
+    <Compile Include="曲\Node\MusicNode.cs" />
+    <Compile Include="曲\Node\Node.cs" />
+    <Compile Include="曲\Node\Node.LevelColor.cs" />
+    <Compile Include="曲\Node\Node.PreviewSound.cs" />
+    <Compile Include="曲\Node\RootNode.cs" />
+    <Compile Include="曲\Node\SetNode.cs" />
+    <Compile Include="曲\SetDef.cs" />
+    <Compile Include="曲\WAV管理.cs" />
+    <Compile Include="曲\曲ツリー.cs" />
+    <Compile Include="設定\成績.cs" />
+    <Compile Include="曲\曲DB.cs" />
+    <Compile Include="曲\曲名.cs" />
+    <Compile Include="設定\ドラムサウンド.cs" />
     <Compile Include="設定\ユーザ管理.cs" />
     <Compile Include="設定\ユーザ設定.cs" />
     <Compile Include="設定\種別\AutoPlay種別.cs" />
@@ -198,6 +225,7 @@
     <Compile Include="App進行描画.cs" />
     <Compile Include="設定\ドラムチッププロパティ.cs" />
     <Compile Include="設定\ドラムチッププロパティ管理.cs" />
+    <Compile Include="設定\種別\ランク種別.cs" />
     <Compile Include="設定\種別\入力グループプリセット種別.cs" />
     <Compile Include="設定\種別\入力グループ種別.cs" />
     <Compile Include="設定\種別\判定種別.cs" />

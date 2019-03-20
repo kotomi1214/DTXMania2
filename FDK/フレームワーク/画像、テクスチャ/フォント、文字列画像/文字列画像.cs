@@ -291,14 +291,18 @@ namespace FDK
                     TextAlignment = this.TextAlignment,
                     ParagraphAlignment = this.ParagraphAlignment,
                     WordWrapping = this.WordWrapping,
+                    FlowDirection = FlowDirection.TopToBottom,
+                    ReadingDirection = ReadingDirection.LeftToRight,
                 };
-                this.TextFormat.SetLineSpacing( LineSpacingMethod.Uniform, this.LineSpacing, this.Baseline );
 
                 // 行間は、プロパティではなくメソッドで設定する。
                 this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
 
                 // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.Baseline = this.LineSpacing * 0.8f;
+                
+                // TextFormat に、行間とベースラインを設定する。
+                this.TextFormat.SetLineSpacing( LineSpacingMethod.Uniform, this.LineSpacing, this.Baseline );
                 //----------------
                 #endregion
             }
@@ -373,11 +377,11 @@ namespace FDK
                     using( var 前景色ブラシ = new SolidColorBrush( this._Bitmap, this.前景色 ) )
                     using( var 背景色ブラシ = new SolidColorBrush( this._Bitmap, this.背景色 ) )
                     {
-                        rt.AntialiasMode = AntialiasMode.Aliased;
-                        rt.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
-                        rt.Transform = Matrix3x2.Identity;  // 等倍描画。(dpx to dpx)
-
                         rt.Clear( Color.Transparent );
+
+                        rt.AntialiasMode = AntialiasMode.PerPrimitive;
+                        rt.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Default;
+                        rt.Transform = Matrix3x2.Identity;  // 等倍描画。(dpx to dpx)
 
                         switch( this.描画効果 )
                         {
@@ -455,9 +459,9 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.Aliased;
+                dc.AntialiasMode = AntialiasMode.PerPrimitive;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-                dc.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Grayscale;
+                dc.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Default;
                 dc.UnitMode = UnitMode.Pixels;
                 dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * グラフィックデバイス.Instance.拡大行列DPXtoPX;
 

@@ -162,16 +162,22 @@ namespace FDK
 
         // フォームサイズの変更
 
+        // 以下の２通りがある。
+        // ・ResizeEnd のタイミングで、サイズの変更を行う。（ユーザのドラッグによるサイズ変更）
+        // ・ResizeBegin～ResizeEnd の範囲外で発生した Resize でもサイズの変更を行う。（最大化、最小化など）
 
-        /// <summary>
-        ///     ユーザによるフォームのサイズ変更が完了した。
-        /// </summary>
-        /// <remarks>
-        ///     1. GUIフレッドで、フォームのサイズが確定されるとこのハンドラが呼び出される。
-        ///     2. 進行描画スレッドで、フォームの新しいサイズに合わせたグラフィックリソースの再構築を行う。
-        /// </remarks>
+
+        protected override void OnResizeBegin( EventArgs e )
+        {
+            this._リサイズ中 = true;
+
+            base.OnResizeBegin( e );
+        }
+
         protected override void OnResizeEnd( EventArgs e )
         {
+            this._リサイズ中 = false;
+
             if( this.WindowState == FormWindowState.Minimized )
             {
                 // (A) 最小化された → 何もしない
@@ -193,6 +199,15 @@ namespace FDK
             base.OnResizeEnd( e );
         }
 
+        protected override void OnResize( EventArgs e )
+        {
+            if( !this._未初期化 && !this._リサイズ中 )   // 未初期化、またはリサイズ中なら無視。
+                this.進行描画.サイズを変更する( this.ClientSize ).WaitOne();   // 完了するまで待つ
+
+            base.OnResize( e );
+        }
+
+        private bool _リサイズ中 = false;
 
 
         // 画面モードの変更
