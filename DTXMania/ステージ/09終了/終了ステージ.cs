@@ -42,8 +42,7 @@ namespace DTXMania
                 return;
 
             this.活性化中 = true;
-
-            this._背景画像 = new 画像( @"$(System)Images\終了\終了画面.jpg" );
+            this.グラフィックリソースを復元する();
 
             this.現在のフェーズ = フェーズ.開始;
         }
@@ -54,10 +53,25 @@ namespace DTXMania
                 return;
 
             this.活性化中 = false;
-
-            this._背景画像?.Dispose();
+            this.グラフィックリソースを解放する();
 
             this.現在のフェーズ = フェーズ.完了;
+        }
+
+        public override void グラフィックリソースを復元する()
+        {
+            if( !this.活性化中 )
+                return;
+
+            this._背景画像 = new 画像( @"$(System)Images\終了\終了画面.jpg" );
+        }
+
+        public override void グラフィックリソースを解放する()
+        {
+            if( !this.活性化中 )
+                return;
+
+            this._背景画像?.Dispose();
         }
 
 

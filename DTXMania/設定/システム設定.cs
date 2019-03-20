@@ -15,7 +15,7 @@ namespace DTXMania
     /// <remarks>
     ///		ユーザ別の項目は<see cref="ユーザ設定"/>で管理すること。
     /// </remarks>
-    partial class システム設定
+    class システム設定
     {
         public static readonly VariablePath システム設定ファイルパス = @"$(AppData)Configuration.yaml";
 

@@ -130,6 +130,7 @@
     <Reference Include="System.Data.SQLite.Linq, Version=1.0.110.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.110.0\lib\net46\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -183,12 +184,27 @@
     <Compile Include="WCF\IDTXManiaService.cs" />
     <Compile Include="WCF\ServiceMessage.cs" />
     <Compile Include="WCF\ServiceMessageQueue.cs" />
+    <Compile Include="入力\ドラム入力イベント.cs" />
     <Compile Include="入力\ドラム入力種別.cs" />
+    <Compile Include="入力\入力管理.cs" />
+    <Compile Include="設定\ユーザ管理.cs" />
+    <Compile Include="設定\ユーザ設定.cs" />
+    <Compile Include="設定\種別\AutoPlay種別.cs" />
+    <Compile Include="設定\種別\PlayMode.cs" />
     <Compile Include="設定\システムサウンド.cs" />
-    <Compile Include="設定\システムサウンド種別.cs" />
-    <Compile Include="設定\システム設定.キーバインディング.cs" />
+    <Compile Include="設定\種別\システムサウンド種別.cs" />
+    <Compile Include="設定\キーバインディング.cs" />
     <Compile Include="設定\システム設定.cs" />
     <Compile Include="App進行描画.cs" />
+    <Compile Include="設定\ドラムチッププロパティ.cs" />
+    <Compile Include="設定\ドラムチッププロパティ管理.cs" />
+    <Compile Include="設定\種別\入力グループプリセット種別.cs" />
+    <Compile Include="設定\種別\入力グループ種別.cs" />
+    <Compile Include="設定\種別\判定種別.cs" />
+    <Compile Include="設定\種別\消音グループ種別.cs" />
+    <Compile Include="設定\種別\表示チップ種別.cs" />
+    <Compile Include="設定\種別\表示レーンの左右.cs" />
+    <Compile Include="設定\種別\表示レーン種別.cs" />
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

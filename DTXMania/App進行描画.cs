@@ -24,6 +24,15 @@ namespace DTXMania
 
         public static システムサウンド システムサウンド { get; protected set; }
 
+        public static ユーザ管理 ユーザ管理 { get; protected set; }
+
+        /// <summary>
+        ///     <see cref="WAV管理"/> で使用される、サウンドのサンプルストリームインスタンスをキャッシュ管理する。
+        /// </summary>
+        public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
+
+        public static 入力管理 入力管理 { get; set; }
+
 
 
         // 生成と終了
@@ -38,6 +47,18 @@ namespace DTXMania
             };
             App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.システムサウンド = new システムサウンド();
+            App進行描画.システムサウンド.読み込む();
+            App進行描画.ユーザ管理 = new ユーザ管理();
+            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
+            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
+                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
+            };
+            App進行描画.入力管理 = new 入力管理( this.AppForm.キーボード ) {
+                キーバインディングを取得する = () => App進行描画.システム設定.キー割り当て,
+                キーバインディングを保存する = () => App進行描画.システム設定.保存する(),
+            };
+            App進行描画.入力管理.初期化する();
+
 
             this.起動ステージ = new 起動ステージ();
             this.終了ステージ = new 終了ステージ();
@@ -60,6 +81,9 @@ namespace DTXMania
             this.起動ステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
+            App進行描画.入力管理?.Dispose();
+            App進行描画.WAVキャッシュレンタル?.Dispose();
+            App進行描画.ユーザ管理?.Dispose();
             App進行描画.システムサウンド?.Dispose();
             App進行描画.サウンドタイマ?.Dispose();
             App進行描画.サウンドデバイス?.Dispose();
@@ -77,7 +101,7 @@ namespace DTXMania
             if( this._fps.FPSをカウントしプロパティを更新する() )
                 this._FPSが変更された();
 
-            
+
             // ステージを進行する。
 
             this.現在のステージ?.進行する();
@@ -118,12 +142,12 @@ namespace DTXMania
 
         protected override void スワップチェーンに依存するグラフィックリソースを作成する()
         {
-            base.スワップチェーンに依存するグラフィックリソースを作成する();
+            this.現在のステージ?.グラフィックリソースを復元する();
         }
 
         protected override void スワップチェーンに依存するグラフィックリソースを解放する()
         {
-            base.スワップチェーンに依存するグラフィックリソースを解放する();
+            this.現在のステージ?.グラフィックリソースを解放する();
         }
 
 

@@ -24,9 +24,9 @@ namespace FDK
         // 開始、終了
 
 
-        public void 開始する( AppForm appForm, Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow )
+        public void 開始する( AppForm form, Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow )
         {
-            this.AppForm = AppForm;
+            this.AppForm = form;
 
             this._タスク = Task.Run( () => {
                 this._タスクエントリ( 物理画面サイズ, 設計画面サイズ, hWindow );

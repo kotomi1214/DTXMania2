@@ -10,12 +10,13 @@ namespace DTXMania
 {
     class システムサウンド : IDisposable
     {
+
+        // 生成と終了
+
+
         public システムサウンド( string プリセット名 = null )
         {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this._プリセットサウンドを読み込む( プリセット名 ?? this._既定のプリセット名 );
-            }
+            this._プリセット名 = プリセット名;
         }
 
         public void Dispose()
@@ -28,6 +29,15 @@ namespace DTXMania
 
             this._種別toサウンドマップ = null;
         }
+
+        public void 読み込む()
+        {
+            this._プリセットサウンドを読み込む( this._プリセット名 ?? this._既定のプリセット名 );
+        }
+
+
+        // 再生等
+
 
         public void 再生する( システムサウンド種別 type, bool ループ再生する = false )
         {
@@ -44,6 +54,11 @@ namespace DTXMania
         public bool 再生中( システムサウンド種別 type )
             => this._種別toサウンドマップ.TryGetValue( type, out var map ) && map.sound.いずれかが再生中である;
 
+
+
+        // private
+
+        private string _プリセット名;
 
         private readonly string _既定のプリセット名 = "default";
 

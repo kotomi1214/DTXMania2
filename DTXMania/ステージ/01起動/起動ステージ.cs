@@ -45,6 +45,14 @@ namespace DTXMania
         {
         }
 
+        public override void グラフィックリソースを復元する()
+        {
+        }
+
+        public override void グラフィックリソースを解放する()
+        {
+        }
+
 
 
         // 進行と描画

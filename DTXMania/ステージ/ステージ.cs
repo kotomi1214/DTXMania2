@@ -24,7 +24,12 @@ namespace DTXMania
 
         public bool 活性化中 { get; protected set; } = false;
 
+        public abstract void グラフィックリソースを復元する();
 
+        public abstract void グラフィックリソースを解放する();
+
+        
+        
         // 進行と描画
 
 

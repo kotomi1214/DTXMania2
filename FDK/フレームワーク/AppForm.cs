@@ -13,7 +13,7 @@ namespace FDK
 {
     public partial class AppForm : Form
     {
-        
+
         // 起動、終了
 
 
@@ -103,6 +103,28 @@ namespace FDK
             }
         }
 
+
+
+        // ウィンドウアクティベート
+
+
+        public bool ウィンドウがアクティブである { get; set; } = false;
+
+        protected override void OnActivated( EventArgs e )
+        {
+            this.ウィンドウがアクティブである = true;
+            Log.Info( "ウィンドウがアクティブ化されました。" );
+
+            base.OnActivated( e );
+        }
+
+        protected override void OnDeactivate( EventArgs e )
+        {
+            this.ウィンドウがアクティブである = false;
+            Log.Info( "ウィンドウが非アクティブ化されました。" );
+
+            base.OnDeactivate( e );
+        }
 
 
         // Raw Input
