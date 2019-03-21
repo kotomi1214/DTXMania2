@@ -38,7 +38,7 @@ namespace DTXMania
 
         public void 読み込む( システムサウンド種別 type )
         {
-            this._サウンドを読み込む( type, this._プリセットフォルダの絶対パス.変数なしパス );
+            this._サウンドを読み込む( type, this._サウンドファイルパスを返す( type ) );
         }
         
 
@@ -75,6 +75,12 @@ namespace DTXMania
         private Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)> _種別toサウンドマップ = null;
 
 
+        private VariablePath _サウンドファイルパスを返す( システムサウンド種別 種別 )
+        {
+            // システムサウンド種別名をそのままファイル名として使う。形式は .ogg のみ。
+            return new VariablePath( Path.Combine( this._プリセットフォルダの絶対パス.変数なしパス, 種別.ToString() + ".ogg" ) );
+        }
+
         private void _プリセット名を設定する( string プリセット名 )
         {
             this._プリセット名 = プリセット名 ?? this._既定のプリセット名;
@@ -87,11 +93,7 @@ namespace DTXMania
             {
                 foreach( システムサウンド種別 種別 in Enum.GetValues( typeof( システムサウンド種別 ) ) )
                 {
-                    // システムサウンド種別名をそのままファイル名として使う。形式は .ogg のみ。
-                    var サウンドファイルの絶対パス = new VariablePath( Path.Combine( this._プリセットフォルダの絶対パス.変数なしパス, 種別.ToString() + ".ogg" ) );
-
-                    this._サウンドを読み込む( 種別, サウンドファイルの絶対パス, 既に登録されているなら何もしない: true );
-
+                    this._サウンドを読み込む( 種別, this._サウンドファイルパスを返す( 種別 ), 既に登録されているなら何もしない: true );
                 }
             }
             catch( Exception e )

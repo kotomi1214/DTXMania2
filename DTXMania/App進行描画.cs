@@ -73,6 +73,8 @@ namespace DTXMania
 
         protected override void On開始する()
         {
+            // グローバルリソースを生成。
+
             App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
             //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
             App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
@@ -95,6 +97,8 @@ namespace DTXMania
             App進行描画.アイキャッチ管理 = new アイキャッチ管理();
 
 
+            // ステージを生成。
+
             this.起動ステージ = new 起動ステージ();
             this.タイトルステージ = new タイトルステージ();
             this.終了ステージ = new 終了ステージ();
@@ -110,9 +114,15 @@ namespace DTXMania
         {
             this.現在のステージ = null;
 
+
+            // ステージを解放。
+
             this.起動ステージ?.Dispose();
             this.タイトルステージ?.Dispose();
             this.終了ステージ?.Dispose();
+
+
+            // グローバルリソースを解放。
 
             App進行描画.アイキャッチ管理?.Dispose();
             App進行描画.ドラムサウンド?.Dispose();
