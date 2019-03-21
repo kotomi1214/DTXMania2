@@ -156,6 +156,12 @@
     <Compile Include="ステージ\03認証\認証ステージ.cs" />
     <Compile Include="ステージ\04選曲\BPMパネル.cs" />
     <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
+    <Compile Include="ステージ\04選曲\曲リスト.cs" />
+    <Compile Include="ステージ\04選曲\曲別SKILL.cs" />
+    <Compile Include="ステージ\04選曲\表示方法選択パネル.cs" />
+    <Compile Include="ステージ\04選曲\選択曲枠ランナー.cs" />
+    <Compile Include="ステージ\04選曲\選曲ステージ.cs" />
+    <Compile Include="ステージ\04選曲\難易度と成績.cs" />
     <Compile Include="ステージ\アイキャッチ\GO.cs" />
     <Compile Include="ステージ\アイキャッチ\アイキャッチ.cs" />
     <Compile Include="ステージ\アイキャッチ\シャッター.cs" />
@@ -168,6 +174,7 @@
     <Compile Include="ステージ\ステージ.cs" />
     <Compile Include="ステージ\アイキャッチ管理.cs" />
     <Compile Include="ステージ\舞台画像.cs" />
+    <Compile Include="ステージ\青い線.cs" />
     <Compile Include="データベース\SQLiteDBBase.cs" />
     <Compile Include="データベース\ユーザ\old\Record01.cs" />
     <Compile Include="データベース\ユーザ\old\Record02.cs" />
@@ -387,7 +394,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="ステージ\05オプション設定\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="System\Images\演奏\エキサイトゲージDANGER.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -76,10 +76,12 @@ namespace FDK
 
         /// <param name="基点のX位置">左揃えなら左端位置、右揃えなら右端位置のX座標。</param>
         /// <param name="右揃え">trueなら右揃え、falseなら左揃え。</param>
-        public void 描画する( DeviceContext dc, float 基点のX位置, float 上位置, string 表示文字列, bool 右揃え = false )
+        public void 描画する( DeviceContext dc, float 基点のX位置, float 上位置, string 表示文字列, Size2F? 拡大率 = null, bool 右揃え = false )
         {
             if( 表示文字列.Nullまたは空である() )
                 return;
+
+            Size2F 拡大率V = ( 拡大率.HasValue ) ? 拡大率.Value : new Size2F( 1, 1 );
 
 
             // 有効文字（矩形リストに登録されている文字）の矩形、文字数を抽出し、文字列全体のサイズを計算する。
@@ -98,11 +100,12 @@ namespace FDK
 
             foreach( var 文字矩形 in 有効文字矩形リスト )
             {
-                文字列全体のサイズ.Width += ( 文字矩形.Width + this.文字幅補正dpx );
+                文字列全体のサイズ.Width += ( 文字矩形.Width * 拡大率V.Width + this.文字幅補正dpx );
 
-                if( 文字列全体のサイズ.Height < 文字矩形.Height )
-                    文字列全体のサイズ.Height = 文字矩形.Height;  // 文字列全体の高さは、最大の文字高に一致。
+                if( 文字列全体のサイズ.Height < 文字矩形.Height * 拡大率V.Height )
+                    文字列全体のサイズ.Height = 文字矩形.Height * 拡大率V.Height;  // 文字列全体の高さは、最大の文字高に一致。
             }
+
 
             // 描画する。
 
@@ -116,11 +119,13 @@ namespace FDK
                 this._文字盤.描画する(
                     dc,
                     基点のX位置,
-                    上位置 + ( 文字列全体のサイズ.Height - 文字矩形.Height ),
+                    上位置 + ( 文字列全体のサイズ.Height - 文字矩形.Height * 拡大率V.Height ),
                     転送元矩形: 文字矩形,
+                    X方向拡大率: 拡大率V.Width,
+                    Y方向拡大率: 拡大率V.Height,
                     不透明度0to1: this.不透明度 );
 
-                基点のX位置 += ( 文字矩形.Width + this.文字幅補正dpx );
+                基点のX位置 += ( 文字矩形.Width * 拡大率V.Width + this.文字幅補正dpx );
             }
         }
     }

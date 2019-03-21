@@ -226,7 +226,6 @@ namespace DTXMania
 
                 グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                    dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
                     dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                     dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

@@ -202,7 +202,7 @@ namespace DTXMania
         // 描画
 
 
-        public virtual void 進行描画する( DeviceContext1 dc, Matrix ワールド変換行列, bool キャプション表示 = true )
+        public virtual void 進行描画する( DeviceContext dc, Matrix ワールド変換行列, bool キャプション表示 = true )
         {
             // (1) ノード画像を描画する。
 

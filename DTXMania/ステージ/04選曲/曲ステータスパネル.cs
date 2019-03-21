@@ -105,9 +105,8 @@ namespace DTXMania
                 {
                     グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                        dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
-                        dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
                         dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                         const float Yオフセット = +2f;
                         var Xオフセット = new Dictionary<表示レーン種別, float>() {

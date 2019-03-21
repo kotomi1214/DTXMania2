@@ -19,7 +19,7 @@ namespace FDK
 
         public static グラフィックデバイス Instance { get; protected set; } = null;
 
-        public static void インスタンスを生成する( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ, bool 深度ステンシルを使う = true )
+        public static void インスタンスを生成する( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ )
         {
             if( null != Instance )
                 throw new Exception( "インスタンスはすでに生成済みです。" );
@@ -450,7 +450,7 @@ namespace FDK
                     this.既定のD3D11DepthStencilState = new SharpDX.Direct3D11.DepthStencilState(
                         this.D3D11Device1,
                         new SharpDX.Direct3D11.DepthStencilStateDescription {
-                            IsDepthEnabled = true,                                      // 深度有効
+                            IsDepthEnabled = false,                                     // 深度無効
                             IsStencilEnabled = false,                                   // ステンシルテスト無効
                             DepthWriteMask = SharpDX.Direct3D11.DepthWriteMask.All,     // 書き込む
                             DepthComparison = SharpDX.Direct3D11.Comparison.Less,       // 手前の物体を描画

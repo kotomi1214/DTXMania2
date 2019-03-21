@@ -108,6 +108,8 @@ namespace DTXMania
         // 起動ステージから呼び出される。
         public void グローバルリソースを生成する()
         {
+            テクスチャ.全インスタンスで共有するリソースを作成する();
+
             App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.ユーザ管理 = new ユーザ管理();
             App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
@@ -122,6 +124,7 @@ namespace DTXMania
 
             this.タイトルステージ = new タイトルステージ();
             this.認証ステージ = new 認証ステージ();
+            this.選曲ステージ = new 選曲ステージ();
             this.終了ステージ = new 終了ステージ();
         }
 
@@ -135,6 +138,7 @@ namespace DTXMania
             this.起動ステージ?.Dispose();
             this.タイトルステージ?.Dispose();
             this.認証ステージ?.Dispose();
+            this.選曲ステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
 
@@ -148,6 +152,8 @@ namespace DTXMania
             App進行描画.システムサウンド?.Dispose();
             App進行描画.サウンドタイマ?.Dispose();
             App進行描画.サウンドデバイス?.Dispose();
+
+            テクスチャ.全インスタンスで共有するリソースを解放する();
 
             App進行描画.Instance = null;
         }
@@ -244,6 +250,49 @@ namespace DTXMania
                     }
                     //----------------
                     #endregion
+                    #region " 完了 → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == 認証ステージ.フェーズ.完了 )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.選曲ステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 選曲ステージ stage:
+                    #region " キャンセル → タイトルステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == 選曲ステージ.フェーズ.キャンセル )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.タイトルステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定_選曲 → 曲読み込みステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == 選曲ステージ.フェーズ.確定_選曲 )
+                    {
+                        //stage.非活性化する();
+                        //this.現在のステージ = this.曲読み込みステージ;
+                        //this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    #region " 確定_設定 → 設定ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == 選曲ステージ.フェーズ.確定_設定 )
+                    {
+                        //stage.非活性化する();
+                        //this.現在のステージ = this.オプション設定ステージ;
+                        //this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
                     break;
 
                 case 終了ステージ stage:
@@ -288,6 +337,8 @@ namespace DTXMania
         protected タイトルステージ タイトルステージ;
 
         protected 認証ステージ 認証ステージ;
+
+        protected 選曲ステージ 選曲ステージ;
 
         protected 終了ステージ 終了ステージ;
 
