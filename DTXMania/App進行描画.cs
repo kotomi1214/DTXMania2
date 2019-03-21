@@ -27,9 +27,6 @@ namespace DTXMania
 
         public static ユーザ管理 ユーザ管理 { get; protected set; }
 
-        /// <summary>
-        ///     <see cref="WAV管理"/> で使用される、サウンドのサンプルストリームインスタンスをキャッシュ管理する。
-        /// </summary>
         public static キャッシュデータレンタル<CSCore.ISampleSource> WAVキャッシュレンタル { get; protected set; }
 
         public static 入力管理 入力管理 { get; set; }
@@ -134,6 +131,13 @@ namespace DTXMania
             App進行描画.サウンドデバイス?.Dispose();
         }
 
+        private void _アプリを終了する()
+        {
+            this.AppForm.BeginInvoke( new Action( () => {
+                this.AppForm.Close();
+            } ) );
+        }
+
 
 
         // 進行と描画
@@ -157,9 +161,7 @@ namespace DTXMania
                     //----------------
                     if( stage.現在のフェーズ == 起動ステージ.フェーズ.キャンセル )
                     {
-                        this.AppForm.BeginInvoke( new Action( () => {
-                            this.AppForm.Close();
-                        } ) );
+                        this._アプリを終了する();
                     }
                     //----------------
                     #endregion
@@ -188,6 +190,27 @@ namespace DTXMania
                     break;
 
                 case タイトルステージ stage:
+                    #region " キャンセル → 終了ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == タイトルステージ.フェーズ.キャンセル )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.終了ステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 終了ステージ stage:
+                    #region " 完了 → アプリ終了 "
+                    //----------------
+                    if( stage.現在のフェーズ == 終了ステージ.フェーズ.完了 )
+                    {
+                        this._アプリを終了する();
+                    }
+                    //----------------
+                    #endregion
                     break;
             }
         }
