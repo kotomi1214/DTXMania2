@@ -6,7 +6,7 @@ using FDK;
 
 namespace DTXMania
 {
-    abstract class ステージ : IDisposable
+    abstract class ステージ : Activity, IDisposable
     {
 
         // 生成と終了
@@ -17,12 +17,6 @@ namespace DTXMania
 
 
         // 活性化と非活性化
-
-        public abstract void 活性化する();
-
-        public abstract void 非活性化する();
-
-        public bool 活性化中 { get; protected set; } = false;
 
         public virtual void スワップチェーンに依存するグラフィックリソースを復元する() { }
 

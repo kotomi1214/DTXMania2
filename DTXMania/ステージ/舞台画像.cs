@@ -87,63 +87,69 @@ namespace DTXMania
 
         public void ぼかしと縮小を適用する( double 完了までの最大時間sec = 1.0 )
         {
-            var animation = グラフィックデバイス.Instance.アニメーション;
-
-            if( !( this.ぼかしと縮小を適用中 ) )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( 0.0 == 完了までの最大時間sec )
+                var animation = グラフィックデバイス.Instance.アニメーション;
+
+                if( !( this.ぼかしと縮小を適用中 ) )
                 {
-                    // (A) アニメーションなしで即適用
-                    this._ストーリーボード?.Abandon();
-                    this._ストーリーボード?.Dispose();
-                    this._ストーリーボード = null;
-                    this._ぼかしと縮小割合?.Dispose();
-                    this._ぼかしと縮小割合 = new Variable( animation.Manager, initialValue: 1.0 );
-                }
-                else
-                {
-                    // (B) アニメーションを付けて徐々に適用
-                    using( var 割合遷移 = animation.TrasitionLibrary.SmoothStop( 完了までの最大時間sec, finalValue: 1.0 ) )
+                    if( 0.0 == 完了までの最大時間sec )
                     {
+                        // (A) アニメーションなしで即適用
                         this._ストーリーボード?.Abandon();
                         this._ストーリーボード?.Dispose();
-                        this._ストーリーボード = new Storyboard( animation.Manager );
-                        this._ストーリーボード.AddTransition( this._ぼかしと縮小割合, 割合遷移 );
-                        this._ストーリーボード.Schedule( animation.Timer.Time ); // 今すぐアニメーション開始
+                        this._ストーリーボード = null;
+                        this._ぼかしと縮小割合?.Dispose();
+                        this._ぼかしと縮小割合 = new Variable( animation.Manager, initialValue: 1.0 );
                     }
+                    else
+                    {
+                        // (B) アニメーションを付けて徐々に適用
+                        using( var 割合遷移 = animation.TrasitionLibrary.SmoothStop( 完了までの最大時間sec, finalValue: 1.0 ) )
+                        {
+                            this._ストーリーボード?.Abandon();
+                            this._ストーリーボード?.Dispose();
+                            this._ストーリーボード = new Storyboard( animation.Manager );
+                            this._ストーリーボード.AddTransition( this._ぼかしと縮小割合, 割合遷移 );
+                            this._ストーリーボード.Schedule( animation.Timer.Time ); // 今すぐアニメーション開始
+                        }
+                    }
+                    this.ぼかしと縮小を適用中 = true;
                 }
-                this.ぼかしと縮小を適用中 = true;
             }
         }
 
         public void ぼかしと縮小を解除する( double 完了までの最大時間sec = 1.0 )
         {
-            var animation = グラフィックデバイス.Instance.アニメーション;
-
-            if( this.ぼかしと縮小を適用中 )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( 0.0 == 完了までの最大時間sec )
+                var animation = グラフィックデバイス.Instance.アニメーション;
+
+                if( this.ぼかしと縮小を適用中 )
                 {
-                    // (A) アニメーションなしで即適用
-                    this._ストーリーボード?.Abandon();
-                    this._ストーリーボード?.Dispose();
-                    this._ストーリーボード = null;
-                    this._ぼかしと縮小割合?.Dispose();
-                    this._ぼかしと縮小割合 = new Variable( animation.Manager, initialValue: 0.0 );
-                }
-                else
-                {
-                    // (B) アニメーションを付けて徐々に適用
-                    using( var 割合遷移 = animation.TrasitionLibrary.SmoothStop( 完了までの最大時間sec, finalValue: 0.0 ) )
+                    if( 0.0 == 完了までの最大時間sec )
                     {
+                        // (A) アニメーションなしで即適用
                         this._ストーリーボード?.Abandon();
                         this._ストーリーボード?.Dispose();
-                        this._ストーリーボード = new Storyboard( animation.Manager );
-                        this._ストーリーボード.AddTransition( this._ぼかしと縮小割合, 割合遷移 );
-                        this._ストーリーボード.Schedule( animation.Timer.Time );    // 今すぐアニメーション開始
+                        this._ストーリーボード = null;
+                        this._ぼかしと縮小割合?.Dispose();
+                        this._ぼかしと縮小割合 = new Variable( animation.Manager, initialValue: 0.0 );
                     }
+                    else
+                    {
+                        // (B) アニメーションを付けて徐々に適用
+                        using( var 割合遷移 = animation.TrasitionLibrary.SmoothStop( 完了までの最大時間sec, finalValue: 0.0 ) )
+                        {
+                            this._ストーリーボード?.Abandon();
+                            this._ストーリーボード?.Dispose();
+                            this._ストーリーボード = new Storyboard( animation.Manager );
+                            this._ストーリーボード.AddTransition( this._ぼかしと縮小割合, 割合遷移 );
+                            this._ストーリーボード.Schedule( animation.Timer.Time );    // 今すぐアニメーション開始
+                        }
+                    }
+                    this.ぼかしと縮小を適用中 = false;
                 }
-                this.ぼかしと縮小を適用中 = false;
             }
         }
 
@@ -186,6 +192,10 @@ namespace DTXMania
 
                 グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                    dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
+                    dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                    dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+
                     if( layerParameters1.HasValue )
                     {
                         // (A-a) レイヤーパラメータの指定あり
@@ -215,6 +225,10 @@ namespace DTXMania
                 this._クリッピングエフェクト.Rectangle = ( null != 表示領域 ) ? ( (Vector4) 表示領域 ) : new Vector4( 0f, 0f, this._背景画像.サイズ.Width, this._背景画像.サイズ.Height );
 
                 グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                    dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
+                    dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                    dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                     if( layerParameters1.HasValue )
                     {

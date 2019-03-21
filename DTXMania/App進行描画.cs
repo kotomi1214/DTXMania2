@@ -15,6 +15,7 @@ namespace DTXMania
 
         // グローバルリソース(static)
 
+        public static App進行描画 Instance { get; protected set; }
 
         public static Random 乱数 { get; protected set; }
 
@@ -69,43 +70,59 @@ namespace DTXMania
         // 生成と終了
 
 
+        public App進行描画()
+        {
+            App進行描画.Instance = this;
+        }
+
         protected override void On開始する()
         {
-            // グローバルリソースを生成。
+            // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
 
             App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
             //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
             App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
                 音量 = 0.5f, // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
             };
-            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.システムサウンド = new システムサウンド();
             //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
-            App進行描画.ユーザ管理 = new ユーザ管理();
-            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
-            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
-                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
-            };
             App進行描画.入力管理 = new 入力管理( this.AppForm.キーボード ) {
                 キーバインディングを取得する = () => App進行描画.システム設定.キー割り当て,
                 キーバインディングを保存する = () => App進行描画.システム設定.保存する(),
             };
             App進行描画.入力管理.初期化する();
-            App進行描画.ドラムサウンド = new ドラムサウンド();
-            App進行描画.アイキャッチ管理 = new アイキャッチ管理();
 
 
-            // ステージを生成。
+            // ステージを生成。（起動ステージのみ。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
 
             this.起動ステージ = new 起動ステージ();
-            this.タイトルステージ = new タイトルステージ();
-            this.終了ステージ = new 終了ステージ();
 
 
             // 最初のステージを設定し、活性化する。
 
             this.現在のステージ = this.起動ステージ;
             this.現在のステージ.活性化する();
+            ;
+        }
+
+        // 起動ステージから呼び出される。
+        public void グローバルリソースを生成する()
+        {
+            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
+            App進行描画.ユーザ管理 = new ユーザ管理();
+            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
+            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
+                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
+            };
+            App進行描画.ドラムサウンド = new ドラムサウンド();
+            App進行描画.アイキャッチ管理 = new アイキャッチ管理();
+
+
+            // 起動ステージ以外のステージを生成。
+
+            this.タイトルステージ = new タイトルステージ();
+            this.認証ステージ = new 認証ステージ();
+            this.終了ステージ = new 終了ステージ();
         }
 
         protected override void On終了する()
@@ -117,6 +134,7 @@ namespace DTXMania
 
             this.起動ステージ?.Dispose();
             this.タイトルステージ?.Dispose();
+            this.認証ステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
 
@@ -130,6 +148,8 @@ namespace DTXMania
             App進行描画.システムサウンド?.Dispose();
             App進行描画.サウンドタイマ?.Dispose();
             App進行描画.サウンドデバイス?.Dispose();
+
+            App進行描画.Instance = null;
         }
 
         private void _アプリを終了する()
@@ -201,6 +221,29 @@ namespace DTXMania
                     }
                     //----------------
                     #endregion
+                    #region " 完了 → 認証ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == タイトルステージ.フェーズ.完了 )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.認証ステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 認証ステージ stage:
+                    #region " キャンセル → タイトルステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == 認証ステージ.フェーズ.キャンセル )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.タイトルステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
                     break;
 
                 case 終了ステージ stage:
@@ -243,6 +286,8 @@ namespace DTXMania
         protected 起動ステージ 起動ステージ;
 
         protected タイトルステージ タイトルステージ;
+
+        protected 認証ステージ 認証ステージ;
 
         protected 終了ステージ 終了ステージ;
 

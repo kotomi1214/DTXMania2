@@ -24,12 +24,18 @@ namespace DTXMania
 
         public 終了ステージ()
         {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+            }
         }
 
         public override void Dispose()
         {
-            if( this.活性化中 )
-                this.非活性化する();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    this.非活性化する();
+            }
         }
 
 
@@ -38,26 +44,36 @@ namespace DTXMania
 
         public override void 活性化する()
         {
-            if( this.活性化中 )
-                return;
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    return;
 
-            this.活性化中 = true;
-            this._背景画像 = new 画像( @"$(System)Images\終了\終了画面.jpg" );
-            this.スワップチェーンに依存するグラフィックリソースを復元する();
+                this.活性化中 = true;
+                this._背景画像 = new 画像( @"$(System)Images\終了\終了画面.jpg" );
+                this.スワップチェーンに依存するグラフィックリソースを復元する();
 
-            this.現在のフェーズ = フェーズ.開始;
+                this.現在のフェーズ = フェーズ.開始;
+
+                base.活性化する();
+            }
         }
 
         public override void 非活性化する()
         {
-            if( !this.活性化中 )
-                return;
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( !this.活性化中 )
+                    return;
 
-            this.活性化中 = false;
-            this._背景画像?.Dispose();
-            this.スワップチェーンに依存するグラフィックリソースを解放する();
+                this.活性化中 = false;
+                this._背景画像?.Dispose();
+                this.スワップチェーンに依存するグラフィックリソースを解放する();
 
-            this.現在のフェーズ = フェーズ.完了;
+                this.現在のフェーズ = フェーズ.完了;
+
+                base.非活性化する();
+            }
         }
 
 

@@ -28,14 +28,6 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._舞台画像 = new 舞台画像();
-                this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" );
-                this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り };
-                this._システム情報 = new システム情報();
-
-                this._帯ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
-                
-                this.現在のフェーズ = フェーズ.表示;
             }
         }
 
@@ -43,8 +35,8 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._帯ブラシ?.Dispose();
-                this._帯ブラシ = null;
+                if( this.活性化中 )
+                    this.非活性化する();
             }
         }
 
@@ -55,15 +47,44 @@ namespace DTXMania
 
         public override void 活性化する()
         {
-            App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_開始音 );
-            App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    return;
+
+                this._舞台画像 = new 舞台画像();
+                this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" );
+                this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り };
+                this._システム情報 = new システム情報();
+
+                this._帯ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
+
+                App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_開始音 );
+                App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );
+
+                this.現在のフェーズ = フェーズ.表示;
+
+
+                base.活性化する();
+            }
         }
 
         public override void 非活性化する()
         {
-            App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_開始音 );
-            App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_ループBGM );
-            //App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_確定音 );  --> ならしっぱなしでいい
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( !this.活性化中 )
+                    return;
+
+                this._帯ブラシ?.Dispose();
+
+                App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_開始音 );
+                App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_ループBGM );
+                //App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_確定音 );  --> ならしっぱなしでいい
+
+
+                base.非活性化する();
+            }
         }
 
 

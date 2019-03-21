@@ -152,6 +152,10 @@
     <Compile Include="App.Designer.cs">
       <DependentUpon>App.cs</DependentUpon>
     </Compile>
+    <Compile Include="ステージ\03認証\ユーザリスト.cs" />
+    <Compile Include="ステージ\03認証\認証ステージ.cs" />
+    <Compile Include="ステージ\04選曲\BPMパネル.cs" />
+    <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
     <Compile Include="ステージ\アイキャッチ\GO.cs" />
     <Compile Include="ステージ\アイキャッチ\アイキャッチ.cs" />
     <Compile Include="ステージ\アイキャッチ\シャッター.cs" />

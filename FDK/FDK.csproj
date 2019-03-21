@@ -158,6 +158,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="フレームワーク\Activity.cs" />
     <Compile Include="フレームワーク\AppForm.cs">
       <SubType>Form</SubType>
     </Compile>

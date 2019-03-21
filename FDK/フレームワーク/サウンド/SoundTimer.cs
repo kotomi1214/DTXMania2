@@ -35,14 +35,20 @@ namespace FDK
 
         public SoundTimer( サウンドデバイス device )
         {
-            this._DeviceRef = new WeakReference<サウンドデバイス>( device );
-            this.リセットする();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._DeviceRef = new WeakReference<サウンドデバイス>( device );
+                this.リセットする();
+            }
         }
         public void Dispose()
         {
-            lock( this._スレッド間同期 )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._DeviceRef = null;
+                lock( this._スレッド間同期 )
+                {
+                    this._DeviceRef = null;
+                }
             }
         }
         public void リセットする( double 新しい現在時刻sec = 0.0 )

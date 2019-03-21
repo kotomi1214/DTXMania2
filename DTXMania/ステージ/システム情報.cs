@@ -16,14 +16,20 @@ namespace DTXMania
 
         public システム情報()
         {
-            this._FPS = new FPS();
-            this._文字列画像 = new 文字列画像();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._FPS = new FPS();
+                this._文字列画像 = new 文字列画像();
+            }
         }
 
         public virtual void Dispose()
         {
-            this._文字列画像?.Dispose();
-            this._FPS?.Dispose();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._文字列画像?.Dispose();
+                this._FPS?.Dispose();
+            }
         }
 
 
