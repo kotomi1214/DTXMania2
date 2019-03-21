@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using SharpDX;
 using SSTFormat.v4;
 using FDK;
 
@@ -217,7 +218,19 @@ namespace DTXMania
 
         protected override void 描画する()
         {
-            // ステージを描画する。
+            #region " 画面クリア "
+            //----------------
+            // 既定のD3Dレンダーターゲットビューを黒でクリアする。
+            グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.ClearRenderTargetView( グラフィックデバイス.Instance.既定のD3D11RenderTargetView, Color4.Black );
+
+            // 深度バッファを 1.0f でクリアする。
+            グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.ClearDepthStencilView(
+                グラフィックデバイス.Instance.既定のD3D11DepthStencilView,
+                SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
+                depth: 1.0f,
+                stencil: 0 );
+            //----------------
+            #endregion
 
             this.現在のステージ.描画する();
         }
