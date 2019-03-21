@@ -80,7 +80,7 @@ namespace DTXMania
             };
             App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.システムサウンド = new システムサウンド();
-            App進行描画.システムサウンド.読み込む();
+            //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
             App進行描画.ユーザ管理 = new ユーザ管理();
             App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
             App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {

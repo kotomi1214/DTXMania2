@@ -11,6 +11,8 @@ namespace DTXMania
     {
         public enum フェーズ
         {
+            開始,
+            システムサウンド構築中,
             ドラムサウンド構築中,
             曲ツリー構築中,
             開始音終了待ち,
@@ -51,6 +53,9 @@ namespace DTXMania
 
             if( !App.ビュアーモードである )
             {
+                App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_開始音 );     // この２つを先行読み込み。残りはシステムサウンド構築フェーズにて。 
+                App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_ループBGM );  //
+
                 App進行描画.システムサウンド.再生する( システムサウンド種別.起動ステージ_開始音 );
                 App進行描画.システムサウンド.再生する( システムサウンド種別.起動ステージ_ループBGM, ループ再生する: true );
             }
@@ -61,8 +66,7 @@ namespace DTXMania
                     $"",
                 };
 
-            this.現在のフェーズ = フェーズ.ドラムサウンド構築中;
-            this._コンソール表示内容.Add( $"Loading and decoding sounds ..." );
+            this.現在のフェーズ = フェーズ.開始;
         }
 
         public override void 非活性化する()
@@ -92,13 +96,32 @@ namespace DTXMania
 
             switch( this.現在のフェーズ )
             {
+                case フェーズ.開始:
+                    this._コンソール表示内容.Add( $"Loading and decoding sounds of system ..." );
+                    this.現在のフェーズ = フェーズ.システムサウンド構築中; // 一度描画処理を通してから（画面を表示させてから）次のフェーズへ。
+                    break;
+
+                case フェーズ.システムサウンド構築中:
+                    #region " システムサウンドを構築する。"
+                    //----------------
+                    App進行描画.システムサウンド.読み込む();
+
+                    this._コンソール表示内容.RemoveAt( this._コンソール表示内容.Count - 1 );
+                    this._コンソール表示内容.Add( $"Loading and decoding sounds of system ... done." );
+                    this._コンソール表示内容.Add( $"Loading and decoding sounds of drums ..." );
+
+                    this.現在のフェーズ = フェーズ.ドラムサウンド構築中;
+                    //----------------
+                    #endregion
+                    break;
+
                 case フェーズ.ドラムサウンド構築中:
                     #region " ドラムサウンドを構築する。"
                     //----------------
                     App進行描画.ドラムサウンド.読み込む();
 
                     this._コンソール表示内容.RemoveAt( this._コンソール表示内容.Count - 1 );
-                    this._コンソール表示内容.Add( $"Loading and decoding sounds ... done." );
+                    this._コンソール表示内容.Add( $"Loading and decoding sounds of drums ... done." );
 
                     this.現在のフェーズ = フェーズ.曲ツリー構築中;
                     //----------------
