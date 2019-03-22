@@ -127,6 +127,7 @@ namespace DTXMania
             this.認証ステージ = new 認証ステージ();
             this.選曲ステージ = new 選曲ステージ();
             this.オプション設定ステージ = new オプション設定ステージ();
+            this.曲読み込みステージ = new 曲読み込みステージ();
             this.終了ステージ = new 終了ステージ();
         }
 
@@ -142,6 +143,7 @@ namespace DTXMania
             this.認証ステージ?.Dispose();
             this.選曲ステージ?.Dispose();
             this.オプション設定ステージ?.Dispose();
+            this.曲読み込みステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
 
@@ -286,9 +288,9 @@ namespace DTXMania
                     //----------------
                     if( stage.現在のフェーズ == 選曲ステージ.フェーズ.確定_選曲 )
                     {
-                        //stage.非活性化する();
-                        //this.現在のステージ = this.曲読み込みステージ;
-                        //this.現在のステージ.活性化する();
+                        stage.非活性化する();
+                        this.現在のステージ = this.曲読み込みステージ;
+                        this.現在のステージ.活性化する();
                     }
                     //----------------
                     #endregion
@@ -316,6 +318,9 @@ namespace DTXMania
                     }
                     //----------------
                     #endregion
+                    break;
+
+                case 曲読み込みステージ stage:
                     break;
 
                 case 終了ステージ stage:
@@ -364,6 +369,8 @@ namespace DTXMania
         protected 選曲ステージ 選曲ステージ;
 
         protected オプション設定ステージ オプション設定ステージ;
+
+        protected 曲読み込みステージ 曲読み込みステージ;
 
         protected 終了ステージ 終了ステージ;
 
