@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using SharpDX;
 using SSTFormat.v4;
 using FDK;
@@ -125,6 +126,7 @@ namespace DTXMania
             this.タイトルステージ = new タイトルステージ();
             this.認証ステージ = new 認証ステージ();
             this.選曲ステージ = new 選曲ステージ();
+            this.オプション設定ステージ = new オプション設定ステージ();
             this.終了ステージ = new 終了ステージ();
         }
 
@@ -139,6 +141,7 @@ namespace DTXMania
             this.タイトルステージ?.Dispose();
             this.認証ステージ?.Dispose();
             this.選曲ステージ?.Dispose();
+            this.オプション設定ステージ?.Dispose();
             this.終了ステージ?.Dispose();
 
 
@@ -163,6 +166,12 @@ namespace DTXMania
             this.AppForm.BeginInvoke( new Action( () => {
                 this.AppForm.Close();
             } ) );
+        }
+
+        internal static void ユーザ管理を再構築する()
+        {
+            ユーザ管理?.Dispose();
+            ユーザ管理 = new ユーザ管理();
         }
 
 
@@ -287,9 +296,23 @@ namespace DTXMania
                     //----------------
                     if( stage.現在のフェーズ == 選曲ステージ.フェーズ.確定_設定 )
                     {
-                        //stage.非活性化する();
-                        //this.現在のステージ = this.オプション設定ステージ;
-                        //this.現在のステージ.活性化する();
+                        stage.非活性化する();
+                        this.現在のステージ = this.オプション設定ステージ;
+                        this.現在のステージ.活性化する();
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case オプション設定ステージ stage:
+                    #region " キャンセル/完了 → 選曲ステージへ "
+                    //----------------
+                    if( stage.現在のフェーズ == オプション設定ステージ.フェーズ.キャンセル ||
+                        stage.現在のフェーズ == オプション設定ステージ.フェーズ.完了 )
+                    {
+                        stage.非活性化する();
+                        this.現在のステージ = this.選曲ステージ;
+                        this.現在のステージ.活性化する();
                     }
                     //----------------
                     #endregion
@@ -339,6 +362,8 @@ namespace DTXMania
         protected 認証ステージ 認証ステージ;
 
         protected 選曲ステージ 選曲ステージ;
+
+        protected オプション設定ステージ オプション設定ステージ;
 
         protected 終了ステージ 終了ステージ;
 

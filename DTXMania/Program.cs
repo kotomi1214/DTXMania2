@@ -76,15 +76,20 @@ namespace DTXMania
 
                 #region " アプリ起動。"
                 //----------------
-                var app = new App();
+                using( var app = new App() )
+                {
+                    if( app.WCFサービスをチェックする( options ) )
+                    {
+                        Application.Run( app );
 
-                if( app.WCFサービスをチェックする( options ) )
-                {
-                    Application.Run( app );
-                }
-                else
-                {
-                    // false ならアプリを起動しない。
+                        // フラグが立っていれば再起動する。
+                        if( app.再起動が必要 )
+                            Application.Restart();
+                    }
+                    else
+                    {
+                        // false ならアプリを起動しない。
+                    }
                 }
                 //----------------
                 #endregion

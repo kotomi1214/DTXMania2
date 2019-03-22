@@ -13,6 +13,11 @@ namespace FDK
 {
     public partial class AppForm : Form
     {
+        /// <summary>
+        ///     アプリの再起動が指示されたときはこれを true にするので、Program 側で適切に確認して処理すること。
+        /// </summary>
+        public bool 再起動が必要 { get; protected set; } = false;
+
 
         // 起動、終了
 
@@ -49,6 +54,12 @@ namespace FDK
 
                 this._未初期化 = true;
             }
+        }
+
+        public void 再起動する()
+        {
+            this.再起動が必要 = true;
+            this.Close();
         }
 
         // 開始のトリガ
@@ -216,7 +227,7 @@ namespace FDK
         public 画面モード 画面モード
         {
             get => this._画面モード;
-            set => this._画面モードを変更する( value );
+            set => this.BeginInvoke( new Action( () => this._画面モードを変更する( value ) ) );
         }
 
         private void _画面モードを変更する( 画面モード 新モード )

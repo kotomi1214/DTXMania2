@@ -162,6 +162,27 @@
     <Compile Include="ステージ\04選曲\選択曲枠ランナー.cs" />
     <Compile Include="ステージ\04選曲\選曲ステージ.cs" />
     <Compile Include="ステージ\04選曲\難易度と成績.cs" />
+    <Compile Include="ステージ\05オプション設定\オプション設定ステージ.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_ONOFFトグル.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_システムボタン.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_フォルダ.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_倍率.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_整数.cs" />
+    <Compile Include="ステージ\05オプション設定\パネル_文字列リスト.cs" />
+    <Compile Include="ステージ\05オプション設定\パネルリスト.cs" />
+    <Compile Include="ステージ\05オプション設定\入力割り当てダイアログ.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ステージ\05オプション設定\入力割り当てダイアログ.Designer.cs">
+      <DependentUpon>入力割り当てダイアログ.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ステージ\05オプション設定\曲読み込みフォルダ割り当てダイアログ.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ステージ\05オプション設定\曲読み込みフォルダ割り当てダイアログ.Designer.cs">
+      <DependentUpon>曲読み込みフォルダ割り当てダイアログ.cs</DependentUpon>
+    </Compile>
     <Compile Include="ステージ\アイキャッチ\GO.cs" />
     <Compile Include="ステージ\アイキャッチ\アイキャッチ.cs" />
     <Compile Include="ステージ\アイキャッチ\シャッター.cs" />
@@ -173,6 +194,7 @@
     <Compile Include="ステージ\システム情報.cs" />
     <Compile Include="ステージ\ステージ.cs" />
     <Compile Include="ステージ\アイキャッチ管理.cs" />
+    <Compile Include="ステージ\パッド矢印.cs" />
     <Compile Include="ステージ\舞台画像.cs" />
     <Compile Include="ステージ\青い線.cs" />
     <Compile Include="データベース\SQLiteDBBase.cs" />
@@ -253,6 +275,12 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="ステージ\05オプション設定\入力割り当てダイアログ.resx">
+      <DependentUpon>入力割り当てダイアログ.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ステージ\05オプション設定\曲読み込みフォルダ割り当てダイアログ.resx">
+      <DependentUpon>曲読み込みフォルダ割り当てダイアログ.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -394,9 +422,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="ステージ\05オプション設定\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="System\Images\演奏\エキサイトゲージDANGER.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

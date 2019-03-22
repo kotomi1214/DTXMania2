@@ -591,6 +591,23 @@ namespace FDK
                 }
             }
         }
+        
+        /// <summary>
+        ///		指定したデバイスコンテキストに対して描画処理をバッチ実行する。
+        /// </summary>
+        /// <remarks>
+        ///		描画処理は、デバイスコンテキストの BeginDraw() と EndDraw() の間で行われることが保証される。
+        ///		描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
+        /// </remarks>
+        /// <param name="dc">デバイスコンテキスト。</param>
+        /// <param name="描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
+        public void D2DBatchDraw( SharpDX.Direct2D1.DeviceContext dc, Action 描画処理 )
+        {
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            dc.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
+
+            this.D2DBatchDraw( (SharpDX.Direct2D1.RenderTarget) dc, 描画処理 );
+        }
 
 
         private List<SharpDX.Direct2D1.RenderTarget> _BatchDraw中のレンダーターゲットリスト = new List<SharpDX.Direct2D1.RenderTarget>();
