@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.終了
 {
     class 終了ステージ : ステージ
     {
@@ -105,11 +105,14 @@ namespace DTXMania
 
         public override void 描画する()
         {
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示中:
                 case フェーズ.開始音終了待ち:
-                    this._背景画像?.描画する( グラフィックデバイス.Instance.既定のD2D1DeviceContext );
+                    this._背景画像?.描画する( dc );
                     break;
             }
         }

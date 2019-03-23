@@ -7,7 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     class 表示方法選択パネル : IDisposable
     {

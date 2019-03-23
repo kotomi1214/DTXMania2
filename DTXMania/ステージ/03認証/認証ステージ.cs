@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.認証
 {
     /// <summary>
     ///		ユーザ選択画面。
@@ -40,6 +40,8 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    this.非活性化する();
             }
         }
 
@@ -168,7 +170,9 @@ namespace DTXMania
             this._システム情報.VPSをカウントする();
 
             var 描画領域 = new RectangleF( 566f, 60f, 784f, 943f );
+
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {

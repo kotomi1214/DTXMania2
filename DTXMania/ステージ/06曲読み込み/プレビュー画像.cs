@@ -6,15 +6,15 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.曲読み込み
 {
-    class 曲読み込み画面プレビュー画像 : IDisposable
+    class プレビュー画像 : IDisposable
     {
 
         // 生成と終了
 
 
-        public 曲読み込み画面プレビュー画像()
+        public プレビュー画像()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {

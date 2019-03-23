@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     class 曲ステータスパネル : IDisposable
     {
@@ -105,7 +105,6 @@ namespace DTXMania
                 {
                     グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                        dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                         dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                         const float Yオフセット = +2f;

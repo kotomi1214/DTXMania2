@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		システム制御用のボタン。「設定完了」「戻る」など。
@@ -45,8 +45,6 @@ namespace DTXMania
             // (1) パネルの下地部分の描画。
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
-
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
                 using( var テキスト背景色 = new SolidColorBrush( dc, Color.LightGray ) )
                     dc.FillRectangle( テキスト矩形, テキスト背景色 );

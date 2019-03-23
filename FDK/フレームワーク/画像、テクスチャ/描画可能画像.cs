@@ -77,14 +77,13 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.Aliased;
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
-                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
-                dc.UnitMode = UnitMode.Pixels;
                 dc.Target = this.Bitmap;            // 描画先
                 dc.Transform = Matrix3x2.Identity;  // 等倍（dpx to dpx）
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 描画アクション( dc );
+
+                dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
 
             } );
         }

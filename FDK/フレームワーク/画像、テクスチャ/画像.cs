@@ -203,12 +203,7 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.Aliased;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
-                dc.UnitMode = UnitMode.Pixels;
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
-
 
                 転送元矩形 = 転送元矩形 ?? new RectangleF( 0f, 0f, this.Bitmap.PixelSize.Width, this.Bitmap.PixelSize.Height );
 
@@ -268,11 +263,10 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.Aliased;
-                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
-                dc.UnitMode = UnitMode.Pixels;
+                var pretrans = dc.Transform;
+
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * pretrans;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
                 using( var layer = new Layer( dc ) )
                 {
@@ -293,6 +287,8 @@ namespace FDK
                     if( null != レイヤーパラメータ )
                         dc.PopLayer();
                 }
+
+                dc.Transform = pretrans;
 
             } );
         }

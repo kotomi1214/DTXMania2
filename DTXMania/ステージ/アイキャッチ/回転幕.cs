@@ -616,6 +616,8 @@ namespace DTXMania
             //----------------
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                var pretrans = dc.Transform;
+
                 for( int i = 0; i < 2; i++ )
                 {
                     var context = this._黒幕アニメーション[ i ];
@@ -629,7 +631,7 @@ namespace DTXMania
                     dc.Transform =
                         Matrix3x2.Rotation( (float) context.回転角rad.Value ) *
                         Matrix3x2.Translation( (float) context.中心位置X.Value, (float) context.中心位置Y.Value ) *
-                        グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        pretrans;
 
                     using( var brush = new SolidColorBrush( dc, new Color4( 0f, 0f, 0f, (float) context.不透明度.Value ) ) )
                     {
@@ -639,6 +641,8 @@ namespace DTXMania
                         dc.FillRectangle( rc, brush );
                     }
                 }
+
+                dc.Transform = pretrans;
 
             } );
             //----------------

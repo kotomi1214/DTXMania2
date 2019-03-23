@@ -56,17 +56,6 @@ namespace FDK
         public virtual void Dispose()
         {
             this._文字盤?.Dispose();
-            this._文字盤 = null;
-        }
-
-
-        private 画像 _文字盤 = null;
-
-        internal protected Dictionary<string, RectangleF> _矩形リスト = null;
-
-        private class YAMLマップ
-        {
-            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
 
 
@@ -127,6 +116,20 @@ namespace FDK
 
                 基点のX位置 += ( 文字矩形.Width * 拡大率V.Width + this.文字幅補正dpx );
             }
+        }
+
+
+
+        // private
+
+
+        private 画像 _文字盤 = null;
+
+        internal protected Dictionary<string, RectangleF> _矩形リスト = null;
+
+        private class YAMLマップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
     }
 }

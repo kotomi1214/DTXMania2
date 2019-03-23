@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///     <see cref="パネル_フォルダ"/> の選択と表示。
@@ -43,7 +43,7 @@ namespace DTXMania
                 this._青い線?.Dispose();
 
                 this._ルートパネルフォルダ = null;    // 実体は外で管理されるので、ここでは Dispose 不要。
-                this.現在のパネルフォルダ = null;    //
+                this.現在のパネルフォルダ = null;     //
             }
         }
 

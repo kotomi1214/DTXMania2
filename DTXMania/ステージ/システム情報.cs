@@ -14,6 +14,10 @@ namespace DTXMania
         public int 現在のVPS => this._FPS.現在のVPS;
 
 
+
+        // 生成と終了
+
+
         public システム情報()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -33,11 +37,20 @@ namespace DTXMania
         }
 
 
+
+        // カウント
+
+
         public bool FPSをカウントしプロパティを更新する()
             => this._FPS.FPSをカウントしプロパティを更新する();
 
         public void VPSをカウントする()
             => this._FPS.VPSをカウントする();
+
+
+
+        // 進行と描画
+
 
         public void 描画する( DeviceContext dc, string 追加文字列 = "" )
         {
@@ -50,6 +63,10 @@ namespace DTXMania
 
             this._文字列画像.描画する( dc, 0f, 0f );
         }
+
+
+
+        // private
 
 
         private FPS _FPS = null;

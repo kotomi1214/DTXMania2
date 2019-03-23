@@ -4,9 +4,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using SharpDX;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.起動
 {
     class 起動ステージ : ステージ
     {
@@ -197,9 +198,12 @@ namespace DTXMania
 
         public override void 描画する()
         {
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
             // 文字列表示
             for( int i = 0; i < this._コンソール表示内容.Count; i++ )
-                this._コンソールフォント.描画する( グラフィックデバイス.Instance.既定のD2D1DeviceContext, 0f, i * 32f, this._コンソール表示内容[ i ] );
+                this._コンソールフォント.描画する( dc, 0f, i * 32f, this._コンソール表示内容[ i ] );
         }
 
 

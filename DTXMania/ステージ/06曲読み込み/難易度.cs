@@ -7,15 +7,15 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.曲読み込み
 {
-    class 曲読み込み画面難易度 : IDisposable
+    class 難易度 : IDisposable
     {
 
         // 生成と終了
 
 
-        public 曲読み込み画面難易度()
+        public 難易度()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -54,7 +54,6 @@ namespace DTXMania
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 using( var 見出し背景ブラシ = new SolidColorBrush( dc, Node.LevelColor[ anker ] ) )

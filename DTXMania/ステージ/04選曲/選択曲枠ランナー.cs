@@ -5,7 +5,7 @@ using System.Linq;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     /// <summary>
     ///     一定時間ごとに、選択曲を囲む枠の上下辺を右から左へすーっと走る光。

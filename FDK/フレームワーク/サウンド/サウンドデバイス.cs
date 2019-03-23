@@ -189,7 +189,7 @@ namespace FDK
                 {
                     if( ( this._レンダリング状態 != PlaybackState.Stopped ) && ( null != this._レンダリングスレッド ) )
                     {
-                        // レンダリングスレッドに終了を通知し、その終了を待つ。
+                        // レンダリングスレッドに終了を通知。
                         this._レンダリング状態 = PlaybackState.Stopped;
                     }
                     else
@@ -198,13 +198,6 @@ namespace FDK
                         return;
                     }
                 }
-            }
-
-            // lock を外してから Join しないとデッドロックするので注意。
-            if( null != this._レンダリングスレッド )
-            {
-                this._レンダリングスレッド.Join();
-                this._レンダリングスレッド = null;
             }
         }
 

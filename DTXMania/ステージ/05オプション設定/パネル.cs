@@ -7,7 +7,7 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		すべてのパネルのベースとなるクラス。
@@ -136,8 +136,6 @@ namespace DTXMania
             // (1) パネルの下地部分の描画。
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
-
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
                 using( var パネル背景色 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var ヘッダ背景色 = new SolidColorBrush( dc, this.ヘッダ色 ) )

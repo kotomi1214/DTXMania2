@@ -261,16 +261,9 @@ namespace FDK
         public virtual void Dispose()
         {
             this._TextRenderer?.Dispose();
-            this._TextRenderer = null;
-
             this._Bitmap?.Dispose();
-            this._Bitmap = null;
-
             this.TextLayout?.Dispose();
-            this.TextLayout = null;
-
             this.TextFormat?.Dispose();
-            this.TextFormat = null;
         }
 
         protected SharpDX.Direct2D1.BitmapRenderTarget _Bitmap;
@@ -459,11 +452,10 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.PerPrimitive;
+                var pretrans = dc.Transform;
+
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * pretrans;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-                dc.TextAntialiasMode = SharpDX.Direct2D1.TextAntialiasMode.Default;
-                dc.UnitMode = UnitMode.Pixels;
-                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
                 using( var bmp = this._Bitmap.Bitmap )
                 {
@@ -476,6 +468,7 @@ namespace FDK
                         erspectiveTransformRef: 変換行列3D );
                 }
 
+                dc.Transform = pretrans;
             } );
         }
 

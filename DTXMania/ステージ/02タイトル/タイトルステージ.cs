@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.タイトル
 {
     class タイトルステージ : ステージ
     {
@@ -94,9 +94,9 @@ namespace DTXMania
 
         public override void 進行する()
         {
-            App進行描画.入力管理.すべての入力デバイスをポーリングする();
-
             this._システム情報.FPSをカウントしプロパティを更新する();
+
+            App進行描画.入力管理.すべての入力デバイスをポーリングする();
 
             switch( this.現在のフェーズ )
             {
@@ -133,6 +133,7 @@ namespace DTXMania
             this._システム情報.VPSをカウントする();
 
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {

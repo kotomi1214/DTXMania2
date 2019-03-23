@@ -7,7 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     class 難易度と成績 : IDisposable
     {
@@ -155,11 +155,8 @@ namespace DTXMania
 
         private void _難易度パネルを１つ描画する( DeviceContext dc, float 基点X, float 基点Y, string 難易度ラベル, float 難易度値, Brush 文字ブラシ, Brush 見出し背景ブラシ, Brush 数値背景ブラシ )
         {
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
-
             dc.FillRectangle( new RectangleF( 基点X, 基点Y, 157f, 20f ), 見出し背景ブラシ );
             dc.FillRectangle( new RectangleF( 基点X, 基点Y + 20f, 157f, 66f ), 数値背景ブラシ );
-
 
             this._見出し用TextFormat.TextAlignment = TextAlignment.Trailing;
 

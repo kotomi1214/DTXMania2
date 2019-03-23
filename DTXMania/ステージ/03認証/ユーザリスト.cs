@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.認証
 {
     /// <summary>
     ///     ユーザリストパネルの表示とユーザの選択。

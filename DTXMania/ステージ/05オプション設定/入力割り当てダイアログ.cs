@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///     ドラム入力の割り当て画面。

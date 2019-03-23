@@ -24,7 +24,7 @@ namespace FDK
         public 描画可能テクスチャ( VariablePath 画像ファイルパス )
             : base( 画像ファイルパス, BindFlags.RenderTarget | BindFlags.ShaderResource )
         {
-            this._作成したテクスチャとデータを共有するビットマップターゲットを作成する();
+            this._Bitmap = this._作成したテクスチャとデータを共有するビットマップターゲットを作成する();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace FDK
         public 描画可能テクスチャ( Size2F サイズ )
             : base( サイズ, BindFlags.RenderTarget | BindFlags.ShaderResource )
         {
-            this._作成したテクスチャとデータを共有するビットマップターゲットを作成する();
+            this._Bitmap = this._作成したテクスチャとデータを共有するビットマップターゲットを作成する();
         }
 
         public override void Dispose()
@@ -49,7 +49,7 @@ namespace FDK
 
         private Bitmap1 _作成したテクスチャとデータを共有するビットマップターゲットを作成する()
         {
-            using( var dxgiSurface = this.Texture.QueryInterfaceOrNull<SharpDX.DXGI.Surface1>() )
+            using( var dxgiSurface = this.Texture.QueryInterfaceOrNull<SharpDX.DXGI.Surface>() )
             {
                 var bmpProp = new BitmapProperties1() {
                     PixelFormat = new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Premultiplied ),
@@ -71,14 +71,13 @@ namespace FDK
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.AntialiasMode = AntialiasMode.Aliased;
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
-                dc.TextAntialiasMode = TextAntialiasMode.Grayscale;
-                dc.UnitMode = UnitMode.Pixels;
                 dc.Target = this._Bitmap;           // 描画先
                 dc.Transform = Matrix3x2.Identity;  // 等倍描画（dpx to dpx）
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 描画アクション( dc );
+
+                dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
 
             } );
         }

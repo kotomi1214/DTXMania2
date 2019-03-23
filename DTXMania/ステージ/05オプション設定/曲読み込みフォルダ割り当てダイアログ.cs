@@ -6,7 +6,7 @@ using System.Threading;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     partial class 曲読み込みフォルダ割り当てダイアログ : Form
     {

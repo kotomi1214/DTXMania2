@@ -833,6 +833,8 @@ namespace DTXMania
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                var pretrans = dc.Transform;
+
                 #region " ぐるぐる棒 "
                 //----------------
                 for( int i = 0; i < this._ぐるぐる棒アニメーション.Length; i++ )
@@ -851,7 +853,7 @@ namespace DTXMania
                     dc.Transform =
                         Matrix3x2.Rotation( (float) context.回転角rad.Value ) *
                         Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
-                        グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        pretrans;
 
                     float contextの幅 = 2800.0f;
                     float contextの高さ = (float) context.太さ.Value;
@@ -883,7 +885,7 @@ namespace DTXMania
                     dc.Transform =
                         Matrix3x2.Rotation( (float) context.回転角rad ) *
                         Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
-                        グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        pretrans;
 
                     float contextの幅 = 2800.0f;
                     float contextの高さ = (float) context.太さ.Value;
@@ -896,6 +898,8 @@ namespace DTXMania
                 }
                 //----------------
                 #endregion
+
+                dc.Transform = pretrans;
 
             } );
 
@@ -923,6 +927,8 @@ namespace DTXMania
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                var pretrans = dc.Transform;
+
                 #region " フラッシュオーバー棒（[5]の1本）... Go! の上にかぶせる"
                 //----------------
                 {
@@ -936,7 +942,7 @@ namespace DTXMania
                         dc.Transform =
                             Matrix3x2.Rotation( (float) context.回転角rad ) *
                             Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
-                            グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                            pretrans;
 
                         float contextの幅 = 2800.0f;
                         float contextの高さ = (float) context.太さ.Value;
@@ -961,7 +967,7 @@ namespace DTXMania
                         if( context.ストーリーボード.Status != StoryboardStatus.Ready )
                             すべて完了 = false;
 
-                        dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        dc.Transform = pretrans;
 
                         using( var ブラシ = new SolidColorBrush( dc, new Color4( 0.5f, 0.5f, 1f, (float) context.不透明度.Value ) ) )
                             dc.FillRectangle( new RectangleF( 0f, 0f, 1920f, 1080f ), ブラシ );
@@ -969,6 +975,8 @@ namespace DTXMania
                 }
                 //----------------
                 #endregion
+
+                dc.Transform = pretrans;
 
             } );
 

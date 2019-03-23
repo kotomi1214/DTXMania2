@@ -28,10 +28,7 @@ namespace DTXMania
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._黒ブラシ?.Dispose();
-                this._黒ブラシ = null;
-
                 this._アニメーション?.Dispose();
-                this._アニメーション = null;
 
                 base.Dispose();
             }
@@ -185,6 +182,7 @@ namespace DTXMania
             }
         }
 
+
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
@@ -203,6 +201,8 @@ namespace DTXMania
                     if( this._アニメーション.ストーリーボード.Status != 描画しないStatus )
                     {
                         グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                            var pretrans = dc.Transform;
 
                             #region " 背景マスク "
                             //----------------
@@ -226,7 +226,7 @@ namespace DTXMania
                                     Matrix3x2.Translation(  // (基点X, H×3/4) へ移動
                                         x: (float) this._アニメーション.黒幕1左下_基点位置X.Value,
                                         y: グラフィックデバイス.Instance.設計画面サイズ.Height ) *
-                                    グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                    pretrans;
 
                                 dc.FillRectangle( rc, this._黒ブラシ );
                             }
@@ -246,7 +246,7 @@ namespace DTXMania
                                     Matrix3x2.Translation(  // (基点X, H×1/4) へ移動
                                         x: (float) this._アニメーション.黒幕2右上_基点位置X.Value,
                                         y: 0f ) *
-                                    グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                    pretrans;
 
                                 dc.FillRectangle( rc, this._黒ブラシ );
                             }
@@ -257,7 +257,7 @@ namespace DTXMania
                             dc.Transform =
                                 Matrix3x2.Scaling( 639f / this._ロゴ画像.サイズ.Width, 262f / this._ロゴ画像.サイズ.Height ) *
                                 Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 771f ) *
-                                グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                pretrans;
 
                             dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
                             //----------------
@@ -282,6 +282,8 @@ namespace DTXMania
                     {
                         グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                            var pretrans = dc.Transform;
+
                             #region " (1) 背景マスク "
                             //----------------
                             using( var ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, (float) this._アニメーション.背景_不透明度.Value ) ) )
@@ -304,7 +306,7 @@ namespace DTXMania
                                     Matrix3x2.Translation(  // (基点X, H×3/4) へ移動
                                         x: (float) this._アニメーション.黒幕1左下_基点位置X.Value,
                                         y: グラフィックデバイス.Instance.設計画面サイズ.Height ) *
-                                    グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                    pretrans;
 
                                 dc.FillRectangle( rc, this._黒ブラシ );
                             }
@@ -324,7 +326,7 @@ namespace DTXMania
                                     Matrix3x2.Translation(  // (基点X, H×1/4) へ移動
                                         x: (float) this._アニメーション.黒幕2右上_基点位置X.Value,
                                         y: 0f ) *
-                                    グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                    pretrans;
 
                                 dc.FillRectangle( rc, this._黒ブラシ );
                             }
@@ -335,7 +337,7 @@ namespace DTXMania
                             dc.Transform =
                                 Matrix3x2.Scaling( 639f / this._ロゴ画像.サイズ.Width, 262f / this._ロゴ画像.サイズ.Height ) *
                                 Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 771f ) *
-                                グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                                pretrans;
 
                             dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
                             //----------------
@@ -383,30 +385,14 @@ namespace DTXMania
             public void Dispose()
             {
                 this.ストーリーボード?.Abandon();
-
                 this.ストーリーボード?.Dispose();
-                this.ストーリーボード = null;
-
                 this.背景_不透明度?.Dispose();
-                this.背景_不透明度 = null;
-
                 this.黒幕1左下_基点位置X?.Dispose();
-                this.黒幕1左下_基点位置X = null;
-
                 this.黒幕1左下_回転角rad?.Dispose();
-                this.黒幕1左下_回転角rad = null;
-
                 this.黒幕2右上_基点位置X?.Dispose();
-                this.黒幕2右上_基点位置X = null;
-
                 this.黒幕2右上_回転角rad?.Dispose();
-                this.黒幕2右上_回転角rad = null;
-
                 this.ロゴ_位置X?.Dispose();
-                this.ロゴ_位置X = null;
-
                 this.ロゴ_不透明度?.Dispose();
-                this.ロゴ_不透明度 = null;
             }
         }
         private アニメ _アニメーション = null;

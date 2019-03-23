@@ -8,7 +8,7 @@ using System.Windows.Forms;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.オプション設定
 {
     class オプション設定ステージ : ステージ
     {
@@ -378,27 +378,26 @@ namespace DTXMania
                 #region "「レーン配置」リスト "
                 //----------------
                 {
-                    // undone: 「レーン配置」オプション
-                    //var 選択肢リスト = 演奏.BASIC.レーンフレーム.レーン配置リスト.Keys.ToList();
+                   var 選択肢リスト = 演奏.BASIC.レーンフレーム.レーン配置リスト.Keys.ToList();
 
-                    //this._ルートパネルフォルダ.子パネルリスト.Add(
+                    this._ルートパネルフォルダ.子パネルリスト.Add(
 
-                    //    new パネル_文字列リスト(
+                        new パネル_文字列リスト(
 
-                    //        パネル名:
-                    //            "レーン配置",
+                            パネル名:
+                                "レーン配置",
 
-                    //        選択肢初期値リスト:
-                    //            選択肢リスト,
+                            選択肢初期値リスト:
+                                選択肢リスト,
 
-                    //        初期選択肢番号:
-                    //            ( 選択肢リスト.Contains( user.レーン配置 ) ) ? 選択肢リスト.IndexOf( user.レーン配置 ) : 0,
+                            初期選択肢番号:
+                                ( 選択肢リスト.Contains( user.レーン配置 ) ) ? 選択肢リスト.IndexOf( user.レーン配置 ) : 0,
 
-                    //        値の変更処理:
-                    //            ( panel ) => {
-                    //                user.レーン配置 = 選択肢リスト[ ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 ];
-                    //            }
-                    //    ) );
+                            値の変更処理:
+                                ( panel ) => {
+                                    user.レーン配置 = 選択肢リスト[ ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 ];
+                                }
+                        ) );
                 }
                 //----------------
                 #endregion
@@ -825,6 +824,7 @@ namespace DTXMania
             this._システム情報.VPSをカウントする();
 
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
             this._舞台画像.進行描画する( dc );
             this._パネルリスト.進行描画する( dc, 613f, 0f );

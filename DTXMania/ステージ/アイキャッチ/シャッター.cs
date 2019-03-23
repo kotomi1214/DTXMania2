@@ -300,6 +300,8 @@ namespace DTXMania
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                var pretrans = dc.Transform;
+
                 #region " シャッター "
                 //----------------
                 for( int i = シャッター枚数 - 1; i >= 0; i-- )
@@ -315,7 +317,7 @@ namespace DTXMania
                     dc.Transform =
                         Matrix3x2.Rotation( context.角度rad ) *
                         Matrix3x2.Translation( context.開き中心位置 + ( context.閉じ中心位置 - context.開き中心位置 ) * new Vector2( (float) context.開to閉割合.Value ) ) *
-                        グラフィックデバイス.Instance.拡大行列DPXtoPX;
+                        pretrans;
                     float w = context.矩形サイズ.Width;
                     float h = context.矩形サイズ.Height;
                     var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
@@ -324,6 +326,8 @@ namespace DTXMania
                 }
                 //----------------
                 #endregion
+
+                dc.Transform = pretrans;
 
             } );
 

@@ -8,7 +8,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     /// <summary>
     ///		曲のリスト表示、選択、スクロール。
@@ -263,7 +263,6 @@ namespace DTXMania
             //----------------
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 if( ノード is BoxNode )

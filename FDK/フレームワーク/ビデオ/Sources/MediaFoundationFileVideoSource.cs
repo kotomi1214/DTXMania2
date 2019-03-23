@@ -250,7 +250,6 @@ namespace FDK
         {
             Log.現在のスレッドに名前をつける( "ビデオデコード" );
 
-
             var 引数 = ((double 再生開始時刻sec, double 再生速度)) obj引数;
 
             double 再生速度 = Math.Max( 0.01, Math.Min( 10.0, 引数.再生速度 ) );
@@ -340,7 +339,7 @@ namespace FDK
             // SourceReaderEx から次のサンプルをひとつデコードする。
 
             var サンプル = this._SourceReaderEx.ReadSample(
-                SourceReaderIndex.AnyStream,
+                SourceReaderIndex.FirstVideoStream,
                 SourceReaderControlFlags.None,
                 out int ストリーム番号,
                 out var ストリームフラグ,

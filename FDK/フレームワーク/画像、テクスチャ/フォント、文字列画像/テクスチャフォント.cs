@@ -47,18 +47,8 @@ namespace FDK
         public virtual void Dispose()
         {
             this._文字盤?.Dispose();
-            this._文字盤 = null;
         }
 
-
-        private テクスチャ _文字盤 = null;
-
-        private Dictionary<string, RectangleF> _文字盤の矩形リスト = null;
-
-        private class YAMLマップ
-        {
-            public Dictionary<string, float[]> 矩形リスト { get; set; }
-        }
 
 
         // 描画
@@ -114,6 +104,20 @@ namespace FDK
 
                 左端 += 文字矩形.Width;
             }
+        }
+
+
+
+        // private
+
+
+        private テクスチャ _文字盤 = null;
+
+        private Dictionary<string, RectangleF> _文字盤の矩形リスト = null;
+
+        private class YAMLマップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
     }
 }

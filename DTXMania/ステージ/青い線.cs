@@ -76,7 +76,6 @@ namespace DTXMania
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                 dc.PrimitiveBlend = PrimitiveBlend.Add; // 加算合成
 
                 if( 0f < 幅dpx )

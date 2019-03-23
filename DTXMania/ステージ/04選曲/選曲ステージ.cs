@@ -8,7 +8,7 @@ using SharpDX.Direct2D1;
 using FDK;
 using SSTFormat.v4;
 
-namespace DTXMania
+namespace DTXMania.選曲
 {
     class 選曲ステージ : ステージ
     {
@@ -52,76 +52,82 @@ namespace DTXMania
 
         public override void 活性化する()
         {
-            this._舞台画像 = new 舞台画像( @"$(System)images\舞台_暗.jpg" );
-            this._システム情報 = new システム情報();
-            this._曲リスト = new 曲リスト();
-            this._難易度と成績 = new 難易度と成績();
-            this._曲ステータスパネル = new 曲ステータスパネル();
-            this._ステージタイマー = new テクスチャ( @"$(System)images\選曲\ステージタイマー.png" );
-            this._青い線 = new 青い線();
-            this._選択曲枠ランナー = new 選択曲枠ランナー();
-            this._BPMパネル = new BPMパネル();
-            this._曲別SKILL = new 曲別SKILL();
-            this._表示方法選択パネル = new 表示方法選択パネル();
-            this._SongNotFound = new 文字列画像() {
-                表示文字列 =
-                "Song not found...\n" +
-                "Hit BDx2 (in default SPACEx2) to select song folders."
-            };
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._舞台画像 = new 舞台画像( @"$(System)images\舞台_暗.jpg" );
+                this._システム情報 = new システム情報();
+                this._曲リスト = new 曲リスト();
+                this._難易度と成績 = new 難易度と成績();
+                this._曲ステータスパネル = new 曲ステータスパネル();
+                this._ステージタイマー = new テクスチャ( @"$(System)images\選曲\ステージタイマー.png" );
+                this._青い線 = new 青い線();
+                this._選択曲枠ランナー = new 選択曲枠ランナー();
+                this._BPMパネル = new BPMパネル();
+                this._曲別SKILL = new 曲別SKILL();
+                this._表示方法選択パネル = new 表示方法選択パネル();
+                this._SongNotFound = new 文字列画像() {
+                    表示文字列 =
+                    "Song not found...\n" +
+                    "Hit BDx2 (in default SPACEx2) to select song folders."
+                };
 
-            // 外部接続。
-            this._難易度と成績.青い線を取得する = () => this._青い線;
+                // 外部接続。
+                this._難易度と成績.青い線を取得する = () => this._青い線;
 
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
-            this._白 = new SolidColorBrush( dc, Color4.White );
-            this._黒 = new SolidColorBrush( dc, Color4.Black );
-            this._黒透過 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) );
-            this._灰透過 = new SolidColorBrush( dc, new Color4( 0x80535353 ) );
+                this._白 = new SolidColorBrush( dc, Color4.White );
+                this._黒 = new SolidColorBrush( dc, Color4.Black );
+                this._黒透過 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) );
+                this._灰透過 = new SolidColorBrush( dc, new Color4( 0x80535353 ) );
 
-            this._上に伸びる導線の長さdpx = null;
-            this._左に伸びる導線の長さdpx = null;
-            this._プレビュー枠の長さdpx = null;
-            this._導線のストーリーボード = null;
+                this._上に伸びる導線の長さdpx = null;
+                this._左に伸びる導線の長さdpx = null;
+                this._プレビュー枠の長さdpx = null;
+                this._導線のストーリーボード = null;
 
-            App進行描画.システムサウンド.再生する( システムサウンド種別.選曲ステージ_開始音 );
+                App進行描画.システムサウンド.再生する( システムサウンド種別.選曲ステージ_開始音 );
 
-            this._フォーカスノードを初期化する();
+                this._フォーカスノードを初期化する();
 
-            App進行描画.アイキャッチ管理.現在のアイキャッチ.オープンする();
-            this._導線アニメをリセットする();
+                App進行描画.アイキャッチ管理.現在のアイキャッチ.オープンする();
+                this._導線アニメをリセットする();
 
-            this.現在のフェーズ = フェーズ.フェードイン;
+                this.現在のフェーズ = フェーズ.フェードイン;
 
-            base.活性化する();
+                base.活性化する();
+            }
         }
 
         public override void 非活性化する()
         {
-            this._灰透過?.Dispose();
-            this._黒透過?.Dispose();
-            this._黒?.Dispose();
-            this._白?.Dispose();
-            this._導線のストーリーボード?.Dispose();
-            this._プレビュー枠の長さdpx?.Dispose();
-            this._左に伸びる導線の長さdpx?.Dispose();
-            this._上に伸びる導線の長さdpx?.Dispose();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._灰透過?.Dispose();
+                this._黒透過?.Dispose();
+                this._黒?.Dispose();
+                this._白?.Dispose();
+                this._導線のストーリーボード?.Dispose();
+                this._プレビュー枠の長さdpx?.Dispose();
+                this._左に伸びる導線の長さdpx?.Dispose();
+                this._上に伸びる導線の長さdpx?.Dispose();
 
-            this._SongNotFound?.Dispose();
-            this._表示方法選択パネル?.Dispose();
-            this._曲別SKILL?.Dispose();
-            this._BPMパネル?.Dispose();
-            this._選択曲枠ランナー?.Dispose();
-            this._青い線?.Dispose();
-            this._ステージタイマー?.Dispose();
-            this._曲ステータスパネル?.Dispose();
-            this._難易度と成績?.Dispose();
-            this._曲リスト?.Dispose();
-            this._システム情報?.Dispose();
-            this._舞台画像?.Dispose();
+                this._SongNotFound?.Dispose();
+                this._表示方法選択パネル?.Dispose();
+                this._曲別SKILL?.Dispose();
+                this._BPMパネル?.Dispose();
+                this._選択曲枠ランナー?.Dispose();
+                this._青い線?.Dispose();
+                this._ステージタイマー?.Dispose();
+                this._曲ステータスパネル?.Dispose();
+                this._難易度と成績?.Dispose();
+                this._曲リスト?.Dispose();
+                this._システム情報?.Dispose();
+                this._舞台画像?.Dispose();
 
-            base.非活性化する();
+                base.非活性化する();
+            }
         }
 
 
@@ -270,6 +276,7 @@ namespace DTXMania
             this._システム情報.VPSをカウントする();
 
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
             if( null != App進行描画.曲ツリー.フォーカスノード )
             {
@@ -367,7 +374,6 @@ namespace DTXMania
         {
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 using( var ソートタブ上色 = new SolidColorBrush( dc, new Color4( 0xFF121212 ) ) )

@@ -21,6 +21,10 @@ namespace DTXMania
         public bool ぼかしと縮小を適用中 { get; protected set; } = false;
 
 
+
+        // 生成と終了
+
+
         public 舞台画像( string 背景画像ファイル名 = null, string 背景黒幕付き画像ファイル名 = null )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -57,32 +61,20 @@ namespace DTXMania
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._ストーリーボード?.Abandon();
-
                 this._ストーリーボード?.Dispose();
-                this._ストーリーボード = null;
-
                 this._ぼかしと縮小割合?.Dispose();
-                this._ぼかしと縮小割合 = null;
-
                 this._クリッピングエフェクト黒幕付き用?.Dispose();
-                this._クリッピングエフェクト黒幕付き用 = null;
-
                 this._クリッピングエフェクト?.Dispose();
-                this._クリッピングエフェクト = null;
-
                 this._拡大エフェクト黒幕付き用?.Dispose();
-                this._拡大エフェクト黒幕付き用 = null;
-
                 this._拡大エフェクト?.Dispose();
-                this._拡大エフェクト = null;
-
                 this._ガウスぼかしエフェクト黒幕付き用?.Dispose();
-                this._ガウスぼかしエフェクト黒幕付き用 = null;
-
                 this._ガウスぼかしエフェクト?.Dispose();
-                this._ガウスぼかしエフェクト = null;
             }
         }
+
+
+
+        // 効果
 
 
         public void ぼかしと縮小を適用する( double 完了までの最大時間sec = 1.0 )
@@ -153,6 +145,11 @@ namespace DTXMania
             }
         }
 
+
+
+        // 進行と描画
+
+
         public void 進行描画する( DeviceContext dc, bool 黒幕付き = false, Vector4? 表示領域 = null, LayerParameters1? layerParameters1 = null )
         {
             #region " 初めての進行描画 "
@@ -192,8 +189,6 @@ namespace DTXMania
 
                 グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                    dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
-                    dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                     dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                     if( layerParameters1.HasValue )
@@ -226,7 +221,6 @@ namespace DTXMania
 
                 グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
-                    dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
                     dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                     if( layerParameters1.HasValue )
@@ -251,6 +245,9 @@ namespace DTXMania
             }
         }
 
+
+
+        // private
 
         private bool _初めての進行描画 = true;
 

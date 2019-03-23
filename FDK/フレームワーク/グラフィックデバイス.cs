@@ -280,14 +280,23 @@ namespace FDK
                     this.MFDXGIDeviceManager = new SharpDX.MediaFoundation.DXGIDeviceManager();
                     this.MFDXGIDeviceManager.ResetDevice( this.D3D11Device1 );
 
+                    // マルチスレッドモードを ON に設定する。Direct3D11 であっても、MediaFoundation でDXVAを使う場合は必須。
+                    using( var multithread = this.D3D11Device1.QueryInterfaceOrNull<SharpDX.Direct3D.DeviceMultithread>() )
+                    {
+                        if( null == multithread )
+                            throw new Exception( "Direct3D11デバイスが、ID3D10Multithread をサポートしていません。" );
+
+                        multithread.SetMultithreadProtected( true );
+                    }
+
                     // ID2D1Factory を生成する。
                     this.D2D1Factory1 = new SharpDX.Direct2D1.Factory1(
 
                         SharpDX.Direct2D1.FactoryType.MultiThreaded,
 #if DEBUG
-                    SharpDX.Direct2D1.DebugLevel.Information
+                        SharpDX.Direct2D1.DebugLevel.Information
 #else
-                    SharpDX.Direct2D1.DebugLevel.None
+                        SharpDX.Direct2D1.DebugLevel.None
 #endif
                     );
 
@@ -502,6 +511,7 @@ namespace FDK
                         } );
 
                     this.既定のD2D1DeviceContext.Target = this.既定のD2D1RenderBitmap1;
+                    this.既定のD2D1DeviceContext.Transform = Matrix3x2.Identity;
                     //----------------
                     #endregion
                 }
@@ -548,7 +558,7 @@ namespace FDK
             転置済みビュー行列.Transpose();  // 転置
 
             転置済み射影行列 = Matrix.PerspectiveFovLH(
-                MathUtil.DegreesToRadians( 視野角deg ),
+                MathUtil.DegreesToRadians( this.視野角deg ),
                 設計画面サイズ.Width / 設計画面サイズ.Height,   // アスペクト比
                 -dz,                                            // 前方投影面までの距離
                 dz );                                           // 後方投影面までの距離
@@ -571,6 +581,9 @@ namespace FDK
             // （D2DBatcDraw() の最中に D2DBatchDraw() が呼び出されている状態）なので、これらを呼び出してはならない。
             bool BeginとEndを行う = !( this._BatchDraw中のレンダーターゲットリスト.Contains( rt ) );
 
+            var pretrans = rt.Transform;
+            var preblend = ( rt is SharpDX.Direct2D1.DeviceContext dc ) ? dc.PrimitiveBlend : SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
+
             try
             {
                 if( BeginとEndを行う )
@@ -580,33 +593,19 @@ namespace FDK
                 }
 
                 描画処理();
-
             }
             finally
             {
+                rt.Transform = pretrans;
+                if( rt is SharpDX.Direct2D1.DeviceContext dc2 )
+                    dc2.PrimitiveBlend = preblend;
+
                 if( BeginとEndを行う )
                 {
                     rt.EndDraw();
                     this._BatchDraw中のレンダーターゲットリスト.Remove( rt );  // End したらリストから削除。
                 }
             }
-        }
-        
-        /// <summary>
-        ///		指定したデバイスコンテキストに対して描画処理をバッチ実行する。
-        /// </summary>
-        /// <remarks>
-        ///		描画処理は、デバイスコンテキストの BeginDraw() と EndDraw() の間で行われることが保証される。
-        ///		描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
-        /// </remarks>
-        /// <param name="dc">デバイスコンテキスト。</param>
-        /// <param name="描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
-        public void D2DBatchDraw( SharpDX.Direct2D1.DeviceContext dc, Action 描画処理 )
-        {
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
-            dc.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
-
-            this.D2DBatchDraw( (SharpDX.Direct2D1.RenderTarget) dc, 描画処理 );
         }
 
 

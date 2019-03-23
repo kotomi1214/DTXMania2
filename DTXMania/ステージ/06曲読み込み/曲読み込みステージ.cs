@@ -9,7 +9,7 @@ using SharpDX.DirectWrite;
 using SSTFormat.v4;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.曲読み込み
 {
     class 曲読み込みステージ : ステージ
     {
@@ -39,6 +39,8 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    this.非活性化する();
             }
         }
 
@@ -73,8 +75,8 @@ namespace DTXMania
                     前景色 = Color4.Black,
                     背景色 = Color4.White,
                 };
-                this._プレビュー画像 = new 曲読み込み画面プレビュー画像();
-                this._難易度 = new 曲読み込み画面難易度();
+                this._プレビュー画像 = new プレビュー画像();
+                this._難易度 = new 難易度();
                 this._システム情報 = new システム情報();
 
 
@@ -129,6 +131,7 @@ namespace DTXMania
             this._システム情報.VPSをカウントする();
 
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
             this._舞台画像.進行描画する( dc );
             this._注意文.描画する( dc, 0f, 760f );
@@ -240,9 +243,9 @@ namespace DTXMania
 
         private 文字列画像 _サブタイトル画像 = null;
 
-        private 曲読み込み画面プレビュー画像 _プレビュー画像 = null;
+        private プレビュー画像 _プレビュー画像 = null;
 
-        private 曲読み込み画面難易度 _難易度 = null;
+        private 難易度 _難易度 = null;
 
         private システム情報 _システム情報 = null;
     }
