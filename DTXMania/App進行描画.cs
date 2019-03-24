@@ -166,11 +166,11 @@ namespace DTXMania
             App進行描画.アイキャッチ管理?.Dispose();
             App進行描画.ドラムサウンド?.Dispose();
             App進行描画.入力管理?.Dispose();
-            App進行描画.WAVキャッシュレンタル?.Dispose();
             App進行描画.ユーザ管理?.Dispose();
             App進行描画.システムサウンド?.Dispose();
             App進行描画.サウンドタイマ?.Dispose();
             App進行描画.サウンドデバイス?.Dispose();
+            App進行描画.WAVキャッシュレンタル?.Dispose();    // サウンドデバイスより後
 
             テクスチャ.全インスタンスで共有するリソースを解放する();
 
