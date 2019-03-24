@@ -10,8 +10,8 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using FDK32;
 using SSTFormat.v4;
+using FDK;
 
 namespace SSTFEditor
 {
@@ -317,9 +317,9 @@ namespace SSTFEditor
 
         #region " WCF サービス "
         //----------------
-        private ChannelFactory<DTXMania.API.IDTXManiaService> _WCFファクトリ = null;
+        private ChannelFactory<DTXMania.WCF.IDTXManiaService> _WCFファクトリ = null;
 
-        private DTXMania.API.IDTXManiaService _WCFサービス = null;
+        private DTXMania.WCF.IDTXManiaService _WCFサービス = null;
 
         private IClientChannel _WCFサービスチャンネル = null;
         //----------------
@@ -1808,7 +1808,7 @@ namespace SSTFEditor
             // ファクトリが未生成なら生成する。
             if( null == this._WCFファクトリ )
             {
-                this._WCFファクトリ = new ChannelFactory<DTXMania.API.IDTXManiaService>( new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ) );
+                this._WCFファクトリ = new ChannelFactory<DTXMania.WCF.IDTXManiaService>( new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ) );
                 this._WCFサービスチャンネル = null;
                 this._WCFサービス = null;
             }
@@ -3208,7 +3208,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxBGV.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxBGV.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         protected void textBoxBGM_TextChanged( object sender, EventArgs e )
@@ -3295,7 +3295,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxBGM.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxBGM.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         protected void textBoxプレビュー音声_TextChanged( object sender, EventArgs e )
@@ -3382,7 +3382,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxプレビュー音声.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxプレビュー音声.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
         }
 
         private void textBoxプレビュー画像_TextChanged( object sender, EventArgs e )
@@ -3471,7 +3471,7 @@ namespace SSTFEditor
             //-----------------
             #endregion
 
-            this.textBoxプレビュー画像.Text = FDK32.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
+            this.textBoxプレビュー画像.Text = FDK.Folder.絶対パスを相対パスに変換する( this._作業フォルダパス, dialog.FileName );
 
             this._プレビュー画像を更新する();
         }

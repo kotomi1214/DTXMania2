@@ -40,7 +40,7 @@ namespace SSTFEditor
 
             try
             {
-                config = FDK32.Serializer.ファイルをデシリアライズしてインスタンスを生成する<Config>( ファイル名 );
+                config = FDK.Serializer.ファイルをデシリアライズしてインスタンスを生成する<Config>( ファイル名 );
             }
             catch( Exception )
             {
@@ -54,7 +54,7 @@ namespace SSTFEditor
         {
             try
             {
-                FDK32.Serializer.インスタンスをシリアライズしてファイルに保存する( ファイル名, this );
+                FDK.Serializer.インスタンスをシリアライズしてファイルに保存する( ファイル名, this );
             }
             catch( Exception e )
             {

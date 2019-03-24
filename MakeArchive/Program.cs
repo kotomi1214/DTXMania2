@@ -6,7 +6,6 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using System.Threading.Tasks;
 
 namespace MakeArchive
 {
@@ -75,7 +74,7 @@ namespace MakeArchive
             foreach( var file in files )
             {
                 var fullfile = Path.GetFullPath( file );    // ".." をなくしたパスにする
-                var destfile = FDK32.Folder.絶対パスを相対パスに変換する( baseDir, fullfile );
+                var destfile = FDK.Folder.絶対パスを相対パスに変換する( baseDir, fullfile );
 
                 yield return (fullfile, destfile);
             }

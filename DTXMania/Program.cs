@@ -13,6 +13,9 @@ namespace DTXMania
 {
     static class Program
     {
+        const int ログファイルの最大保存日数 = 30;
+        public static string ログファイル名 = "";
+
         [STAThread]
         static void Main( string[] args )
         {
@@ -43,8 +46,7 @@ namespace DTXMania
             //----------------
             Trace.AutoFlush = true;
 
-            const int ログファイルの最大保存日数 = 30;
-            var ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名.変数なしパス, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
+            ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名.変数なしパス, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
 
             // ログファイルをTraceリスナとして追加。
             // 以降、Trace（ならびにFDK.Logクラス）による出力は、このリスナ（＝ログファイル）にも出力される。

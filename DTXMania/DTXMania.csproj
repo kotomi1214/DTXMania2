@@ -152,6 +152,7 @@
     <Compile Include="App.Designer.cs">
       <DependentUpon>App.cs</DependentUpon>
     </Compile>
+    <Compile Include="Version.cs" />
     <Compile Include="ステージ\03認証\ユーザリスト.cs" />
     <Compile Include="ステージ\03認証\認証ステージ.cs" />
     <Compile Include="ステージ\04選曲\BPMパネル.cs" />
@@ -276,6 +277,12 @@
     <Compile Include="曲\SetDef.cs" />
     <Compile Include="曲\WAV管理.cs" />
     <Compile Include="曲\曲ツリー.cs" />
+    <Compile Include="未処理例外検出ダイアログ.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="未処理例外検出ダイアログ.designer.cs">
+      <DependentUpon>未処理例外検出ダイアログ.cs</DependentUpon>
+    </Compile>
     <Compile Include="設定\成績.cs" />
     <Compile Include="曲\曲DB.cs" />
     <Compile Include="曲\曲名.cs" />
@@ -313,6 +320,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ステージ\05オプション設定\曲読み込みフォルダ割り当てダイアログ.resx">
       <DependentUpon>曲読み込みフォルダ割り当てダイアログ.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="未処理例外検出ダイアログ.resx">
+      <DependentUpon>未処理例外検出ダイアログ.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

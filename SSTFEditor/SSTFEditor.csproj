@@ -239,13 +239,13 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DTXMania035\DTXMania035.csproj">
-      <Project>{736be388-5ec5-4bf9-838b-8580c9a8da9c}</Project>
-      <Name>DTXMania035</Name>
+    <ProjectReference Include="..\DTXMania\DTXMania.csproj">
+      <Project>{9ab944ae-d0c4-4022-b407-a497160e2bd6}</Project>
+      <Name>DTXMania</Name>
     </ProjectReference>
-    <ProjectReference Include="..\FDK32\FDK32.csproj">
-      <Project>{0e35c4ac-6e28-4a09-a6ce-05d177800051}</Project>
-      <Name>FDK32</Name>
+    <ProjectReference Include="..\FDK\FDK.csproj">
+      <Project>{8df302d9-4ba8-4f0f-b673-ccf87ecee30e}</Project>
+      <Name>FDK</Name>
     </ProjectReference>
     <ProjectReference Include="..\SSTFormat\SSTFormat.csproj">
       <Project>{93b53767-a0a5-431c-9ec7-b23dbffb10ec}</Project>
