@@ -72,7 +72,7 @@ namespace DTXMania.起動
                 }
 
                 this._コンソール表示内容 = new List<string>() {
-                    $"{App.属性<AssemblyTitleAttribute>().Title} r{App.リリース番号:000}",
+                    $"{App.属性<AssemblyTitleAttribute>().Title} Release {App.リリース番号:000} - Beats with your heart.",
                     $"{App.属性<AssemblyCopyrightAttribute>().Copyright}",
                     $"",
                 };
