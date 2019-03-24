@@ -10,8 +10,8 @@ using System.ServiceModel;
 using System.ServiceModel.Channels;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using FDK;
 using SSTFormat.v4;
+using FDK;
 
 namespace SSTFEditor
 {
@@ -87,6 +87,8 @@ namespace SSTFEditor
         public クリップボード クリップボード { get; set; }
 
         public Size 譜面パネルサイズ => this.pictureBox譜面パネル.ClientSize;
+
+        public Rectangle 譜面パネル領域 => this.pictureBox譜面パネル.ClientRectangle;
 
         public チップ種別 現在のチップ種別
         {
@@ -315,9 +317,9 @@ namespace SSTFEditor
 
         #region " WCF サービス "
         //----------------
-        private ChannelFactory<DTXMania.API.IDTXManiaService> _WCFファクトリ = null;
+        private ChannelFactory<DTXMania.WCF.IDTXManiaService> _WCFファクトリ = null;
 
-        private DTXMania.API.IDTXManiaService _WCFサービス = null;
+        private DTXMania.WCF.IDTXManiaService _WCFサービス = null;
 
         private IClientChannel _WCFサービスチャンネル = null;
         //----------------
@@ -1806,7 +1808,7 @@ namespace SSTFEditor
             // ファクトリが未生成なら生成する。
             if( null == this._WCFファクトリ )
             {
-                this._WCFファクトリ = new ChannelFactory<DTXMania.API.IDTXManiaService>( new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ) );
+                this._WCFファクトリ = new ChannelFactory<DTXMania.WCF.IDTXManiaService>( new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ) );
                 this._WCFサービスチャンネル = null;
                 this._WCFサービス = null;
             }

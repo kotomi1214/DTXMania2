@@ -5,21 +5,24 @@ using System.IO;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
-using YamlDotNet.RepresentationModel;
 using FDK;
 
-namespace DTXMania.ステージ
+namespace DTXMania
 {
-    class パッド矢印 : Activity
+    class パッド矢印 : IDisposable
     {
         public enum 種類 { 上_Tom1, 下_Tom2, 左_Snare, 右_Tom3 };
+
+
+
+        // 生成と終了
 
 
         public パッド矢印()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._矢印画像 = new 画像( @"$(System)images\パッド矢印.png" ) );
+                this._矢印画像 = new 画像( @"$(System)images\パッド矢印.png" );
 
                 var yaml = File.ReadAllText( new VariablePath( @"$(System)images\パッド矢印.yaml" ).変数なしパス );
                 var deserializer = new YamlDotNet.Serialization.Deserializer();
@@ -34,7 +37,20 @@ namespace DTXMania.ステージ
             }
         }
 
-        public void 描画する( DeviceContext1 dc, 種類 type, Vector2 中央位置dpx, float 拡大率 = 1f )
+        public virtual void Dispose()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._矢印画像?.Dispose();
+            }
+        }
+
+
+
+        // 進行と描画
+
+
+        public void 描画する( DeviceContext dc, 種類 type, Vector2 中央位置dpx, float 拡大率 = 1f )
         {
             var 矩形 = new RectangleF();
 
@@ -56,10 +72,13 @@ namespace DTXMania.ステージ
         }
 
 
+
+        // private
+
+
         private 画像 _矢印画像 = null;
 
         private Dictionary<string, RectangleF> _矢印の矩形リスト = null;
-
 
         private class YAMLマップ
         {

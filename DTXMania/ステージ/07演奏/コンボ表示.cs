@@ -8,22 +8,20 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class コンボ表示 : Activity
+    class コンボ表示 : IDisposable
     {
+
+        // 生成と終了
+
+
         public コンボ表示()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._コンボ文字画像 = new 画像( @"$(System)images\演奏\コンボ文字.png" ) );
-            }
-        }
+                this._コンボ文字画像 = new 画像( @"$(System)images\演奏\コンボ文字.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 this._前回表示した値 = 0;
                 this._前回表示した数字 = "    ";
 
@@ -48,7 +46,7 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -57,14 +55,20 @@ namespace DTXMania.ステージ.演奏
                 this._各桁のアニメ = null;
 
                 this._百ごとのアニメ?.Dispose();
-                this._百ごとのアニメ = null;
+
+                this._コンボ文字画像?.Dispose();
             }
         }
+
+
+
+        // 進行と描画
+
 
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext1 dc, アニメーション管理 am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext dc, アニメーション am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             int Combo値 = Math.Min( Math.Max( 現在の成績.Combo, 0 ), 9999 );  // 表示は9999でカンスト。
 
@@ -100,8 +104,8 @@ namespace DTXMania.ステージ.演奏
             var 振動幅 = (float) ( this._百ごとのアニメ.振動幅?.Value ?? 0.0f );
             if( 0.0f < 振動幅 )
             {
-                全体の中央位置.X += App.乱数.NextFloat( -振動幅, +振動幅 );
-                全体の中央位置.Y += App.乱数.NextFloat( -振動幅, +振動幅 );
+                全体の中央位置.X += App進行描画.乱数.NextFloat( -振動幅, +振動幅 );
+                全体の中央位置.Y += App進行描画.乱数.NextFloat( -振動幅, +振動幅 );
             }
 
             
@@ -110,6 +114,7 @@ namespace DTXMania.ステージ.演奏
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 #region " 数字を描画。"
                 //----------------
@@ -174,6 +179,10 @@ namespace DTXMania.ステージ.演奏
         }
 
 
+
+        // private
+
+
         private int _前回表示した値 = 0;
 
         private string _前回表示した数字 = "    ";
@@ -202,7 +211,7 @@ namespace DTXMania.ステージ.演奏
                 this.不透明度?.Dispose();
             }
 
-            public void 落下開始( アニメーション管理 am )
+            public void 落下開始( アニメーション am )
             {
                 this.Dispose();
 
@@ -222,7 +231,7 @@ namespace DTXMania.ステージ.演奏
                 }
                 this.ストーリーボード.Schedule( am.Timer.Time );
             }
-            public void 跳ね開始( アニメーション管理 am, double 遅延sec )
+            public void 跳ね開始( アニメーション am, double 遅延sec )
             {
                 this.Dispose();
 
@@ -243,6 +252,7 @@ namespace DTXMania.ステージ.演奏
                 this.ストーリーボード.Schedule( am.Timer.Time );
             }
         };
+
         private 各桁のアニメ[] _各桁のアニメ = null;
 
 
@@ -265,7 +275,7 @@ namespace DTXMania.ステージ.演奏
                 this.振動幅?.Dispose();
             }
 
-            public void 開始( アニメーション管理 am )
+            public void 開始( アニメーション am )
             {
                 this.ストーリーボード = new Storyboard( am.Manager );
                 this.拡大率 = new Variable( am.Manager, initialValue: 1.0 );
@@ -296,8 +306,8 @@ namespace DTXMania.ステージ.演奏
                 this.ストーリーボード.Schedule( am.Timer.Time );
             }
         };
-        private 百ごとのアニメ _百ごとのアニメ = null;
 
+        private 百ごとのアニメ _百ごとのアニメ = null;
 
         private class YAMLマップ
         {

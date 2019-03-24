@@ -2,31 +2,42 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.BASIC
+namespace DTXMania.演奏.BASIC
 {
     /// <summary>
     ///     ヒットバー ... チップがこの位置に来たら叩け！という線。
     /// </summary>
-    class ヒットバー : Activity
+    class ヒットバー : IDisposable
     {
         public const float ヒット判定バーの中央Y座標dpx = 847f;
 
 
+
+        // 生成と終了
+
+
         public ヒットバー()
         {
-            this.子Activityを追加する( this._ヒットバー画像 = new テクスチャ( @"$(System)images\演奏\ヒットバー.png" ) );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._ヒットバー画像 = new テクスチャ( @"$(System)images\演奏\ヒットバー.png" );
+            }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._ヒットバー画像?.Dispose();
+            }
         }
 
-        protected override void On非活性化()
-        {
-        }
+
+
+        // 進行と描画
+
 
         public void 描画する()
         {
@@ -36,6 +47,10 @@ namespace DTXMania.ステージ.演奏.BASIC
 
             this._ヒットバー画像.描画する( バーの左端Xdpx, バーの中央Ydpx - バーの厚さdpx / 2f );
         }
+
+
+
+        // private
 
 
         private テクスチャ _ヒットバー画像 = null;

@@ -7,22 +7,20 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.BASIC
+namespace DTXMania.演奏.BASIC
 {
-    class ドラムパッド : Activity
+    class ドラムパッド : IDisposable
     {
+
+        // 生成と終了
+
+
         public ドラムパッド()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._パッド絵 = new テクスチャ( @"$(System)images\演奏\ドラムパッド.png" ) );
-            }
-        }
+                this._パッド絵 = new テクスチャ( @"$(System)images\演奏\ドラムパッド.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\ドラムパッド.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -52,18 +50,29 @@ namespace DTXMania.ステージ.演奏.BASIC
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._レーンtoパッドContext.Clear();
+                this._パッド絵?.Dispose();
             }
         }
+
+
+
+        // ヒット
+
 
         public void ヒットする( 表示レーン種別 lane )
         {
             this._レーンtoパッドContext[ lane ].アニメカウンタ.開始する( 0, 100, 1 );
         }
+
+
+
+        // 進行と描画
+
 
         public void 進行描画する()
         {
@@ -102,6 +111,10 @@ namespace DTXMania.ステージ.演奏.BASIC
                 }
             }
         }
+
+
+
+        // private
 
 
         private テクスチャ _パッド絵 = null;

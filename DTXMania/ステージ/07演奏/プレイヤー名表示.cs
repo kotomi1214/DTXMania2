@@ -7,52 +7,49 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
     /// <summary>
     ///		プレイヤー名の表示。
     /// </summary>
-    class プレイヤー名表示 : Activity
+    class プレイヤー名表示 : IDisposable
     {
         public string 名前 { get; set; }
+
+
+
+        // 生成と終了
 
 
         public プレイヤー名表示()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-            }
-        }
-
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                //this.名前 = "(no name)";	更新しない。親Activityで設定済みのため。
+                this.名前 = "(no nmae)";
                 this._前回表示した名前 = "";
                 this._TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "メイリオ", FontWeight.Regular, FontStyle.Normal, 22f );
                 this._TextLayout = null;
-                this._文字色 = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, Color4.White );
+                this._文字色 = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, Color4.White );
                 this._拡大率X = 1.0f;
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._文字色?.Dispose();
-                this._文字色 = null;
-
                 this._TextLayout?.Dispose();
-                this._TextLayout = null;
-
                 this._TextFormat?.Dispose();
-                this._TextFormat = null;
             }
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
             var 描画矩形 = new RectangleF( 122f, 313f, 240f, 30f );
 
@@ -71,6 +68,7 @@ namespace DTXMania.ステージ.演奏
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 dc.Transform =
                     Matrix3x2.Scaling( this._拡大率X, 1.0f ) *          // 拡大縮小
@@ -79,10 +77,16 @@ namespace DTXMania.ステージ.演奏
 
                 dc.DrawTextLayout( Vector2.Zero, this._TextLayout, this._文字色 ); // 座標（描画矩形）は拡大率の影響をうけるので、このメソッドではなく、Matrix3x2.Translation() で設定するほうが楽。
 
+                dc.Transform = pretrans;
+
             } );
 
             this._前回表示した名前 = this.名前;
         }
+
+
+
+        // private
 
 
         private string _前回表示した名前;

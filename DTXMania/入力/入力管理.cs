@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
 using SSTFormat.v4;
-using DTXMania.設定;
+using FDK;
 
-namespace DTXMania.入力
+namespace DTXMania
 {
     /// <summary>
     ///     入力デバイスと、その入力データの管理。
@@ -18,19 +17,9 @@ namespace DTXMania.入力
     /// </remarks>
     class 入力管理 : IDisposable
     {
-        public Func<キーバインディング> キーバインディングを取得する = null;   // 外部依存アクション
+        public キーボードデバイス キーボード { get; protected set; } = null;
 
-        public Action キーバインディングを保存する = null;    // 外部依存アクション
-
-        /// <summary>
-        ///     HIDキーボードデバイス。
-        /// </summary>
-        public HIDKeyboard HIDKeyboard { get; protected set; } = null;
-
-        /// <summary>
-        ///     MIDI入力デバイス。
-        /// </summary>
-        public MidiIn MidiIn { get; protected set; } = null;
+        public MIDI入力デバイス MIDI入力 { get; protected set; } = null;
 
         /// <summary>
         ///		全デバイスの入力イベントをドラム入力イベントに変換し、それを集めたリスト。
@@ -43,45 +32,58 @@ namespace DTXMania.入力
         public List<ドラム入力イベント> ポーリング結果 { get; } = new List<ドラム入力イベント>();
 
 
+
+        // 外部依存アクション
+
+
+        public Func<キーバインディング> キーバインディングを取得する = null;
+
+        public Action キーバインディングを保存する = null;
+
+
+
+        // 生成と終了
+
+
         /// <summary>
         ///		コンストラクタ。
         /// </summary>
-        /// <param name="hWindow">ウィンドウハンドル。キーボードのAcquireに使用する。</param>
+        /// <param name="keyboard">キーボードデバイス。キーボードはフォームに依存するため、外部から共有する。</param>
         ///	<param name="最大入力履歴数">１つのシーケンスの最大入力サイズ。</param>
-        public 入力管理( IntPtr hWindow, int 最大入力履歴数 = 32 )
+        public 入力管理( キーボードデバイス keyboard, int 最大入力履歴数 = 32 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._hWindow = hWindow;
+                this.キーボード = keyboard;
 
                 Trace.Assert( 0 < 最大入力履歴数 );
                 this._最大入力履歴数 = 最大入力履歴数;
             }
         }
 
-        /// <summary>
-        ///		初期化する。
+        /// <remarks>
         ///		コンストラクタの実行時点では外部依存アクションが設定されていないので、初期化にはこのメソッドを呼び出すこと。
-        /// </summary>
+        /// </remarks>
         public void 初期化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.HIDKeyboard = new HIDKeyboard();
-                this.MidiIn = new MidiIn();
+                //this.キーボード = new キーボード();     --> キーボードはフォームに依存するため、外部から共有する（コンストラクタで設定済み）。
+                this.MIDI入力 = new MIDI入力デバイス();
+
                 this.ポーリング結果.Clear();
                 this._入力履歴 = new List<ドラム入力イベント>( this._最大入力履歴数 );
 
                 // MIDI入力デバイスの可変IDへの対応を行う。
-                if( 0 < this.MidiIn.DeviceName.Count )
+                if( 0 < this.MIDI入力.DeviceName.Count )
                 {
                     var デバイスリスト = new Dictionary<int, string>();    // <デバイスID, デバイス名>
                     var キーバインディング = this.キーバインディングを取得する();
 
                     #region " (1) 先に列挙された実際のデバイスに合わせて、デバイスリスト（配列番号がデバイス番号）を作成する。"
                     //----------------
-                    for( int i = 0; i < this.MidiIn.DeviceName.Count; i++ )
-                        デバイスリスト.Add( i, this.MidiIn.DeviceName[ i ] );
+                    for( int i = 0; i < this.MIDI入力.DeviceName.Count; i++ )
+                        デバイスリスト.Add( i, this.MIDI入力.DeviceName[ i ] );
                     //----------------
                     #endregion
                     #region " (2) キーバインディングのデバイスリストとマージして、新しいデバイスリストを作成する。"
@@ -146,9 +148,6 @@ namespace DTXMania.入力
             }
         }
 
-        /// <summary>
-        ///		個々のデバイスを解放する。
-        /// </summary>
         public void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -156,18 +155,15 @@ namespace DTXMania.入力
                 this.キーバインディングを取得する = null;
                 this.キーバインディングを保存する = null;
 
-                this.MidiIn?.Dispose();
-                this.MidiIn = null;
-
-                this.HIDKeyboard?.Dispose();
-                this.HIDKeyboard = null;
+                this.MIDI入力?.Dispose();
+                //this.キーボード?.Dispose();        --> 借り物なのでDisposeしない。
             }
         }
 
-        public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
-        {
-            this.HIDKeyboard.WM_INPUTを処理する( wmInputMsg );
-        }
+
+
+        // ポーリング
+
 
         /// <summary>
         ///		すべての入力デバイスをポーリングし、<see cref="ポーリング結果"/>のクリア＆再構築と、<see cref="_入力履歴"/>の更新を行う。
@@ -176,12 +172,15 @@ namespace DTXMania.入力
         public void すべての入力デバイスをポーリングする( bool 入力履歴を記録する = true )
         {
             // 入力履歴が OFF から ON に変わった場合には、入力履歴を全クリアする。
+
             if( 入力履歴を記録する && this._入力履歴の記録を中断している )
             {
                 this._入力履歴.Clear();
                 this._前回の入力履歴の追加時刻sec = null;
+
             }
             this._入力履歴を記録中である = 入力履歴を記録する;
+
 
             // 個別にポーリングする。
 
@@ -189,28 +188,99 @@ namespace DTXMania.入力
 
             var キーバインディング = this.キーバインディングを取得する();
 
-            if( App.ウィンドウがアクティブである )
-            {
-                // HIDキーボード
-                this._入力デバイスをポーリングする(
-                    this.HIDKeyboard,
-                    キーバインディング.キーボードtoドラム,
-                    入力履歴を記録する );
+            this._入力デバイスをポーリングする( this.キーボード, キーバインディング.キーボードtoドラム, 入力履歴を記録する );
+            this._入力デバイスをポーリングする( this.MIDI入力, キーバインディング.MIDItoドラム, 入力履歴を記録する );
 
-                // MIDI入力
-                this._入力デバイスをポーリングする(
-                    this.MidiIn,
-                    キーバインディング.MIDItoドラム,
-                    入力履歴を記録する );
 
-                // タイムスタンプの小さい順にソートする。
-                this.ポーリング結果.Sort( ( x, y ) => (int) ( x.InputEvent.TimeStamp - y.InputEvent.TimeStamp ) );
-            }
-            else
+            // タイムスタンプの小さい順にソートする。
+
+            this.ポーリング結果.Sort( ( x, y ) => (int) ( x.InputEvent.TimeStamp - y.InputEvent.TimeStamp ) );
+        }
+
+        /// <summary>
+        ///		これまでにポーリングで取得された入力の履歴。
+        /// </summary>
+        /// <remarks>
+        ///		キーバインディングに従ってマッピングされた後の、ドラム入力イベントを対象とする。
+        ///		リストのサイズには制限があり（<see cref="_最大入力履歴数"/>）、それを超える場合は、ポーリング時に古いイベントから削除されていく。
+        /// </remarks>
+        private List<ドラム入力イベント> _入力履歴 = null;
+
+        private int _最大入力履歴数 = 32;
+
+        private bool _入力履歴を記録中である = true;
+
+        private bool _入力履歴の記録を中断している
+        {
+            get
+                => !this._入力履歴を記録中である;
+            set
+                => this._入力履歴を記録中である = !( value );
+        }
+
+        /// <summary>
+        ///		null なら、入力履歴に追加された入力がまだないことを示す。
+        /// </summary>
+        private double? _前回の入力履歴の追加時刻sec = null;
+
+        /// <summary>
+        ///		単一の IInputDevice をポーリングし、対応表に従ってドラム入力へ変換して、ポーリング結果 に追加登録する。
+        /// </summary>
+        /// <param name="入力デバイス">ポーリングを行う入力デバイス。</param>
+        /// <param name="デバイスtoドラム対応表">ドラム入力イベントへ変換するためのマッピング。</param>
+        /// <param name="入力履歴を記録する">ドラム入力イベントを入力履歴に登録するなら true。</param>
+        private void _入力デバイスをポーリングする( IInputDevice 入力デバイス, Dictionary<キーバインディング.IdKey, ドラム入力種別> デバイスtoドラム対応表, bool 入力履歴を記録する )
+        {
+            入力デバイス.ポーリングする();
+
+            // ポーリングされた入力イベントのうち、キーバインディングに登録されているイベントだけを ポーリング結果 に追加する。
+
+            foreach( var ev in 入力デバイス.入力イベントリスト )
             {
-                // ウィンドウが非アクティブならポーリングしない。
+                // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
+                var evKey = new キーバインディング.IdKey( ev );
+
+                if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
+                    continue;   // 使われないならスキップ。
+
+                var ドラム入力 = new ドラム入力イベント( ev, デバイスtoドラム対応表[ evKey ] );
+
+                // ドラム入力を、ポーリング結果に追加登録する。
+                this.ポーリング結果.Add( ドラム入力 );
+
+                // ドラム入力を入力履歴に追加登録する。
+                if( 入力履歴を記録する &&
+                    ev.押された &&
+                    ドラム入力.Type != ドラム入力種別.HiHat_Control )   // HHC は入力履歴の対象外とする。
+                {
+                    const double _連続入力だとみなす最大の間隔sec = 0.5;
+
+                    double 入力時刻sec = QPCTimer.生カウント相対値を秒へ変換して返す( ev.TimeStamp );   // 相対か絶対か、どっちかに統一さえされていればいい。
+
+                    // 容量がいっぱいなら、古い履歴から削除する。
+                    if( this._入力履歴.Count >= this._最大入力履歴数 )
+                        this._入力履歴.RemoveRange( 0, ( this._入力履歴.Count - this._最大入力履歴数 + 1 ) );
+
+                    // 前回の追加登録時刻からの経過時間がオーバーしているなら、履歴をすべて破棄する。
+                    if( null != this._前回の入力履歴の追加時刻sec )
+                    {
+                        var 前回の登録からの経過時間sec = 入力時刻sec - this._前回の入力履歴の追加時刻sec;
+
+                        if( _連続入力だとみなす最大の間隔sec < 前回の登録からの経過時間sec )
+                            this._入力履歴.Clear();
+                    }
+
+                    // 今回の入力を履歴に登録する。
+                    this._入力履歴.Add( ドラム入力 );
+                    this._前回の入力履歴の追加時刻sec = 入力時刻sec;
+                }
             }
         }
+
+
+
+        // 押下チェック
+
 
         /// <summary>
         ///		現在の<see cref="ポーリング結果"/>に、指定したドラム入力イベントが含まれているかを確認する。
@@ -270,7 +340,7 @@ namespace DTXMania.入力
         public bool キャンセルキーが入力された()
         {
             return
-                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Escape ) ||
+                this.キーボード.キーが押された( 0, System.Windows.Forms.Keys.Escape ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom3,
                     ドラム入力種別.Tom3_Rim } );
@@ -283,7 +353,7 @@ namespace DTXMania.入力
         public bool 上移動キーが入力された()
         {
             return
-                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
+                this.キーボード.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom1,
                     ドラム入力種別.Tom1_Rim } );
@@ -291,7 +361,7 @@ namespace DTXMania.入力
         public bool 上移動キーが押されている()
         {
             return
-                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Up );
+                this.キーボード.キーが押されている( 0, System.Windows.Forms.Keys.Up );
         }
 
         /// <summary>
@@ -301,7 +371,7 @@ namespace DTXMania.入力
         public bool 下移動キーが入力された()
         {
             return
-                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
+                this.キーボード.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom2,
                     ドラム入力種別.Tom2_Rim } );
@@ -309,7 +379,7 @@ namespace DTXMania.入力
         public bool 下移動キーが押されている()
         {
             return
-                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Down );
+                this.キーボード.キーが押されている( 0, System.Windows.Forms.Keys.Down );
         }
 
         /// <summary>
@@ -319,7 +389,7 @@ namespace DTXMania.入力
         public bool 左移動キーが入力された()
         {
             return
-                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
+                this.キーボード.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Snare,
                     ドラム入力種別.Snare_ClosedRim,
@@ -328,7 +398,7 @@ namespace DTXMania.入力
         public bool 左移動キーが押されている()
         {
             return
-                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Left );
+                this.キーボード.キーが押されている( 0, System.Windows.Forms.Keys.Left );
         }
 
         /// <summary>
@@ -338,7 +408,7 @@ namespace DTXMania.入力
         public bool 右移動キーが入力された()
         {
             return
-                this.HIDKeyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
+                this.キーボード.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
                 this.ドラムのいずれか１つが入力された( new[] {
                     ドラム入力種別.Tom3,
                     ドラム入力種別.Tom3_Rim } );
@@ -346,7 +416,7 @@ namespace DTXMania.入力
         public bool 右移動キーが押されている()
         {
             return
-                this.HIDKeyboard.キーが押されている( 0, System.Windows.Forms.Keys.Right );
+                this.キーボード.キーが押されている( 0, System.Windows.Forms.Keys.Right );
         }
 
         /// <summary>
@@ -492,90 +562,6 @@ namespace DTXMania.入力
             this._入力履歴.RemoveRange( 0, ( 履歴の検索開始位置 + シーケンスのストローク数 ) );
 
             return true;
-        }
-
-
-        /// <summary>
-        ///		これまでにポーリングで取得された入力の履歴。
-        /// </summary>
-        /// <remarks>
-        ///		キーバインディングに従ってマッピングされた後の、ドラム入力イベントを対象とする。
-        ///		リストのサイズには制限があり（<see cref="_最大入力履歴数"/>）、それを超える場合は、ポーリング時に古いイベントから削除されていく。
-        /// </remarks>
-        private List<ドラム入力イベント> _入力履歴 = null;
-
-        private int _最大入力履歴数 = 32;
-
-        private IntPtr _hWindow;
-
-        private bool _入力履歴を記録中である = true;
-
-        private bool _入力履歴の記録を中断している
-        {
-            get
-                => !this._入力履歴を記録中である;
-            set
-                => this._入力履歴を記録中である = !( value );
-        }
-
-        /// <summary>
-        ///		null なら、入力履歴に追加された入力がまだないことを示す。
-        /// </summary>
-        private double? _前回の入力履歴の追加時刻sec = null;
-
-
-        /// <summary>
-        ///		単一の IInputDevice をポーリングし、対応表に従ってドラム入力へ変換して、ポーリング結果 に追加登録する。
-        /// </summary>
-        /// <param name="入力デバイス">ポーリングを行う入力デバイス。</param>
-        /// <param name="デバイスtoドラム対応表">ドラム入力イベントへ変換するためのマッピング。</param>
-        /// <param name="入力履歴を記録する">ドラム入力イベントを入力履歴に登録するなら true。</param>
-        private void _入力デバイスをポーリングする( IInputDevice 入力デバイス, Dictionary<キーバインディング.IdKey, ドラム入力種別> デバイスtoドラム対応表, bool 入力履歴を記録する )
-        {
-            入力デバイス.ポーリングする();
-
-            // ポーリングされた入力イベントのうち、キーバインディングに登録されているイベントだけを ポーリング結果 に追加する。
-
-            foreach( var ev in 入力デバイス.入力イベントリスト )
-            {
-                // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
-                var evKey = new キーバインディング.IdKey( ev );
-
-                if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
-                    continue;   // 使われないならスキップ。
-
-                var ドラム入力 = new ドラム入力イベント( ev, デバイスtoドラム対応表[ evKey ] );
-
-                // ドラム入力を、ポーリング結果に追加登録する。
-                this.ポーリング結果.Add( ドラム入力 );
-
-                // ドラム入力を入力履歴に追加登録する。
-                if( 入力履歴を記録する &&
-                    ev.押された &&
-                    ドラム入力.Type != ドラム入力種別.HiHat_Control )   // HHC は入力履歴の対象外とする。
-                {
-                    const double _連続入力だとみなす最大の間隔sec = 0.5;
-
-                    double 入力時刻sec = QPCTimer.生カウント相対値を秒へ変換して返す( ev.TimeStamp );   // 相対か絶対か、どっちかに統一さえされていればいい。
-
-                    // 容量がいっぱいなら、古い履歴から削除する。
-                    if( this._入力履歴.Count >= this._最大入力履歴数 )
-                        this._入力履歴.RemoveRange( 0, ( this._入力履歴.Count - this._最大入力履歴数 + 1 ) );
-
-                    // 前回の追加登録時刻からの経過時間がオーバーしているなら、履歴をすべて破棄する。
-                    if( null != this._前回の入力履歴の追加時刻sec )
-                    {
-                        var 前回の登録からの経過時間sec = 入力時刻sec - this._前回の入力履歴の追加時刻sec;
-
-                        if( _連続入力だとみなす最大の間隔sec < 前回の登録からの経過時間sec )
-                            this._入力履歴.Clear();
-                    }
-
-                    // 今回の入力を履歴に登録する。
-                    this._入力履歴.Add( ドラム入力 );
-                    this._前回の入力履歴の追加時刻sec = 入力時刻sec;
-                }
-            }
         }
     }
 }

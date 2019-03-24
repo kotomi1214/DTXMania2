@@ -4,25 +4,24 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using SharpDX;
-using FDK;
 using SSTFormat.v4;
+using FDK;
+using DTXMania.演奏;
 
-namespace DTXMania.ステージ.演奏.EXPERT
+namespace DTXMania.演奏.EXPERT
 {
-    class ドラムチップ : Activity
+    class ドラムチップ : IDisposable
     {
+
+        // 生成と終了
+
+
         public ドラムチップ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._ドラムチップ画像 = new テクスチャ( @"$(System)images\演奏\ドラムチップEXPERT.png" ) );
-            }
-        }
+                this._ドラムチップ画像 = new テクスチャ( @"$(System)images\演奏\ドラムチップEXPERT.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\ドラムチップEXPERT.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -39,12 +38,18 @@ namespace DTXMania.ステージ.演奏.EXPERT
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._ドラムチップ画像?.Dispose();
             }
         }
+
+
+
+        // 進行と描画
+
 
         /// <returns>クリアしたらtrueを返す。</returns>
         public bool 進行描画する( レーンフレーム frame, double 現在の演奏時刻sec, ref int 描画開始チップ番号, チップの演奏状態 state, チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx )
@@ -73,7 +78,7 @@ namespace DTXMania.ステージ.演奏.EXPERT
                 描画開始チップ番号++;
 
                 // 描画開始チップがチップリストの末尾に到達したら、演奏を終了する。
-                if( App.演奏スコア.チップリスト.Count <= 描画開始チップ番号 )
+                if( App進行描画.演奏スコア.チップリスト.Count <= 描画開始チップ番号 )
                 {
                     描画開始チップ番号 = -1;    // 演奏完了。
                     return true;                // クリア。
@@ -100,11 +105,11 @@ namespace DTXMania.ステージ.演奏.EXPERT
             #endregion
 
             // チップ種別 から、表示レーン種別 と 表示チップ種別 を取得。
-            var 表示レーン種別 = App.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ].表示レーン種別;
-            var 表示チップ種別 = App.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ].表示チップ種別;
+            var 表示レーン種別 = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ].表示レーン種別;
+            var 表示チップ種別 = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ].表示チップ種別;
 
-            if( ( 表示レーン種別 != 表示レーン種別.Unknown ) &&   // Unknwon ならチップを表示しない。
-                ( 表示チップ種別 != 表示チップ種別.Unknown ) )    //
+            if( ( 表示レーン種別 != DTXMania.表示レーン種別.Unknown ) &&   // Unknwon ならチップを表示しない。
+                ( 表示チップ種別 != DTXMania.表示チップ種別.Unknown ) )    //
             {
                 #region " チップを描画する。"
                 //----------------
@@ -188,28 +193,28 @@ namespace DTXMania.ステージ.演奏.EXPERT
                         break;
 
                     case チップ種別.China:
-                        if( App.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Chinaは左 )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Chinaは左 )
                             this._単画チップを１つ描画する( 表示レーン種別.LeftCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.LeftChina ], たて中央位置dpx, 大きさ0to1 );
                         else
                             this._単画チップを１つ描画する( 表示レーン種別.RightCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.RightChina ], たて中央位置dpx, 大きさ0to1 );
                         break;
 
                     case チップ種別.Ride:
-                        if( App.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Rideは左 )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Rideは左 )
                             this._単画チップを１つ描画する( 表示レーン種別.LeftCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.LeftRide ], たて中央位置dpx, 大きさ0to1 );
                         else
                             this._単画チップを１つ描画する( 表示レーン種別.RightCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.RightRide ], たて中央位置dpx, 大きさ0to1 );
                         break;
 
                     case チップ種別.Ride_Cup:
-                        if( App.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Rideは左 )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Rideは左 )
                             this._単画チップを１つ描画する( 表示レーン種別.LeftCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.LeftRide_Cup ], たて中央位置dpx, 大きさ0to1 );
                         else
                             this._単画チップを１つ描画する( 表示レーン種別.RightCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.RightRide_Cup ], たて中央位置dpx, 大きさ0to1 );
                         break;
 
                     case チップ種別.Splash:
-                        if( App.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Splashは左 )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.表示レーンの左右.Splashは左 )
                             this._単画チップを１つ描画する( 表示レーン種別.LeftCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.LeftSplash ], たて中央位置dpx, 大きさ0to1 );
                         else
                             this._単画チップを１つ描画する( 表示レーン種別.RightCymbal, this._ドラムチップの矩形リスト[ 表示チップ種別.RightSplash ], たて中央位置dpx, 大きさ0to1 );
@@ -229,16 +234,6 @@ namespace DTXMania.ステージ.演奏.EXPERT
 
             return false;
         }
-
-
-        private テクスチャ _ドラムチップ画像 = null;
-
-        private Dictionary<表示チップ種別, RectangleF> _ドラムチップの矩形リスト = null;
-
-        private LoopCounter _ドラムチップアニメ = null;
-
-        private const float _チップの最終調整倍率 = 1.2f;
-
 
         private void _単画チップを１つ描画する( 表示レーン種別 lane, RectangleF 転送元矩形, float 上位置, float 大きさ0to1 )
         {
@@ -284,6 +279,18 @@ namespace DTXMania.ステージ.演奏.EXPERT
                 Y方向拡大率: Y倍率 );
         }
 
+
+
+        // private
+
+
+        private テクスチャ _ドラムチップ画像 = null;
+
+        private Dictionary<表示チップ種別, RectangleF> _ドラムチップの矩形リスト = null;
+
+        private LoopCounter _ドラムチップアニメ = null;
+
+        private const float _チップの最終調整倍率 = 1.2f;
 
         private class YAMLマップ_ドラムチップ
         {

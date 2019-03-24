@@ -53,6 +53,7 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -87,8 +88,8 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
-    <Reference Include="YamlDotNet, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.5.4.0\lib\net45\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.6.0.0\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -240,11 +241,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DTXMania\DTXMania.csproj">
-      <Project>{736be388-5ec5-4bf9-838b-8580c9a8da9c}</Project>
+      <Project>{9ab944ae-d0c4-4022-b407-a497160e2bd6}</Project>
       <Name>DTXMania</Name>
     </ProjectReference>
     <ProjectReference Include="..\FDK\FDK.csproj">
-      <Project>{0e35c4ac-6e28-4a09-a6ce-05d177800051}</Project>
+      <Project>{8df302d9-4ba8-4f0f-b673-ccf87ecee30e}</Project>
       <Name>FDK</Name>
     </ProjectReference>
     <ProjectReference Include="..\SSTFormat\SSTFormat.csproj">

@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
 using SSTFormat.v4;
-using DTXMania.設定;
-using DTXMania.データベース.ユーザ;
-using DTXMania.入力;
+using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
     /// <summary>
     ///     ビュアーモードでは、SSTFファイルのみ再生可能。
@@ -33,91 +31,153 @@ namespace DTXMania.ステージ.演奏
         public 成績 成績 { get; protected set; } = null;
 
 
+
+        // 生成と終了
+
+
         public 演奏ステージ_ビュアーモード()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" ) );
-                this.子Activityを追加する( this._レーンフレームBASIC = new BASIC.レーンフレーム() );
-                this.子Activityを追加する( this._レーンフレームEXPERT = new EXPERT.レーンフレーム() );
-                this.子Activityを追加する( this._曲名パネル = new 曲名パネル() );
-                this.子Activityを追加する( this._ドラムパッドBASIC = new BASIC.ドラムパッド() );
-                this.子Activityを追加する( this._ヒットバーBASIC = new BASIC.ヒットバー() );
-                this.子Activityを追加する( this._ドラムキットとヒットバーEXPERT = new EXPERT.ドラムキットとヒットバー() );
-                this.子Activityを追加する( this._レーンフラッシュBASIC = new BASIC.レーンフラッシュ() );
-                this.子Activityを追加する( this._レーンフラッシュEXPERT = new EXPERT.レーンフラッシュ() );
-                this.子Activityを追加する( this._ドラムチップBASIC = new BASIC.ドラムチップ() );
-                this.子Activityを追加する( this._ドラムチップEXPERT = new EXPERT.ドラムチップ() );
-                this.子Activityを追加する( this._判定文字列 = new 判定文字列() );
-                this.子Activityを追加する( this._チップ光 = new チップ光() );
-                this.子Activityを追加する( this._左サイドクリアパネル = new 左サイドクリアパネル() );
-                this.子Activityを追加する( this._右サイドクリアパネル = new 右サイドクリアパネル() );
-                this.子Activityを追加する( this._判定パラメータ表示 = new 判定パラメータ表示() );
-                this.子Activityを追加する( this._フェーズパネル = new フェーズパネル() );
-                this.子Activityを追加する( this._コンボ表示 = new コンボ表示() );
-                this.子Activityを追加する( this._カウントマップライン = new カウントマップライン() );
-                this.子Activityを追加する( this._スコア表示 = new スコア表示() );
-                this.子Activityを追加する( this._プレイヤー名表示 = new プレイヤー名表示() );
-                this.子Activityを追加する( this._譜面スクロール速度 = new 譜面スクロール速度() );
-                this.子Activityを追加する( this._達成率表示 = new 達成率表示() );
-                this.子Activityを追加する( this._曲別SKILL = new 曲別SKILL() );
-                this.子Activityを追加する( this._エキサイトゲージ = new エキサイトゲージ() );
-                this.子Activityを追加する( this._FPS = new FPS() );
-                this.子Activityを追加する( this._数字フォント中グレー48x64 = new 画像フォント(
-                   @"$(System)images\数字フォント中ホワイト48x64.png",
-                   @"$(System)images\数字フォント中48x64矩形リスト.yaml",
-                   文字幅補正dpx: -16f,
-                   不透明度: 0.3f ) );
             }
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._小節線色 = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, Color.White );
-                this._小節線影色 = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, Color.Blue );
-                this._拍線色 = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, Color.LightGray );
-                this._プレイヤー名表示.名前 = App.ユーザ管理.ログオン中のユーザ.ユーザ名;
-                BASIC.レーンフレーム.レーン配置を設定する( App.ユーザ管理.ログオン中のユーザ.レーン配置 );
+                if( this.活性化中 )
+                    this.非活性化する();
+            }
+        }
+
+
+
+        // 活性化と非活性化
+
+
+        public override void 活性化する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    return;
+
+                this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
+                this._レーンフレームBASIC = new BASIC.レーンフレーム();
+                this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
+                this._曲名パネル = new 曲名パネル();
+                this._ドラムパッドBASIC = new BASIC.ドラムパッド();
+                this._ヒットバーBASIC = new BASIC.ヒットバー();
+                this._ドラムキットとヒットバーEXPERT = new EXPERT.ドラムキットとヒットバー();
+                this._レーンフラッシュBASIC = new BASIC.レーンフラッシュ();
+                this._レーンフラッシュEXPERT = new EXPERT.レーンフラッシュ();
+                this._ドラムチップBASIC = new BASIC.ドラムチップ();
+                this._ドラムチップEXPERT = new EXPERT.ドラムチップ();
+                this._判定文字列 = new 判定文字列();
+                this._チップ光 = new チップ光();
+                this._左サイドクリアパネル = new 左サイドクリアパネル();
+                this._右サイドクリアパネル = new 右サイドクリアパネル();
+                this._判定パラメータ表示 = new 判定パラメータ表示();
+                this._フェーズパネル = new フェーズパネル();
+                this._コンボ表示 = new コンボ表示();
+                this._カウントマップライン = new カウントマップライン();
+                this._スコア表示 = new スコア表示();
+                this._プレイヤー名表示 = new プレイヤー名表示();
+                this._譜面スクロール速度 = new 譜面スクロール速度( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
+                this._達成率表示 = new 達成率表示();
+                this._曲別SKILL = new 曲別SKILL();
+                this._エキサイトゲージ = new エキサイトゲージ();
+                this._システム情報 = new システム情報();
+                this._数字フォント中グレー48x64 = new 画像フォント(
+                   @"$(System)images\数字フォント中ホワイト48x64.png",
+                   @"$(System)images\数字フォント中48x64矩形リスト.yaml",
+                   文字幅補正dpx: -16f,
+                   不透明度: 0.3f );
+
+
+                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+
+                this._小節線色 = new SolidColorBrush( dc, Color.White );
+                this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
+                this._拍線色 = new SolidColorBrush( dc, Color.Gray );
+                this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
+                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
                 //this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
                 //this._演奏状態を初期化する();
 
+                // マウスクリックイベント登録
+                App進行描画.Instance.AppForm.MouseDown += this.App_MouseDown;
+
                 this._ビュアーモード時にドラムサウンドを発声する = true;
+
                 this.現在のフェーズ = フェーズ.クリア;
+
+                base.活性化する();
             }
         }
 
-        protected override void On非活性化()
+        public override void 非活性化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
+                // マウスクリックイベント登録解除
+                App進行描画.Instance.AppForm.MouseDown -= this.App_MouseDown;
+
                 this._演奏状態を終了する();
 
                 #region " 現在の譜面スクロール速度をDBに保存。"
                 //----------------
                 using( var userdb = new UserDB() )
                 {
-                    var user = userdb.Users.Where( ( r ) => ( r.Id == App.ユーザ管理.ログオン中のユーザ.ユーザID ) ).SingleOrDefault();
+                    var user = userdb.Users.Where( ( r ) => ( r.Id == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID ) ).SingleOrDefault();
                     if( null != user )
                     {
-                        user.ScrollSpeed = App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度;
+                        user.ScrollSpeed = App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度;
                         userdb.DataContext.SubmitChanges();
-                        Log.Info( $"現在の譜面スクロール速度({App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度})をDBに保存しました。[{user}]" );
+                        Log.Info( $"現在の譜面スクロール速度({App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度})をDBに保存しました。[{user}]" );
                     }
                 }
                 //----------------
                 #endregion
 
                 this._拍線色?.Dispose();
-                this._拍線色 = null;
-
                 this._小節線影色?.Dispose();
-                this._小節線影色 = null;
-
                 this._小節線色?.Dispose();
-                this._小節線色 = null;
+
+                this._背景画像?.Dispose();
+                //this._レーンフレームBASIC?.Dispose();
+                this._レーンフレームEXPERT?.Dispose();
+                this._曲名パネル?.Dispose();
+                this._ドラムパッドBASIC?.Dispose();
+                this._ヒットバーBASIC?.Dispose();
+                this._ドラムキットとヒットバーEXPERT?.Dispose();
+                this._レーンフラッシュBASIC?.Dispose();
+                this._レーンフラッシュEXPERT?.Dispose();
+                this._ドラムチップBASIC?.Dispose();
+                this._ドラムチップEXPERT?.Dispose();
+                this._判定文字列?.Dispose();
+                this._チップ光?.Dispose();
+                this._左サイドクリアパネル?.Dispose();
+                this._右サイドクリアパネル?.Dispose();
+                this._判定パラメータ表示?.Dispose();
+                this._フェーズパネル?.Dispose();
+                this._コンボ表示?.Dispose();
+                this._カウントマップライン?.Dispose();
+                this._スコア表示?.Dispose();
+                this._プレイヤー名表示?.Dispose();
+                this._譜面スクロール速度?.Dispose();
+                this._達成率表示?.Dispose();
+                this._曲別SKILL?.Dispose();
+                this._エキサイトゲージ?.Dispose();
+                this._システム情報?.Dispose();
+                this._数字フォント中グレー48x64?.Dispose();
+
+                base.非活性化する();
             }
         }
 
@@ -126,299 +186,240 @@ namespace DTXMania.ステージ.演奏
         /// </summary>
         private void _演奏状態を初期化する()
         {
-            // スコアに依存するデータを初期化する。
+            if( null == App進行描画.演奏スコア )
+                return;
+
+            //スコアに依存するデータを初期化する。
 
             this.成績 = new 成績();
-            this.成績.スコアと設定を反映する( App.演奏スコア, App.ユーザ管理.ログオン中のユーザ );
+            this.成績.スコアと設定を反映する( App進行描画.演奏スコア, App進行描画.ユーザ管理.ログオン中のユーザ );
 
-            this._カウントマップライン.非活性化する();
-            this._カウントマップライン.活性化する();
+            this._カウントマップライン?.Dispose();
+            this._カウントマップライン = new カウントマップライン();
 
             this._描画開始チップ番号 = -1;
 
             this._チップの演奏状態 = new Dictionary<チップ, チップの演奏状態>();
-            foreach( var chip in App.演奏スコア.チップリスト )
+            foreach( var chip in App進行描画.演奏スコア.チップリスト )
                 this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
 
 
             // WAVを生成する。
 
-            App.WAVキャッシュレンタル.世代を進める();
+            App進行描画.WAVキャッシュレンタル.世代を進める();
 
-            App.WAV管理?.Dispose();
-            App.WAV管理 = new 曲.WAV管理();
+            App進行描画.WAV管理?.Dispose();
+            App進行描画.WAV管理 = new WAV管理();
 
-            foreach( var kvp in App.演奏スコア.WAVリスト )
+            foreach( var kvp in App進行描画.演奏スコア.WAVリスト )
             {
                 var wavInfo = kvp.Value;
 
-                var path = Path.Combine( App.演奏スコア.PATH_WAV, wavInfo.ファイルパス );
-                App.WAV管理.登録する( App.サウンドデバイス, kvp.Key, path, wavInfo.多重再生する, wavInfo.BGMである );
+                var path = Path.Combine( App進行描画.演奏スコア.PATH_WAV, wavInfo.ファイルパス );
+                App進行描画.WAV管理.登録する( kvp.Key, path, wavInfo.多重再生する, wavInfo.BGMである );
             }
 
 
             // AVIを生成する。
 
-            App.AVI管理?.Dispose();
-            App.AVI管理 = null;
+            App進行描画.AVI管理?.Dispose();
+            App進行描画.AVI管理 = null;
 
-            if( App.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
+            if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
             {
-                App.AVI管理 = new 曲.AVI管理();
+                App進行描画.AVI管理 = new AVI管理();
 
-                foreach( var kvp in App.演奏スコア.AVIリスト )
+                foreach( var kvp in App進行描画.演奏スコア.AVIリスト )
                 {
-                    var path = Path.Combine( App.演奏スコア.PATH_WAV, kvp.Value );
-                    App.AVI管理.登録する( kvp.Key, path, App.ユーザ管理.ログオン中のユーザ.再生速度 );
+                    var path = Path.Combine( App進行描画.演奏スコア.PATH_WAV, kvp.Value );
+                    App進行描画.AVI管理.登録する( kvp.Key, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 );
                 }
             }
 
-            this._初めての進行描画 = true;
+            // その他。
+
+            this._一時停止中 = false;
         }
 
         private void _演奏状態を終了する()
         {
             this._描画開始チップ番号 = -1;
 
-            //App.WAV管理?.Dispose();	
-            //App.WAV管理 = null;
-            App.AVI管理?.Dispose();
-            App.AVI管理 = null;
+            //App進行描画.WAV管理?.Dispose();	
+            //App進行描画.WAV管理 = null;
+            App進行描画.AVI管理?.Dispose();
+            App進行描画.AVI管理 = null;
+
+            this.現在のフェーズ = フェーズ.クリア;
         }
 
-        public override void 高速進行する()
+
+
+        // BGM停止
+        
+
+        /// <remarks>
+        ///		演奏クリア時には、次の結果ステージに入ってもBGMが鳴り続ける。
+        ///		そのため、後からBGMだけを別個に停止するためのメソッドが必要になる。
+        /// </remarks>
+        public void BGMを停止する()
         {
-            if( this._初めての進行描画 )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._初めての進行描画 = false;
+                App進行描画.WAV管理.すべての発声を停止する();
             }
+        }
 
-            // 高速進行
 
-            this._FPS.FPSをカウントしプロパティを更新する();
 
-            switch( this.現在のフェーズ )
+        // 進行と描画
+
+
+        public override void 進行する()
+        {
+            try
             {
-                case フェーズ.クリア:
-                    break;
-
-                case フェーズ.表示:
-
-                    // ※注:クリアや失敗の判定は、ここではなく、進行描画側で行っている。
-
-                    double 現在の演奏時刻sec = this._演奏開始からの経過時間secを返す();
+                this._システム情報.FPSをカウントしプロパティを更新する();
 
 
-                    // AutoPlay 判定
-
-                    #region " 自動ヒット処理。"
-                    //----------------
-                    this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) => {
-
-                        var ユーザ設定 = App.ユーザ管理.ログオン中のユーザ;
-                        var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ chip.チップ種別 ];
-                        var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
-
-                        bool チップはヒット済みである = this._チップの演奏状態[ chip ].ヒット済みである;
-                        bool チップはまだヒットされていない = !( チップはヒット済みである );
-                        bool チップはMISSエリアに達している = ( ヒット判定バーと描画との時間sec > ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] );
-                        bool チップは描画についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと描画との時間sec );
-                        bool チップは発声についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと発声との時間sec );
-
-                        if( チップはまだヒットされていない && チップはMISSエリアに達している )
-                        {
-                            #region " MISS判定。"
-                            //----------------
-                            if( AutoPlay && ドラムチッププロパティ.AutoPlayON_Miss判定 )
-                            {
-                                this._チップのヒット処理を行う(
-                                    chip,
-                                    判定種別.MISS,
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
-                                    ヒット判定バーと発声との時間sec );
-                                return;
-                            }
-                            else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_Miss判定 )
-                            {
-                                this._チップのヒット処理を行う(
-                                    chip,
-                                    判定種別.MISS,
-                                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生,
-                                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
-                                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
-                                    ヒット判定バーと発声との時間sec );
-
-                                this.成績.エキサイトゲージを加算する( 判定種別.MISS ); // 手動演奏なら MISS はエキサイトゲージに反映。
-                                return;
-                            }
-                            else
-                            {
-                                // 通過。
-                            }
-                            //----------------
-                            #endregion
-                        }
-
-                        // ヒット処理(1) 発声時刻
-                        if( チップは発声についてヒット判定バーを通過した )    // ヒット済みかどうかには関係ない
-                        {
-                            #region " 自動ヒット判定。"
-                            //----------------
-                            if( ( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット_再生 ) ||
-                                ( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生 ) )
-                            {
-                                // チップの発声がまだなら発声を行う。
-
-                                if( !( this._チップの演奏状態[ chip ].発声済みである ) )
-                                {
-                                    this.チップの発声を行う( chip, ( ユーザ設定.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する ) );
-                                    this._チップの演奏状態[ chip ].発声済みである = true;
-                                }
-
-                            }
-                            //----------------
-                            #endregion
-                        }
-
-                        // ヒット処理(2) 描画時刻
-                        if( チップはまだヒットされていない && チップは描画についてヒット判定バーを通過した )
-                        {
-                            #region " 自動ヒット判定。"
-                            //----------------
-                            if( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット )
-                            {
-                                this._チップのヒット処理を行う(
-                                    chip,
-                                    判定種別.PERFECT,   // AutoPlay 時は Perfect 扱い。
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
-                                    ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
-                                    ヒット判定バーと発声との時間sec );
-
-                                //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
-
-                                this._ドラムキットとヒットバーEXPERT.ヒットアニメ開始( ドラムチッププロパティ.表示レーン種別 );
-
-                                return;
-                            }
-                            else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット )
-                            {
-                                this._チップのヒット処理を行う(
-                                    chip,
-                                    判定種別.PERFECT,   // AutoPlay OFF でも自動ヒットする場合は Perfect 扱い。
-                                    ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生,
-                                    ドラムチッププロパティ.AutoPlayOFF_自動ヒット_判定,
-                                    ドラムチッププロパティ.AutoPlayOFF_自動ヒット_非表示,
-                                    ヒット判定バーと発声との時間sec );
-
-                                //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
-
-                                this._ドラムキットとヒットバーEXPERT.ヒットアニメ開始( ドラムチッププロパティ.表示レーン種別 );
-
-                                return;
-                            }
-                            else
-                            {
-                                // 通過。
-                            }
-                            //----------------
-                            #endregion
-                        }
-
-                    } );
-                    //----------------
-                    #endregion
-
-
-                    // 入力(1) 手動演奏
-
-                    App.入力管理.すべての入力デバイスをポーリングする( 入力履歴を記録する: false );
-
-                    #region " ユーザヒット処理。"
-                    //----------------
-                    /*
+                while( this._メッセージキュー.TryDequeue( out var msg ) )
+                {
+                    switch( msg )
                     {
-                        var ヒット処理済み入力 = new List<ドラム入力イベント>(); // ヒット処理が終わった入力は、二重処理しないよう、この中に追加しておく。
+                        case App進行描画.ViewerPlayメッセージ msg2:
+                            this._演奏を開始する( msg2 );
+                            break;
 
-                        var ユーザ設定 = App.ユーザ管理.ログオン中のユーザ;
+                        case App進行描画.ViewerStopメッセージ msg2:
+                            this._演奏を停止する( msg2 );
+                            break;
+                    }
+                }
 
-                        #region " 描画範囲内のすべてのチップについて、対応する入力があればヒット処理を行う。"
+                switch( this.現在のフェーズ )
+                {
+                    case フェーズ.表示:
+
+                        // ※注:クリアや失敗の判定は、ここではなく描画側で行っている。
+
+                        double 現在の演奏時刻sec = this._演奏開始からの経過時間secを返す();
+                        long 現在の演奏時刻qpc = QPCTimer.生カウント;
+
+
+                        // AutoPlay 判定
+
+                        #region " 自動ヒット処理。"
                         //----------------
-                        this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離 ) => {
+                        this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) => {
 
-                            // チップにヒットしている入力を探す。
-
+                            var ユーザ設定 = App進行描画.ユーザ管理.ログオン中のユーザ;
                             var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ chip.チップ種別 ];
-                            var AutoPlayである = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
+                            var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
                             bool チップはヒット済みである = this._チップの演奏状態[ chip ].ヒット済みである;
+                            bool チップはまだヒットされていない = !( チップはヒット済みである );
                             bool チップはMISSエリアに達している = ( ヒット判定バーと描画との時間sec > ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] );
                             bool チップは描画についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと描画との時間sec );
                             bool チップは発声についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと発声との時間sec );
 
-                            if( チップはヒット済みである || // ヒット済みなら何もしない。
-                                AutoPlayである ||          // AutoPlay チップなので何もしない。
-                                !( ドラムチッププロパティ.AutoPlayOFF_ユーザヒット ) ||   // このチップは AutoPlay OFF の時でもユーザヒットの対象ではないので何もしない。
-                                !( ヒット判定バーと描画との時間sec >= -( ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] ) && !( チップはMISSエリアに達している ) ) )    // チップはヒット可能エリアの外にあるので何もしない。
-                                return;
-
-                            var チップにヒットしている入力 = App.入力管理.ポーリング結果.FirstOrDefault( ( 入力 ) => {
-
-                                if( 入力.InputEvent.離された ||                   // 押下入力じゃないなら無視。
-                                    ヒット処理済み入力.Contains( 入力 ) ||         // すでに今回のターンで処理済み（＝処理済み入力リストに追加済み）なら無視。
-                                    入力.Type == ドラム入力種別.HiHat_Control )    // HiHat_Control 入力はここでは無視。
-                                    return false;
-
-                                var チップの入力グループ = ドラムチッププロパティ.入力グループ種別;
-
-                                // (A) 入力グループ種別 が Unknown の場合 → ドラム入力種別で比較
-                                if( チップの入力グループ == 入力グループ種別.Unknown )
+                            if( チップはまだヒットされていない && チップはMISSエリアに達している )
+                            {
+                                #region " MISS判定。"
+                                //----------------
+                                if( AutoPlay && ドラムチッププロパティ.AutoPlayON_Miss判定 )
                                 {
-                                    return ( ドラムチッププロパティ.ドラム入力種別 == 入力.Type );
+                                    this._チップのヒット処理を行う(
+                                        chip,
+                                        判定種別.MISS,
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
+                                        ヒット判定バーと発声との時間sec );
+                                    return;
                                 }
-                                // (B) 入力グループ種別が Unknown ではない場合　→　入力グループ種別で比較
+                                else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_Miss判定 )
+                                {
+                                    this._チップのヒット処理を行う(
+                                        chip,
+                                        判定種別.MISS,
+                                        ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生,
+                                        ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
+                                        ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
+                                        ヒット判定バーと発声との時間sec );
+
+                                    this.成績.エキサイトゲージを加算する( 判定種別.MISS ); // 手動演奏なら MISS はエキサイトゲージに反映。
+                                    return;
+                                }
                                 else
                                 {
-                                    var 入力の入力グループ = ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ.First( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) ).Value.入力グループ種別;
-
-                                    return ( チップの入力グループ == 入力の入力グループ );
+                                    // 通過。
                                 }
-
-                            } );
-
-                            // チップにヒットした入力があった。
-
-                            if( null != チップにヒットしている入力 )
-                            {
-                                #region " チップの手動ヒット処理。"
                                 //----------------
+                                #endregion
+                            }
 
-                                ヒット処理済み入力.Add( チップにヒットしている入力 );    // この入力はこのチップでヒット処理した。
+                            // ヒット処理(1) 発声時刻
+                            if( チップは発声についてヒット判定バーを通過した )    // ヒット済みかどうかには関係ない
+                            {
+                                #region " 自動ヒット判定。"
+                                //----------------
+                                if( ( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット_再生 ) ||
+                                    ( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生 ) )
+                                {
+                                    // チップの発声がまだなら発声を行う。
 
-                                // 入力とチップとの時間差を算出。
-                                double ヒット判定バーと入力との時間sec = QPCTimer.生カウント相対値を秒へ変換して返す( 現在の演奏時刻qpc - チップにヒットしている入力.InputEvent.TimeStamp );   // 常に正
-                                double 入力とチップの間隔sec = Math.Abs( ヒット判定バーと入力との時間sec - ヒット判定バーと描画との時間sec );
+                                    if( !( this._チップの演奏状態[ chip ].発声済みである ) )
+                                    {
+                                        this.チップの発声を行う( chip, ( ユーザ設定.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する ) );
+                                        this._チップの演奏状態[ chip ].発声済みである = true;
+                                    }
 
-                                // 時間差から判定を算出。
-                                var 判定 =
-                                    ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
-                                    ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
-                                    ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD : 判定種別.OK;
+                                }
+                                //----------------
+                                #endregion
+                            }
 
-                                // ヒット処理。
-                                this._チップのヒット処理を行う(
-                                    chip,
-                                    判定,
-                                    ( ユーザ設定.ドラムの音を発声する ) ? ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生 : false,
-                                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
-                                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
-                                    ヒット判定バーと発声との時間sec );
+                            // ヒット処理(2) 描画時刻
+                            if( チップはまだヒットされていない && チップは描画についてヒット判定バーを通過した )
+                            {
+                                #region " 自動ヒット判定。"
+                                //----------------
+                                if( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット )
+                                {
+                                    this._チップのヒット処理を行う(
+                                        chip,
+                                        判定種別.PERFECT,   // AutoPlay 時は Perfect 扱い。
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
+                                        ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
+                                        ヒット判定バーと発声との時間sec );
 
-                                // エキサイトゲージに反映する。
-                                this.成績.エキサイトゲージを加算する( 判定 );
+                                    //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
 
+                                    this._ドラムキットとヒットバーEXPERT.ヒットアニメ開始( ドラムチッププロパティ.表示レーン種別 );
+
+                                    return;
+                                }
+                                else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット )
+                                {
+                                    this._チップのヒット処理を行う(
+                                        chip,
+                                        判定種別.PERFECT,   // AutoPlay OFF でも自動ヒットする場合は Perfect 扱い。
+                                        ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生,
+                                        ドラムチッププロパティ.AutoPlayOFF_自動ヒット_判定,
+                                        ドラムチッププロパティ.AutoPlayOFF_自動ヒット_非表示,
+                                        ヒット判定バーと発声との時間sec );
+
+                                    //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
+
+                                    this._ドラムキットとヒットバーEXPERT.ヒットアニメ開始( ドラムチッププロパティ.表示レーン種別 );
+
+                                    return;
+                                }
+                                else
+                                {
+                                    // 通過。
+                                }
                                 //----------------
                                 #endregion
                             }
@@ -427,122 +428,82 @@ namespace DTXMania.ステージ.演奏
                         //----------------
                         #endregion
 
-                        #region " ヒットしてようがしてまいが起こすアクションを実行。"
+
+                        // 入力(1) 手動演奏
+
+                        App進行描画.入力管理.すべての入力デバイスをポーリングする( 入力履歴を記録する: false );
+
+                        #region " ユーザヒット処理 --> ビュアーモードでは無効 "
                         //----------------
+                        //----------------
+                        #endregion
+
+
+                        // 入力(2) 演奏以外の操作（※演奏中なのでドラム入力は無視。）
+
+                        if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Escape ) )
                         {
-                            var アクション済み入力 = new List<ドラム入力イベント>();  // ヒット処理が終わった入力は、二重処理しないよう、この中に追加しておく。
+                            // ビュアーモードでは無効。
+                        }
 
-                            foreach( var 入力 in App.入力管理.ポーリング結果 )
+                        if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Up ) )
+                        {
+                            if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                // 押下入力じゃないなら無視。
-                                if( 入力.InputEvent.離された )
-                                    continue;
-
-                                var プロパティs = ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ.Where( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) );
-
-                                if( プロパティs.Count() > 0 )
-                                {
-                                    //for( int i = 0; i < プロパティs.Count(); i++ )
-                                    int i = 0;  // １つの入力で処理するのは、１つの表示レーン種別のみ。
-                                    {
-                                        this._ドラムパッド.ヒットする( プロパティs.ElementAt( i ).Value.表示レーン種別 );
-                                        this._レーンフラッシュ.開始する( プロパティs.ElementAt( i ).Value.表示レーン種別 );
-                                    }
-                                }
+                                // Shift+上 → BGMAdjust 増加 （ビュアーモードでは無効）
+                            }
+                            else
+                            {
+                                #region " 上 → 譜面スクロールを加速 "
+                                //----------------
+                                const double 最大倍率 = 8.0;
+                                App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
+                                //----------------
+                                #endregion
                             }
                         }
-                        //----------------
-                        #endregion
 
-                        #region " どのチップにもヒットしなかった入力は空打ちとみなし、空打ち音を再生する。"
-                        //----------------
-                        if( ユーザ設定.ドラムの音を発声する )
+                        if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Down ) )
                         {
-                            foreach( var 入力 in App.入力管理.ポーリング結果 )
+                            if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                if( ヒット処理済み入力.Contains( 入力 ) ||   // ヒット済みなら無視。
-                                    入力.InputEvent.離された )              // 押下じゃないなら無視。
-                                    continue;
-
-                                var プロパティs = ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ.Where( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) );
-
-                                for( int i = 0; i < プロパティs.Count(); i++ )
-                                {
-                                    var prop = プロパティs.ElementAt( i ).Value;
-
-                                    int zz = App.演奏スコア.空打ちチップ[ prop.レーン種別 ];
-
-                                    // (A) 空打ちチップの指定があるなら、それを発声する。
-                                    if( 0 != zz )
-                                        App.WAV管理.発声する( zz, prop.チップ種別, prop.発声前消音, prop.消音グループ種別 );
-
-                                    // (B) 空打ちチップの指定がないなら、一番近いチップを検索し、それを発声する。
-                                    else
-                                    {
-                                        var chip = this._指定された時刻に一番近いチップを返す( 現在の演奏時刻sec, 入力.Type );
-
-                                        if( null != chip )
-                                            this._チップの発声を行う( chip, 現在の演奏時刻sec );
-                                    }
-                                }
+                                // Shift+下 → BGMAdjust 減少（ビュアーモードでは無効）
+                            }
+                            else
+                            {
+                                #region " 下 → 譜面スクロールを減速 "
+                                //----------------
+                                const double 最小倍率 = 0.5;
+                                App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
+                                //----------------
+                                #endregion
                             }
                         }
-                        //----------------
-                        #endregion
 
-                        ヒット処理済み入力 = null;
-                    }
-                    */
-                    //----------------
-                    #endregion
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
+                        {
+                            // ハイハットの開閉 （ビュアーモードでは無効）
+                        
+                        }
 
+                        break;
 
-                    // 入力(2) 演奏以外の操作（※演奏中なのでドラム入力は無視。）
-
-                    if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Escape ) )
-                    {
-                        /*
-                        #region " ESC → 演奏中断 "
-                        //----------------
-                        Log.Info( "ESC キーが押されました。演奏を中断します。" );
-
-                        this.BGMを停止する();
-                        App.WAV管理.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
-
-                        // 進行描画スレッドへの通知フェーズを挟む。
-                        this.現在のフェーズ = フェーズ.キャンセル通知;
-                        //----------------
-                        #endregion
-                        */
-                    }
-                    if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Up ) )
-                    {
-                        #region " 上 → 譜面スクロールを加速 "
-                        //----------------
-                        const double 最大倍率 = 8.0;
-                        App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Min( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 + 0.5, 最大倍率 );
-                        //----------------
-                        #endregion
-                    }
-                    if( App.入力管理.HIDKeyboard.キーが押された( 0, Keys.Down ) )
-                    {
-                        #region " 下 → 譜面スクロールを減速 "
-                        //----------------
-                        const double 最小倍率 = 0.5;
-                        App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 = Math.Max( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 - 0.5, 最小倍率 );
-                        //----------------
-                        #endregion
-                    }
-                    break;
+                    case フェーズ.クリア:
+                        break;
+                }
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"!!! 進行スレッドで例外が発生しました !!! [{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
             }
         }
 
-        public override void 進行描画する( DeviceContext1 dc )
+        public override void 描画する()
         {
-            // (1) 進行描画
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
-            if( this._初めての進行描画 )
-                return; // まだ最初の高速進行が行われていない。
+            var playMode = App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード;
 
             switch( this.現在のフェーズ )
             {
@@ -554,13 +515,13 @@ namespace DTXMania.ステージ.演奏
                     {
                         double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + グラフィックデバイス.Instance.次のDComp表示までの残り時間sec;
 
-                        this._譜面スクロール速度.進行する( App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
+                        this._譜面スクロール速度.進行する( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
                         {
                             #region " AVI（動画）の進行描画を行う。"
                             //----------------
-                            foreach( var kvp in App.AVI管理.動画リスト )
+                            foreach( var kvp in App進行描画.AVI管理.動画リスト )
                             {
                                 int zz = kvp.Key;
                                 var video = kvp.Value;
@@ -596,44 +557,45 @@ namespace DTXMania.ステージ.演奏
                             //----------------
                             #endregion
                         }
+
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, グラフィックデバイス.Instance.Animation, new Vector2( +280f, +120f ), this.成績 );
+                            this._スコア表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
                             this._曲別SKILL.進行描画する( dcp, this.成績.Skill );
                         } );
-                        this._左サイドクリアパネル.描画する( dc );
+                        this._左サイドクリアパネル.描画する();
 
                         this._右サイドクリアパネル.クリアする();
                         this._右サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
-                            this._コンボ表示.進行描画する( dcp, グラフィックデバイス.Instance.Animation, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
+                            this._コンボ表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
                         } );
-                        this._右サイドクリアパネル.描画する( dc );
+                        this._右サイドクリアパネル.描画する();
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
-                            this._レーンフレームBASIC.描画する( dc, App.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
-                            this._レーンフレームEXPERT.描画する( dc, App.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
+                        if( playMode == PlayMode.BASIC )
+                            this._レーンフレームBASIC.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
+                        if( playMode == PlayMode.EXPERT )
+                            this._レーンフレームEXPERT.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
+                        if( playMode == PlayMode.BASIC )
                             this._レーンフラッシュBASIC.進行描画する();
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
+                        if( playMode == PlayMode.EXPERT )
                             this._レーンフラッシュEXPERT.進行描画する();
 
                         this._小節線拍線を描画する( dc, 演奏時刻sec );
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
+                        if( playMode == PlayMode.BASIC )
                             this._ドラムパッドBASIC.進行描画する();
 
                         this._背景画像.描画する( dc, 0f, 0f );
 
-                        this._譜面スクロール速度.描画する( dc, App.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
+                        this._譜面スクロール速度.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
 
                         this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
 
-                        double 曲の長さsec = App.演奏スコア.チップリスト[ App.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
+                        double 曲の長さsec = App進行描画.演奏スコア.チップリスト[ App進行描画.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
                         float 現在位置 = (float) ( 1.0 - ( 曲の長さsec - 演奏時刻sec ) / 曲の長さsec );
 
                         this._カウントマップライン.カウント値を設定する( 現在位置, this.成績.判定toヒット数 );
@@ -644,10 +606,10 @@ namespace DTXMania.ステージ.演奏
 
                         this._曲名パネル.描画する( dc );
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
+                        if( playMode == PlayMode.BASIC )
                             this._ヒットバーBASIC.描画する();
 
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
+                        if( playMode == PlayMode.EXPERT )
                         {
                             this._ドラムキットとヒットバーEXPERT.ヒットバーを進行描画する();
                             this._ドラムキットとヒットバーEXPERT.ドラムキットを進行描画する();
@@ -655,23 +617,23 @@ namespace DTXMania.ステージ.演奏
 
                         this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
 
-                            if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
+                            if( playMode == PlayMode.BASIC )
                             {
                                 // クリア判定はこの中。
                                 if( this._ドラムチップBASIC.進行描画する(
-                                        演奏時刻sec, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ],
-                                        chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) )
+                                    演奏時刻sec, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ],
+                                    chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) )
                                 {
                                     this.現在のフェーズ = フェーズ.クリア;
                                 }
                             }
-                            if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
+                            if( playMode == PlayMode.EXPERT )
                             {
                                 // クリア判定はこの中。
                                 if( this._ドラムチップEXPERT.進行描画する(
-                                        this._レーンフレームEXPERT,
-                                        演奏時刻sec, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ],
-                                        chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) )
+                                    this._レーンフレームEXPERT,
+                                    演奏時刻sec, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ],
+                                    chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) )
                                 {
                                     this.現在のフェーズ = フェーズ.クリア;
                                 }
@@ -683,73 +645,66 @@ namespace DTXMania.ステージ.演奏
 
                         this._判定文字列.進行描画する();
 
-                        this._FPS.VPSをカウントする();
-                        this._FPS.描画する( dc, 0f, 0f );
+                        this._システム情報.VPSをカウントする();
+                        this._システム情報.描画する( dc, $"BGMAdjust: {App進行描画.演奏曲ノード.BGMAdjust}" );
                     }
                     break;
             }
-
-
-            // (2) サービスメッセージ
-
-            {
-                var msg = App.サービスメッセージキュー.取得する();
-
-                if( null != msg )
-                {
-                    switch( msg.種別 )
-                    {
-                        case API.ServiceMessage.指示種別.指示なし:
-                            break;
-
-                        case API.ServiceMessage.指示種別.演奏開始:
-                            {
-                                this._演奏状態を終了する();
-
-                                App.ビュアー用曲ノード = new 曲.MusicNode( msg.演奏対象曲のファイルパス, null );
-                                App.演奏スコア = this._スコアを読み込む();
-
-                                if( null == App.演奏スコア )
-                                    return;
-
-                                this._ビュアーモード時にドラムサウンドを発声する = msg.ドラムチップのヒット時に発声する;
-                                this._演奏状態を初期化する();
-
-                                this._ビュアー演奏を開始する( msg.演奏を開始する小節番号 );
-                                this.現在のフェーズ = フェーズ.表示;
-
-                                this.進行描画する( dc );  // 1フレーム無駄にしないよう、即座に次のフレームに取り掛かる。
-                                return;
-                            }
-
-                        case API.ServiceMessage.指示種別.演奏停止:
-                            this._演奏状態を終了する();
-                            break;
-                    }
-                }
-            }
         }
 
-        /// <remarks>
-        ///		演奏クリア時には、次の結果ステージに入ってもBGMが鳴り続ける。
-        ///		そのため、後からBGMだけを別個に停止するためのメソッドが必要になる。
-        /// </remarks>
-        public void BGMを停止する()
+
+
+        // メッセージ処理
+
+
+        public void ViewerPlay( App進行描画.ViewerPlayメッセージ msg )
         {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                App.WAV管理.すべての発声を停止する();
-            }
+            this._メッセージキュー.Enqueue( msg );
         }
+
+        public void ViewerStop( App進行描画.ViewerStopメッセージ msg )
+        {
+            this._メッセージキュー.Enqueue( msg );
+        }
+
+        private void _演奏を開始する( App進行描画.ViewerPlayメッセージ msg )
+        {
+            this._演奏状態を終了する();
+
+            App進行描画.ビュアー用曲ノード = new MusicNode( msg.path, null );
+            App進行描画.演奏スコア = this._スコアを読み込む();
+
+            if( null == App進行描画.演奏スコア )
+                return;
+
+            this._ビュアーモード時にドラムサウンドを発声する = msg.drumSound;
+            this._演奏状態を初期化する();
+
+            this._ビュアー演奏を開始する( msg.startPart );
+            this.現在のフェーズ = フェーズ.表示;
+
+            msg.完了通知.Set();
+        }
+
+        private void _演奏を停止する( App進行描画.ViewerStopメッセージ msg )
+        {
+            this._演奏状態を初期化する();
+
+            msg.完了通知.Set();
+        }
+
+        private ConcurrentQueue<App進行描画.通知メッセージ> _メッセージキュー = new ConcurrentQueue<進行描画.通知メッセージ>();
+
 
 
         // 画面を構成するもの
+
 
         private 画像 _背景画像 = null;
 
         private 曲名パネル _曲名パネル = null;
 
-        private FPS _FPS = null;
+        private システム情報 _システム情報 = null;
 
         private BASIC.レーンフレーム _レーンフレームBASIC = null;
 
@@ -777,8 +732,10 @@ namespace DTXMania.ステージ.演奏
 
         private 右サイドクリアパネル _右サイドクリアパネル = null;
 
+
         
         // 左サイドクリアパネル内に表示されるもの
+
 
         private スコア表示 _スコア表示 = null;
 
@@ -791,12 +748,16 @@ namespace DTXMania.ステージ.演奏
         private 曲別SKILL _曲別SKILL = null;
 
 
+
         // 右サイドクリアパネル内に表示されるもの
+
 
         private コンボ表示 _コンボ表示 = null;
 
+
         
         // 譜面上に表示されるもの
+
 
         private BASIC.レーンフラッシュ _レーンフラッシュBASIC = null;
 
@@ -809,7 +770,9 @@ namespace DTXMania.ステージ.演奏
         private 画像フォント _数字フォント中グレー48x64 = null;
 
         
+
         // 小節線・拍線
+
 
         private SolidColorBrush _小節線色 = null;
 
@@ -817,11 +780,13 @@ namespace DTXMania.ステージ.演奏
 
         private SolidColorBrush _拍線色 = null;
 
-        private void _小節線拍線を描画する( DeviceContext1 dc, double 現在の演奏時刻sec )
+        private void _小節線拍線を描画する( DeviceContext dc, double 現在の演奏時刻sec )
         {
             // 小節線・拍線 と チップ は描画階層（奥行き）が異なるので、別々のメソッドに分ける。
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) => {
 
@@ -830,7 +795,7 @@ namespace DTXMania.ステージ.演奏
                         float 上位置dpx = (float) ( ヒット判定位置Ydpx + ヒット判定バーとの距離dpx - 1f );   // -1f は小節線の厚みの半分。
 
                         // 小節線
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏中に小節線と拍線を表示する )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に小節線と拍線を表示する )
                         {
                             float x = 441f;
                             float w = 780f;
@@ -839,7 +804,7 @@ namespace DTXMania.ステージ.演奏
                         }
 
                         // 小節番号
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏中に小節番号を表示する )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に小節番号を表示する )
                         {
                             float 右位置dpx = 441f + 780f - 24f;   // -24f は適当なマージン。
                             this._数字フォント中グレー48x64.描画する( dc, 右位置dpx, 上位置dpx - 84f, chip.小節番号.ToString(), 右揃え: true );    // -84f は適当なマージン。
@@ -848,7 +813,7 @@ namespace DTXMania.ステージ.演奏
                     else if( chip.チップ種別 == チップ種別.拍線 )
                     {
                         // 拍線
-                        if( App.ユーザ管理.ログオン中のユーザ.演奏中に小節線と拍線を表示する )
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に小節線と拍線を表示する )
                         {
                             float 上位置dpx = (float) ( ヒット判定位置Ydpx + ヒット判定バーとの距離dpx - 1f );   // -1f は拍線の厚みの半分。
                             dc.DrawLine( new Vector2( 441f, 上位置dpx ), new Vector2( 441f + 780f, 上位置dpx ), this._拍線色, strokeWidth: 1f );
@@ -861,7 +826,9 @@ namespace DTXMania.ステージ.演奏
         }
 
 
+
         // 演奏状態
+
 
         /// <summary>
         ///		<see cref="スコア表示.チップリスト"/> のうち、描画を始めるチップのインデックス番号。
@@ -875,8 +842,14 @@ namespace DTXMania.ステージ.演奏
 
         private Dictionary<チップ, チップの演奏状態> _チップの演奏状態 = null;
 
+        private bool _一時停止中 = false;
+
         private double _演奏開始からの経過時間secを返す()
-            => App.サウンドタイマ.現在時刻sec;
+            => App進行描画.サウンドタイマ.現在時刻sec;
+
+
+
+        // private
 
 
         /// <summary>
@@ -888,35 +861,54 @@ namespace DTXMania.ステージ.演奏
         ///	</param>
         private void _描画範囲内のすべてのチップに対して( double 現在の演奏時刻sec, Action<チップ, int, double, double, double> 適用する処理 )
         {
-            var スコア = App.演奏スコア;
+            var スコア = App進行描画.演奏スコア;
+
             if( null == スコア )
                 return;
 
+            // 描画開始チップから後方のチップに向かって……
+
             for( int i = this._描画開始チップ番号; ( 0 <= i ) && ( i < スコア.チップリスト.Count ); i++ )
             {
+                var ユーザ設定 = App進行描画.ユーザ管理.ログオン中のユーザ;
                 var チップ = スコア.チップリスト[ i ];
+                var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ チップ.チップ種別 ];
+                var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
+
 
                 // ヒット判定バーとチップの間の、時間 と 距離 を算出。→ いずれも、負数ならバー未達、0でバー直上、正数でバー通過。
+
                 double ヒット判定バーと描画との時間sec = 現在の演奏時刻sec - チップ.描画時刻sec;
                 double ヒット判定バーと発声との時間sec = 現在の演奏時刻sec - チップ.発声時刻sec;
+                if( !AutoPlay )
+                {
+                    // ユーザ入力については、判定位置調整を適用する。（自動ヒットについては適用しない。）
+                    ヒット判定バーと描画との時間sec += ( App進行描画.システム設定.判定位置調整ms / 1000.0 );
+                    ヒット判定バーと発声との時間sec += ( App進行描画.システム設定.判定位置調整ms / 1000.0 );
+                }
                 double 倍率 = this._譜面スクロール速度.補間付き速度;
                 double ヒット判定バーとの距離dpx = this._指定された時間secに対応する符号付きピクセル数を返す( 倍率, ヒット判定バーと描画との時間sec );
 
-                // 終了判定。
+
+                // 演奏終了？
+
                 bool チップは画面上端より上に出ている = ( ( ヒット判定位置Ydpx + ヒット判定バーとの距離dpx ) < -40.0 );   // -40 はチップが隠れるであろう適当なマージン。
+
                 if( チップは画面上端より上に出ている )
                     break;
 
-                // 処理実行。開始判定（描画開始チップ番号の更新）もこの中で。
+
+                // 適用する処理を呼び出す。開始判定（描画開始チップ番号の更新）もこの中で。
+
                 適用する処理( チップ, i, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx );
             }
         }
 
         private double _指定された時間secに対応する符号付きピクセル数を返す( double speed, double 指定時間sec )
         {
-            const double _1ミリ秒あたりのピクセル数 = 0.14625 * 2.25 * 1000.0;    // これを変えると、speed あたりの速度が変わる。
+            const double _1秒あたりのピクセル数 = 0.14625 * 2.25 * 1000.0;    // これを変えると、speed あたりの速度が変わる。
 
-            return ( 指定時間sec * _1ミリ秒あたりのピクセル数 * speed );
+            return ( 指定時間sec * _1秒あたりのピクセル数 * speed );
         }
 
         private void _チップのヒット処理を行う( チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec )
@@ -941,19 +933,19 @@ namespace DTXMania.ステージ.演奏
             {
                 #region " チップの判定処理を行う。"
                 //----------------
-                var 対応表 = App.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
+                var 対応表 = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
 
                 if( judge != 判定種別.MISS )
                 {
                     // MISS以外（PERFECT～OK）
                     this._チップ光.表示を開始する( 対応表.表示レーン種別 );
 
-                    if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
+                    if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
                     {
                         this._ドラムパッドBASIC.ヒットする( 対応表.表示レーン種別 );
                         this._レーンフラッシュBASIC.開始する( 対応表.表示レーン種別 );
                     }
-                    if( App.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
+                    if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                     {
                         this._レーンフラッシュEXPERT.開始する( 対応表.表示レーン種別 );
                     }
@@ -961,8 +953,8 @@ namespace DTXMania.ステージ.演奏
 
                 this._判定文字列.表示を開始する( 対応表.表示レーン種別, judge );
 
-                var ドラムチッププロパティ = App.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
-                var AutoPlay = App.ユーザ管理.ログオン中のユーザ.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
+                var ドラムチッププロパティ = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
+                var AutoPlay = App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
                 this.成績.ヒット数を加算する( judge, AutoPlay );
                 //----------------
@@ -986,18 +978,24 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
+
+
+
+        // ビュアーモード専用 private
+
+
         private スコア _スコアを読み込む()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                var 選択曲ファイルパス = App.演奏曲ノード.曲ファイルの絶対パス;
+                var 選択曲ファイルパス = App進行描画.演奏曲ノード.曲ファイルの絶対パス;
 
                 // 曲ファイルを読み込む。
                 var score = スコア.ファイルから生成する( 選択曲ファイルパス.変数なしパス );
 
                 // 全チップの発声時刻を修正する。
                 foreach( var chip in score.チップリスト )
-                    chip.発声時刻sec -= App.サウンドデバイス.再生遅延sec;
+                    chip.発声時刻sec -= App進行描画.サウンドデバイス.再生遅延sec;
 
                 // 完了。
                 Log.Info( $"曲ファイルを読み込みました。" );
@@ -1010,7 +1008,7 @@ namespace DTXMania.ステージ.演奏
         // 演奏状態の初期化が完了していること。
         private void _ビュアー演奏を開始する( int 演奏開始小節番号 )
         {
-            var score = App.演奏スコア;
+            var score = App進行描画.演奏スコア;
 
 
             // 演奏開始小節番号に位置する最初のチップを検索する。
@@ -1060,7 +1058,7 @@ namespace DTXMania.ステージ.演奏
             // 必要なら、AVI動画, WAV音声の途中再生を行う。
 
             // (1) AVI動画
-            if( App.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
+            if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
             {
                 var 動画チップリスト = score.チップリスト.Where( ( chip ) => (
                     this._チップの演奏状態[ chip ].ヒット済みである &&  // ヒット済みの
@@ -1068,7 +1066,7 @@ namespace DTXMania.ステージ.演奏
 
                 foreach( var aviChip in 動画チップリスト )
                 {
-                    if( App.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video video ) )
+                    if( App進行描画.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video video ) )
                     {
                         video.再生を開始する( 演奏開始時刻sec - aviChip.発声時刻sec );
                     }
@@ -1082,27 +1080,51 @@ namespace DTXMania.ステージ.演奏
 
             foreach( var wavChip in BGMチップリスト )
             {
-                var prop = App.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理.チップtoプロパティ[ wavChip.チップ種別 ];
+                var prop = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理.チップtoプロパティ[ wavChip.チップ種別 ];
 
-                App.WAV管理.発声する( 
+                App進行描画.WAV管理.発声する( 
                     wavChip.チップサブID,
                     wavChip.チップ種別, 
                     prop.発声前消音, 
                     prop.消音グループ種別, 
-                    BGM以外も再生する: App.ユーザ管理.ログオン中のユーザ.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する,
+                    BGM以外も再生する: App進行描画.ユーザ管理.ログオン中のユーザ.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する,
                     音量: wavChip.音量 / (float) チップ.最大音量, 演奏開始時刻sec - wavChip.発声時刻sec );
             }
 
             
             // 全部終わってからタイマリセット。
 
-            App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+            App進行描画.サウンドタイマ.リセットする( 演奏開始時刻sec );
 
             return;
         }
 
+        // マウス右クリック　→　一時停止／再開する。
+        private void App_MouseDown( object sender, MouseEventArgs e )
+        {
+            if( e.Button == MouseButtons.Right )
+            {
+                if( !this._一時停止中 )
+                {
+                    this._一時停止中 = true;
 
-        private bool _初めての進行描画 = true;
+                    App進行描画.サウンドタイマ.一時停止する();
+
+                    App進行描画.AVI管理?.再生中の動画をすべて一時停止する();
+                    App進行描画.WAV管理?.再生中の音声をすべて一時停止する();
+                }
+                else
+                {
+                    this._一時停止中 = false;
+
+                    App進行描画.AVI管理?.一時停止中の動画をすべて再開する();
+                    App進行描画.WAV管理?.一時停止中の音声をすべて再開する();
+
+                    App進行描画.サウンドタイマ.再開する();
+                }
+            }
+        }
+
 
         private bool _ビュアーモード時にドラムサウンドを発声する = true;
 

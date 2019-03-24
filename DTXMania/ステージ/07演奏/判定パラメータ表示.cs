@@ -7,23 +7,21 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class 判定パラメータ表示 : Activity
+    class 判定パラメータ表示 : IDisposable
     {
+
+        // 生成と終了
+
+
         public 判定パラメータ表示()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._パラメータ文字 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml" ) );
-                this.子Activityを追加する( this._判定種別文字 = new 画像( @"$(System)images\演奏\パラメータ用判定種別文字.png" ) );
-            }
-        }
+                this._パラメータ文字 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml" );
+                this._判定種別文字 = new 画像( @"$(System)images\演奏\パラメータ用判定種別文字.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\パラメータ用判定種別文字.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -39,99 +37,96 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._パラメータ文字?.Dispose();
+                this._判定種別文字?.Dispose();
             }
         }
 
-        public virtual void 描画する( DeviceContext1 dc, float x, float y, 成績 現在の成績 )
+
+
+        // 進行と描画
+
+
+        public virtual void 描画する( DeviceContext dc, float x, float y, 成績 現在の成績 )
         {
-            var scaling = Matrix3x2.Scaling( 1.0f, 1.4f );
+            var scaling = new Size2F( 1.0f, 1.4f );
 
             var 判定toヒット数 = 現在の成績.判定toヒット数;
             var 割合表 = 現在の成績.判定toヒット割合;
             int MaxCombo = 現在の成績.MaxCombo;
             int 合計 = 0;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            this.パラメータを一行描画する( dc, x, y, scaling, 判定種別.PERFECT, 判定toヒット数[ 判定種別.PERFECT ], 割合表[ 判定種別.PERFECT ] );
 
-                var pretrans = dc.Transform;
+            合計 += 判定toヒット数[ 判定種別.PERFECT ];
+            y += _改行幅dpx;
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.パラメータを一行描画する( dc, 0f, 0f, 判定種別.PERFECT, 判定toヒット数[ 判定種別.PERFECT ], 割合表[ 判定種別.PERFECT ] );
-                合計 += 判定toヒット数[ 判定種別.PERFECT ];
-                y += _改行幅dpx;
+            this.パラメータを一行描画する( dc, x, y, scaling, 判定種別.GREAT, 判定toヒット数[ 判定種別.GREAT ], 割合表[ 判定種別.GREAT ] );
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.パラメータを一行描画する( dc, 0f, 0f, 判定種別.GREAT, 判定toヒット数[ 判定種別.GREAT ], 割合表[ 判定種別.GREAT ] );
-                合計 += 判定toヒット数[ 判定種別.GREAT ];
-                y += _改行幅dpx;
+            合計 += 判定toヒット数[ 判定種別.GREAT ];
+            y += _改行幅dpx;
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.パラメータを一行描画する( dc, 0f, 0f, 判定種別.GOOD, 判定toヒット数[ 判定種別.GOOD ], 割合表[ 判定種別.GOOD ] );
-                合計 += 判定toヒット数[ 判定種別.GOOD ];
-                y += _改行幅dpx;
+            this.パラメータを一行描画する( dc, x, y, scaling, 判定種別.GOOD, 判定toヒット数[ 判定種別.GOOD ], 割合表[ 判定種別.GOOD ] );
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.パラメータを一行描画する( dc, 0f, 0f, 判定種別.OK, 判定toヒット数[ 判定種別.OK ], 割合表[ 判定種別.OK ] );
-                合計 += 判定toヒット数[ 判定種別.OK ];
-                y += _改行幅dpx;
+            合計 += 判定toヒット数[ 判定種別.GOOD ];
+            y += _改行幅dpx;
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.パラメータを一行描画する( dc, 0f, 0f, 判定種別.MISS, 判定toヒット数[ 判定種別.MISS ], 割合表[ 判定種別.MISS ] );
-                合計 += 判定toヒット数[ 判定種別.MISS ];
-                y += _改行幅dpx;
+            this.パラメータを一行描画する( dc, x, y, scaling, 判定種別.OK, 判定toヒット数[ 判定種別.OK ], 割合表[ 判定種別.OK ] );
 
-                y += 3f;    // ちょっと間を開けて
+            合計 += 判定toヒット数[ 判定種別.OK ];
+            y += _改行幅dpx;
 
-                var 矩形 = this._判定種別文字の矩形リスト[ "MaxCombo" ];
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this._判定種別文字.描画する( dc, 0f, 0f, 転送元矩形: 矩形 );
-                x += 矩形.Width + 16f;
+            this.パラメータを一行描画する( dc, x, y, scaling, 判定種別.MISS, 判定toヒット数[ 判定種別.MISS ], 割合表[ 判定種別.MISS ] );
 
-                dc.Transform =
-                    scaling *
-                    Matrix3x2.Translation( x, y ) *
-                    pretrans;
-                this.数値を描画する( dc, 0f, 0f, MaxCombo, 桁数: 4 );
-                this.数値を描画する( dc, _dr, 0f, (int) Math.Floor( 100.0 * MaxCombo / 合計 ), 桁数: 3 );    // 切り捨てでいいやもう
-                this._パラメータ文字.描画する( dc, _dp, 0f, "%" );
+            合計 += 判定toヒット数[ 判定種別.MISS ];
+            y += _改行幅dpx;
 
-            } );
 
-        }
+            y += 3f;    // ちょっと間を開けて
 
-        public void パラメータを一行描画する( DeviceContext1 dc, float x, float y, 判定種別 judge, int ヒット数, int ヒット割合, float 不透明度 = 1.0f )
-        {
-            var 矩形 = this._判定種別文字の矩形リスト[ judge.ToString() ];
-            this._判定種別文字.描画する( dc, x, y - 4f, 不透明度, 転送元矩形: 矩形 );
+
+            var 矩形 = this._判定種別文字の矩形リスト[ "MaxCombo" ];
+
+            this._判定種別文字.描画する( dc, x, y, 転送元矩形: 矩形, X方向拡大率: scaling.Width, Y方向拡大率: scaling.Height );
+
             x += 矩形.Width + 16f;
 
-            this.数値を描画する( dc, x, y, ヒット数, 4, 不透明度 );
-            this.数値を描画する( dc, x + _dr, y, ヒット割合, 3, 不透明度 );
-            this._パラメータ文字.不透明度 = 不透明度;
-            this._パラメータ文字.描画する( dc, x + _dp, y, "%" );
+            this.数値を描画する( dc, x, y, scaling, MaxCombo, 桁数: 4 );
+            this.数値を描画する( dc, x + _dr, y, scaling, (int) Math.Floor( 100.0 * MaxCombo / 合計 ), 桁数: 3 );    // 切り捨てでいいやもう
+            this._パラメータ文字.描画する( dc, x + _dp, y, "%", scaling );
         }
+
+        public void パラメータを一行描画する( DeviceContext dc, float x, float y, Size2F 拡大率, 判定種別 judge, int ヒット数, int ヒット割合, float 不透明度 = 1.0f )
+        {
+            var 矩形 = this._判定種別文字の矩形リスト[ judge.ToString() ];
+            this._判定種別文字.描画する( dc, x, y - 4f, 不透明度, 転送元矩形: 矩形, X方向拡大率: 拡大率.Width, Y方向拡大率: 拡大率.Height );
+            x += 矩形.Width + 16f;
+
+            this.数値を描画する( dc, x, y, 拡大率, ヒット数, 4, 不透明度 );
+            this.数値を描画する( dc, x + _dr * 拡大率.Width, y, 拡大率, ヒット割合, 3, 不透明度 );
+            this._パラメータ文字.不透明度 = 不透明度;
+            this._パラメータ文字.描画する( dc, x + _dp * 拡大率.Width, y, "%", 拡大率 );
+        }
+
+        protected void 数値を描画する( DeviceContext dc, float x, float y, Size2F 拡大率, int 描画する数値, int 桁数, float 不透明度 = 1.0f )
+        {
+            Debug.Assert( 1 <= 桁数 && 10 >= 桁数 );    // 最大10桁まで
+
+            int 最大値 = (int) Math.Pow( 10, 桁数 ) - 1;     // 1桁なら9, 2桁なら99, 3桁なら999, ... でカンスト。
+            int 判定数 = Math.Max( Math.Min( 描画する数値, 最大値 ), 0 );   // 丸める。
+            var 判定数文字列 = 判定数.ToString().PadLeft( 桁数 ).Replace( ' ', 'o' );  // グレーの '0' は 'o' で描画できる（矩形リスト参照）。
+
+            this._パラメータ文字.不透明度 = 不透明度;
+            this._パラメータ文字.描画する( dc, x, y, 判定数文字列, 拡大率 );
+        }
+
+
+
+        // private
 
 
         protected const float _dr = 78f;       // 割合(%)までのXオフセット[dpx]
@@ -146,18 +141,6 @@ namespace DTXMania.ステージ.演奏
 
         protected Dictionary<string, RectangleF> _判定種別文字の矩形リスト = null;
 
-
-        protected void 数値を描画する( DeviceContext1 dc, float x, float y, int 描画する数値, int 桁数, float 不透明度 = 1.0f )
-        {
-            Debug.Assert( 1 <= 桁数 && 10 >= 桁数 );    // 最大10桁まで
-
-            int 最大値 = (int) Math.Pow( 10, 桁数 ) - 1;     // 1桁なら9, 2桁なら99, 3桁なら999, ... でカンスト。
-            int 判定数 = Math.Max( Math.Min( 描画する数値, 最大値 ), 0 );   // 丸める。
-            var 判定数文字列 = 判定数.ToString().PadLeft( 桁数 ).Replace( ' ', 'o' );  // グレーの '0' は 'o' で描画できる（矩形リスト参照）。
-
-            this._パラメータ文字.不透明度 = 不透明度;
-            this._パラメータ文字.描画する( dc, x, y, 判定数文字列 );
-        }
 
         private class YAMLマップ
         {

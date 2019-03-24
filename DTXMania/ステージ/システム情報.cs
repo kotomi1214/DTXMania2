@@ -5,28 +5,41 @@ using System.Linq;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ
+namespace DTXMania
 {
-    class システム情報 : Activity
+    class システム情報 : IDisposable
     {
         public int 現在のFPS => this._FPS.現在のFPS;
 
         public int 現在のVPS => this._FPS.現在のVPS;
 
 
+
+        // 生成と終了
+
+
         public システム情報()
         {
-            this.子Activityを追加する( this._FPS = new FPS() );
-            this.子Activityを追加する( this._文字列画像 = new 文字列画像() );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._FPS = new FPS();
+                this._文字列画像 = new 文字列画像();
+            }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._文字列画像?.Dispose();
+                this._FPS?.Dispose();
+            }
         }
 
-        protected override void On非活性化()
-        {
-        }
+
+
+        // カウント
+
 
         public bool FPSをカウントしプロパティを更新する()
             => this._FPS.FPSをカウントしプロパティを更新する();
@@ -34,7 +47,12 @@ namespace DTXMania.ステージ
         public void VPSをカウントする()
             => this._FPS.VPSをカウントする();
 
-        public void 描画する( DeviceContext1 dc, string 追加文字列 = "" )
+
+
+        // 進行と描画
+
+
+        public void 描画する( DeviceContext dc, string 追加文字列 = "" )
         {
             double FPSの周期ms = ( 0 < this._FPS.現在のFPS ) ? ( 1000.0 / this._FPS.現在のFPS ) : -1.0;
 
@@ -45,6 +63,10 @@ namespace DTXMania.ステージ
 
             this._文字列画像.描画する( dc, 0f, 0f );
         }
+
+
+
+        // private
 
 
         private FPS _FPS = null;

@@ -8,13 +8,17 @@ using SharpDX.Direct2D1;
 using YamlDotNet.Serialization;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.BASIC
+namespace DTXMania.演奏.BASIC
 {
     /// <summary>
     ///		チップの背景であり、レーン全体を示すフレーム画像。
     /// </summary>
-    class レーンフレーム : Activity
+    class レーンフレーム
     {
+
+        // static
+
+
         /// <summary>
         ///		画面全体に対する、レーンフレームの表示位置と範囲。
         /// </summary>
@@ -51,7 +55,12 @@ namespace DTXMania.ステージ.演奏.BASIC
 
             public Color4 レーンライン色;
         }
+
         public static レーン配置 現在のレーン配置 { get; private set; }
+
+
+
+        // 生成と終了(static)
 
 
         public static void 初期化する()
@@ -106,6 +115,10 @@ namespace DTXMania.ステージ.演奏.BASIC
             }
         }
 
+        public static void 終了する()
+        {
+        }
+
         public static void レーン配置を設定する( string レーン配置名 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -133,15 +146,23 @@ namespace DTXMania.ステージ.演奏.BASIC
             }
         }
 
-        public void 描画する( DeviceContext1 dc, int BGAの透明度 )
+
+
+        // 進行と描画
+
+
+        public void 描画する( DeviceContext dc, int BGAの透明度 )
         {
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+
 
                 // レーンエリアを描画する。
 
                 var レーン色 = 現在のレーン配置.レーン色;
                 レーン色.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
-                using( var laneBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, レーン色 ) )
+                using( var laneBrush = new SolidColorBrush( dc, レーン色 ) )
                 {
                     dc.FillRectangle( レーンフレーム.領域, laneBrush );
                 }
@@ -151,7 +172,7 @@ namespace DTXMania.ステージ.演奏.BASIC
 
                 var レーンライン色 = 現在のレーン配置.レーンライン色;
                 レーンライン色.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
-                using( var laneLineBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, レーンライン色 ) )
+                using( var laneLineBrush = new SolidColorBrush( dc, レーンライン色 ) )
                 {
                     for( int i = 0; i < 現在のレーン配置.レーンライン.Length; i++ )
                     {
@@ -164,6 +185,10 @@ namespace DTXMania.ステージ.演奏.BASIC
 
             } );
         }
+
+
+
+        // private
 
 
         private class YAMLマップ

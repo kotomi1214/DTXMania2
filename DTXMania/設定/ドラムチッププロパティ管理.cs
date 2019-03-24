@@ -3,12 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using FDK;
-using DTXMania.入力;
-using DTXMania.ステージ.演奏;
-using DTXMania.設定;
 using SSTFormat.v4;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     class ドラムチッププロパティ管理
     {

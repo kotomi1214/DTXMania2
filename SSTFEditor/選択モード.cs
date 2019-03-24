@@ -321,28 +321,29 @@ namespace SSTFEditor
         protected void 現在の選択範囲を描画する( Graphics g )
         {
             var 現在の選択領域px = new Rectangle() {
-                X = Math.Min( this.現在の範囲選択用ドラッグ開始位置px.X, this.現在の範囲選択用ドラッグ終了位置px.X ),
-                Y = Math.Min( this.現在の範囲選択用ドラッグ開始位置px.Y, this.現在の範囲選択用ドラッグ終了位置px.Y ),
-                Width = Math.Abs( (int) ( this.現在の範囲選択用ドラッグ開始位置px.X - this.現在の範囲選択用ドラッグ終了位置px.X ) ),
-                Height = Math.Abs( (int) ( this.現在の範囲選択用ドラッグ開始位置px.Y - this.現在の範囲選択用ドラッグ終了位置px.Y ) ),
+
+                X = Math.Min(
+                    this.現在の範囲選択用ドラッグ開始位置Xpx,
+                    this.現在の範囲選択用ドラッグ終了位置Xpx ),
+
+                Y = this.Form.譜面.譜面内絶対位置gridにおける対象領域内のY座標pxを返す(
+                    Math.Max(   // grid は上に行くほど大きくなる
+                        this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid,
+                        this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid ),
+                    this.Form.譜面パネルサイズ ),
+
+                Width = Math.Abs( this.現在の範囲選択用ドラッグ開始位置Xpx - this.現在の範囲選択用ドラッグ終了位置Xpx ),
+
+                Height = Math.Abs( this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid - this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid ) / this.Form.GRID_PER_PIXEL,
             };
 
-            #region " クリッピング "
-            //-----------------
-            if( 0 > 現在の選択領域px.Width )
-            {
-                現在の選択領域px.X = this.現在の移動用ドラッグ開始位置px.X;
-                現在の選択領域px.Width = this.現在の移動用ドラッグ開始位置px.X - 現在の選択領域px.X;
-            }
-            if( 0 > 現在の選択領域px.Height )
-            {
-                現在の選択領域px.Y = this.現在の移動用ドラッグ開始位置px.Y;
-                現在の選択領域px.Height = this.現在の移動用ドラッグ開始位置px.Y - 現在の選択領域px.Y;
-            }
-            //-----------------
-            #endregion
+            // クリッピング
 
-            if( ( 0 != 現在の選択領域px.Width ) && ( 0 != 現在の選択領域px.Height ) )
+            現在の選択領域px.Intersect( this.Form.譜面パネル領域 );
+
+            // 描画
+
+            if( ( 0 < 現在の選択領域px.Width ) && ( 0 < 現在の選択領域px.Height ) )
             {
                 g.FillRectangle( this.選択領域用のブラシ, 現在の選択領域px );
                 g.DrawRectangle( Pens.LightBlue, 現在の選択領域px );
@@ -356,32 +357,38 @@ namespace SSTFEditor
 
             if( e.Y <= 上端スクロール発動幅px )
             {
-                double 速度係数X = ( Math.Max( ( 上端スクロール発動幅px - e.Y ), 0 ) ) / (double) 上端スクロール発動幅px;
-                double 速度係数Y = ( 1.0 - Math.Cos( ( Math.PI / 2.0 ) * 速度係数X ) ) * 2.0 + 1.0;
-                int スクロール量grid = (int) ( -速度係数Y * 180.0 );
+                // (A) マウスが上端にいるので、上から下へスクロールする。
+
+                double 発動量 = Math.Min( Math.Max( 上端スクロール発動幅px - e.Y, 0 ) / (double) 上端スクロール発動幅px, 1.0 ); // 0～1  (Liner)
+                double 速度係数 = ( 1.0 - Math.Cos( ( Math.PI / 2.0 ) * 発動量 ) ) * 2.0 + 1.0;    // 発動量:0→1 のとき、速度係数:3→1 (Cos)
+                int スクロール量grid = (int) ( -速度係数 * 180.0 );  // 速度係数:1→3 のとき、スクロール量grid:-180→-540;
 
                 this.Form.譜面を縦スクロールする( スクロール量grid );
 
                 if( this.移動のためにドラッグ中である )
                     this.現在の移動用ドラッグ開始位置px.Y -= スクロール量grid / this.Form.GRID_PER_PIXEL;
 
-                if( this.範囲選択のためにドラッグ中である )
-                    this.現在の範囲選択用ドラッグ開始位置px.Y -= スクロール量grid / this.Form.GRID_PER_PIXEL;
+                //if( this.範囲選択のためにドラッグ中である )
+                //    this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid += スクロール量grid; // grid は上方向がプラス
+                // → 譜面スクロール後のマウスイベントですぐに更新されるので、ここで位置を増減してしまうと２倍動いてしまう。なのでコメントアウト。
             }
             else if( e.Y >= ( this.Form.譜面パネルサイズ.Height - 下端スクロール発動幅px ) &&
                 ( this.Form.譜面.譜面表示下辺の譜面内絶対位置grid > 0 ) )   // まだスクロールができる場合のみ
             {
-                double 速度係数X = ( Math.Max( ( e.Y - ( this.Form.譜面パネルサイズ.Height - 上端スクロール発動幅px ) ), 0 ) ) / (double) 下端スクロール発動幅px;
-                double 速度係数Y = ( 1.0 - Math.Cos( ( Math.PI / 2.0 ) * 速度係数X ) ) * 2.0 + 1.0;
-                int スクロール量grid = (int) ( 速度係数Y * 180.0 );
+                // (B) マウスが下端にいるので、下から上へスクロールする。
+
+                double 発動量 = Math.Min( Math.Max( e.Y - ( this.Form.譜面パネルサイズ.Height - 下端スクロール発動幅px ), 0 ) / (double) 下端スクロール発動幅px, 1.0 );  // 0～1 (Liner)
+                double 速度係数 = ( 1.0 - Math.Cos( ( Math.PI / 2.0 ) * 発動量 ) ) * 2.0 + 1.0;    // 発動量:0→1 のとき、速度係数:3→1 (Cos)
+                int スクロール量grid = (int) ( 速度係数 * 180.0 );    // 速度係数:1→3 のとき、スクロール量grid:180→540;
 
                 this.Form.譜面を縦スクロールする( スクロール量grid );
 
                 if( this.移動のためにドラッグ中である )
                     this.現在の移動用ドラッグ開始位置px.Y -= スクロール量grid / this.Form.GRID_PER_PIXEL;
 
-                if( this.範囲選択のためにドラッグ中である )
-                    this.現在の範囲選択用ドラッグ開始位置px.Y -= スクロール量grid / this.Form.GRID_PER_PIXEL;
+                //if( this.範囲選択のためにドラッグ中である )
+                //    this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid += スクロール量grid;   // grid は上がプラス
+                // → 譜面がスクロールしても開始位置は絶対grid指定なので、変更する必要がない。よって、コメントアウト。
             }
         }
 
@@ -609,17 +616,23 @@ namespace SSTFEditor
 
         protected bool 範囲選択のためにドラッグ中である = false;
 
-        protected Point 現在の範囲選択用ドラッグ開始位置px = new Point( 0, 0 );
+        protected int 現在の範囲選択用ドラッグ開始位置Xpx = 0;
+        protected int 現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid = 0;
 
-        protected Point 現在の範囲選択用ドラッグ終了位置px = new Point( 0, 0 );
+        protected int 現在の範囲選択用ドラッグ終了位置Xpx = 0;
+        protected int 現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid = 0;
 
         protected void 範囲選択の開始処理( MouseEventArgs e )
         {
             this.範囲選択のためにドラッグ中である = true;
 
             // ドラッグ範囲の初期化。
-            this.現在の範囲選択用ドラッグ開始位置px.X = this.現在の範囲選択用ドラッグ終了位置px.X = e.X;
-            this.現在の範囲選択用ドラッグ開始位置px.Y = this.現在の範囲選択用ドラッグ終了位置px.Y = e.Y;
+            this.現在の範囲選択用ドラッグ開始位置Xpx =
+                this.現在の範囲選択用ドラッグ終了位置Xpx =
+                e.X;
+            this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid =
+                this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid =
+                this.Form.譜面.譜面パネル内Y座標pxにおける譜面内絶対位置gridを返す( e.Y );
 
             // CTRL が押されていない場合、いったん全チップの選択を解除する。
             if( ( Control.ModifierKeys & Keys.Control ) != Keys.Control )
@@ -632,16 +645,12 @@ namespace SSTFEditor
         protected void 範囲選択の継続処理( MouseEventArgs e )
         {
             // クリッピング。
-            int x = e.X;
-            int y = e.Y;
-            if( 0 > x ) x = 0;
-            if( this.Form.譜面パネルサイズ.Width <= x ) x = this.Form.譜面パネルサイズ.Width;
-            if( 0 > y ) y = 0;
-            if( this.Form.譜面パネルサイズ.Height <= y ) y = this.Form.譜面パネルサイズ.Height;
+            int Xpt = Math.Min( Math.Max( e.X, 0 ), this.Form.譜面パネルサイズ.Width );
+            int Ypt = Math.Min( Math.Max( e.Y, 0 ), this.Form.譜面パネルサイズ.Height );
 
             // ドラッグ終了位置を現在のマウスの位置に更新。
-            this.現在の範囲選択用ドラッグ終了位置px.X = x;
-            this.現在の範囲選択用ドラッグ終了位置px.Y = y;
+            this.現在の範囲選択用ドラッグ終了位置Xpx = Xpt;
+            this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid = this.Form.譜面.譜面パネル内Y座標pxにおける譜面内絶対位置gridを返す( Ypt );
 
             // スクロールチェック。
             this.譜面パネルの上下端にきたならスクロールする( e );
@@ -692,48 +701,54 @@ namespace SSTFEditor
 
         protected void 現在のドラッグ範囲中のチップをすべて選択状態にしそれ以外は選択を解除する()
         {
-            // 現在のドラッグ範囲を lane×grid 座標で算出する。
-            // Y座標について： px は上→下、grid は下→上に向かって増加するので注意！
-            var 現在のドラッグ範囲px = new Rectangle() {
-                X = Math.Min( this.現在の範囲選択用ドラッグ開始位置px.X, this.現在の範囲選択用ドラッグ終了位置px.X ),
-                Y = Math.Min( this.現在の範囲選択用ドラッグ開始位置px.Y, this.現在の範囲選択用ドラッグ終了位置px.Y ),
-                Width = Math.Abs( (int) ( this.現在の範囲選択用ドラッグ開始位置px.X - this.現在の範囲選択用ドラッグ終了位置px.X ) ),
-                Height = Math.Abs( (int) ( this.現在の範囲選択用ドラッグ開始位置px.Y - this.現在の範囲選択用ドラッグ終了位置px.Y ) ),
-            };
-            var 現在のドラッグ範囲LaneGrid = new Rectangle() {
-                X = this.Form.譜面.dicレーン番号[ this.Form.譜面.譜面パネル内X座標pxにある編集レーンを返す( 現在のドラッグ範囲px.Left ) ],
-                Y = this.Form.譜面.譜面パネル内Y座標pxにおける譜面内絶対位置gridを返す( 現在のドラッグ範囲px.Bottom ),
-            };
-            現在のドラッグ範囲LaneGrid.Width = Math.Abs( this.Form.譜面.dicレーン番号[ this.Form.譜面.譜面パネル内X座標pxにある編集レーンを返す( 現在のドラッグ範囲px.Right ) ] - 現在のドラッグ範囲LaneGrid.X );
-            現在のドラッグ範囲LaneGrid.Height = Math.Abs( 現在のドラッグ範囲px.Height * this.Form.GRID_PER_PIXEL );
+            // 現在のドラッグ範囲を (px, grid) 座標で算出する。
+            // ※ px は上→下、grid は下→上に向かって増加するので注意！
 
-            // すべてのチップについて、現在のドラッグ範囲 内に存在しているチップは「ドラッグ操作により選択中」フラグを立てる。
+            var 現在のドラッグ範囲pxGrid = new Rectangle() {
+
+                X = Math.Min(
+                    this.現在の範囲選択用ドラッグ開始位置Xpx,
+                    this.現在の範囲選択用ドラッグ終了位置Xpx ),
+
+                Y = Math.Min(
+                    this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid,
+                    this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid ),
+
+                Width = Math.Abs(
+                    this.現在の範囲選択用ドラッグ開始位置Xpx -
+                    this.現在の範囲選択用ドラッグ終了位置Xpx ),
+
+                Height = Math.Abs(
+                    this.現在の範囲選択用ドラッグ開始位置Ypxの譜面内絶対位置grid -
+                    this.現在の範囲選択用ドラッグ終了位置Ypxの譜面内絶対位置grid ),
+            };
+
+            // 現在のドラッグ範囲を (lane, grid) 座標に変換する。
+
+            int ドラッグ範囲左のレーン番号 = this.Form.譜面.dicレーン番号[ this.Form.譜面.譜面パネル内X座標pxにある編集レーンを返す( 現在のドラッグ範囲pxGrid.Left ) ];
+            int ドラッグ範囲右のレーン番号 = this.Form.譜面.dicレーン番号[ this.Form.譜面.譜面パネル内X座標pxにある編集レーンを返す( 現在のドラッグ範囲pxGrid.Right ) ];
+
+            var 現在のドラッグ範囲LaneGrid = new Rectangle() {
+                X = ドラッグ範囲左のレーン番号,
+                Y = 現在のドラッグ範囲pxGrid.Y,
+                Width = Math.Abs( ドラッグ範囲右のレーン番号 - ドラッグ範囲左のレーン番号 ) + 1,  // +1 を忘れずに。
+                Height = 現在のドラッグ範囲pxGrid.Height + 1,    // +1 を忘れずに。
+            };
+
+            // すべてのチップについて、現在のドラッグ範囲内に存在しているチップは「ドラッグ操作により選択中」フラグを立てる。
             foreach( 描画用チップ chip in this.Form.譜面.SSTFormatScore.チップリスト )
             {
                 int チップのレーン番号 = this.Form.譜面.dicレーン番号[ this.Form.譜面.dicチップ編集レーン対応表[ chip.チップ種別 ] ];
                 int チップの厚さgrid = this.Form.譜面.チップサイズpx.Height * this.Form.GRID_PER_PIXEL;
 
-                var rcチップLaneGrid = new Rectangle() {
+                var チップの領域LaneGrid = new Rectangle() {
                     X = チップのレーン番号,
                     Y = chip.譜面内絶対位置grid,
-                    Width = 0,
+                    Width = 1,  // +1 を忘れずに。
                     Height = チップの厚さgrid,
                 };
 
-                if( ( rcチップLaneGrid.Right < 現在のドラッグ範囲LaneGrid.Left ) ||
-                    ( 現在のドラッグ範囲LaneGrid.Right < rcチップLaneGrid.Left ) )
-                {
-                    chip.ドラッグ操作により選択中である = false;       // チップは範囲外のレーンにいる
-                }
-                else if( ( rcチップLaneGrid.Bottom < 現在のドラッグ範囲LaneGrid.Top ) ||
-                    ( 現在のドラッグ範囲LaneGrid.Bottom < rcチップLaneGrid.Top ) )
-                {
-                    chip.ドラッグ操作により選択中である = false;       // チップは範囲外のグリッドにいる
-                }
-                else
-                {
-                    chip.ドラッグ操作により選択中である = true;        // チップは範囲内である
-                }
+                chip.ドラッグ操作により選択中である = チップの領域LaneGrid.IntersectsWith( 現在のドラッグ範囲LaneGrid );
             }
         }
     }

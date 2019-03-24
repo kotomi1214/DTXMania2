@@ -2,19 +2,16 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Runtime.Serialization;
 using System.Windows.Forms;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using FDK;
-using DTXMania.入力;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
-    internal class キーバインディング : ICloneable
+    class キーバインディング : ICloneable
     {
         /// <summary>
         ///		入力コードのマッピング用 Dictionary のキーとなる型。
@@ -176,6 +173,5 @@ namespace DTXMania.設定
 
             return clone;
         }
-        
     }
 }

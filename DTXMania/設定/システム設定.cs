@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using FDK;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     /// <summary>
     ///		システム設定。
@@ -27,14 +27,11 @@ namespace DTXMania.設定
         /// <remarks>
         ///		キーバインディングは全ユーザで共通。
         /// </remarks>
-        public キーバインディング キーバインディング { get; set; } = null;
+        public キーバインディング キー割り当て { get; set; } = null;
 
         /// <summary>
         ///		曲ファイルを検索するフォルダのリスト。
         /// </summary>
-        /// <remarks>
-        ///		シリアライゼーションでは、これを直接使わずに、<see cref="_曲検索フォルダProxy"/> を仲介する。
-        /// </remarks>
         public List<VariablePath> 曲検索フォルダ { get; protected set; } = null;
 
         public Point ウィンドウ表示位置Viewerモード用 { get; set; }
@@ -53,16 +50,20 @@ namespace DTXMania.設定
         public int 判定位置調整ms { get; set; }
 
 
+
+        // 生成と終了
+
+
         public システム設定()
         {
-            this.キーバインディング = new キーバインディング();
+            this.キー割り当て = new キーバインディング();
             this.曲検索フォルダ = new List<VariablePath>() { @"$(Exe)" };
             this.ウィンドウ表示位置Viewerモード用 = new Point( 100, 100 );
             this.ウィンドウサイズViewerモード用 = new Size( 640, 360 );
             this.判定位置調整ms = 0;
         }
 
-        public static システム設定 復元する()
+        public static システム設定 読み込む()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {

@@ -6,9 +6,9 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.EXPERT
+namespace DTXMania.演奏.EXPERT
 {
-    class ドラムキットとヒットバー : Activity
+    class ドラムキットとヒットバー : IDisposable
     {
         /// <summary>
         ///		0.0:閉じてる ～ 1.0:開いてる
@@ -16,18 +16,16 @@ namespace DTXMania.ステージ.演奏.EXPERT
         public float ハイハットの開度 { get; protected set; } = 1f;
 
 
+
+        // 生成と終了
+
+
         public ドラムキットとヒットバー()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._ドラムキット画像 = new テクスチャ( @"$(System)images\演奏\ドラムキットとヒットバー.png" ) );
-            }
-        }
+                this._ドラムキット画像 = new テクスチャ( @"$(System)images\演奏\ドラムキットとヒットバー.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\ドラムキットとヒットバー.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -54,12 +52,18 @@ namespace DTXMania.ステージ.演奏.EXPERT
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._ドラムキット画像?.Dispose();
             }
         }
+
+
+
+        // 操作
+
 
         /// <summary>
         ///		ベロシティ（開:0～80:閉）に応じたハイハット開度を設定する。
@@ -78,6 +82,11 @@ namespace DTXMania.ステージ.演奏.EXPERT
                 振動幅 = 0f,
             };
         }
+
+
+
+        // 進行と描画
+
 
         public void ドラムキットを進行描画する()
         {
@@ -223,14 +232,6 @@ namespace DTXMania.ステージ.演奏.EXPERT
             this._パーツを描画する( パーツ.Bar );
         }
 
-
-        protected テクスチャ _ドラムキット画像;
-
-        protected Dictionary<パーツ, RectangleF> _パーツ画像の矩形リスト = null;
-
-        protected Dictionary<パーツ, (float X, float Y)> _パーツ画像の中心位置 = null;
-
-
         private void _パーツを描画する( パーツ パーツ名, float X方向移動量 = 0f, float Y方向移動量 = 0f )
         {
             var 中心位置 = this._パーツ画像の中心位置[ パーツ名 ];
@@ -243,11 +244,22 @@ namespace DTXMania.ステージ.演奏.EXPERT
         }
 
 
+
+        // private
+
+
+        protected テクスチャ _ドラムキット画像;
+
+        protected Dictionary<パーツ, RectangleF> _パーツ画像の矩形リスト = null;
+
+        protected Dictionary<パーツ, (float X, float Y)> _パーツ画像の中心位置 = null;
+
         private class 振動パラメータ
         {
             public Counter カウンタ = null;
             public float 振動幅 = 0f;
         }
+
         private Dictionary<表示レーン種別, 振動パラメータ> _振動パラメータ = null;
 
         protected enum パーツ

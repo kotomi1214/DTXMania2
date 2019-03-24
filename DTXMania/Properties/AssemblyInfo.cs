@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration( "" )]
 [assembly: AssemblyCompany( "" )]
 [assembly: AssemblyProduct( "DTXMania2 - Beat with your heart" )]
-[assembly: AssemblyCopyright( "2000 2019 ＦＲＯＭ／Kenji Yamazaki" )]
+[assembly: AssemblyCopyright( "Copyright 2000 2019 ＦＲＯＭ／Kenji Yamazaki" )]
 [assembly: AssemblyTrademark( "" )]
 [assembly: AssemblyCulture( "" )]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible( false )]
 
 // このプロジェクトが COM に公開される場合、次の GUID が typelib の ID になります
-[assembly: Guid( "736be388-5ec5-4bf9-838b-8580c9a8da9c" )]
+[assembly: Guid( "9ab944ae-d0c4-4022-b407-a497160e2bd6" )]
 
 // アセンブリのバージョン情報は次の 4 つの値で構成されています:
 //
@@ -32,9 +32,5 @@ using System.Runtime.InteropServices;
 // すべての値を指定するか、次を使用してビルド番号とリビジョン番号を既定に設定できます
 // 既定値にすることができます:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion( "35.0.0.0" )]
-[assembly: AssemblyFileVersion( "35.0.0.0" )]
-
-// 公開先のアセンブリを指定する
-// [assembly: InternalsVisibleTo("公開先のアセンブリ名")]
-[assembly: InternalsVisibleTo( "DTXManiaTests" )]
+[assembly: AssemblyVersion( "36.0.0.0" )]
+[assembly: AssemblyFileVersion( "36.0.0.0" )]

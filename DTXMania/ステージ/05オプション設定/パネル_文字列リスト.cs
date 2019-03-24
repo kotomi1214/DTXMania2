@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		任意個の文字列から１つを選択できるパネル項目（コンボボックス）。
@@ -19,27 +19,21 @@ namespace DTXMania.ステージ.オプション設定
         public List<string> 選択肢リスト { get; protected set; } = new List<string>();
 
 
+
+        // 生成と終了
+
+
         public パネル_文字列リスト( string パネル名, IEnumerable<string> 選択肢初期値リスト = null, int 初期選択肢番号 = 0, Action<パネル> 値の変更処理 = null )
             : base( パネル名, 値の変更処理 )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            this.現在選択されている選択肢の番号 = 初期選択肢番号;
+
+            // 初期値があるなら設定する。
+            if( null != 選択肢初期値リスト )
             {
-                this.現在選択されている選択肢の番号 = 初期選択肢番号;
-
-                // 初期値があるなら設定する。
-                if( null != 選択肢初期値リスト )
-                {
-                    foreach( var item in 選択肢初期値リスト )
-                        this.選択肢リスト.Add( item );
-                }
-
-                Log.Info( $"文字列リストパネルを生成しました。[{this}]" );
+                foreach( var item in 選択肢初期値リスト )
+                    this.選択肢リスト.Add( item );
             }
-        }
-
-        protected override void On活性化()
-        {
-            Debug.Assert( 0 < this.選択肢リスト.Count, "リストが空です。活性化するより先に設定してください。" );
 
             this._選択肢文字列画像リスト = new Dictionary<string, 文字列画像>();
 
@@ -52,41 +46,51 @@ namespace DTXMania.ステージ.オプション設定
                 };
 
                 this._選択肢文字列画像リスト.Add( this.選択肢リスト[ i ], image );
-
-                this.子Activityを追加する( image );
             }
-
-            base.On活性化();   //忘れないこと
         }
 
-        protected override void On非活性化()
+        public override void Dispose()
         {
             foreach( var kvp in this._選択肢文字列画像リスト )
-                this.子Activityを削除する( kvp.Value );
+                kvp.Value?.Dispose();
 
             this._選択肢文字列画像リスト = null;
 
-            base.On非活性化();   //忘れないこと
+            base.Dispose(); // 忘れずに
         }
+
+
+        public override string ToString()
+            => $"{this.パネル名}, 選択肢: [{string.Join( ",", this.選択肢リスト )}]";
+
+
+
+        // 入力
+
 
         public override void 左移動キーが入力された()
         {
             this.現在選択されている選択肢の番号 = ( this.現在選択されている選択肢の番号 - 1 + this.選択肢リスト.Count ) % this.選択肢リスト.Count;
 
-            base.左移動キーが入力された(); // 忘れないこと
+            base.左移動キーが入力された();
         }
 
         public override void 右移動キーが入力された()
         {
             this.現在選択されている選択肢の番号 = ( this.現在選択されている選択肢の番号 + 1 ) % this.選択肢リスト.Count;
 
-            base.右移動キーが入力された(); // 忘れないこと
+            base.右移動キーが入力された();
         }
 
         public override void 確定キーが入力された()
             => this.右移動キーが入力された();
 
-        public override void 進行描画する( DeviceContext1 dc, float left, float top, bool 選択中 )
+
+
+        // 進行と描画
+
+
+        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
         {
             // (1) パネルの下地と名前を描画。
 
@@ -116,8 +120,9 @@ namespace DTXMania.ステージ.オプション設定
                 Y方向拡大率: 拡大率Y );
         }
 
-        public override string ToString()
-            => $"{this.パネル名}, 選択肢: [{string.Join( ",", this.選択肢リスト )}]";
+
+
+        // private
 
 
         // 各文字列は画像で保持。

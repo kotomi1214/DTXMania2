@@ -5,21 +5,24 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania.設定;
 
-namespace DTXMania.ステージ.認証
+namespace DTXMania.認証
 {
     /// <summary>
     ///     ユーザリストパネルの表示とユーザの選択。
-    ///     ユーザリストは <see cref="App.ユーザ管理"/> が保持している。
+    ///     ユーザリストは <see cref="App進行描画.ユーザ管理"/> が保持している。
     /// </summary>
-    class ユーザリスト : Activity
+    class ユーザリスト : IDisposable
     {
         /// <summary>
         ///		現在選択中のユーザ。
-        ///		0 ～ <see cref="App.ユーザ管理.ユーザリスト.Count"/>-1。
+        ///		0 ～ <see cref="App進行描画.ユーザ管理.ユーザリスト.Count"/>-1。
         /// </summary>
         public int 選択中のユーザ { get; protected set; } = 0;
+
+
+
+        // 生成と終了
 
 
         public ユーザリスト()
@@ -28,78 +31,82 @@ namespace DTXMania.ステージ.認証
             {
                 var image = (画像) null;
 
+
+                // ユーザパネル
+
                 this._ユーザパネル = new Dictionary<PlayMode, 画像>();
 
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\パネル_0.png" ) );
+                image = new 画像( @"$(System)images\認証\パネル_0.png" );
                 this._ユーザパネル.Add( PlayMode.BASIC, image );
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\パネル_1.png" ) );
+
+                image = new 画像( @"$(System)images\認証\パネル_1.png" );
                 this._ユーザパネル.Add( PlayMode.EXPERT, image );
+
+
+                // ユーザパネル（光彩付き）
 
                 this._ユーザパネル光彩付き = new Dictionary<PlayMode, 画像>();
 
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\パネル_0_光彩あり.png" ) );
+                image = new 画像( @"$(System)images\認証\パネル_0_光彩あり.png" );
                 this._ユーザパネル光彩付き.Add( PlayMode.BASIC, image );
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\パネル_1_光彩あり.png" ) );
+
+                image = new 画像( @"$(System)images\認証\パネル_1_光彩あり.png" );
                 this._ユーザパネル光彩付き.Add( PlayMode.EXPERT, image );
+
+
+                // 肩書パネル
 
                 this._ユーザ肩書きパネル = new Dictionary<PlayMode, 画像>();
 
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\肩書きパネル_0.png" ) );
+                image = new 画像( @"$(System)images\認証\肩書きパネル_0.png" );
                 this._ユーザ肩書きパネル.Add( PlayMode.BASIC, image );
-                this.子Activityを追加する( image = new 画像( @"$(System)images\認証\肩書きパネル_1.png" ) );
+
+                image = new 画像( @"$(System)images\認証\肩書きパネル_1.png" );
                 this._ユーザ肩書きパネル.Add( PlayMode.EXPERT, image );
 
-                this.子Activityを追加する( this._ユーザ名 = new 文字列画像() {
+
+                // ユーザ名
+
+                this._ユーザ名 = new 文字列画像() {
                     表示文字列 = "",
                     フォントサイズpt = 46f,
                     描画効果 = 文字列画像.効果.縁取り,
                     縁のサイズdpx = 6f,
                     前景色 = Color4.Black,
                     背景色 = Color4.White,
-                } );
+                };
+
+
+                this._光彩アニメカウンタをリセットする();
             }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
+                this._ユーザ名?.Dispose();
+
+                foreach( var kvp in this._ユーザ肩書きパネル )
+                    kvp.Value?.Dispose();
+
+                foreach( var kvp in this._ユーザパネル光彩付き )
+                    kvp.Value?.Dispose();
+
+                foreach( var kvp in this._ユーザパネル )
+                    kvp.Value?.Dispose();
             }
         }
 
-        protected override void On非活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
+        
+        
+        // 進行と描画
 
-        /// <summary>
-        ///     ユーザリスト上で、選択されているユーザのひとつ前のユーザを選択する。
-        /// </summary>
-        public void 前のユーザを選択する()
-        {
-            this.選択中のユーザ = ( this.選択中のユーザ - 1 + App.ユーザ管理.ユーザリスト.Count ) % App.ユーザ管理.ユーザリスト.Count;  // 前がないなら末尾へ
 
-            // アニメーションリセット
-            this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
-        }
-
-        /// <summary>
-        ///     ユーザリスト上で、選択されているユーザのひとつ前のユーザを選択する。
-        /// </summary>
-        public void 次のユーザを選択する()
-        {
-            this.選択中のユーザ = ( this.選択中のユーザ + 1 ) % App.ユーザ管理.ユーザリスト.Count;   // 次がないなら先頭へ
-
-            // アニメーションリセット
-            this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
-        }
-
-        public void 進行描画する( DeviceContext1 dc )
+        public void 進行描画する( DeviceContext dc )
         {
             var 描画位置 = new Vector2( 569f, 188f );
+
             const float リストの改行幅 = 160f;
 
 
@@ -120,12 +127,12 @@ namespace DTXMania.ステージ.認証
 
 
             // ユーザリストを描画する。
-            
-            int 表示人数 = Math.Min( 5, App.ユーザ管理.ユーザリスト.Count );   // HACK: 現状は最大５人までとする。
+
+            int 表示人数 = Math.Min( 5, App進行描画.ユーザ管理.ユーザリスト.Count );   // HACK: 現状は最大５人までとする。
 
             for( int i = 0; i < 表示人数; i++ )
             {
-                var user = App.ユーザ管理.ユーザリスト[ i ];
+                var user = App進行描画.ユーザ管理.ユーザリスト[ i ];
                 var playMode = user.演奏モード;
 
                 if( i == this.選択中のユーザ )
@@ -141,6 +148,37 @@ namespace DTXMania.ステージ.認証
         }
 
 
+
+        // ユーザ選択
+
+
+        /// <summary>
+        ///     ユーザリスト上で、選択されているユーザのひとつ前のユーザを選択する。
+        /// </summary>
+        public void 前のユーザを選択する()
+        {
+            this.選択中のユーザ = ( this.選択中のユーザ - 1 + App進行描画.ユーザ管理.ユーザリスト.Count ) % App進行描画.ユーザ管理.ユーザリスト.Count;  // 前がないなら末尾へ
+
+            // アニメーションリセット
+            this._光彩アニメカウンタをリセットする();
+        }
+
+        /// <summary>
+        ///     ユーザリスト上で、選択されているユーザのひとつ前のユーザを選択する。
+        /// </summary>
+        public void 次のユーザを選択する()
+        {
+            this.選択中のユーザ = ( this.選択中のユーザ + 1 ) % App進行描画.ユーザ管理.ユーザリスト.Count;   // 次がないなら先頭へ
+
+            // アニメーションリセット
+            this._光彩アニメカウンタをリセットする();
+        }
+
+
+        
+        // private
+
+
         private Dictionary<PlayMode, 画像> _ユーザパネル = null;
 
         private Dictionary<PlayMode, 画像> _ユーザパネル光彩付き = null;
@@ -150,5 +188,11 @@ namespace DTXMania.ステージ.認証
         private LoopCounter _光彩アニメカウンタ = null;
 
         private 文字列画像 _ユーザ名 = null;
+
+
+        private void _光彩アニメカウンタをリセットする()
+        {
+            this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
+        }
     }
 }

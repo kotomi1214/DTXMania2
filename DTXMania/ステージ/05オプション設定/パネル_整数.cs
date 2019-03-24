@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		数値ボックス。整数のみ、単位表示は任意。
@@ -24,38 +24,44 @@ namespace DTXMania.ステージ.オプション設定
         public string 単位 { get; set; }
 
 
+
+        // 生成と終了
+
+
         public パネル_整数( string パネル名, int 最小値, int 最大値, int 初期値, int 増加減単位値 = 1, string 単位 = "", Action<パネル> 値の変更処理 = null, Color4? ヘッダ色 = null )
             : base( パネル名, 値の変更処理, ヘッダ色 )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.最小値 = 最小値;
-                this.最大値 = 最大値;
-                this.現在の値 = 初期値;
-                this.増加減単位値 = 増加減単位値;
-                this.単位 = 単位;
+            this.最小値 = 最小値;
+            this.最大値 = 最大値;
+            this.現在の値 = 初期値;
+            this.増加減単位値 = 増加減単位値;
+            this.単位 = 単位;
 
-                this.子Activityを追加する( this._項目画像 = new 文字列画像() { 表示文字列 = "", フォントサイズpt = 34f, 前景色 = Color4.White } );
-                Log.Info( $"整数パネルを生成しました。[{this}]" );
-            }
+            this._項目画像 = new 文字列画像() { 表示文字列 = "", フォントサイズpt = 34f, 前景色 = Color4.White };
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            base.On活性化();   //忘れないこと
+            this._項目画像?.Dispose();
+
+            base.Dispose(); // 忘れずに
         }
 
-        protected override void On非活性化()
-        {
-            base.On非活性化();   //忘れないこと
-        }
+
+        public override string ToString()
+            => $"{this.パネル名}, 最小値:{this.最小値}, 最大値:{this.最大値}, 増加減単位値:{this.増加減単位値}, 現在の値:{this.現在の値}";
+
+
+
+        // 入力
+
 
         public override void 左移動キーが入力された()
         {
             // 値を減らす。
             this.現在の値 = Math.Max( this.最小値, this.現在の値 - this.増加減単位値 );
 
-            base.左移動キーが入力された(); // 忘れないこと
+            base.左移動キーが入力された();
         }
 
         public override void 右移動キーが入力された()
@@ -63,7 +69,7 @@ namespace DTXMania.ステージ.オプション設定
             // 値を増やす。
             this.現在の値 = Math.Min( this.最大値, this.現在の値 + this.増加減単位値 );
 
-            base.右移動キーが入力された(); // 忘れないこと
+            base.右移動キーが入力された();
         }
 
         public override void 確定キーが入力された()
@@ -75,10 +81,15 @@ namespace DTXMania.ステージ.オプション設定
             if( this.現在の値 > this.最大値 )
                 this.現在の値 = this.最小値;
 
-            base.確定キーが入力された();  // 忘れないこと
+            base.確定キーが入力された();
         }
 
-        public override void 進行描画する( DeviceContext1 dc, float left, float top, bool 選択中 )
+
+
+        // 進行と描画
+
+
+        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
         {
             // (1) パネルの下地と名前を描画。
 
@@ -109,8 +120,9 @@ namespace DTXMania.ステージ.オプション設定
                 Y方向拡大率: 拡大率Y );
         }
 
-        public override string ToString()
-            => $"{this.パネル名}, 最小値:{this.最小値}, 最大値:{this.最大値}, 増加減単位値:{this.増加減単位値}, 現在の値:{this.現在の値}";
+
+
+        // private
 
 
         private 文字列画像 _項目画像 = null;

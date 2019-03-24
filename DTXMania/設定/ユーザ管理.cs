@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.データベース.ユーザ.User09;
+using User = DTXMania.User09;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     /// <summary>
     ///		全ユーザの管理（ログオン、ログオフなど）を行う。
@@ -21,6 +21,10 @@ namespace DTXMania.設定
         /// </summary>
         public ユーザ設定 ログオン中のユーザ
             => ( 0 <= this.ユーザリスト.SelectedIndex ) ? this.ユーザリスト[ this.ユーザリスト.SelectedIndex ] : null;
+
+
+
+        // 生成と終了
 
 
         public ユーザ管理()

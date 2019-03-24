@@ -7,34 +7,30 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class フェーズパネル : Activity
+    class フェーズパネル : IDisposable
     {
         /// <summary>
         ///		現在の位置を 開始点:0～1:終了点 で示す。
         /// </summary>
         public float 現在位置
         {
-            get
-                => this._現在位置;
-            set
-                => this._現在位置 = Math.Min( Math.Max( 0.0f, value ), 1.0f );
+            get => this._現在位置;
+            set => this._現在位置 = Math.Min( Math.Max( 0.0f, value ), 1.0f );
         }
+
+
+
+        // 生成と終了
 
 
         public フェーズパネル()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._演奏位置カーソル画像 = new テクスチャ( @"$(System)images\演奏\演奏位置カーソル.png" ) );
-            }
-        }
+                this._演奏位置カーソル画像 = new テクスチャ( @"$(System)images\演奏\演奏位置カーソル.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\演奏位置カーソル.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -49,24 +45,26 @@ namespace DTXMania.ステージ.演奏
                 }
 
                 this._現在位置 = 0.0f;
-                this._初めての進行描画 = true;
+
+                this._左右三角アニメ用カウンタ = new LoopCounter( 0, 100, 5 );
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._演奏位置カーソル画像?.Dispose();
             }
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
-            if( this._初めての進行描画 )
-            {
-                this._左右三角アニメ用カウンタ = new LoopCounter( 0, 100, 5 );
-                this._初めての進行描画 = false;
-            }
 
             var 中央位置dpx = new Vector2( 1308f, 876f - this._現在位置 * 767f );
 
@@ -90,7 +88,9 @@ namespace DTXMania.ステージ.演奏
         }
 
 
-        private bool _初めての進行描画 = true;
+
+        // private
+
 
         private float _現在位置 = 0.0f;
 

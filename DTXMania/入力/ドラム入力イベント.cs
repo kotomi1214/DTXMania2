@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania.入力
+namespace DTXMania
 {
     /// <summary>
     ///		単一の入力イベントを表す。

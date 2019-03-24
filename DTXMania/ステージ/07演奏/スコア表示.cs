@@ -8,26 +8,24 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
     /// <summary>
     ///		スコアの描画を行う。
     ///		スコアの計算については、<see cref="成績"/> クラスにて実装する。
     /// </summary>
-    class スコア表示 : Activity
+    class スコア表示 : IDisposable
     {
+
+        // 生成と終了
+
+
         public スコア表示()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._スコア数字画像 = new 画像( @"$(System)images\演奏\スコア数字.png" ) );
-            }
-        }
+                this._スコア数字画像 = new 画像( @"$(System)images\演奏\スコア数字.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\スコア数字.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -56,20 +54,27 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 for( int i = 0; i < this._各桁のアニメ.Length; i++ )
                     this._各桁のアニメ[ i ].Dispose();
                 this._各桁のアニメ = null;
+
+                this._スコア数字画像?.Dispose();
             }
         }
+
+
+
+        // 進行と描画
+
 
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext1 dc, アニメーション管理 am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext dc, アニメーション am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             // 進行。
 
@@ -94,14 +99,13 @@ namespace DTXMania.ステージ.演奏
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 for( int i = 0; i < 数字.Length; i++ )
                 {
                     // 前回の文字と違うなら、桁アニメーション開始。
                     if( 数字[ i ] != this._前回表示した数字[ i ] )
-                    {
                         this._各桁のアニメ[ i ].跳ね開始( am, 0.0 );
-                    }
 
                     var 転送元矩形 = this._スコア数字の矩形リスト[ 数字[ i ].ToString() ];
 
@@ -123,6 +127,10 @@ namespace DTXMania.ステージ.演奏
             this._前回表示したスコア = this._現在表示中のスコア;
             this._前回表示した数字 = 数字;
         }
+
+
+
+        // private
 
 
         /// <summary>
@@ -161,7 +169,7 @@ namespace DTXMania.ステージ.演奏
                 this.Yオフセット?.Dispose();
             }
 
-            public void 跳ね開始( アニメーション管理 am, double 遅延sec )
+            public void 跳ね開始( アニメーション am, double 遅延sec )
             {
                 this.Dispose();
 
@@ -181,6 +189,7 @@ namespace DTXMania.ステージ.演奏
                 this.ストーリーボード.Schedule( am.Timer.Time );
             }
         };
+
         private 各桁のアニメ[] _各桁のアニメ = null;
 
 

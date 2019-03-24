@@ -7,9 +7,9 @@ using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania.ステージ.選曲
+namespace DTXMania.選曲
 {
-    class 表示方法選択パネル : Activity
+    class 表示方法選択パネル : IDisposable
     {
         public enum 表示方法
         {
@@ -17,11 +17,11 @@ namespace DTXMania.ステージ.選曲
             評価順,
         }
 
-        public 表示方法 現在の表示方法
-        {
-            get;
-            protected set;
-        }
+        public 表示方法 現在の表示方法 { get; protected set; }
+
+
+
+        // 生成と終了
 
 
         public 表示方法選択パネル()
@@ -33,19 +33,11 @@ namespace DTXMania.ステージ.選曲
                 this._表示開始位置 = this._指定した表示方法が選択位置に来る場合の表示開始位置を返す( this.現在の表示方法 );
 
                 foreach( var p in this._パネルs )
-                    this.子Activityを追加する( p.画像 = new テクスチャ( p.vpath ) );
-            }
-        }
+                    p.画像 = new テクスチャ( p.vpath );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                //this.表示方法 = 表示方法種別.全曲;    --> 前回の値を継承
-
-                var animation = グラフィックデバイス.Instance.Animation;
+                var animation = グラフィックデバイス.Instance.アニメーション;
                 this._横方向差分割合 = new Variable( animation.Manager, initialValue: 0.0 );
-                this._横方向差分移動ストーリーボード = new Storyboard( グラフィックデバイス.Instance.Animation.Manager );
+                this._横方向差分移動ストーリーボード = new Storyboard( animation.Manager );
                 using( var 維持 = animation.TrasitionLibrary.Constant( 0.0 ) )
                 {
                     this._横方向差分移動ストーリーボード.AddTransition( this._横方向差分割合, 維持 );
@@ -54,20 +46,25 @@ namespace DTXMania.ステージ.選曲
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                foreach( var p in this._パネルs )
+                    p.画像?.Dispose();
+
                 this._横方向差分移動ストーリーボード?.Abandon();
                 this._横方向差分移動ストーリーボード?.Dispose();
-                this._横方向差分移動ストーリーボード = null;
-
                 this._横方向差分割合?.Dispose();
-                this._横方向差分割合 = null;
             }
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
             // パネルを合計８枚表示する。（左隠れ１枚 ＋ 表示６枚 ＋ 右隠れ１枚）
 
@@ -84,6 +81,11 @@ namespace DTXMania.ステージ.選曲
                 表示元の位置 = ( 表示元の位置 + 1 ) % this._パネルs.Count;
             }
         }
+
+
+
+        // パネルの選択
+
 
         public void 次のパネルを選択する()
         {

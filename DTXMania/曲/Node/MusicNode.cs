@@ -3,13 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using SharpDX.Direct3D11;
-using SSTFormat.v4;
 using FDK;
-using DTXMania.設定;
-using DTXMania.データベース.曲;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		曲ツリー階層において「曲」を表すノード。
@@ -33,16 +29,20 @@ namespace DTXMania.曲
         public int BGMAdjust { get; set; } = 0;
 
 
-        /// <summary>
-        ///     指定されたファイルをもとに、初期化する。
-        /// </summary>
+
+        // 生成と終了
+
+
         public MusicNode( VariablePath 曲ファイルの絶対パス, Node 親ノード )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
 
-            // （まだ存在してなければ）曲DBに追加する。
-            曲DB.曲を追加または更新する( this.曲ファイルの絶対パス, App.ユーザ管理.ログオン中のユーザ );
+            if( !App.ビュアーモードである )
+            {
+                // （まだ存在してなければ）曲DBに追加する。
+                曲DB.曲を追加または更新する( this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
+            }
 
             // 追加後、改めて曲DBから情報を取得する。
             using( var songdb = new SongDB() )
@@ -62,7 +62,7 @@ namespace DTXMania.曲
                 if( song.PreImage.Nullでも空でもない() )
                 {
                     var プレビュー画像ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage );
-                    this.子Activityを追加する( this.ノード画像 = new テクスチャ( プレビュー画像ファイルの絶対パス ) );
+                    this.ノード画像 = new テクスチャ( プレビュー画像ファイルの絶対パス );
                 }
 
                 if( song.PreSound.Nullでも空でもない() )
@@ -70,6 +70,13 @@ namespace DTXMania.曲
 
                 this.BGMAdjust = song.BGMAdjust;
             }
+        }
+
+        public override void Dispose()
+        {
+            this.ノード画像?.Dispose();
+
+            base.Dispose();
         }
     }
 }

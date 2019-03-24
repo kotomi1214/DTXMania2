@@ -6,23 +6,21 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.EXPERT
+namespace DTXMania.演奏.EXPERT
 {
-    class レーンフラッシュ : Activity
+    class レーンフラッシュ : IDisposable
     {
+
+
+        // 生成と終了
+
+
         public レーンフラッシュ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュEXPERT.png" ) );
-                this._レーンフラッシュ画像.加算合成する = true;
-            }
-        }
+                this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュEXPERT.png" ) { 加算合成する = true };
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 {
                     var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\レーンフラッシュEXPERT.yaml" );
 
@@ -65,17 +63,29 @@ namespace DTXMania.ステージ.演奏.EXPERT
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._レーンフラッシュ画像?.Dispose();
             }
         }
+
+
+
+
+        // フラッシュ開始
+
 
         public void 開始する( 表示レーン種別 laneType )
         {
             this._フラッシュ情報[ laneType ].開始する( 0, 10, 15 );
         }
+
+
+
+        // 進行と描画
+
 
         public void 進行描画する()
         {
@@ -105,6 +115,10 @@ namespace DTXMania.ステージ.演奏.EXPERT
         }
 
 
+
+        // private
+
+
         private テクスチャ _レーンフラッシュ画像 = null;
 
         private Dictionary<表示レーン種別, RectangleF> _レーンフラッシュの矩形リスト = null;
@@ -112,7 +126,6 @@ namespace DTXMania.ステージ.演奏.EXPERT
         private Dictionary<表示レーン種別, float> _レーン中央位置Xリスト = null;
 
         private Dictionary<表示レーン種別, Counter> _フラッシュ情報 = null;
-
 
         private class YAMLマップ_レーンフラッシュ
         {

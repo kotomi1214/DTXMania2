@@ -4,11 +4,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CSCore;
-using FDK;
 using SSTFormat.v4;
-using DTXMania.設定;
+using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		<see cref="スコア.WAVリスト"/> の各サウンドインスタンスを管理する。
@@ -16,6 +15,10 @@ namespace DTXMania.曲
     /// </summary>
     class WAV管理 : IDisposable
     {
+
+        // 生成と終了
+
+
         /// <param name="多重度">
         ///     １サウンドの最大多重発声数。1以上。
         /// </param>
@@ -36,12 +39,22 @@ namespace DTXMania.曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                foreach( var kvp in this._WAV情報リスト )
-                    kvp.Value.Dispose();
+                this._一時停止中の音声のリスト = null;
+
+                if( null != this._WAV情報リスト )
+                {
+                    foreach( var kvp in this._WAV情報リスト )
+                        kvp.Value?.Dispose();
+                }
 
                 this._WAV情報リスト = null;
             }
         }
+
+
+
+        // 登録、発声停止、再開
+
 
         /// <summary>
         ///		指定したWAV番号にサウンドファイルを登録する。
@@ -51,13 +64,8 @@ namespace DTXMania.曲
         /// <remarks>
         ///     サウンドの生成に失敗した場合には登録を行わない。
         /// </remarks>
-        public void 登録する( SoundDevice device, int wav番号, VariablePath サウンドファイル, bool 多重再生する, bool BGMである )
+        public void 登録する( int wav番号, VariablePath サウンドファイル, bool 多重再生する, bool BGMである )
         {
-            #region " パラメータチェック。"
-            //----------------
-            if( null == device )
-                throw new ArgumentNullException();
-
             if( ( 0 > wav番号 ) || ( 36 * 36 <= wav番号 ) )
                 throw new ArgumentOutOfRangeException( $"WAV番号が範囲(0～1295)を超えています。[{wav番号}]" );
 
@@ -66,12 +74,11 @@ namespace DTXMania.曲
                 Log.WARNING( $"サウンドファイルが存在しません。[{サウンドファイル.変数付きパス}]" );
                 return;
             }
-            //----------------
-            #endregion
+
 
             // 先に ISampleSource を生成する。
 
-            var サンプルソース = App.WAVキャッシュレンタル.作成する( サウンドファイル );
+            var サンプルソース = App進行描画.WAVキャッシュレンタル.作成する( サウンドファイル );
 
             if( null == サンプルソース )
             {
@@ -87,7 +94,7 @@ namespace DTXMania.曲
             int 多重度 = ( 多重再生する ) ? this._既定の多重度 : 1;
 
             this._WAV情報リスト[ wav番号 ] = new WAV情報( wav番号, 多重度, BGMである );
-            this._WAV情報リスト[ wav番号 ].サウンドを生成する( device, サンプルソース );
+            this._WAV情報リスト[ wav番号 ].サウンドを生成する( App進行描画.サウンドデバイス, サンプルソース );
 
             Log.Info( $"サウンドを読み込みました。[{サウンドファイル.変数付きパス}]" );
         }
@@ -118,7 +125,7 @@ namespace DTXMania.曲
             // 発声する。
 
             if( this._WAV情報リスト[ WAV番号 ].BGMである )        // BGM なら BGMAdjust を適用する
-                再生開始時刻sec += App.演奏曲ノード.BGMAdjust / 1000.0;
+                再生開始時刻sec += App進行描画.演奏曲ノード.BGMAdjust / 1000.0;
 
             this._WAV情報リスト[ WAV番号 ].発声する( muteGroupType, 音量, 再生開始時刻sec );
         }
@@ -145,6 +152,37 @@ namespace DTXMania.曲
                 kvp.Value.再生位置を移動する( 移動量sec );
         }
 
+        public void 再生中の音声をすべて一時停止する()
+        {
+            this._一時停止中の音声のリスト.Clear();
+
+            foreach( var kvp in this._WAV情報リスト )
+            {
+                foreach( var sound in kvp.Value.Sounds )
+                {
+                    if( sound.再生中である )
+                    {
+                        sound.Pause();
+                        this._一時停止中の音声のリスト.Add( sound );
+                    }
+                }
+            }
+        }
+
+        public void 一時停止中の音声をすべて再開する()
+        {
+            foreach( var sound in this._一時停止中の音声のリスト )
+            {
+                sound.Resume();
+            }
+        }
+
+
+
+        // private
+
+
+        private List<Sound> _一時停止中の音声のリスト = new List<Sound>();
 
         private readonly int _既定の多重度;
 
@@ -199,7 +237,7 @@ namespace DTXMania.曲
             /// <summary>
             ///     多重度の数だけ Sound を生成する。ただしソースは共通。
             /// </summary>
-            public void サウンドを生成する( SoundDevice device, ISampleSource sampleSource )
+            public void サウンドを生成する( サウンドデバイス device, ISampleSource sampleSource )
             {
                 for( int i = 0; i < this.Sounds.Length; i++ )
                     this.Sounds[ i ] = new Sound( device, sampleSource );

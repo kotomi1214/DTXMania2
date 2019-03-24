@@ -5,9 +5,8 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania.アイキャッチ;
 
-namespace DTXMania.ステージ.タイトル
+namespace DTXMania.タイトル
 {
     class タイトルステージ : ステージ
     {
@@ -15,144 +14,172 @@ namespace DTXMania.ステージ.タイトル
         {
             表示,
             フェードアウト,
-            確定,
+            完了,
             キャンセル,
         }
-
         public フェーズ 現在のフェーズ { get; protected set; }
+
+
+
+        // 生成と終了
 
 
         public タイトルステージ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._舞台画像 = new 舞台画像() );
-                this.子Activityを追加する( this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" ) );
-                this.子Activityを追加する( this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り } );
-                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._帯ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
+                if( this.活性化中 )
+                    this.非活性化する();
+            }
+        }
 
-                App.システムサウンド.再生する( 設定.システムサウンド種別.タイトルステージ_開始音 );
-                App.システムサウンド.再生する( 設定.システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );
+
+
+        // 活性化と非活性化
+
+
+        public override void 活性化する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    return;
+
+                this._舞台画像 = new 舞台画像();
+                this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" );
+                this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り };
+                this._システム情報 = new システム情報();
+
+                this._帯ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
+
+                App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_開始音 );
+                App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );
 
                 this.現在のフェーズ = フェーズ.表示;
 
-                base.On活性化();
+
+                base.活性化する();
             }
         }
 
-        protected override void On非活性化()
+        public override void 非活性化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                App.システムサウンド.停止する( 設定.システムサウンド種別.タイトルステージ_開始音 );
-                App.システムサウンド.停止する( 設定.システムサウンド種別.タイトルステージ_ループBGM );
-                //App.システムサウンド.停止する( 設定.システムサウンド種別.タイトルステージ_確定音 );  --> ならしっぱなしでいい
+                if( !this.活性化中 )
+                    return;
 
                 this._帯ブラシ?.Dispose();
-                this._帯ブラシ = null;
 
-                base.On非活性化();
+                App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_開始音 );
+                App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_ループBGM );
+                //App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_確定音 );  --> ならしっぱなしでいい
+
+
+                base.非活性化する();
             }
         }
 
-        public override void 進行描画する( DeviceContext1 dc )
-        {
-            App.入力管理.すべての入力デバイスをポーリングする();
 
-            this._システム情報.VPSをカウントする();
+
+        // 進行と描画
+
+
+        public override void 進行する()
+        {
             this._システム情報.FPSをカウントしプロパティを更新する();
+
+            App進行描画.入力管理.すべての入力デバイスをポーリングする();
 
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示:
-                    #region " タイトル画面を表示し、入力の判定を行う。"
+                    #region " 入力判定 "
                     //----------------
+                    if( App進行描画.入力管理.確定キーが入力された() )
                     {
-                        // 進行描画
+                        #region " 確定 "
+                        //----------------
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_確定音 );
+                        App進行描画.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( シャッター ) );
 
-                        this._舞台画像.進行描画する( dc );
-
-                        this._タイトルロゴ.描画する(
-                            dc,
-                            ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                            ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
-
-                        this._帯メッセージを描画する( dc );
-
-                        this._システム情報.描画する( dc );
-
-                        // 入力
-
-                        if( App.入力管理.確定キーが入力された() )
-                        {
-                            #region " 確定 "
-                            //----------------
-                            App.システムサウンド.再生する( 設定.システムサウンド種別.タイトルステージ_確定音 );
-                            App.ステージ管理.アイキャッチを選択しクローズする( nameof( シャッター ) );
-                            this.現在のフェーズ = フェーズ.フェードアウト;
-                            //----------------
-                            #endregion
-                        }
-                        else if( App.入力管理.キャンセルキーが入力された() )
-                        {
-                            #region " キャンセル "
-                            //----------------
-                            this.現在のフェーズ = フェーズ.キャンセル;
-                            //----------------
-                            #endregion
-                        }
+                        this.現在のフェーズ = フェーズ.フェードアウト;
+                        //----------------
+                        #endregion
                     }
+                    else if( App進行描画.入力管理.キャンセルキーが入力された() )
+                    {
+                        #region " キャンセル "
+                        //----------------
+                        this.現在のフェーズ = フェーズ.キャンセル;
+                        //----------------
+                        #endregion
+                    }
+                    //----------------
+                    #endregion
+                    break;
+            }
+        }
+
+        public override void 描画する()
+        {
+            this._システム情報.VPSをカウントする();
+
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.表示:
+                    #region " タイトル画面を表示する。"
+                    //----------------
+                    this._舞台画像.進行描画する( dc );
+                    this._タイトルロゴ.描画する(
+                        dc,
+                        ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
+                        ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+                    this._帯メッセージを描画する( dc );
                     //----------------
                     #endregion
                     break;
 
                 case フェーズ.フェードアウト:
-                    #region " アイキャッチを使って、タイトル画面をフェードアウトする。"
+                    #region " タイトル画面を表示する。"
                     //----------------
+                    this._舞台画像.進行描画する( dc );
+                    this._タイトルロゴ.描画する(
+                        dc,
+                        ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
+                        ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+                    this._帯メッセージを描画する( dc );
+                    //----------------
+                    #endregion
+                    #region " アイキャッチを描画する。"
+                    //----------------
+                    App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( グラフィックデバイス.Instance.既定のD2D1DeviceContext );
+
+                    if( App進行描画.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
                     {
-                        // 画面描画
-
-                        this._舞台画像.進行描画する( dc );
-
-                        this._タイトルロゴ.描画する(
-                            dc,
-                            ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                            ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
-
-                        this._帯メッセージを描画する( dc );
-
-
-                        // アイキャッチ描画
-
-                        App.ステージ管理.現在のアイキャッチ.進行描画する( dc );
-
-                        if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.クローズ完了 )
-                        {
-                            this.現在のフェーズ = フェーズ.確定;
-                        }
-
-
-                        // システム情報描画
-
-                        this._システム情報.描画する( dc );
+                        this.現在のフェーズ = フェーズ.完了;
                     }
                     //----------------
                     #endregion
                     break;
-
-                case フェーズ.確定:
-                case フェーズ.キャンセル:
-                    break;
             }
+
+            this._システム情報.描画する( dc );
         }
+
+
+
+        // private
 
 
         private 舞台画像 _舞台画像 = null;
@@ -166,7 +193,7 @@ namespace DTXMania.ステージ.タイトル
         private システム情報 _システム情報 = null;
 
 
-        private void _帯メッセージを描画する( DeviceContext1 dc )
+        private void _帯メッセージを描画する( DeviceContext dc )
         {
             var 領域 = new RectangleF( 0f, 800f, グラフィックデバイス.Instance.設計画面サイズ.Width, 80f );
 

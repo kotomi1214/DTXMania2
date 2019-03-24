@@ -7,22 +7,20 @@ using SharpDX;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class 判定文字列 : Activity
+    class 判定文字列 : IDisposable
     {
+
+        // 生成と終了
+
+
         public 判定文字列()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._判定文字列画像 = new テクスチャ( @"$(System)images\演奏\判定文字列.png" ) );
-            }
-        }
+                this._判定文字列画像 = new テクスチャ( @"$(System)images\演奏\判定文字列.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\判定文字列.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -51,16 +49,22 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 foreach( var kvp in this._レーンtoステータス )
                     kvp.Value.Dispose();
-
                 this._レーンtoステータス = null;
+
+                this._判定文字列画像?.Dispose();
             }
         }
+
+
+
+        // 表示開始
+
 
         public void 表示を開始する( 表示レーン種別 lane, 判定種別 judge )
         {
@@ -69,6 +73,11 @@ namespace DTXMania.ステージ.演奏
             status.判定種別 = judge;
             status.現在の状態 = 表示レーンステータス.状態.表示開始;  // 描画スレッドへ通知。
         }
+
+
+
+        // 進行と描画
+
 
         public void 進行描画する()
         {
@@ -84,7 +93,7 @@ namespace DTXMania.ステージ.演奏
                         {
                             status.アニメ用メンバを解放する();
 
-                            var animation = グラフィックデバイス.Instance.Animation;
+                            var animation = グラフィックデバイス.Instance.アニメーション;
 
                             #region " (1) 光 アニメーションを構築 "
                             //----------------
@@ -332,6 +341,10 @@ namespace DTXMania.ステージ.演奏
         }
 
 
+
+        // private
+
+
         private テクスチャ _判定文字列画像 = null;
 
         private Dictionary<string, RectangleF> _判定文字列の矩形リスト = null;
@@ -407,9 +420,10 @@ namespace DTXMania.ステージ.演奏
                 // 表示中央位置は、レーンごとに固定。
                 float x = 0f;
 
-                if( App.ユーザ管理.ログオン中のユーザ.演奏モード == 設定.PlayMode.BASIC )
+                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
                     x = BASIC.レーンフレーム.領域.Left + BASIC.レーンフレーム.現在のレーン配置.表示レーンの左端位置dpx[ lane ] + BASIC.レーンフレーム.現在のレーン配置.表示レーンの幅dpx[ lane ] / 2f;
-                if( App.ユーザ管理.ログオン中のユーザ.演奏モード == 設定.PlayMode.EXPERT )
+
+                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                     x = EXPERT.レーンフレーム.レーン中央位置X[ lane ];
 
                 switch( lane )
@@ -436,40 +450,18 @@ namespace DTXMania.ステージ.演奏
             public void アニメ用メンバを解放する()
             {
                 this.文字列本体のストーリーボード?.Abandon();
-
                 this.文字列本体のストーリーボード?.Dispose();
-                this.文字列本体のストーリーボード = null;
-
                 this.文字列本体の不透明度?.Dispose();
-                this.文字列本体の不透明度 = null;
-
                 this.文字列本体の相対Y位置dpx?.Dispose();
-                this.文字列本体の相対Y位置dpx = null;
-
                 this.文字列影のストーリーボード?.Abandon();
-
                 this.文字列影のストーリーボード?.Dispose();
-                this.文字列影のストーリーボード = null;
-
                 this.文字列影の不透明度?.Dispose();
-                this.文字列影の不透明度 = null;
-
                 this.文字列影の相対Y位置dpx?.Dispose();
-                this.文字列影の相対Y位置dpx = null;
-
                 this.光のストーリーボード?.Abandon();
-
                 this.光のストーリーボード?.Dispose();
-                this.光のストーリーボード = null;
-
                 this.光のY方向拡大率?.Dispose();
-                this.光のY方向拡大率 = null;
-
                 this.光のX方向拡大率?.Dispose();
-                this.光のX方向拡大率 = null;
-
                 this.光の回転角?.Dispose();
-                this.光の回転角 = null;
             }
         }
 

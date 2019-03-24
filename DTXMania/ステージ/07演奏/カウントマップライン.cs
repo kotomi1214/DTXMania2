@@ -6,9 +6,9 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class カウントマップライン : Activity
+    class カウントマップライン : IDisposable
     {
         /// <summary>
         ///		カウント値の配列。
@@ -29,14 +29,11 @@ namespace DTXMania.ステージ.演奏
         public const int カウントマップの最大要素数 = 768 / 12;
 
 
-        public カウントマップライン()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
 
-        protected override void On活性化()
+        // 生成と終了
+
+
+        public カウントマップライン()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -51,12 +48,17 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
             }
         }
+
+
+
+        // 設定登録
+
 
         /// <summary>
         ///		初期化。
@@ -99,16 +101,23 @@ namespace DTXMania.ステージ.演奏
                 this._最後にカウント値を設定したときの成績[ judge ] = 判定toヒット数[ judge ];
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 using( var 水色ブラシ = new SolidColorBrush( dc, new Color4( 0xffdd8e69 ) ) )
                 using( var 黄色ブラシ = new SolidColorBrush( dc, new Color4( 0xff17fffe ) ) )
                 {
+                    const float 単位幅 = 12f;
                     var 今回のライン全体の矩形 = new RectangleF( 1357f, 108f, 10f, 768f );
                     var 過去最高のライン全体の矩形 = new RectangleF( 1371f, 108f, 6f, 768f );
-                    const float 単位幅 = 12f;
 
 
                     // (1) 今回のカウントマップラインを描画する。
@@ -142,6 +151,10 @@ namespace DTXMania.ステージ.演奏
 
             } );
         }
+
+
+
+        // private
 
 
         private int[] _過去最大のカウントマップ = null;

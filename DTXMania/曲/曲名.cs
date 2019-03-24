@@ -7,7 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     class 曲名 : 描画可能テクスチャ
     {
@@ -22,6 +22,10 @@ namespace DTXMania.曲
         public string サブタイトル { get; set; } = null;
 
 
+
+        // 生成と終了
+
+
         public 曲名()
             : base( Node.全体サイズ )
         {
@@ -33,11 +37,6 @@ namespace DTXMania.曲
             this._fontStyle = FontStyle.Normal;
             this._fontSizePt = 20f;
             this._textAlignment = TextAlignment.Leading;
-        }
-
-        protected override void On活性化()
-        {
-            base.On活性化();  // 忘れずに。サイズメンバを確定させるために、先に呼び出す。
 
             this._前回のタイトル = null;
 
@@ -49,12 +48,12 @@ namespace DTXMania.曲
                 this._fontSizePt ) {
                 TextAlignment = this._textAlignment
             };
-            this._titleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, this._titleFontColor );
-            this._subtitleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, this._subtitleFontColor );
-            this._backBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, this._backColor );
+            this._titleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._titleFontColor );
+            this._subtitleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._subtitleFontColor );
+            this._backBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._backColor );
         }
 
-        protected override void On非活性化()
+        public override void Dispose()
         {
             this._backBrush?.Dispose();
             this._backBrush = null;
@@ -68,13 +67,16 @@ namespace DTXMania.曲
             this._textFormat?.Dispose();
             this._textFormat = null;
 
-            base.On非活性化(); // 忘れずに。
+            base.Dispose(); // 忘れずに。
         }
+
+
+
+        // 描画
+
 
         public new void 描画する( Matrix ワールド行列変換, float 不透明度0to1 = 1f, RectangleF? レイアウト矩形 = null )
         {
-            Debug.Assert( this.活性化している );
-
             if( this.タイトル.Nullまたは空である() )
                 return;
 
@@ -140,6 +142,10 @@ namespace DTXMania.曲
             // テクスチャを描画する。
             base.描画する( ワールド行列変換, 不透明度0to1 );
         }
+
+
+        
+        // private
 
 
         private string _前回のタイトル = null;

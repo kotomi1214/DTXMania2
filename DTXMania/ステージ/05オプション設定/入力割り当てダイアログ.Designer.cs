@@ -1,4 +1,4 @@
-﻿namespace DTXMania.ステージ.オプション設定
+﻿namespace DTXMania.オプション設定
 {
     partial class 入力割り当てダイアログ
     {
@@ -360,6 +360,7 @@
             this.Controls.Add(this.buttonOk);
             this.Controls.Add(this.groupBox2);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.KeyPreview = true;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "入力割り当てダイアログ";

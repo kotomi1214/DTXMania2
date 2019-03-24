@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		倍率専用の数値ボックス。
@@ -22,37 +22,39 @@ namespace DTXMania.ステージ.オプション設定
         public double 現在値 { get; protected set; } = 0.0;
 
 
+
+        // 生成と終了
+
+
         public パネル_倍率( string パネル名, double 初期値, double 最小倍率, double 最大倍率, double 増減量, Action<パネル> 値の変更処理 = null )
             : base( パネル名, 値の変更処理 )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.現在値 = 初期値;
-                this.最小倍率 = 最小倍率;
-                this.最大倍率 = 最大倍率;
-                this.増減量 = 増減量;
+            this.現在値 = 初期値;
+            this.最小倍率 = 最小倍率;
+            this.最大倍率 = 最大倍率;
+            this.増減量 = 増減量;
 
-                this.子Activityを追加する( this._項目画像 = new 文字列画像() { 表示文字列 = "", フォントサイズpt = 34f, 前景色 = Color4.White } );
-                Log.Info( $"倍率パネルを生成しました。[{this}]" );
-            }
+            this._項目画像 = new 文字列画像() { 表示文字列 = "", フォントサイズpt = 34f, 前景色 = Color4.White };
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            base.On活性化();   //忘れないこと
+            this._項目画像?.Dispose();
+
+            base.Dispose(); // 忘れずに
         }
 
-        protected override void On非活性化()
-        {
-            base.On非活性化();   //忘れないこと
-        }
+
+
+        // 入力
+
 
         public override void 左移動キーが入力された()
         {
             // 値を減らす。
             this.現在値 = Math.Max( this.現在値 - this.増減量, 最小倍率 );
 
-            base.左移動キーが入力された(); // 忘れないこと
+            base.左移動キーが入力された();
         }
 
         public override void 右移動キーが入力された()
@@ -60,24 +62,27 @@ namespace DTXMania.ステージ.オプション設定
             // 値を増やす。
             this.現在値 = Math.Min( this.現在値 + this.増減量, 最大倍率 );
 
-            base.右移動キーが入力された(); // 忘れないこと
+            base.右移動キーが入力された();
         }
 
         public override void 確定キーが入力された()
         {
             // 値を増やす。
-
             this.現在値 += this.増減量;
 
             // 最大値を超えたら最小値に戻る。
-
             if( 最大倍率 < this.現在値 )
                 this.現在値 = 最小倍率;
 
             base.確定キーが入力された();
         }
 
-        public override void 進行描画する( DeviceContext1 dc, float left, float top, bool 選択中 )
+
+
+        // 進行と描画
+
+
+        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
         {
             // (1) パネルの下地と名前を描画。
 
@@ -107,6 +112,10 @@ namespace DTXMania.ステージ.オプション設定
                 X方向拡大率: 拡大率X,
                 Y方向拡大率: 拡大率Y );
         }
+
+
+
+        // private
 
 
         private 文字列画像 _項目画像 = null;

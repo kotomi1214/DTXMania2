@@ -4,14 +4,14 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using FDK;
-using DTXMania.データベース.曲;
-using SharpDX;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     class SetNode : Node
     {
+
         // 曲ノード[]
+
 
         /// <summary>
         ///		このset.defブロックに登録される、最大５つの曲ノード。
@@ -19,14 +19,61 @@ namespace DTXMania.曲
         public MusicNode[] MusicNodes = new MusicNode[ 5 ];
 
 
-        // プロパティ
+
+        // 難易度
+
 
         public override float 難易度
-            => this.MusicNodes[ App.曲ツリー.フォーカス難易度 ].難易度;
+            => this.MusicNodes[ App進行描画.曲ツリー.フォーカス難易度 ].難易度;
 
         public override string 難易度ラベル
-            => this.MusicNodes[ App.曲ツリー.フォーカス難易度 ].難易度ラベル;
+            => this.MusicNodes[ App進行描画.曲ツリー.フォーカス難易度 ].難易度ラベル;
 
+        public int ユーザ希望難易度に最も近い難易度レベルを返す( int ユーザ希望難易度 )
+        {
+            if( null != this.MusicNodes[ ユーザ希望難易度 ] )
+                return ユーザ希望難易度;    // 難易度ぴったりの曲があった
+
+
+            // 現在のアンカレベルから、難易度上向きに検索開始。
+
+            int 最も近いレベル = ユーザ希望難易度;
+
+            for( int i = 0; i < 5; i++ )
+            {
+                if( null != this.MusicNodes[ 最も近いレベル ] )
+                    break;  // 曲があった。
+
+                // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
+                最も近いレベル = ( 最も近いレベル + 1 ) % 5;
+            }
+
+
+            // 見つかった曲がアンカより下のレベルだった場合……
+            // アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
+
+            if( 最も近いレベル < ユーザ希望難易度 )
+            {
+                // 現在のアンカレベルから、難易度下向きに検索開始。
+
+                最も近いレベル = ユーザ希望難易度;
+
+                for( int i = 0; i < 5; i++ )
+                {
+                    if( null != this.MusicNodes[ 最も近いレベル ] )
+                        break;  // 曲があった。
+
+                    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
+                    最も近いレベル = ( ( 最も近いレベル - 1 ) + 5 ) % 5;
+                }
+            }
+
+            return 最も近いレベル;
+        }
+
+
+
+        // プレビュー画像とプレビュー音声
 
 
         /// <summary>
@@ -41,7 +88,7 @@ namespace DTXMania.曲
             get
             {
                 // (1) 現在のフォーカス難易度と同じ MusicNode のノード画像が有効なら、それを返す。
-                var 現在の難易度のMusicNode = this.MusicNodes[ App.曲ツリー.フォーカス難易度 ];
+                var 現在の難易度のMusicNode = this.MusicNodes[ App進行描画.曲ツリー.フォーカス難易度 ];
 
                 if( null != 現在の難易度のMusicNode?.ノード画像 )
                     return 現在の難易度のMusicNode.ノード画像;
@@ -52,7 +99,7 @@ namespace DTXMania.曲
 
 
                 // (3) 現在のフォーカス難易度に一番近い MusicNode のノード画像が有効ならそれを返す。
-                return this.MusicNodes[ this.ユーザ希望難易度に最も近い難易度レベルを返す( App.曲ツリー.ユーザ希望難易度 ) ].ノード画像;
+                return this.MusicNodes[ this.ユーザ希望難易度に最も近い難易度レベルを返す( App進行描画.曲ツリー.ユーザ希望難易度 ) ].ノード画像;
             }
             set
             {
@@ -61,7 +108,13 @@ namespace DTXMania.曲
         }
 
         public override string プレビュー音声ファイルの絶対パス
-            => this.MusicNodes[ App.曲ツリー.フォーカス難易度 ].プレビュー音声ファイルの絶対パス;
+            => this.MusicNodes[ App進行描画.曲ツリー.フォーカス難易度 ].プレビュー音声ファイルの絶対パス;
+
+        private テクスチャ _SetNode自身のノード画像 = null;
+
+
+
+        // 生成と終了
 
 
         /// <summary>
@@ -112,78 +165,18 @@ namespace DTXMania.曲
                   where _対応するサムネイル画像名.Any( thumbファイル名 => ( Path.GetFileName( ファイル名 ).ToLower() == thumbファイル名 ) )
                   select ファイル名 ).FirstOrDefault();
 
-            if( null != サムネイル画像ファイルパス )
-            {
-                this.子Activityを追加する( this._SetNode自身のノード画像 = new テクスチャ( サムネイル画像ファイルパス ) );
-            }
+            this._SetNode自身のノード画像 = ( null != サムネイル画像ファイルパス ) ? new テクスチャ( サムネイル画像ファイルパス ) : null;  // ないなら null
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            foreach( var node in this.MusicNodes )
-            {
-                if( null != node )
-                    node.活性化する();
-            }
-
-            base.On活性化();
-        }
-
-        protected override void On非活性化()
-        {
-            foreach( var node in this.MusicNodes )
-            {
-                if( null != node )
-                    node.非活性化する();
-            }
-
-            base.On非活性化();
-        }
-
-        public int ユーザ希望難易度に最も近い難易度レベルを返す( int ユーザ希望難易度 )
-        {
-            if( null != this.MusicNodes[ ユーザ希望難易度 ] )
-                return ユーザ希望難易度;    // 難易度ぴったりの曲があった
-
-
-            // 現在のアンカレベルから、難易度上向きに検索開始。
-
-            int 最も近いレベル = ユーザ希望難易度;
-
-            for( int i = 0; i < 5; i++ )
-            {
-                if( null != this.MusicNodes[ 最も近いレベル ] )
-                    break;  // 曲があった。
-
-                // 曲がなかったので次の難易度レベルへGo。（5以上になったら0に戻る。）
-                最も近いレベル = ( 最も近いレベル + 1 ) % 5;
-            }
-
-
-            // 見つかった曲がアンカより下のレベルだった場合……
-            // アンカから下向きに検索すれば、もっとアンカに近い曲があるんじゃね？
-
-            if( 最も近いレベル < ユーザ希望難易度 )
-            {
-                // 現在のアンカレベルから、難易度下向きに検索開始。
-
-                最も近いレベル = ユーザ希望難易度;
-
-                for( int i = 0; i < 5; i++ )
-                {
-                    if( null != this.MusicNodes[ 最も近いレベル ] )
-                        break;  // 曲があった。
-
-                    // 曲がなかったので次の難易度レベルへGo。（0未満になったら4に戻る。）
-                    最も近いレベル = ( ( 最も近いレベル - 1 ) + 5 ) % 5;
-                }
-            }
-
-            return 最も近いレベル;
+            base.Dispose();
         }
 
 
-        private テクスチャ _SetNode自身のノード画像 = null;
+
+        // private
+
 
         private readonly string[] _対応するサムネイル画像名 = { "thumb.png", "thumb.bmp", "thumb.jpg", "thumb.jpeg" };
     }

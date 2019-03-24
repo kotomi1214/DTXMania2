@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using DTXMania.入力;
-using DTXMania.ステージ.演奏;
 using SSTFormat.v4;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     /// <summary>
     ///     譜面のチップ（<see cref="チップ種別"/>）をキーとして、様々なコンフィグプロパティを定義する。

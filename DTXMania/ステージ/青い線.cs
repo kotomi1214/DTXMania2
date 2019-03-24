@@ -6,24 +6,21 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ
+namespace DTXMania
 {
     /// <summary>
     ///		枠を形成する青い「線」を一本描画する。
     /// </summary>
-    class 青い線 : Activity
+    class 青い線 : IDisposable
     {
         public float 太さdpx { get; protected set; } = 26f;
 
 
-        public 青い線()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
 
-        protected override void On活性化()
+        // 生成と終了
+
+
+        public 青い線()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -32,7 +29,7 @@ namespace DTXMania.ステージ
                 int 白色 = 0xffffff;
 
                 this._線グラ頂点集合 = new GradientStopCollection(
-                    グラフィックデバイス.Instance.D2DDeviceContext,
+                    グラフィックデバイス.Instance.既定のD2D1DeviceContext,
                     new GradientStop[] {
                         new GradientStop() { Position = 0.00f, Color = new Color4( new Color3( 青色 ), 0f ) },		// 完全透明
 						new GradientStop() { Position = 0.35f, Color = new Color4( new Color3( 水色 ), 1f ) },
@@ -48,18 +45,20 @@ namespace DTXMania.ステージ
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._線グラブラシ?.Dispose();
-                this._線グラブラシ = null;
-
                 this._線グラ頂点集合?.Dispose();
-                this._線グラ頂点集合 = null;
             }
         }
+
+
         
+        // 進行と描画
+
+
         /// <summary>
         /// 	よこ線（左→右）か、たて線（上→下）のいずれかを描画できる。
         /// 	よこ線を描画したい場合は<paramref name="幅dpx"/>を指定し、
@@ -68,7 +67,7 @@ namespace DTXMania.ステージ
         /// </summary>
         /// <param name="幅dpx">横方向（左→右）の長さ。<paramref name="高さdpx"/>と同時に指定してはならない。</param>
         /// <param name="高さdpx">縦方向（上→下）の長さ。<paramref name="幅dpx"/>と同時に指定してはならない。</param>
-        public void 描画する( DeviceContext1 dc, Vector2 開始位置dpx, float 幅dpx = -1f, float 高さdpx = -1f )
+        public void 描画する( DeviceContext dc, Vector2 開始位置dpx, float 幅dpx = -1f, float 高さdpx = -1f )
         {
             var check = ( 幅dpx * 高さdpx );
             Debug.Assert( 0f >= check, "幅か高さが両方指定されていないか、両方指定されています。どちらか一方だけを指定してください。" );
@@ -122,6 +121,10 @@ namespace DTXMania.ステージ
 
             } );
         }
+
+
+
+        // private
 
 
         private LinearGradientBrush _線グラブラシ = null;

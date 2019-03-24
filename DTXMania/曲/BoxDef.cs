@@ -7,7 +7,7 @@ using System.Text;
 using SSTFormat.v4;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		BOX定義。

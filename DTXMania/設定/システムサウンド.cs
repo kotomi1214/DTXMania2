@@ -4,19 +4,20 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CSCore;
-using YamlDotNet.RepresentationModel;
 using FDK;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     class システムサウンド : IDisposable
     {
+
+        // 生成と終了
+
+
         public システムサウンド( string プリセット名 = null )
         {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this._プリセットサウンドを読み込む( プリセット名 ?? this._既定のプリセット名 );
-            }
+            this._プリセット名を設定する( プリセット名 );
+            this._種別toサウンドマップ = new Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)>();
         }
 
         public void Dispose()
@@ -29,6 +30,21 @@ namespace DTXMania.設定
 
             this._種別toサウンドマップ = null;
         }
+
+        public void 読み込む()
+        {
+            this._プリセットサウンドを読み込む();
+        }
+
+        public void 読み込む( システムサウンド種別 type )
+        {
+            this._サウンドを読み込む( type, this._サウンドファイルパスを返す( type ) );
+        }
+        
+
+
+        // 再生等
+
 
         public void 再生する( システムサウンド種別 type, bool ループ再生する = false )
         {
@@ -46,56 +62,90 @@ namespace DTXMania.設定
             => this._種別toサウンドマップ.TryGetValue( type, out var map ) && map.sound.いずれかが再生中である;
 
 
+
+        // private
+
+
+        private string _プリセット名;
+
         private readonly string _既定のプリセット名 = "default";
+
+        private VariablePath _プリセットフォルダの絶対パス;
 
         private Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)> _種別toサウンドマップ = null;
 
 
-        private void _プリセットサウンドを読み込む( string プリセット名 )
+        private VariablePath _サウンドファイルパスを返す( システムサウンド種別 種別 )
         {
-            this._種別toサウンドマップ = new Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)>();
+            // システムサウンド種別名をそのままファイル名として使う。形式は .ogg のみ。
+            return new VariablePath( Path.Combine( this._プリセットフォルダの絶対パス.変数なしパス, 種別.ToString() + ".ogg" ) );
+        }
 
-            var プリセットフォルダの絶対パス = new VariablePath( $@"$(System)sounds\presets\{プリセット名}" );
+        private void _プリセット名を設定する( string プリセット名 )
+        {
+            this._プリセット名 = プリセット名 ?? this._既定のプリセット名;
+            this._プリセットフォルダの絶対パス = new VariablePath( $@"$(System)sounds\presets\{this._プリセット名}" );
+        }
 
+        private void _プリセットサウンドを読み込む()
+        {
             try
             {
                 foreach( システムサウンド種別 種別 in Enum.GetValues( typeof( システムサウンド種別 ) ) )
                 {
-                    // システムサウンド種別名をそのままファイル名として使う。形式は .ogg のみ。
-                    var サウンドファイルの絶対パス = new VariablePath( Path.Combine( プリセットフォルダの絶対パス.変数なしパス, 種別.ToString() + ".ogg" ) );
-
-                    // ファイルがないなら無視。
-                    if( !File.Exists( サウンドファイルの絶対パス.変数なしパス ) )
-                    {
-                        Log.ERROR( $"システムサウンドファイルが見つかりません。スキップします。[{サウンドファイルの絶対パス.変数付きパス}]" );
-                        continue;
-                    }
-
-                    var sampleSource = SampleSourceFactory.Create( App.サウンドデバイス, サウンドファイルの絶対パス, 1.0 );  // システムサウンドは常に再生速度 = 1.0
-                    if( null == sampleSource )
-                        throw new Exception( $"システムサウンドの読み込みに失敗しました。[{サウンドファイルの絶対パス.変数付きパス}]" );
-
-                    var sound = new PolySound( App.サウンドデバイス, sampleSource, 2 );
-
-                    this._種別toサウンドマップ[ 種別 ] = (sampleSource, sound);
-
-                    Log.Info( $"システムサウンドを読み込みました。[{サウンドファイルの絶対パス.変数付きパス}]" );
+                    this._サウンドを読み込む( 種別, this._サウンドファイルパスを返す( 種別 ), 既に登録されているなら何もしない: true );
                 }
             }
             catch( Exception e )
             {
-                Log.ERROR( $"プリセットサウンドの読み込みに失敗しました。[{プリセット名}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+                Log.ERROR( $"プリセットサウンドの読み込みに失敗しました。[{this._プリセット名}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
 
-                if( !( プリセット名.Equals( this._既定のプリセット名, StringComparison.OrdinalIgnoreCase ) ) )
+                if( !( this._プリセット名.Equals( this._既定のプリセット名, StringComparison.OrdinalIgnoreCase ) ) )
                 {
                     Log.Info( "既定のプリセットの読み込みを行います。" );
                     this.Dispose();
-                    this._プリセットサウンドを読み込む( this._既定のプリセット名 );
+                    this._プリセット名を設定する( this._既定のプリセット名 );
+                    this._プリセットサウンドを読み込む();
                     return;
                 }
             }
 
-            Log.Info( $"プリセットサウンドを読み込みました。[{プリセット名}]" );
+            Log.Info( $"プリセットサウンドを読み込みました。[{this._プリセット名}]" );
+        }
+
+        private void _サウンドを読み込む( システムサウンド種別 種別, VariablePath サウンドファイルパス, bool 既に登録されているなら何もしない = false )
+        {
+            // 上書き？
+            if( this._種別toサウンドマップ.ContainsKey( 種別 ) )
+            {
+                if( 既に登録されているなら何もしない )
+                    return; // 上書きしない
+
+                // 登録済みのサウンドを破棄。
+                this._種別toサウンドマップ[ 種別 ].source?.Dispose();
+                this._種別toサウンドマップ[ 種別 ].sound?.Dispose();
+            }
+
+            // ファイルがないなら無視。
+            if( !File.Exists( サウンドファイルパス.変数なしパス ) )
+            {
+                Log.ERROR( $"システムサウンドファイルが見つかりません。スキップします。[{サウンドファイルパス.変数付きパス}]" );
+                return;
+            }
+
+            // サンプルソースを読み込む。
+            var sampleSource = SampleSourceFactory.Create( App進行描画.サウンドデバイス, サウンドファイルパス, 1.0 );  // システムサウンドは常に再生速度 = 1.0
+
+            if( null == sampleSource )
+                throw new Exception( $"システムサウンドの読み込みに失敗しました。[{サウンドファイルパス.変数付きパス}]" );
+
+            // サウンドを生成する。
+            var sound = new PolySound( App進行描画.サウンドデバイス, sampleSource, 2 );
+
+            // マップに登録。
+            this._種別toサウンドマップ[ 種別 ] = (sampleSource, sound);
+
+            Log.Info( $"システムサウンドを読み込みました。[{サウンドファイルパス.変数付きパス}]" );
         }
     }
 }

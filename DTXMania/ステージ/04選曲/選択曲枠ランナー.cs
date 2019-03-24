@@ -5,34 +5,37 @@ using System.Linq;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.選曲
+namespace DTXMania.選曲
 {
     /// <summary>
     ///     一定時間ごとに、選択曲を囲む枠の上下辺を右から左へすーっと走る光。
     /// </summary>
-    class 選択曲枠ランナー : Activity
+    class 選択曲枠ランナー : IDisposable
     {
+
+        // 生成と終了
+
+
         public 選択曲枠ランナー()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._ランナー画像 = new テクスチャ( @"$(System)images\選曲\枠ランナー.png" ) );
+                this._ランナー画像 = new テクスチャ( @"$(System)images\選曲\枠ランナー.png" );
             }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._ランナー画像?.Dispose();
             }
         }
 
-        protected override void On非活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
+
+
+        // 進行と描画
+
 
         public void リセットする()
         {
@@ -40,7 +43,7 @@ namespace DTXMania.ステージ.選曲
             this._カウンタ = new LoopCounter( 0, 2300, 1 );
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+        public void 進行描画する( DeviceContext dc )
         {
             if( null == this._カウンタ )
                 return;
@@ -60,6 +63,10 @@ namespace DTXMania.ステージ.選曲
                     598f - this._ランナー画像.サイズ.Height / 2f );
             }
         }
+
+
+
+        // private
 
 
         private テクスチャ _ランナー画像 = null;
