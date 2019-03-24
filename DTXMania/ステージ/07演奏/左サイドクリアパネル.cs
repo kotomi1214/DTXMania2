@@ -16,6 +16,7 @@ namespace DTXMania.演奏
 
         // 生成と終了
 
+
         public 左サイドクリアパネル()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

@@ -49,7 +49,7 @@ namespace DTXMania.選曲
 
 
 
-        // 描画
+        // 進行と描画
 
 
         public void 描画する( DeviceContext dc )

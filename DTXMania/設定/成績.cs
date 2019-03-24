@@ -52,6 +52,10 @@ namespace DTXMania
         public ランク種別 ランク { get; protected set; } = ランク種別.E;
 
 
+
+        // 生成と終了
+
+
         public 成績()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -78,6 +82,10 @@ namespace DTXMania
                 this._譜面レベル = 0.5;
             }
         }
+
+
+
+        // 操作
 
 
         public void スコアと設定を反映する( SSTFormatCurrent.スコア 譜面, ユーザ設定 設定 )
@@ -189,6 +197,10 @@ namespace DTXMania
 
             this.エキサイトゲージ量 = Math.Max( Math.Min( this.エキサイトゲージ量, 1.0f ), 0.0f );
         }
+
+
+
+        // private
 
 
         private Dictionary<判定種別, int> _判定toヒット数 = null;

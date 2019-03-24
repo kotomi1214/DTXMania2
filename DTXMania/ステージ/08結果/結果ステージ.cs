@@ -21,7 +21,9 @@ namespace DTXMania.結果
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
+
         // 外部依存アクション
+
 
         internal Func<成績> 結果を取得する = null;
 
@@ -55,6 +57,9 @@ namespace DTXMania.結果
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    return;
+
                 this._背景 = new 舞台画像();
                 this._曲名パネル = new 画像( @"$(System)images\結果\曲名パネル.png" );
                 this._曲名画像 = new 文字列画像() {
@@ -112,6 +117,9 @@ namespace DTXMania.結果
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
                 App進行描画.システムサウンド.停止する( システムサウンド種別.ステージクリア );
 
                 this._結果 = null;

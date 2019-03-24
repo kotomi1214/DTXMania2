@@ -16,6 +16,10 @@ namespace DTXMania
         public IReadOnlyDictionary<int, Video> 動画リスト => this._動画リスト;
 
 
+
+        // 生成と終了
+
+
         public AVI管理()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -37,6 +41,10 @@ namespace DTXMania
                 this._動画リスト = null;
             }
         }
+
+
+
+        // 登録、停止、再開
 
 
         /// <summary>
@@ -84,6 +92,10 @@ namespace DTXMania
                 video.再開する();
             }
         }
+
+
+
+        // private
 
 
         /// <summary>

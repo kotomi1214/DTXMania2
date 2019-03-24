@@ -11,6 +11,10 @@ namespace DTXMania
 {
     class 半回転黒フェード : アイキャッチ
     {
+
+        // 生成と終了
+
+
         public 半回転黒フェード()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -33,6 +37,10 @@ namespace DTXMania
                 base.Dispose();
             }
         }
+
+
+
+        // オープンとクローズ
 
 
         /// <summary>
@@ -181,6 +189,10 @@ namespace DTXMania
                 this.現在のフェーズ = フェーズ.オープン;
             }
         }
+
+
+
+        // 進行と描画
 
 
         /// <summary>
@@ -365,6 +377,10 @@ namespace DTXMania
                 }
             }
         }
+
+
+
+        // private
 
 
         private class アニメ : IDisposable

@@ -153,91 +153,6 @@ namespace DTXMania.選曲
             }
         }
 
-
-
-        // ノードの選択
-
-
-        public void 前のノードを選択する()
-        {
-            this._カーソル位置--;     // 下限なし
-
-            App進行描画.曲ツリー.前のノードをフォーカスする();
-
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
-        }
-
-        public void 次のノードを選択する()
-        {
-            this._カーソル位置++;     // 上限なし
-
-            App進行描画.曲ツリー.次のノードをフォーカスする();
-
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
-        }
-
-        public void BOXに入る()
-        {
-            this._カーソル位置 = 4;
-
-            this._曲リスト全体のY軸移動オフセット = 0;
-
-            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.子ノードリスト[ 0 ] );
-        }
-
-        public void BOXから出る()
-        {
-            this._カーソル位置 = 4;
-
-            this._曲リスト全体のY軸移動オフセット = 0;
-
-            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.親ノード );
-        }
-
-        public void 難易度アンカをひとつ増やす()
-        {
-            App進行描画.曲ツリー.難易度アンカをひとつ増やす();
-        }
-
-
-        private bool _初めての進行描画 = true;
-        
-        /// <summary>
-        ///		曲リスト（10行分！）の合計表示領域の左上隅の座標。
-        ///		基準というのは、曲リストがスクロールしていないとき、という意味。
-        /// </summary>
-        private readonly Vector3 _曲リストの基準左上隅座標dpx = new Vector3( 1065f, 145f - _ノードの高さdpx, 0f );
-
-        private readonly Vector3 _サムネイル表示サイズdpx = new Vector3( 100f, 100f, 0f );
-
-        private const float _ノードの高さdpx = ( 913f / 8f );
-
-        private Dictionary<Node, 文字列画像> _ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
-
-        private Dictionary<Node, 文字列画像> _ノードtoサブタイトル画像 = new Dictionary<Node, 文字列画像>();
-        
-        /// <summary>
-        ///		静止時は 4 。曲リストがスクロールしているときは、4より大きい整数（下から上にスクロール中）か、
-        ///		または 4 より小さい整数（上から下にスクロール中）になる。
-        /// </summary>
-        private int _カーソル位置 = 4;
-
-        private 定間隔進行 _スクロール用カウンタ = null;
-        
-        /// <summary>
-        ///		-100～100。曲リスト全体の表示位置を、負数は 上 へ、正数は 下 へずらす 。（正負と上下の対応に注意。）
-        /// </summary>
-        private int _曲リスト全体のY軸移動オフセット = 0;
-        
-        /// <summary>
-        ///		選択中の曲ノードエリアを左にずらす度合い。
-        ///		-50f ～ 0f [dpx] 。
-        /// </summary>
-        private Variable _選択ノードの表示オフセットdpx = null;
-
-        private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
-
-
         /// <param name="行番号">
         ///		一番上:0 ～ 9:一番下。
         ///		「静止時の」可視範囲は 1～8。
@@ -490,6 +405,95 @@ namespace DTXMania.選曲
             //----------------
             #endregion
         }
+
+
+
+        // ノードの選択
+
+
+        public void 前のノードを選択する()
+        {
+            this._カーソル位置--;     // 下限なし
+
+            App進行描画.曲ツリー.前のノードをフォーカスする();
+
+            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+        }
+
+        public void 次のノードを選択する()
+        {
+            this._カーソル位置++;     // 上限なし
+
+            App進行描画.曲ツリー.次のノードをフォーカスする();
+
+            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+        }
+
+        public void BOXに入る()
+        {
+            this._カーソル位置 = 4;
+
+            this._曲リスト全体のY軸移動オフセット = 0;
+
+            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.子ノードリスト[ 0 ] );
+        }
+
+        public void BOXから出る()
+        {
+            this._カーソル位置 = 4;
+
+            this._曲リスト全体のY軸移動オフセット = 0;
+
+            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.親ノード );
+        }
+
+        public void 難易度アンカをひとつ増やす()
+        {
+            App進行描画.曲ツリー.難易度アンカをひとつ増やす();
+        }
+
+
+
+        // private
+
+
+        private bool _初めての進行描画 = true;
+        
+        /// <summary>
+        ///		曲リスト（10行分！）の合計表示領域の左上隅の座標。
+        ///		基準というのは、曲リストがスクロールしていないとき、という意味。
+        /// </summary>
+        private readonly Vector3 _曲リストの基準左上隅座標dpx = new Vector3( 1065f, 145f - _ノードの高さdpx, 0f );
+
+        private readonly Vector3 _サムネイル表示サイズdpx = new Vector3( 100f, 100f, 0f );
+
+        private const float _ノードの高さdpx = ( 913f / 8f );
+
+        private Dictionary<Node, 文字列画像> _ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
+
+        private Dictionary<Node, 文字列画像> _ノードtoサブタイトル画像 = new Dictionary<Node, 文字列画像>();
+        
+        /// <summary>
+        ///		静止時は 4 。曲リストがスクロールしているときは、4より大きい整数（下から上にスクロール中）か、
+        ///		または 4 より小さい整数（上から下にスクロール中）になる。
+        /// </summary>
+        private int _カーソル位置 = 4;
+
+        private 定間隔進行 _スクロール用カウンタ = null;
+        
+        /// <summary>
+        ///		-100～100。曲リスト全体の表示位置を、負数は 上 へ、正数は 下 へずらす 。（正負と上下の対応に注意。）
+        /// </summary>
+        private int _曲リスト全体のY軸移動オフセット = 0;
+        
+        /// <summary>
+        ///		選択中の曲ノードエリアを左にずらす度合い。
+        ///		-50f ～ 0f [dpx] 。
+        /// </summary>
+        private Variable _選択ノードの表示オフセットdpx = null;
+
+        private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
+
 
         private void _選択ノードのオフセットアニメをリセットする( アニメーション am )
         {

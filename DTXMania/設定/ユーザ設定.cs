@@ -131,6 +131,10 @@ namespace DTXMania
         }
 
 
+
+        // 生成と終了
+
+
         public ユーザ設定()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -175,6 +179,11 @@ namespace DTXMania
                 }
             }
         }
+
+
+
+        // 作成、保存
+
 
         /// <summary>
         ///		指定したユーザ情報を新しいユーザとしてデータベースに登録し、
@@ -234,6 +243,9 @@ namespace DTXMania
         public override string ToString()
             => this._User.ToString();
 
+
+
+        // private
         
         private User _User = null;
 

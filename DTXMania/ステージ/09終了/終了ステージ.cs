@@ -19,6 +19,7 @@ namespace DTXMania.終了
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
+
         // 生成と終了
 
 
@@ -37,6 +38,7 @@ namespace DTXMania.終了
                     this.非活性化する();
             }
         }
+
 
 
         // 活性化と非活性化
@@ -120,6 +122,7 @@ namespace DTXMania.終了
 
 
         // private
+
 
         private 画像 _背景画像 = null;
 

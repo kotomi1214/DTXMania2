@@ -51,7 +51,7 @@ namespace DTXMania
 
 
 
-        // 生成と保存
+        // 生成と終了
 
 
         public システム設定()

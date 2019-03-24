@@ -15,6 +15,10 @@ namespace DTXMania
     /// </summary>
     class WAV管理 : IDisposable
     {
+
+        // 生成と終了
+
+
         /// <param name="多重度">
         ///     １サウンドの最大多重発声数。1以上。
         /// </param>
@@ -46,6 +50,10 @@ namespace DTXMania
                 this._WAV情報リスト = null;
             }
         }
+
+
+
+        // 登録、発声停止、再開
 
 
         /// <summary>
@@ -170,8 +178,11 @@ namespace DTXMania
         }
 
 
-        private List<Sound> _一時停止中の音声のリスト = new List<Sound>();
 
+        // private
+
+
+        private List<Sound> _一時停止中の音声のリスト = new List<Sound>();
 
         private readonly int _既定の多重度;
 

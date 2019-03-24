@@ -14,6 +14,10 @@ namespace DTXMania
         public アイキャッチ 現在のアイキャッチ { get; protected set; } = null;
 
 
+
+        // 生成と終了
+
+
         public アイキャッチ管理()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -42,6 +46,10 @@ namespace DTXMania
         }
 
 
+
+        // クローズ開始
+
+
         /// <summary>
         ///     指定した名前のアイキャッチのクローズアニメーションを開始する。
         /// </summary>
@@ -55,6 +63,10 @@ namespace DTXMania
             this.現在のアイキャッチ = this._アイキャッチリスト[ 名前 ]; // 保存。
             this.現在のアイキャッチ.クローズする();
         }
+
+
+
+        // private
 
 
         private Dictionary<string, アイキャッチ> _アイキャッチリスト;

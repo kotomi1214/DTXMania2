@@ -33,11 +33,16 @@ namespace DTXMania
 
 
 
+        // 外部依存アクション
+
+
+        public Func<キーバインディング> キーバインディングを取得する = null;
+
+        public Action キーバインディングを保存する = null;
+
+
+
         // 生成と終了
-
-        public Func<キーバインディング> キーバインディングを取得する = null;   // 外部依存アクション
-
-        public Action キーバインディングを保存する = null;    // 外部依存アクション
 
 
         /// <summary>

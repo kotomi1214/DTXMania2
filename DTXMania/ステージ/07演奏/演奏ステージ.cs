@@ -70,6 +70,9 @@ namespace DTXMania.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    return;
+
                 this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
                 this._レーンフレームBASIC = new BASIC.レーンフレーム();
                 this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
@@ -123,6 +126,9 @@ namespace DTXMania.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
                 this._演奏状態を終了する();
 
                 #region " 現在の譜面スクロール速度をDBに保存。"

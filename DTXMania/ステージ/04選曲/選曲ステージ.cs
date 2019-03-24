@@ -54,6 +54,9 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    return;
+
                 this._舞台画像 = new 舞台画像( @"$(System)images\舞台_暗.jpg" );
                 this._システム情報 = new システム情報();
                 this._曲リスト = new 曲リスト();
@@ -104,6 +107,9 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
                 this._灰透過?.Dispose();
                 this._黒透過?.Dispose();
                 this._黒?.Dispose();

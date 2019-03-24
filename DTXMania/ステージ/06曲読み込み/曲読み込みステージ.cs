@@ -53,6 +53,9 @@ namespace DTXMania.曲読み込み
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    return;
+
                 this._舞台画像 = new 舞台画像();
                 this._注意文 = new 画像( @"$(System)images\曲読み込み\ご注意ください.png" );
                 this._曲名画像 = new 文字列画像() {
@@ -100,6 +103,9 @@ namespace DTXMania.曲読み込み
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
                 //App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_開始音 ); --> なりっぱなしでいい
                 App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_ループBGM );
 

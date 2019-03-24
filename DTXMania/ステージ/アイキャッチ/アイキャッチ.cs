@@ -29,6 +29,9 @@ namespace DTXMania
 
 
 
+        // 生成と終了
+
+
         public アイキャッチ()
         {
             this.現在のフェーズ = フェーズ.未定;
@@ -37,6 +40,10 @@ namespace DTXMania
         public virtual void Dispose()
         {
         }
+
+
+
+        // オープンとクローズ
 
 
         /// <summary>
@@ -60,6 +67,11 @@ namespace DTXMania
 
             this.現在のフェーズ = フェーズ.オープン;
         }
+
+
+
+        // 進行と描画
+
 
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。

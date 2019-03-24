@@ -23,6 +23,10 @@ namespace DTXMania
             => ( 0 <= this.ユーザリスト.SelectedIndex ) ? this.ユーザリスト[ this.ユーザリスト.SelectedIndex ] : null;
 
 
+
+        // 生成と終了
+
+
         public ユーザ管理()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

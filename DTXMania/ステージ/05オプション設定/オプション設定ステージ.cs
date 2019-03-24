@@ -57,6 +57,9 @@ namespace DTXMania.オプション設定
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化中 )
+                    return;
+
                 this._舞台画像 = new 舞台画像();
                 this._パネルリスト = new パネルリスト();
                 this._システム情報 = new システム情報();
@@ -711,6 +714,9 @@ namespace DTXMania.オプション設定
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( !this.活性化中 )
+                    return;
+
                 App進行描画.システム設定.保存する();
 
                 this._ルートパネルフォルダ = null;

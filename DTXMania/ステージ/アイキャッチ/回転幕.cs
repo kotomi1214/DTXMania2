@@ -44,6 +44,10 @@ namespace DTXMania
 {
     class 回転幕 : アイキャッチ
     {
+
+        // 生成と終了
+
+
         public 回転幕()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -100,6 +104,10 @@ namespace DTXMania
                 base.Dispose();
             }
         }
+
+
+
+        // オープンとクローズ
 
 
         /// <summary>
@@ -450,6 +458,11 @@ namespace DTXMania
             }
         }
 
+
+
+        // 進行と描画
+
+
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
@@ -660,6 +673,10 @@ namespace DTXMania
                 }
             }
         }
+
+
+
+        // private
 
 
         private bool _初めての進行描画 = false;

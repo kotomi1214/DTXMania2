@@ -232,7 +232,6 @@ namespace DTXMania.演奏.EXPERT
             this._パーツを描画する( パーツ.Bar );
         }
 
-
         private void _パーツを描画する( パーツ パーツ名, float X方向移動量 = 0f, float Y方向移動量 = 0f )
         {
             var 中心位置 = this._パーツ画像の中心位置[ パーツ名 ];

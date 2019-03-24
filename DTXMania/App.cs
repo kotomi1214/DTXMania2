@@ -99,7 +99,7 @@ namespace DTXMania
 
 
 
-        // IDTXManiaService
+        // IDTXManiaService の実装
 
 
         /// <summary>

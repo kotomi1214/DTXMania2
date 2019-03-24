@@ -21,7 +21,9 @@ namespace DTXMania.認証
         public int 選択中のユーザ { get; protected set; } = 0;
 
 
+
         // 生成と終了
+
 
         public ユーザリスト()
         {

@@ -11,6 +11,10 @@ namespace DTXMania
 {
     class GO : アイキャッチ
     {
+
+        // 生成と終了
+
+
         public GO()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -103,6 +107,10 @@ namespace DTXMania
 
             base.Dispose();
         }
+
+
+
+        // オープンとクローズ
 
 
         /// <summary>
@@ -824,6 +832,11 @@ namespace DTXMania
             }
         }
 
+
+
+        // 進行と描画
+
+
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
@@ -992,6 +1005,10 @@ namespace DTXMania
                 }
             }
         }
+
+
+
+        // protected, private
 
 
         /// <summary>
