@@ -21,7 +21,7 @@ namespace DTXMania.演奏
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._背景 = new 画像( @"$(System)images\演奏\左サイドクリアパネル.png" );
-                this.クリアパネル = new 描画可能テクスチャ( new Size2F( 388, 990 ) );  // this._背景.サイズはまだ設定されていない。
+                this.クリアパネル = new 描画可能テクスチャ( this._背景.サイズ );
             }
         }
 
@@ -39,12 +39,10 @@ namespace DTXMania.演奏
         // クリア
 
 
-        /// <summary>
-        ///		クリアパネルに初期背景を上書きすることで、それまで描かれていた内容を消去する。
-        /// </summary>
         public void クリアする()
         {
             this.クリアパネル.テクスチャへ描画する( ( dcp ) => {
+                dcp.Clear( new Color4( Color3.Black, 0f ) );
                 dcp.DrawBitmap( this._背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
             } );
         }
