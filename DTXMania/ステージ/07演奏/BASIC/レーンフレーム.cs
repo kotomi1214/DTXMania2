@@ -117,8 +117,8 @@ namespace DTXMania.演奏.BASIC
 
         public static void 終了する()
         {
-            // undone: レーンフレーム.終了する() の実装
         }
+
         public static void レーン配置を設定する( string レーン配置名 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )

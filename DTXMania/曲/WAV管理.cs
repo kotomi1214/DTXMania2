@@ -37,8 +37,11 @@ namespace DTXMania
             {
                 this._一時停止中の音声のリスト = null;
 
-                foreach( var kvp in this._WAV情報リスト )
-                    kvp.Value.Dispose();
+                if( null != this._WAV情報リスト )
+                {
+                    foreach( var kvp in this._WAV情報リスト )
+                        kvp.Value?.Dispose();
+                }
 
                 this._WAV情報リスト = null;
             }

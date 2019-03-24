@@ -28,6 +28,7 @@ namespace DTXMania
             VariablePath.フォルダ変数を追加または更新する( "Exe", $@"{exePath}\" );
             VariablePath.フォルダ変数を追加または更新する( "System", Path.Combine( exePath, @"System\" ) );
             VariablePath.フォルダ変数を追加または更新する( "AppData", Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" ) );
+            VariablePath.フォルダ変数を追加または更新する( "UserProfile", Environment.GetFolderPath( Environment.SpecialFolder.UserProfile ) + @"\" );
 
             #region " %USERPROFILE%/AppData/DTXMania2 フォルダがなければ作成する。"
             //----------------

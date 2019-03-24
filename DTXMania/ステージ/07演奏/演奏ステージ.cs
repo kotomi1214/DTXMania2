@@ -65,107 +65,113 @@ namespace DTXMania.演奏
 
         public override void 活性化する()
         {
-            this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
-            this._レーンフレームBASIC = new BASIC.レーンフレーム();
-            this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
-            this._曲名パネル = new 曲名パネル();
-            this._ドラムパッドBASIC = new BASIC.ドラムパッド();
-            this._ヒットバーBASIC = new BASIC.ヒットバー();
-            this._ドラムキットとヒットバーEXPERT = new EXPERT.ドラムキットとヒットバー();
-            this._レーンフラッシュBASIC = new BASIC.レーンフラッシュ();
-            this._レーンフラッシュEXPERT = new EXPERT.レーンフラッシュ();
-            this._ドラムチップBASIC = new BASIC.ドラムチップ();
-            this._ドラムチップEXPERT = new EXPERT.ドラムチップ();
-            this._判定文字列 = new 判定文字列();
-            this._チップ光 = new チップ光();
-            this._左サイドクリアパネル = new 左サイドクリアパネル();
-            this._右サイドクリアパネル = new 右サイドクリアパネル();
-            this._判定パラメータ表示 = new 判定パラメータ表示();
-            this._フェーズパネル = new フェーズパネル();
-            this._コンボ表示 = new コンボ表示();
-            this._カウントマップライン = new カウントマップライン();
-            this._スコア表示 = new スコア表示();
-            this._プレイヤー名表示 = new プレイヤー名表示();
-            this._譜面スクロール速度 = new 譜面スクロール速度( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
-            this._達成率表示 = new 達成率表示();
-            this._曲別SKILL = new 曲別SKILL();
-            this._エキサイトゲージ = new エキサイトゲージ();
-            this._システム情報 = new システム情報();
-            this._数字フォント中グレー48x64 = new 画像フォント(
-               @"$(System)images\数字フォント中ホワイト48x64.png",
-               @"$(System)images\数字フォント中48x64矩形リスト.yaml",
-               文字幅補正dpx: -16f,
-               不透明度: 0.3f );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
+                this._レーンフレームBASIC = new BASIC.レーンフレーム();
+                this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
+                this._曲名パネル = new 曲名パネル();
+                this._ドラムパッドBASIC = new BASIC.ドラムパッド();
+                this._ヒットバーBASIC = new BASIC.ヒットバー();
+                this._ドラムキットとヒットバーEXPERT = new EXPERT.ドラムキットとヒットバー();
+                this._レーンフラッシュBASIC = new BASIC.レーンフラッシュ();
+                this._レーンフラッシュEXPERT = new EXPERT.レーンフラッシュ();
+                this._ドラムチップBASIC = new BASIC.ドラムチップ();
+                this._ドラムチップEXPERT = new EXPERT.ドラムチップ();
+                this._判定文字列 = new 判定文字列();
+                this._チップ光 = new チップ光();
+                this._左サイドクリアパネル = new 左サイドクリアパネル();
+                this._右サイドクリアパネル = new 右サイドクリアパネル();
+                this._判定パラメータ表示 = new 判定パラメータ表示();
+                this._フェーズパネル = new フェーズパネル();
+                this._コンボ表示 = new コンボ表示();
+                this._カウントマップライン = new カウントマップライン();
+                this._スコア表示 = new スコア表示();
+                this._プレイヤー名表示 = new プレイヤー名表示();
+                this._譜面スクロール速度 = new 譜面スクロール速度( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
+                this._達成率表示 = new 達成率表示();
+                this._曲別SKILL = new 曲別SKILL();
+                this._エキサイトゲージ = new エキサイトゲージ();
+                this._システム情報 = new システム情報();
+                this._数字フォント中グレー48x64 = new 画像フォント(
+                   @"$(System)images\数字フォント中ホワイト48x64.png",
+                   @"$(System)images\数字フォント中48x64矩形リスト.yaml",
+                   文字幅補正dpx: -16f,
+                   不透明度: 0.3f );
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
-            this._小節線色 = new SolidColorBrush( dc, Color.White );
-            this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
-            this._拍線色 = new SolidColorBrush( dc, Color.Gray );
-            this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
-            BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
-            this._フェードインカウンタ = new Counter( 0, 100, 10 );
+                this._小節線色 = new SolidColorBrush( dc, Color.White );
+                this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
+                this._拍線色 = new SolidColorBrush( dc, Color.Gray );
+                this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
+                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
+                this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
-            this._演奏状態を初期化する();
+                this._演奏状態を初期化する();
 
-            this.現在のフェーズ = フェーズ.フェードイン;
+                this.現在のフェーズ = フェーズ.フェードイン;
 
-            base.活性化する();
+                base.活性化する();
+            }
         }
 
         public override void 非活性化する()
         {
-            this._演奏状態を終了する();
-
-            #region " 現在の譜面スクロール速度をDBに保存。"
-            //----------------
-            using( var userdb = new UserDB() )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                var user = userdb.Users.Where( ( r ) => ( r.Id == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID ) ).SingleOrDefault();
-                if( null != user )
+                this._演奏状態を終了する();
+
+                #region " 現在の譜面スクロール速度をDBに保存。"
+                //----------------
+                using( var userdb = new UserDB() )
                 {
-                    user.ScrollSpeed = App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度;
-                    userdb.DataContext.SubmitChanges();
-                    Log.Info( $"現在の譜面スクロール速度({App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度})をDBに保存しました。[{user}]" );
+                    var user = userdb.Users.Where( ( r ) => ( r.Id == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID ) ).SingleOrDefault();
+                    if( null != user )
+                    {
+                        user.ScrollSpeed = App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度;
+                        userdb.DataContext.SubmitChanges();
+                        Log.Info( $"現在の譜面スクロール速度({App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度})をDBに保存しました。[{user}]" );
+                    }
                 }
+                //----------------
+                #endregion
+
+                this._拍線色?.Dispose();
+                this._小節線影色?.Dispose();
+                this._小節線色?.Dispose();
+                this.キャプチャ画面?.Dispose();
+
+                this._背景画像?.Dispose();
+                //this._レーンフレームBASIC?.Dispose();
+                this._レーンフレームEXPERT?.Dispose();
+                this._曲名パネル?.Dispose();
+                this._ドラムパッドBASIC?.Dispose();
+                this._ヒットバーBASIC?.Dispose();
+                this._ドラムキットとヒットバーEXPERT?.Dispose();
+                this._レーンフラッシュBASIC?.Dispose();
+                this._レーンフラッシュEXPERT?.Dispose();
+                this._ドラムチップBASIC?.Dispose();
+                this._ドラムチップEXPERT?.Dispose();
+                this._判定文字列?.Dispose();
+                this._チップ光?.Dispose();
+                this._左サイドクリアパネル?.Dispose();
+                this._右サイドクリアパネル?.Dispose();
+                this._判定パラメータ表示?.Dispose();
+                this._フェーズパネル?.Dispose();
+                this._コンボ表示?.Dispose();
+                this._カウントマップライン?.Dispose();
+                this._スコア表示?.Dispose();
+                this._プレイヤー名表示?.Dispose();
+                this._譜面スクロール速度?.Dispose();
+                this._達成率表示?.Dispose();
+                this._曲別SKILL?.Dispose();
+                this._エキサイトゲージ?.Dispose();
+                this._システム情報?.Dispose();
+                this._数字フォント中グレー48x64?.Dispose();
+
+                base.非活性化する();
             }
-            //----------------
-            #endregion
-
-            this._拍線色?.Dispose();
-            this._小節線影色?.Dispose();
-            this._小節線色?.Dispose();
-            this.キャプチャ画面?.Dispose();
-
-            this._背景画像?.Dispose();
-            //this._レーンフレームBASIC?.Dispose();
-            this._レーンフレームEXPERT?.Dispose();
-            this._曲名パネル?.Dispose();
-            this._ドラムパッドBASIC?.Dispose();
-            this._ヒットバーBASIC?.Dispose();
-            this._ドラムキットとヒットバーEXPERT?.Dispose();
-            this._レーンフラッシュBASIC?.Dispose();
-            this._レーンフラッシュEXPERT?.Dispose();
-            this._ドラムチップBASIC?.Dispose();
-            this._ドラムチップEXPERT?.Dispose();
-            this._判定文字列?.Dispose();
-            this._チップ光?.Dispose();
-            this._左サイドクリアパネル?.Dispose();
-            this._右サイドクリアパネル?.Dispose();
-            this._判定パラメータ表示?.Dispose();
-            this._フェーズパネル?.Dispose();
-            this._コンボ表示?.Dispose();
-            this._カウントマップライン?.Dispose();
-            this._スコア表示?.Dispose();
-            this._プレイヤー名表示?.Dispose();
-            this._譜面スクロール速度?.Dispose();
-            this._達成率表示?.Dispose();
-            this._曲別SKILL?.Dispose();
-            this._エキサイトゲージ?.Dispose();
-            this._システム情報?.Dispose();
-            this._数字フォント中グレー48x64?.Dispose();
-
-            base.非活性化する();
         }
 
         /// <summary>
