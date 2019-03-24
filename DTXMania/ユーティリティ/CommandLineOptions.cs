@@ -7,6 +7,8 @@ namespace DTXMania
 {
     class CommandLineOptions
     {
+        public bool ビュアーモードである => ( this.再生開始 || this.再生停止 );
+
         public readonly string Usage =
             "DTXMania " + App.リリース番号.ToString( "000" ) + "\n" +
             "Usage: dtxmania.exe [options] [filename]\n" +

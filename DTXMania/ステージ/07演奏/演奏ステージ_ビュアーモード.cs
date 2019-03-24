@@ -1,42 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
 using SSTFormat.v4;
+using FDK;
 
 namespace DTXMania.演奏
 {
     /// <summary>
     ///     ビュアーモードでは、SSTFファイルのみ再生可能。
     /// </summary>
-    class 演奏ステージ : ステージ
+    class 演奏ステージ_ビュアーモード : ステージ
     {
         public const float ヒット判定位置Ydpx = 847f;
 
 
         public enum フェーズ
         {
-            フェードイン,
             表示,
             クリア,
-            キャンセル通知,
-            キャンセル時フェードアウト,
-            キャンセル完了,
         }
 
         public フェーズ 現在のフェーズ { get; protected set; }
-
-        /// <summary>
-        ///     フェードインアイキャッチの遷移元画面。
-        ///     活性化前に、外部から設定される。
-        /// </summary>
-        public Bitmap キャプチャ画面 { get; set; } = null;
 
         public 成績 成績 { get; protected set; } = null;
 
@@ -45,7 +35,7 @@ namespace DTXMania.演奏
         // 生成と終了
 
 
-        public 演奏ステージ()
+        public 演奏ステージ_ビュアーモード()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -102,6 +92,7 @@ namespace DTXMania.演奏
                    文字幅補正dpx: -16f,
                    不透明度: 0.3f );
 
+
                 var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
                 this._小節線色 = new SolidColorBrush( dc, Color.White );
@@ -109,11 +100,16 @@ namespace DTXMania.演奏
                 this._拍線色 = new SolidColorBrush( dc, Color.Gray );
                 this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
                 BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
-                this._フェードインカウンタ = new Counter( 0, 100, 10 );
+                //this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
-                this._演奏状態を初期化する();
+                //this._演奏状態を初期化する();
 
-                this.現在のフェーズ = フェーズ.フェードイン;
+                // マウスクリックイベント登録
+                App進行描画.Instance.AppForm.MouseDown += this.App_MouseDown;
+
+                this._ビュアーモード時にドラムサウンドを発声する = true;
+
+                this.現在のフェーズ = フェーズ.クリア;
 
                 base.活性化する();
             }
@@ -123,6 +119,9 @@ namespace DTXMania.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                // マウスクリックイベント登録解除
+                App進行描画.Instance.AppForm.MouseDown -= this.App_MouseDown;
+
                 this._演奏状態を終了する();
 
                 #region " 現在の譜面スクロール速度をDBに保存。"
@@ -143,7 +142,6 @@ namespace DTXMania.演奏
                 this._拍線色?.Dispose();
                 this._小節線影色?.Dispose();
                 this._小節線色?.Dispose();
-                this.キャプチャ画面?.Dispose();
 
                 this._背景画像?.Dispose();
                 //this._レーンフレームBASIC?.Dispose();
@@ -182,7 +180,10 @@ namespace DTXMania.演奏
         /// </summary>
         private void _演奏状態を初期化する()
         {
-            // スコアに依存するデータを初期化する。
+            if( null == App進行描画.演奏スコア )
+                return;
+
+            //スコアに依存するデータを初期化する。
 
             this.成績 = new 成績();
             this.成績.スコアと設定を反映する( App進行描画.演奏スコア, App進行描画.ユーザ管理.ログオン中のユーザ );
@@ -213,7 +214,7 @@ namespace DTXMania.演奏
             }
 
 
-            // AVIを生成する。（必要があれば）
+            // AVIを生成する。
 
             App進行描画.AVI管理?.Dispose();
             App進行描画.AVI管理 = null;
@@ -228,6 +229,10 @@ namespace DTXMania.演奏
                     App進行描画.AVI管理.登録する( kvp.Key, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 );
                 }
             }
+
+            // その他。
+
+            this._一時停止中 = false;
         }
 
         private void _演奏状態を終了する()
@@ -238,11 +243,14 @@ namespace DTXMania.演奏
             //App進行描画.WAV管理 = null;
             App進行描画.AVI管理?.Dispose();
             App進行描画.AVI管理 = null;
+
+            this.現在のフェーズ = フェーズ.クリア;
         }
 
 
 
         // BGM停止
+        
 
         /// <remarks>
         ///		演奏クリア時には、次の結果ステージに入ってもBGMが鳴り続ける。
@@ -267,29 +275,23 @@ namespace DTXMania.演奏
             {
                 this._システム情報.FPSをカウントしプロパティを更新する();
 
+
+                while( this._メッセージキュー.TryDequeue( out var msg ) )
+                {
+                    switch( msg )
+                    {
+                        case App進行描画.ViewerPlayメッセージ msg2:
+                            this._演奏を開始する( msg2 );
+                            break;
+
+                        case App進行描画.ViewerStopメッセージ msg2:
+                            this._演奏を停止する( msg2 );
+                            break;
+                    }
+                }
+
                 switch( this.現在のフェーズ )
                 {
-                    case フェーズ.フェードイン:
-                        if( this._フェードインカウンタ.終了値に達した )
-                        {
-                            #region " フェードインが終わったので、演奏開始。 "
-                            //----------------
-                            Log.Info( "演奏を開始します。" );
-
-                            this._描画開始チップ番号 = 0; // -1 から 0 に変われば演奏開始。
-
-                            App進行描画.サウンドタイマ.リセットする();
-
-                            this.現在のフェーズ = フェーズ.表示;
-
-                            // ここで break; すると、次の表示フェーズまで１フレーム分の時間（数ミリ秒）が空いてしまう。
-                            // なので、フレームが空かないように、ここですぐさま最初の表示フェーズを実行する。
-                            this.進行する();
-                            //----------------
-                            #endregion
-                        }
-                        break;
-
                     case フェーズ.表示:
 
                         // ※注:クリアや失敗の判定は、ここではなく描画側で行っている。
@@ -362,7 +364,7 @@ namespace DTXMania.演奏
 
                                     if( !( this._チップの演奏状態[ chip ].発声済みである ) )
                                     {
-                                        this.チップの発声を行う( chip, ユーザ設定.ドラムの音を発声する );
+                                        this.チップの発声を行う( chip, ( ユーザ設定.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する ) );
                                         this._チップの演奏状態[ chip ].発声済みである = true;
                                     }
 
@@ -425,197 +427,8 @@ namespace DTXMania.演奏
 
                         App進行描画.入力管理.すべての入力デバイスをポーリングする( 入力履歴を記録する: false );
 
-                        #region " ユーザヒット処理。"
+                        #region " ユーザヒット処理 --> ビュアーモードでは無効 "
                         //----------------
-                        {
-                            var ヒット処理済み入力 = new List<ドラム入力イベント>(); // ヒット処理が終わった入力は、二重処理しないよう、この中に追加しておく。
-
-                            var ユーザ設定 = App進行描画.ユーザ管理.ログオン中のユーザ;
-
-                            #region " 描画範囲内のすべてのチップについて、対応する入力があればヒット処理を行う。"
-                            //----------------
-                            this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離 ) => {
-
-                                #region " チップにヒットしている入力を探す。"
-                                //----------------
-                                var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ chip.チップ種別 ];
-                                var AutoPlayである = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
-
-                                bool チップはヒット済みである = this._チップの演奏状態[ chip ].ヒット済みである;
-                                bool チップはMISSエリアに達している = ( ヒット判定バーと描画との時間sec > ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] );
-                                bool チップは描画についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと描画との時間sec );
-                                bool チップは発声についてヒット判定バーを通過した = ( 0 <= ヒット判定バーと発声との時間sec );
-
-                                if( チップはヒット済みである || // ヒット済みなら何もしない。
-                                    AutoPlayである ||          // AutoPlay チップなので何もしない。
-                                    !( ドラムチッププロパティ.AutoPlayOFF_ユーザヒット ) ||   // このチップは AutoPlay OFF の時でもユーザヒットの対象ではないので何もしない。
-                                    !( ヒット判定バーと描画との時間sec >= -( ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] ) && !( チップはMISSエリアに達している ) ) )    // チップはヒット可能エリアの外にあるので何もしない。
-                                    return;
-
-                                var チップにヒットしている入力 = App進行描画.入力管理.ポーリング結果.FirstOrDefault( ( 入力 ) => {
-
-                                    if( 入力.InputEvent.離された ||                    // 押下入力じゃないなら無視。
-                                        ヒット処理済み入力.Contains( 入力 ) ||         // すでに今回のターンで処理済み（＝処理済み入力リストに追加済み）なら無視。
-                                        入力.Type == ドラム入力種別.HiHat_Control )    // HiHat_Control 入力はここでは無視。
-                                        return false;
-
-                                    var チップの入力グループ = ドラムチッププロパティ.入力グループ種別;
-
-                                    // (A) 入力グループ種別 が Unknown の場合 → ドラム入力種別で比較
-                                    if( チップの入力グループ == 入力グループ種別.Unknown )
-                                    {
-                                        return ( ドラムチッププロパティ.ドラム入力種別 == 入力.Type );
-                                    }
-                                    // (B) 入力グループ種別が Unknown ではない場合　→　入力グループ種別で比較
-                                    else
-                                    {
-                                        var 入力の入力グループ種別リスト =
-                                            from kvp in ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ
-                                            where ( kvp.Value.ドラム入力種別 == 入力.Type )
-                                            select kvp.Value.入力グループ種別;
-
-                                        foreach( var 入力の入力グループ種別 in 入力の入力グループ種別リスト )
-                                        {
-                                            if( チップの入力グループ == 入力の入力グループ種別 )
-                                                return true;
-                                        }
-                                    }
-                                    return false;
-
-                                } );
-                                //----------------
-                                #endregion
-
-                                if( null != チップにヒットしている入力 ) // チップにヒットした入力があった
-                                {
-                                    #region " チップの手動ヒット処理。"
-                                    //----------------
-
-                                    ヒット処理済み入力.Add( チップにヒットしている入力 );    // この入力はこのチップでヒット処理した。
-
-                                    // 入力とチップとの時間差を算出。
-                                    double ヒット判定バーと入力との時間sec = QPCTimer.生カウント相対値を秒へ変換して返す( 現在の演奏時刻qpc - チップにヒットしている入力.InputEvent.TimeStamp );   // 常に正
-                                    double 入力とチップの間隔sec = Math.Abs( ヒット判定バーと入力との時間sec - ヒット判定バーと描画との時間sec );
-
-                                    // 時間差から判定を算出。
-                                    var 判定 =
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD : 判定種別.OK;
-
-                                    // ヒット処理。
-                                    this._チップのヒット処理を行う(
-                                        chip,
-                                        判定,
-                                        ( ユーザ設定.ドラムの音を発声する ) ? ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生 : false,
-                                        ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
-                                        ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
-
-                                    // エキサイトゲージに反映する。
-                                    this.成績.エキサイトゲージを加算する( 判定 );
-
-                                    //----------------
-                                    #endregion
-                                }
-
-                            } );
-                            //----------------
-                            #endregion
-
-                            #region " ヒットしてようがしてまいが起こすアクションを実行。"
-                            //----------------
-                            {
-                                var アクション済み入力 = new List<ドラム入力イベント>();  // ヒット処理が終わった入力は、二重処理しないよう、この中に追加しておく。
-
-                                foreach( var 入力 in App進行描画.入力管理.ポーリング結果 )
-                                {
-                                    // 押下入力じゃないなら無視。
-                                    if( 入力.InputEvent.離された )
-                                        continue;
-
-                                    var プロパティs = ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ.Where( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) );
-
-                                    if( プロパティs.Count() > 0 )
-                                    {
-                                        //for( int i = 0; i < プロパティs.Count(); i++ )
-                                        int i = 0;  // １つの入力で処理するのは、１つの表示レーン種別のみ。
-                                        {
-                                            var laneType = プロパティs.ElementAt( i ).Value.表示レーン種別;
-
-                                            if( ユーザ設定.演奏モード == PlayMode.BASIC )
-                                            {
-                                                this._ドラムパッドBASIC.ヒットする( laneType );
-                                                this._レーンフラッシュBASIC.開始する( laneType );
-                                            }
-                                            if( ユーザ設定.演奏モード == PlayMode.EXPERT )
-                                            {
-                                                this._ドラムキットとヒットバーEXPERT.ヒットアニメ開始( laneType );
-                                                this._レーンフラッシュEXPERT.開始する( laneType );
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            //----------------
-                            #endregion
-
-                            #region " どのチップにもヒットしなかった入力は空打ちとみなし、空打ち音を再生する。"
-                            //----------------
-                            if( ユーザ設定.ドラムの音を発声する )
-                            {
-                                foreach( var 入力 in App進行描画.入力管理.ポーリング結果 )
-                                {
-                                    if( ヒット処理済み入力.Contains( 入力 ) ||  // ヒット済みなら無視。
-                                        入力.InputEvent.離された )              // 押下じゃないなら無視。
-                                        continue;
-
-                                    var プロパティs = ユーザ設定.ドラムチッププロパティ管理.チップtoプロパティ.Where( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) );
-
-                                    for( int i = 0; i < プロパティs.Count(); i++ )
-                                    {
-                                        var prop = プロパティs.ElementAt( i ).Value;
-
-                                        if( 0 < App進行描画.演奏スコア.空打ちチップマップ.Count )
-                                        {
-                                            #region " DTX他の場合（空うちチップマップ使用）"
-                                            //----------------
-                                            int zz = App進行描画.演奏スコア.空打ちチップマップ[ prop.レーン種別 ];
-
-                                            // (A) 空打ちチップの指定があるなら、それを発声する。
-                                            if( 0 != zz )
-                                                App進行描画.WAV管理.発声する( zz, prop.チップ種別, prop.発声前消音, prop.消音グループ種別, true );
-
-                                            // (B) 空打ちチップの指定がないなら、一番近いチップを検索し、それを発声する。
-                                            else
-                                            {
-                                                var chip = this.指定された時刻に一番近いチップを返す( 現在の演奏時刻sec, 入力.Type );
-
-                                                if( null != chip )
-                                                {
-                                                    this.チップの発声を行う( chip, true );
-                                                    break;  // 複数のチップが該当する場合でも、最初のチップの発声のみ行う。
-                                                }
-                                            }
-                                            //----------------
-                                            #endregion
-                                        }
-                                        else
-                                        {
-                                            #region " SSTFの場合（空うちチップマップ未使用）"
-                                            //----------------
-                                            App進行描画.ドラムサウンド.発声する( prop.チップ種別, 0, prop.発声前消音, prop.消音グループ種別 );
-                                            //----------------
-                                            #endregion
-                                        }
-                                    }
-                                }
-                            }
-                            //----------------
-                            #endregion
-
-                            ヒット処理済み入力 = null;
-                        }
                         //----------------
                         #endregion
 
@@ -624,32 +437,14 @@ namespace DTXMania.演奏
 
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Escape ) )
                         {
-                            #region " ESC → 演奏中断 "
-                            //----------------
-                            Log.Info( "ESC キーが押されました。演奏を中断します。" );
-
-                            this.BGMを停止する();
-                            App進行描画.WAV管理.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
-
-                            // 進行描画スレッドへの通知フェーズを挟む。
-                            this.現在のフェーズ = フェーズ.キャンセル通知;
-                            //----------------
-                            #endregion
+                            // ビュアーモードでは無効。
                         }
 
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Up ) )
                         {
                             if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                #region " Shift+上 → BGMAdjust 増加 "
-                                //----------------
-                                App進行描画.演奏曲ノード.BGMAdjust += 10; // ms
-
-                                App進行描画.WAV管理.すべてのBGMの再生位置を移動する( +10.0 / 1000.0 );  // sec
-
-                                this._BGMAdjustをデータベースに保存する( App進行描画.演奏曲ノード );
-                                //----------------
-                                #endregion
+                                // Shift+上 → BGMAdjust 増加 （ビュアーモードでは無効）
                             }
                             else
                             {
@@ -661,18 +456,12 @@ namespace DTXMania.演奏
                                 #endregion
                             }
                         }
+
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Down ) )
                         {
                             if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                #region " Shift+下 → BGMAdjust 減少 "
-                                //----------------
-                                App進行描画.演奏曲ノード.BGMAdjust -= 10; // ms
-                                App進行描画.WAV管理.すべてのBGMの再生位置を移動する( -10.0 / 1000.0 );  // sec
-
-                                this._BGMAdjustをデータベースに保存する( App進行描画.演奏曲ノード );
-                                //----------------
-                                #endregion
+                                // Shift+下 → BGMAdjust 減少（ビュアーモードでは無効）
                             }
                             else
                             {
@@ -684,22 +473,15 @@ namespace DTXMania.演奏
                                 #endregion
                             }
                         }
+
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                         {
-                            #region " ハイハットの開閉 "
-                            //----------------
-                            foreach( var ev in App進行描画.入力管理.MIDI入力.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
-                            {
-                                this._ドラムキットとヒットバーEXPERT.ハイハットの開度を設定する( ev.Velocity );
-                            }
-                            //----------------
-                            #endregion
+                            // ハイハットの開閉 （ビュアーモードでは無効）
+                        
                         }
+
                         break;
 
-                    case フェーズ.キャンセル完了:
-                    case フェーズ.キャンセル時フェードアウト:
-                    case フェーズ.キャンセル通知:
                     case フェーズ.クリア:
                         break;
                 }
@@ -719,54 +501,11 @@ namespace DTXMania.演奏
 
             switch( this.現在のフェーズ )
             {
-                case フェーズ.フェードイン:
-                case フェーズ.キャンセル完了:
-                    {
-                        this._左サイドクリアパネル.クリアする();
-                        this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
-                            this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
-                            this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
-                            this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
-                            this._曲別SKILL.進行描画する( dcp, 0f );
-                        } );
-                        this._左サイドクリアパネル.描画する();
-
-                        this._右サイドクリアパネル.クリアする();
-                        this._右サイドクリアパネル.描画する();
-
-                        if( playMode == PlayMode.BASIC )
-                            this._レーンフレームBASIC.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
-                        if( playMode == PlayMode.EXPERT )
-                            this._レーンフレームEXPERT.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
-
-                        if( playMode == PlayMode.BASIC )
-                            this._ドラムパッドBASIC.進行描画する();
-
-                        this._背景画像.描画する( dc, 0f, 0f );
-                        this._譜面スクロール速度.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
-                        this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
-                        this._カウントマップライン.進行描画する( dc );
-                        this._フェーズパネル.進行描画する( dc );
-                        this._曲名パネル.描画する( dc );
-
-                        if( playMode == PlayMode.BASIC )
-                            this._ヒットバーBASIC.描画する();
-                        if( playMode == PlayMode.EXPERT )
-                        {
-                            this._ドラムキットとヒットバーEXPERT.ヒットバーを進行描画する();
-                            this._ドラムキットとヒットバーEXPERT.ドラムキットを進行描画する();
-                        }
-                        this._キャプチャ画面を描画する( dc, ( 1.0f - this._フェードインカウンタ.現在値の割合 ) );
-                    }
-                    break;
-
                 case フェーズ.クリア:
                     this._背景画像.描画する( dc, 0f, 0f );
                     break;
 
                 case フェーズ.表示:
-                case フェーズ.キャンセル時フェードアウト:
                     {
                         double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + グラフィックデバイス.Instance.次のDComp表示までの残り時間sec;
 
@@ -902,28 +641,56 @@ namespace DTXMania.演奏
 
                         this._システム情報.VPSをカウントする();
                         this._システム情報.描画する( dc, $"BGMAdjust: {App進行描画.演奏曲ノード.BGMAdjust}" );
-
-                        if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
-                        {
-                            App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
-
-                            if( App進行描画.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
-                            {
-                                this.現在のフェーズ = フェーズ.キャンセル完了;
-                            }
-                        }
                     }
-                    break;
-
-                case フェーズ.キャンセル通知:
-                    App進行描画.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
-                    this.現在のフェーズ = フェーズ.キャンセル時フェードアウト;
                     break;
             }
         }
 
 
-       
+
+        // メッセージ処理
+
+
+        public void ViewerPlay( App進行描画.ViewerPlayメッセージ msg )
+        {
+            this._メッセージキュー.Enqueue( msg );
+        }
+
+        public void ViewerStop( App進行描画.ViewerStopメッセージ msg )
+        {
+            this._メッセージキュー.Enqueue( msg );
+        }
+
+        private void _演奏を開始する( App進行描画.ViewerPlayメッセージ msg )
+        {
+            this._演奏状態を終了する();
+
+            App進行描画.ビュアー用曲ノード = new MusicNode( msg.path, null );
+            App進行描画.演奏スコア = this._スコアを読み込む();
+
+            if( null == App進行描画.演奏スコア )
+                return;
+
+            this._ビュアーモード時にドラムサウンドを発声する = msg.drumSound;
+            this._演奏状態を初期化する();
+
+            this._ビュアー演奏を開始する( msg.startPart );
+            this.現在のフェーズ = フェーズ.表示;
+
+            msg.完了通知.Set();
+        }
+
+        private void _演奏を停止する( App進行描画.ViewerStopメッセージ msg )
+        {
+            this._演奏状態を初期化する();
+
+            msg.完了通知.Set();
+        }
+
+        private ConcurrentQueue<App進行描画.通知メッセージ> _メッセージキュー = new ConcurrentQueue<進行描画.通知メッセージ>();
+
+
+
         // 画面を構成するもの
 
 
@@ -959,8 +726,8 @@ namespace DTXMania.演奏
 
         private 右サイドクリアパネル _右サイドクリアパネル = null;
 
-        
 
+        
         // 左サイドクリアパネル内に表示されるもの
 
 
@@ -982,7 +749,7 @@ namespace DTXMania.演奏
         private コンボ表示 _コンボ表示 = null;
 
 
-
+        
         // 譜面上に表示されるもの
 
 
@@ -996,7 +763,7 @@ namespace DTXMania.演奏
 
         private 画像フォント _数字フォント中グレー48x64 = null;
 
-
+        
 
         // 小節線・拍線
 
@@ -1069,18 +836,10 @@ namespace DTXMania.演奏
 
         private Dictionary<チップ, チップの演奏状態> _チップの演奏状態 = null;
 
+        private bool _一時停止中 = false;
+
         private double _演奏開始からの経過時間secを返す()
             => App進行描画.サウンドタイマ.現在時刻sec;
-
-
-
-        // ステージ切り替え（特別にアイキャッチを使わないパターン）
-
-
-        /// <summary>
-        ///		読み込み画面: 0 ～ 1: 演奏画面
-        /// </summary>
-        private Counter _フェードインカウンタ = null;
 
 
 
@@ -1213,39 +972,160 @@ namespace DTXMania.演奏
             }
         }
 
-        private void _キャプチャ画面を描画する( DeviceContext dc, float 不透明度 = 1.0f )
+
+
+
+        // ビュアーモード専用 private
+
+
+        private スコア _スコアを読み込む()
         {
-            Debug.Assert( null != this.キャプチャ画面, "キャプチャ画面が設定されていません。" );
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                var 選択曲ファイルパス = App進行描画.演奏曲ノード.曲ファイルの絶対パス;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+                // 曲ファイルを読み込む。
+                var score = スコア.ファイルから生成する( 選択曲ファイルパス.変数なしパス );
 
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+                // 全チップの発声時刻を修正する。
+                foreach( var chip in score.チップリスト )
+                    chip.発声時刻sec -= App進行描画.サウンドデバイス.再生遅延sec;
 
-                dc.DrawBitmap(
-                    this.キャプチャ画面,
-                    new RectangleF( 0f, 0f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height ),
-                    不透明度,
-                    BitmapInterpolationMode.Linear );
-            } );
+                // 完了。
+                Log.Info( $"曲ファイルを読み込みました。" );
+                Log.Info( $"曲名: {score.曲名}" );
+
+                return score;
+            }
         }
 
-        private void _BGMAdjustをデータベースに保存する( MusicNode musicNode )
+        // 演奏状態の初期化が完了していること。
+        private void _ビュアー演奏を開始する( int 演奏開始小節番号 )
         {
-            Task.Run( () => {
+            var score = App進行描画.演奏スコア;
 
-                using( var songdb = new SongDB() )
+
+            // 演奏開始小節番号に位置する最初のチップを検索する。
+
+            var チップ番号 = -1;
+
+            for( int i = 0; i < score.チップリスト.Count; i++ )
+            {
+                if( score.チップリスト[ i ].小節番号 >= 演奏開始小節番号 )
                 {
-                    var 曲レコード = songdb.Songs.Where( ( song ) => ( song.HashId == musicNode.曲ファイルハッシュ ) ).SingleOrDefault();
+                    チップ番号 = i;
+                    break;
+                }
+            }
 
-                    if( null != 曲レコード )
-                    {
-                        曲レコード.BGMAdjust = musicNode.BGMAdjust;  // 更新
+            if( -1 == チップ番号 )
+                return; // すべて演奏終了している
 
-                        songdb.DataContext.SubmitChanges(); // 更新完了
-                    }
+
+            // 演奏開始時刻を、最初のチップの描画より少し手前に設定。
+
+            double 演奏開始時刻sec = score.チップリスト[ チップ番号 ].描画時刻sec - 0.5;   // 0.5 秒早く
+
+            if( 0.0 > 演奏開始時刻sec ) 演奏開始時刻sec = 0.0;
+
+
+            // 演奏開始時刻をもとに、描画開始チップ番号を確定する。
+
+            this._描画開始チップ番号 = -1;
+
+            for( int i = 0; i < score.チップリスト.Count; i++ )
+            {
+                var chip = score.チップリスト[ i ];
+
+                if( chip.描画時刻sec >= 演奏開始時刻sec )
+                {
+                    this._描画開始チップ番号 = i;
+                    break;
                 }
 
-            } );
+                // 同時に、開始時刻より前のチップはヒット済みとする。
+
+                this._チップの演奏状態[ chip ].ヒット済みの状態にする();
+            }
+
+
+            // 必要なら、AVI動画, WAV音声の途中再生を行う。
+
+            // (1) AVI動画
+            if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
+            {
+                var 動画チップリスト = score.チップリスト.Where( ( chip ) => (
+                    this._チップの演奏状態[ chip ].ヒット済みである &&  // ヒット済みの
+                    chip.チップ種別 == チップ種別.背景動画 ) );         // 動画チップ
+
+                foreach( var aviChip in 動画チップリスト )
+                {
+                    if( App進行描画.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video video ) )
+                    {
+                        video.再生を開始する( 演奏開始時刻sec - aviChip.発声時刻sec );
+                    }
+                }
+            }
+
+            // (2) WAV音声
+            var BGMチップリスト = score.チップリスト.Where( ( chip ) => (
+                this._チップの演奏状態[ chip ].ヒット済みである &&  // ヒット済みの
+                chip.チップ種別 == チップ種別.BGM ) );              // BGMチップ
+
+            foreach( var wavChip in BGMチップリスト )
+            {
+                var prop = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理.チップtoプロパティ[ wavChip.チップ種別 ];
+
+                App進行描画.WAV管理.発声する( 
+                    wavChip.チップサブID,
+                    wavChip.チップ種別, 
+                    prop.発声前消音, 
+                    prop.消音グループ種別, 
+                    BGM以外も再生する: App進行描画.ユーザ管理.ログオン中のユーザ.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する,
+                    音量: wavChip.音量 / (float) チップ.最大音量, 演奏開始時刻sec - wavChip.発声時刻sec );
+            }
+
+            
+            // 全部終わってからタイマリセット。
+
+            App進行描画.サウンドタイマ.リセットする( 演奏開始時刻sec );
+
+            return;
+        }
+
+        // マウス右クリック　→　一時停止／再開する。
+        private void App_MouseDown( object sender, MouseEventArgs e )
+        {
+            if( e.Button == MouseButtons.Right )
+            {
+                if( !this._一時停止中 )
+                {
+                    this._一時停止中 = true;
+
+                    App進行描画.サウンドタイマ.一時停止する();
+
+                    App進行描画.AVI管理?.再生中の動画をすべて一時停止する();
+                    App進行描画.WAV管理?.再生中の音声をすべて一時停止する();
+                }
+                else
+                {
+                    this._一時停止中 = false;
+
+                    App進行描画.AVI管理?.一時停止中の動画をすべて再開する();
+                    App進行描画.WAV管理?.一時停止中の音声をすべて再開する();
+
+                    App進行描画.サウンドタイマ.再開する();
+                }
+            }
+        }
+
+
+        private bool _ビュアーモード時にドラムサウンドを発声する = true;
+
+        private class YAMLマップ_ドラムチップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
+            public float 縦方向中央位置 { get; set; }
         }
     }
 }

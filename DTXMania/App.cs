@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using SharpDX;
 using FDK;
 using DTXMania.WCF;
+using System.ComponentModel;
 
 namespace DTXMania
 {
@@ -33,7 +34,7 @@ namespace DTXMania
         // 生成と終了
 
 
-        public App()
+        public App( CommandLineOptions options )
             : base( new App進行描画() )
         {
             InitializeComponent();
@@ -41,6 +42,9 @@ namespace DTXMania
             this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( App.ビュアーモードである ? " [Viewer Mode]" : "" );
 
             App進行描画.システム設定 = システム設定.読み込む();
+
+            App.ビュアーモードである = options.ビュアーモードである;
+            App.サービスメッセージキュー = new ServiceMessageQueue();   // WCFサービス用
 
             if( App.ビュアーモードである )
             {
@@ -60,6 +64,26 @@ namespace DTXMania
         }
 
         private new App進行描画 進行描画 => (App進行描画) base.進行描画;
+
+        protected override void OnLoad( EventArgs e )
+        {
+            this.画面モード = 画面モード.ウィンドウ;   // ビュアーモードでは常にウィンドウモード
+
+            base.OnLoad( e );
+        }
+
+        protected override void OnClosing( CancelEventArgs e )
+        {
+            if( App.ビュアーモードである )
+            {
+                // 今回の位置とサイズを保存する。
+                App進行描画.システム設定.ウィンドウ表示位置Viewerモード用 = this.Location;
+                App進行描画.システム設定.ウィンドウサイズViewerモード用 = this.ClientSize;
+                App進行描画.システム設定.保存する();
+            }
+
+            base.OnClosing( e );
+        }
 
         protected override void OnKeyDown( KeyEventArgs e )
         {
@@ -124,9 +148,6 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                App.ビュアーモードである = ( options.再生開始 || options.再生停止 );
-                App.サービスメッセージキュー = new ServiceMessageQueue();   // WCFサービス用
-
                 // WCFサービスホストを起動する。
                 this._wcfServiceHost = null;
                 try
@@ -135,11 +156,17 @@ namespace DTXMania
 
                     Log.Info( $"WCF サービスの受付を開始しました。[{endPointUri}]" );
                 }
-                catch( AddressAlreadyInUseException )   // 既に起動されている。
+                catch( AddressAlreadyInUseException )
                 {
+                }
+
+                if( null == this._wcfServiceHost )
+                {
+                    // (A) 既に起動されている場合
+
                     if( ビュアーモードである )
                     {
-                        // ビュアーモードなら OK。既に別のWCFサービスが立ち上がっているので、そのサービスでオプションを処理して、終了する。
+                        // (A-a) ビュアーモードなら OK。既に別のWCFサービスが立ち上がっているので、そのサービスでオプションを処理して、終了する。
                         this._WCFサービスを取得する( out var factory, out var service, out var serviceChannel );
                         this._WCFサービスでオプションを処理する( service, options );
                         this._WCFサービスを解放する( factory, service, serviceChannel );
@@ -147,17 +174,27 @@ namespace DTXMania
                     }
                     else
                     {
-                        // 通常モードなら二重起動で NG。
+                        // (A-b) 通常モードなら二重起動で NG。
                         MessageBox.Show( "DTXMania はすでに起動しています。多重起動はできません。", "DTXMania Runtime Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
                         return false;
                     }
                 }
-
-                // ビュアーモードなら、オプションを自分で処理する。
-                if( ビュアーモードである )
-                    _WCFサービスでオプションを処理する( this, options );
-
-                return true;
+                else
+                {
+                    // (B) まだ起動されていない場合
+                    
+                    if( ビュアーモードである )
+                    {
+                        // (B-a) ビュアーモードなら、オプションを自分で処理する。
+                        _WCFサービスでオプションを処理する( this, options );
+                        return true;
+                    }
+                    else
+                    {
+                        // (B-b) 通常起動。
+                        return true;
+                    }
+                }
             }
         }
 

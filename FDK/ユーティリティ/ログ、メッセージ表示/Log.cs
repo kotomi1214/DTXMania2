@@ -265,7 +265,7 @@ namespace FDK
                 var NETスレッドID = System.Threading.Thread.CurrentThread.ManagedThreadId;
                 var Win32スレッドID = Log.GetCurrentThreadId();
                 var スレッド識別文字列 = ( Log._IDto名前.ContainsKey( Win32スレッドID ) ) ? $"({Log._IDto名前[ Win32スレッドID ]})" : "";
-                return $"{DateTime.Now.ToLongTimeString()} [{NETスレッドID:00},0x{Win32スレッドID:x}{スレッド識別文字列}]";
+                return $"{DateTime.Now.ToString( "HH:mm:ss.fffffff" )} [{NETスレッドID:00},0x{Win32スレッドID:x}{スレッド識別文字列}]";
             }
         }
 

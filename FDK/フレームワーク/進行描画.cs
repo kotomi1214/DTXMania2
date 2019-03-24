@@ -24,6 +24,11 @@ namespace FDK
         // 開始、終了
 
 
+        public 進行描画()
+        {
+            this._メッセージキュー = new ConcurrentQueue<通知メッセージ>();
+        }
+
         public void 開始する( AppForm form, Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow )
         {
             this.AppForm = form;
@@ -107,7 +112,6 @@ namespace FDK
 
             グラフィックデバイス.インスタンスを生成する( hWindow, 物理画面サイズ, 設計画面サイズ );
 
-            this._メッセージキュー = new ConcurrentQueue<通知メッセージ>();
             this._Tick通知 = new AutoResetEvent( false );
             this._終了指示通知 = new ManualResetEventSlim( false );
             this._終了完了通知 = new ManualResetEventSlim( false );
@@ -138,7 +142,7 @@ namespace FDK
                     }
                     else
                     {
-                        this._メッセージを処理する( msg );
+                        this.メッセージを処理する( msg );
                     }
                 }
                 if( ループを抜ける )
@@ -182,14 +186,14 @@ namespace FDK
         // スレッドメッセージとキュー
 
 
-        protected abstract class 通知メッセージ
+        public abstract class 通知メッセージ
         {
             public AutoResetEvent 完了通知 = new AutoResetEvent( false );
         }
 
         protected ConcurrentQueue<通知メッセージ> _メッセージキュー;
 
-        protected void _メッセージを処理する( 通知メッセージ msg )
+        protected virtual void メッセージを処理する( 通知メッセージ msg )
         {
             switch( msg )
             {

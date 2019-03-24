@@ -210,6 +210,7 @@
     <Compile Include="ステージ\07演奏\曲別SKILL.cs" />
     <Compile Include="ステージ\07演奏\曲名パネル.cs" />
     <Compile Include="ステージ\07演奏\演奏ステージ.cs" />
+    <Compile Include="ステージ\07演奏\演奏ステージ_ビュアーモード.cs" />
     <Compile Include="ステージ\07演奏\譜面スクロール速度.cs" />
     <Compile Include="ステージ\07演奏\達成率表示.cs" />
     <Compile Include="ステージ\08結果\ランク.cs" />

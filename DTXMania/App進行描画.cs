@@ -82,9 +82,14 @@ namespace DTXMania
 
             App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
             //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
+            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
+                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
+            };
             App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
                 音量 = 0.5f, // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
             };
+            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
+            App進行描画.ドラムサウンド = new ドラムサウンド();
             App進行描画.システムサウンド = new システムサウンド();
             //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
             App進行描画.入力管理 = new 入力管理( this.AppForm.キーボード ) {
@@ -92,11 +97,14 @@ namespace DTXMania
                 キーバインディングを保存する = () => App進行描画.システム設定.保存する(),
             };
             App進行描画.入力管理.初期化する();
+            App進行描画.ユーザ管理 = new ユーザ管理();
+            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
 
 
-            // ステージを生成。（起動ステージのみ。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
+            // ステージを生成。（残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
 
             this.起動ステージ = new 起動.起動ステージ();
+            this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();
 
 
             // 最初のステージを設定し、活性化する。
@@ -111,13 +119,6 @@ namespace DTXMania
         {
             テクスチャ.全インスタンスで共有するリソースを作成する();
 
-            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
-            App進行描画.ユーザ管理 = new ユーザ管理();
-            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
-            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
-                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
-            };
-            App進行描画.ドラムサウンド = new ドラムサウンド();
             App進行描画.アイキャッチ管理 = new アイキャッチ管理();
 
 
@@ -129,6 +130,7 @@ namespace DTXMania
             this.オプション設定ステージ = new オプション設定.オプション設定ステージ();
             this.曲読み込みステージ = new 曲読み込み.曲読み込みステージ();
             this.演奏ステージ = new 演奏.演奏ステージ();
+            //this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();    --> On開始する() で生成
             this.結果ステージ = new 結果.結果ステージ() {
                 BGMを停止する = () => 演奏ステージ.BGMを停止する(),
                 結果を取得する = () => 演奏ステージ.成績,
@@ -226,8 +228,7 @@ namespace DTXMania
                         if( App.ビュアーモードである )
                         {
                             // (A) ビュアーモードなら 演奏ステージ_ビュアーモード へ
-                            // undone: 演奏ステージ_ビュアーモード へ
-                            //this.現在のステージ = this.演奏ステージ_ビュアーモード;
+                            this.現在のステージ = this.演奏ステージ_ビュアーモード;
                         }
                         else
                         {
@@ -425,6 +426,23 @@ namespace DTXMania
             this.現在のステージ.描画する();
         }
 
+        protected override void メッセージを処理する( 通知メッセージ msg )
+        {
+            switch( msg )
+            {
+                case ViewerPlayメッセージ msg2:
+                    if( App.ビュアーモードである )
+                        this.演奏ステージ_ビュアーモード.ViewerPlay( msg2 );
+                    break;
+
+                case ViewerStopメッセージ msg2:
+                    if( App.ビュアーモードである )
+                        this.演奏ステージ_ビュアーモード.ViewerStop( msg2 );
+                    break;
+            }
+
+            base.メッセージを処理する( msg ); // 忘れずに
+        }
 
 
         // ステージ
@@ -443,6 +461,8 @@ namespace DTXMania
         protected 曲読み込み.曲読み込みステージ 曲読み込みステージ;
 
         protected 演奏.演奏ステージ 演奏ステージ;
+
+        protected 演奏.演奏ステージ_ビュアーモード 演奏ステージ_ビュアーモード;
 
         protected 結果.結果ステージ 結果ステージ;
 
@@ -481,17 +501,11 @@ namespace DTXMania
             return msg.完了通知;
         }
 
-        private class ViewerPlayメッセージ : 通知メッセージ
+        public class ViewerPlayメッセージ : 通知メッセージ
         {
             public string path = "";
             public int startPart = 0;
             public bool drumSound = true;
-        }
-
-        private void _ViewrePlay( ViewerPlayメッセージ msg )
-        {
-            // undone: ViewerPlay の実装
-            throw new NotImplementedException();
         }
         //----------------
         #endregion
@@ -505,14 +519,8 @@ namespace DTXMania
             return msg.完了通知;
         }
 
-        private class ViewerStopメッセージ : 通知メッセージ
+        public class ViewerStopメッセージ : 通知メッセージ
         {
-        }
-
-        private void _ViewerStop( ViewerStopメッセージ msg )
-        {
-            // undone: ViewerStop の実装
-            throw new NotImplementedException();
         }
         //----------------
         #endregion
@@ -521,8 +529,7 @@ namespace DTXMania
         //----------------
         public float GetSoundDelay()    // 常に同期
         {
-            // undone: GetSoundDelay の実装
-            throw new NotImplementedException();
+            return (float) App進行描画.サウンドデバイス.再生遅延sec;
         }
         //----------------
         #endregion

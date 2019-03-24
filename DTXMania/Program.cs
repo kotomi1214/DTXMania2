@@ -77,7 +77,7 @@ namespace DTXMania
 
                 #region " アプリ起動。"
                 //----------------
-                using( var app = new App() )
+                using( var app = new App( options ) )
                 {
                     if( app.WCFサービスをチェックする( options ) )
                     {
