@@ -77,7 +77,6 @@ namespace DTXMania.曲読み込み
                 };
                 this._プレビュー画像 = new プレビュー画像();
                 this._難易度 = new 難易度();
-                this._システム情報 = new システム情報();
 
 
                 var 選択曲 = App進行描画.曲ツリー.フォーカス曲ノード;
@@ -104,7 +103,6 @@ namespace DTXMania.曲読み込み
                 //App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_開始音 ); --> なりっぱなしでいい
                 App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_ループBGM );
 
-                this._システム情報?.Dispose();
                 this._難易度?.Dispose();
                 this._プレビュー画像?.Dispose();
                 this._サブタイトル画像?.Dispose();
@@ -123,13 +121,10 @@ namespace DTXMania.曲読み込み
 
         public override void 進行する()
         {
-            this._システム情報.FPSをカウントしプロパティを更新する();
         }
 
         public override void 描画する()
         {
-            this._システム情報.VPSをカウントする();
-
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
             dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
@@ -144,7 +139,6 @@ namespace DTXMania.曲読み込み
             {
                 case フェーズ.フェードイン:
                     App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
-                    this._システム情報.描画する( dc );
 
                     if( App進行描画.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.オープン完了 )
                         this.現在のフェーズ = フェーズ.表示;
@@ -152,8 +146,6 @@ namespace DTXMania.曲読み込み
                     break;
 
                 case フェーズ.表示:
-                    this._システム情報.描画する( dc );
-
                     this._スコアを読み込む();
 
                     App進行描画.入力管理.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
@@ -163,7 +155,6 @@ namespace DTXMania.曲読み込み
 
                 case フェーズ.完了:
                 case フェーズ.キャンセル:
-                    this._システム情報.描画する( dc );
                     break;
             }
         }
@@ -246,7 +237,5 @@ namespace DTXMania.曲読み込み
         private プレビュー画像 _プレビュー画像 = null;
 
         private 難易度 _難易度 = null;
-
-        private システム情報 _システム情報 = null;
     }
 }
