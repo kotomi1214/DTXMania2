@@ -31,7 +31,7 @@ namespace FDK
             Task.Run( () => {
 
                 グラフィックデバイス.Instance.DXGIOutput1.WaitForVerticalBlank();
-                グラフィックデバイス.Instance.DXGISwapChain1.Present( 1, SharpDX.DXGI.PresentFlags.None );
+                グラフィックデバイス.Instance.DXGISwapChain1.Present( 0, SharpDX.DXGI.PresentFlags.None );
 
                 this.ただいま表示中 = false;   // 表示完了
             } );

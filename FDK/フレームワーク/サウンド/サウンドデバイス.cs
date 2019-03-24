@@ -48,17 +48,16 @@ namespace FDK
         /// <summary>
         ///		ミキサー。
         /// </summary>
-        internal Mixer Mixer
-        {
-            get;
-            private set;
-        } = null;
+        internal Mixer Mixer { get; private set; } = null;
+
+
+
+        // 生成と終了
 
 
         /// <summary>
-        ///		デバイスを初期化する。
+        ///		デバイスを初期化し、レンダリングを開始する。
         /// </summary>
-        /// <param name="共有モード">true なら共有モード、false なら排他モード。</param>
         public サウンドデバイス( AudioClientShareMode 共有モード, double バッファサイズsec = 0.010, WaveFormat 希望フォーマット = null )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -69,75 +68,113 @@ namespace FDK
 
                 lock( this._スレッド間同期 )
                 {
-                    if( this._レンダリング状態 != PlaybackState.Stopped )
-                        throw new InvalidOperationException( "WASAPI のレンダリングを停止しないまま初期化することはできません。" );
-
-                    if( null != this._レンダリングスレッド )
-                        throw new Exception( "レンダリングスレッドがすでに起動しています。" );
-
-                    this._解放する();
-
-                    // MMDevice を取得する。
+                    #region " MMDevice を生成し、AudioClient を取得する。"
+                    //----------------
                     this._MMDevice = MMDeviceEnumerator.DefaultAudioEndpoint(
                         DataFlow.Render,    // 方向 ... 書き込み
                         Role.Console );     // 用途 ... ゲーム、システム通知音、音声命令
 
-                    // AudioClient を取得する。
                     this._AudioClient = AudioClient.FromMMDevice( this._MMDevice );
+                    //----------------
+                    #endregion
 
-                    // フォーマットを決定する。
+                    #region " フォーマットを決定する。"
+                    //----------------
                     this.WaveFormat = this._適切なフォーマットを調べて返す( 希望フォーマット ) ??
                         throw new NotSupportedException( "サポート可能な WaveFormat が見つかりませんでした。" );
-                    Log.Info( $"WaveFormat: {this.WaveFormat}" );
 
-                    // AudioClient を初期化する。
+                    Log.Info( $"WaveFormat: {this.WaveFormat}" );
+                    //----------------
+                    #endregion
+
+                    #region " AudioClient を初期化する。"
+                    //----------------
                     try
                     {
                         long 期間100ns = ( this._共有モード == AudioClientShareMode.Shared ) ?
-                            this._AudioClient.DefaultDevicePeriod :                     // 共有モードの場合、遅延を既定値に設定する。
-                            FDKUtilities.変換_sec単位から100ns単位へ( this.再生遅延sec );    // 排他モードの場合、コンストラクタで指定された値。
+                            this._AudioClient.DefaultDevicePeriod :                         // 共有モードの場合、遅延を既定値に設定する。
+                            FDKUtilities.変換_sec単位から100ns単位へ( this.再生遅延sec );   // 排他モードの場合、コンストラクタで指定された値。
 
-                        this._AudioClientを初期化する( 期間100ns );
+                        // イベント駆動で初期化。
+
+                        this._AudioClient.Initialize( this._共有モード, AudioClientStreamFlags.StreamFlagsEventCallback, 期間100ns, 期間100ns, this.WaveFormat, Guid.Empty );
+
                     }
                     catch( CoreAudioAPIException e )
                     {
-                        // 排他モードかつイベント駆動 の場合、この例外が返されることがある。
-                        // この場合、バッファサイズを調整して再度初期化する。
                         if( e.ErrorCode == FDKUtilities.AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED )
                         {
+                            // 排他モードかつイベント駆動 の場合、この例外が返されることがある。
+                            // この場合、バッファサイズを調整して再度初期化する。
+
                             int サイズframe = this._AudioClient.GetBufferSize();   // アライメント済みサイズが取得できる。
                             this.再生遅延sec = (double) サイズframe / this.WaveFormat.SampleRate;
                             long 期間100ns = FDKUtilities.変換_sec単位から100ns単位へ( this.再生遅延sec );
 
-                            this._AudioClientを初期化する( 期間100ns );    // 再度初期化。
+                            // 再度初期化。
+
+                            this._AudioClient.Initialize( this._共有モード, AudioClientStreamFlags.StreamFlagsEventCallback, 期間100ns, 期間100ns, this.WaveFormat, Guid.Empty );
                         }
                         else
                         {
                             throw;  // それでも例外なら知らん。
                         }
                     }
+                    //----------------
+                    #endregion
 
-                    // イベント駆動に使うイベントを生成し、AudioClient へ登録する。
+                    #region " イベント駆動に使うイベントを生成し、AudioClient へ登録する。"
+                    //----------------
                     this._レンダリングイベント = new EventWaitHandle( false, EventResetMode.AutoReset );
                     this._AudioClient.SetEventHandle( this._レンダリングイベント.SafeWaitHandle.DangerousGetHandle() );
+                    //----------------
+                    #endregion
 
-                    // その他のインターフェースを取得する。
+                    #region " その他のインターフェースを取得する。"
+                    //----------------
                     this._AudioRenderClient = AudioRenderClient.FromAudioClient( this._AudioClient );
                     this._AudioClock = AudioClock.FromAudioClient( this._AudioClient );
+                    //----------------
+                    #endregion
 
                     Log.Info( $"サウンドデバイスを生成しました。" );
 
-                    // ミキサーを生成する。
+                    #region " ミキサーを生成する。 "
+                    //----------------
                     this.Mixer = new Mixer( this.WaveFormat );
+                    //----------------
+                    #endregion
                 }
 
                 this.レンダリングを開始する();
             }
         }
 
+        public void Dispose()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.レンダリングを停止する();
+
+                if( !this._レンダリング終了完了通知.WaitOne( 5000 ) )
+                    throw new InvalidOperationException( "レンダリングの終了完了待ちでタイムアウトしました。" );
+
+                this.Mixer?.Dispose();
+                this._AudioClock?.Dispose();
+                this._AudioRenderClient?.Dispose();
+                this._AudioClient?.Dispose();
+                this._レンダリングイベント?.Dispose();
+                this._MMDevice?.Dispose();
+            }
+        }
+
+
+
+        // レンダリング操作
+
+
         /// <summary>
-        ///		ミキサーの出力を開始する。
-        ///		以降、ミキサーに Sound を追加すれば自動的に再生され、再生が完了した Sound は自動的にミキサーから削除される。
+        ///		レンダリングスレッドを生成し、ミキサーの出力のレンダリングを開始する。
         /// </summary>
         public void レンダリングを開始する()
         {
@@ -150,60 +187,45 @@ namespace FDK
                 switch( 現在の状態 )
                 {
                     case PlaybackState.Paused:
-                        this.レンダリングを再開する(); // Resume する。
+                        this.レンダリングを再開する();     // 再開する。
                         break;
 
                     case PlaybackState.Stopped:
-                        using( var 起動完了通知 = new AutoResetEvent( false ) )
-                        {
-                            if( null != this._レンダリングスレッド )
-                                throw new InvalidOperationException( "レンダリングスレッドがすでに起動しています。" );
 
-                            // レンダリングスレッドを起動する。
-                            this._レンダリングスレッド = new Thread( this._レンダリングスレッドエントリ ) {
-                                Name = "WASAPI Playback",
-                                Priority = ThreadPriority.AboveNormal, // 標準よりやや上
-                            };
-                            this._レンダリングスレッド.SetApartmentState( ApartmentState.MTA );   // マルチスレッドアパートメント
-                            this._レンダリングスレッド.Start( 起動完了通知 );
+                        this._レンダリング起動完了通知 = new ManualResetEvent( false );
+                        this._レンダリング終了完了通知 = new ManualResetEvent( false );
 
-                            // スレッドからの起動完了通知を待つ。
-                            Log.Info( "レンダリングスレッドを起動しました。" );
-                            起動完了通知.WaitOne();
-                            Log.Info( "レンダリングスレッドの起動を確認しました。" );
-                        }
+
+                        // レンダリングスレッドを生成する。
+
+                        if( null != this._レンダリングスレッド )  // すでに起動してたら例外発出。
+                            throw new InvalidOperationException( "レンダリングスレッドがすでに起動しています。" );
+
+                        this._レンダリングスレッド = new Thread( this._レンダリングスレッドエントリ ) {
+                            Name = "WASAPI Playback",
+                            Priority = ThreadPriority.AboveNormal, // 標準よりやや上
+                        };
+                        this._レンダリングスレッド.SetApartmentState( ApartmentState.MTA );   // マルチスレッドアパートメント
+                        this._レンダリングスレッド.Start();
+
+
+                        // 起動完了待ち。
+
+                        if( !this._レンダリング起動完了通知.WaitOne( 5000 ) )
+                            throw new InvalidOperationException( "レンダリングスレッドの起動完了待ちがタイムアウトしました。" );
+
+                        Log.Info( "レンダリングスレッドを起動しました。" );
+                        break;
+
+                    case PlaybackState.Playing:
                         break;
                 }
             }
         }
 
         /// <summary>
-        ///		ミキサーの出力を停止する。
-        ///		ミキサーに登録されているすべての Sound の再生が停止する。
-        /// </summary>
-        public void レンダリングを停止する()
-        {
-            lock( this._スレッド間同期 )
-            {
-                using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-                {
-                    if( ( this._レンダリング状態 != PlaybackState.Stopped ) && ( null != this._レンダリングスレッド ) )
-                    {
-                        // レンダリングスレッドに終了を通知。
-                        this._レンダリング状態 = PlaybackState.Stopped;
-                    }
-                    else
-                    {
-                        // すでに停止済み。
-                        return;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        ///		ミキサーの出力を一時停止する。
-        ///		ミキサーに登録されているすべての Sound の再生が一時停止する。
+        ///		ミキサーの出力のレンダリングを一時停止する。
+        ///		ミキサーに登録されているすべてのサウンドの再生が一時停止する。
         /// </summary>
         public void レンダリングを一時停止する()
         {
@@ -211,22 +233,14 @@ namespace FDK
             {
                 using( Log.Block( FDKUtilities.現在のメソッド名 ) )
                 {
-                    switch( this._レンダリング状態 )
-                    {
-                        case PlaybackState.Playing:
-                            this._レンダリング状態 = PlaybackState.Paused;
-                            break;
-
-                        default:
-                            // すでに一時停止済み。
-                            break;
-                    }
+                    if( this._レンダリング状態 == PlaybackState.Playing )
+                        this._レンダリング状態 = PlaybackState.Paused;
                 }
             }
         }
 
         /// <summary>
-        ///		ミキサーの出力を再開する。
+        ///		ミキサーの出力のレンダリングを再開する。
         ///		一時停止状態にあるときのみ有効。
         /// </summary>
         public void レンダリングを再開する()
@@ -235,245 +249,52 @@ namespace FDK
             {
                 using( Log.Block( FDKUtilities.現在のメソッド名 ) )
                 {
-                    switch( this._レンダリング状態 )
-                    {
-                        case PlaybackState.Paused:
-                            this._レンダリング状態 = PlaybackState.Playing;
-                            break;
-
-                        default:
-                            // すでに再開済み。
-                            break;
-                    }
+                    if( this._レンダリング状態 == PlaybackState.Paused )
+                        this._レンダリング状態 = PlaybackState.Playing;
                 }
             }
         }
 
         /// <summary>
-        ///		現在のデバイス位置を返す[秒]。
+        ///		ミキサーの出力のレンダリングを停止する。
+        ///		ミキサーに登録されているすべてのサウンドの再生が停止する。
         /// </summary>
-        public double GetDevicePosition()
+        public void レンダリングを停止する()
         {
             lock( this._スレッド間同期 )
             {
-                // AudioClock から現在のデバイス位置を取得する。
-                this.GetClock( out long position, out long qpcPosition, out long frequency );
-
-                // position ...... 現在のデバイス位置（デバイスからの報告）
-                // frequency ..... 現在のデバイス周波数（デバイスからの報告）
-                // qpcPosition ... デバイス位置を取得した時刻[100ns単位] → パフォーマンスカウンタの生値ではないので注意。
-
-                // デバイス位置÷デバイス周波数 で、秒単位に換算できる。
-                double デバイス位置sec = (double) position / frequency;
-
-                // デバイス位置の精度が荒い（階段状のとびとびの値になる）場合には、パフォーマンスカウンタで補間する。
-                if( position == this._最後のデバイス位置.position )
+                using( Log.Block( FDKUtilities.現在のメソッド名 ) )
                 {
-                    // (A) デバイス位置が前回と同じである場合：
-                    // → 最後のデバイス位置における qpcPosition と今回の qpcPosition の差をデバイス位置secに加算する。
-                    デバイス位置sec += FDKUtilities.変換_100ns単位からsec単位へ( qpcPosition - this._最後のデバイス位置.qpcPosition );
+                    if( this._レンダリング状態 != PlaybackState.Stopped )
+                        this._レンダリング状態 = PlaybackState.Stopped;
                 }
-                else
-                {
-                    // (B) デバイス位置が前回と異なる場合：
-                    // → 最後のデバイス位置を現在の値に更新する。今回のデバイス位置secは補間しない。
-                    this._最後のデバイス位置 = (position, qpcPosition);
-                }
-
-                return デバイス位置sec;
-
-                // 没１：
-                // ↓サウンドデバイス固有のpositionを使う場合。なんかの拍子で、音飛びと同時に不連続になる？
-                //return ( (double) position / frequency );
-
-                // 没２：
-                // ↓パフォーマンスカウンタを使う場合。こちらで、音飛び＆不連続現象が消えるか否かを検証中。
-                // なお、qpcPosition には、生カウンタではなく、100ns単位に修正された値が格納されているので注意。（GetClockの仕様）
-                //return FDKUtilities.変換_100ns単位からsec単位へ( qpcPosition );
-            }
-        }
-
-        /// <summary>
-        ///		終了する。
-        /// </summary>
-        public void Dispose()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.レンダリングを停止する();
-                this._解放する();
             }
         }
 
 
-        private volatile PlaybackState _レンダリング状態 = PlaybackState.Stopped;
 
-        private AudioClientShareMode _共有モード;
+        // レンダリングスレッド
 
-        private AudioClock _AudioClock = null;
-
-        private AudioRenderClient _AudioRenderClient = null;
-
-        private AudioClient _AudioClient = null;
-
-        private MMDevice _MMDevice = null;
-
-        private (long position, long qpcPosition) _最後のデバイス位置 = (0, 0);
-
-        private Thread _レンダリングスレッド = null;
-
-        private EventWaitHandle _レンダリングイベント = null;
-
-        private readonly object _スレッド間同期 = new object();
-
-
-        private void _AudioClientを初期化する( long 期間100ns )
-        {
-            this._AudioClient.Initialize(
-                this._共有モード,
-                AudioClientStreamFlags.StreamFlagsEventCallback,    // イベント駆動で固定。
-                期間100ns,
-                期間100ns,      // イベント駆動の場合、Periodicity は BufferDuration と同じ値でなければならない。
-                this.WaveFormat,
-                Guid.Empty );
-        }
-
-        private void _解放する()
-        {
-            if( null != this._レンダリングスレッド )
-                throw new InvalidOperationException( "レンダリングスレッドが稼働しています。先に終了してください。" );
-
-            this.Mixer?.Dispose();
-            this.Mixer = null;
-
-            this._AudioClock?.Dispose();
-            this._AudioClock = null;
-
-            this._AudioRenderClient?.Dispose();
-            this._AudioRenderClient = null;
-
-            if( ( null != this._AudioClient ) && ( IntPtr.Zero != this._AudioClient.BasePtr ) )
-            {
-                try
-                {
-                    this._AudioClient.StopNative();
-                    this._AudioClient.Reset();
-                }
-                catch( CoreAudioAPIException e )
-                {
-                    if( e.ErrorCode != FDKUtilities.AUDCLNT_E_NOT_INITIALIZED )
-                        throw;
-                }
-            }
-
-            this._AudioClient?.Dispose();
-            this._AudioClient = null;
-
-            this._レンダリングイベント?.Dispose();
-            this._レンダリングイベント = null;
-
-            this._MMDevice?.Dispose();
-            this._MMDevice = null;
-        }
-
-        /// <summary>
-        ///		希望したフォーマットをもとに、適切なフォーマットを調べて返す。
-        /// </summary>
-        /// <param name="waveFormat">希望するフォーマット</param>
-        /// <param name="audioClient">AudioClient インスタンス。Initialize 前でも可。</param>
-        /// <returns>適切なフォーマット。見つからなかったら null。</returns>
-        private WaveFormat _適切なフォーマットを調べて返す( WaveFormat waveFormat )
-        {
-            Trace.Assert( null != this._AudioClient );
-
-            var 最も近いフォーマット = (WaveFormat) null;
-            var 最終的に決定されたフォーマット = (WaveFormat) null;
-
-            if( ( null != waveFormat ) && this._AudioClient.IsFormatSupported( this._共有モード, waveFormat, out 最も近いフォーマット ) )
-            {
-                // (A) そのまま使える。
-                最終的に決定されたフォーマット = waveFormat;
-            }
-            else if( null != 最も近いフォーマット )
-            {
-                // (B) AudioClient が推奨フォーマットを返してきたので、それを採択する。
-                最終的に決定されたフォーマット = 最も近いフォーマット;
-            }
-            else
-            {
-                // (C) AudioClient からの提案がなかったので、共有モードのフォーマットを採択してみる。
-
-                var 共有モードのフォーマット = this._AudioClient.GetMixFormat();
-
-                if( ( null != 共有モードのフォーマット ) && this._AudioClient.IsFormatSupported( this._共有モード, 共有モードのフォーマット ) )
-                {
-                    最終的に決定されたフォーマット = 共有モードのフォーマット;
-                }
-                else
-                {
-                    // (D) 共有モードのフォーマットも NG である場合は、以下から探す。
-
-                    bool found = this._AudioClient.IsFormatSupported( AudioClientShareMode.Exclusive,
-                        new WaveFormat( 48000, 24, 2, AudioEncoding.Pcm ),
-                        out WaveFormat closest );
-
-                    最終的に決定されたフォーマット = new[] {
-                        new WaveFormat( 48000, 32, 2, AudioEncoding.IeeeFloat ),
-                        new WaveFormat( 44100, 32, 2, AudioEncoding.IeeeFloat ),
-						/*
-						 * 24bit PCM には対応しない。
-						 * 
-						 * https://msdn.microsoft.com/ja-jp/library/cc371566.aspx
-						 * > wFormatTag が WAVE_FORMAT_PCM の場合、wBitsPerSample は 8 または 16 でなければならない。
-						 * > wFormatTag が WAVE_FORMAT_EXTENSIBLE の場合、この値は、任意の 8 の倍数を指定できる。
-						 * 
-						 * また、Realtek HD Audio の場合、IAudioClient.IsSupportedFormat() は 24bit PCM でも true を返してくるが、
-						 * 単純に 1sample = 3byte で書き込んでも正常に再生できない。
-						 * おそらく 32bit で包む必要があると思われるが、その方法は不明。
-						 */
-						//new WaveFormat( 48000, 24, 2, AudioEncoding.Pcm ),
-						//new WaveFormat( 44100, 24, 2, AudioEncoding.Pcm ),
-						new WaveFormat( 48000, 16, 2, AudioEncoding.Pcm ),
-                        new WaveFormat( 44100, 16, 2, AudioEncoding.Pcm ),
-                        new WaveFormat( 48000,  8, 2, AudioEncoding.Pcm ),
-                        new WaveFormat( 44100,  8, 2, AudioEncoding.Pcm ),
-                        new WaveFormat( 48000, 32, 1, AudioEncoding.IeeeFloat ),
-                        new WaveFormat( 44100, 32, 1, AudioEncoding.IeeeFloat ),
-						//new WaveFormat( 48000, 24, 1, AudioEncoding.Pcm ),
-						//new WaveFormat( 44100, 24, 1, AudioEncoding.Pcm ),
-						new WaveFormat( 48000, 16, 1, AudioEncoding.Pcm ),
-                        new WaveFormat( 44100, 16, 1, AudioEncoding.Pcm ),
-                        new WaveFormat( 48000,  8, 1, AudioEncoding.Pcm ),
-                        new WaveFormat( 44100,  8, 1, AudioEncoding.Pcm ),
-                    }
-                    .FirstOrDefault( ( format ) => ( this._AudioClient.IsFormatSupported( this._共有モード, format ) ) );
-
-                    // (E) それでも見つからなかったら null のまま。
-                }
-            }
-
-            return 最終的に決定されたフォーマット;
-        }
 
         /// <summary>
         ///		WASAPIイベント駆動スレッドのエントリ。
         /// </summary>
-        /// <param name="起動完了通知">
-        ///		無事に起動できたら、これを Set して（スレッドの生成元に）知らせる。
-        ///	</param>
-        private void _レンダリングスレッドエントリ( object 起動完了通知 )
+        /// <param name="起動完了通知">無事に起動できたら、これを Set して（スレッドの生成元に）知らせる。</param>
+        private void _レンダリングスレッドエントリ()
         {
-            //var 例外 = (Exception) null;
             var 元のMMCSS特性 = IntPtr.Zero;
+            var encoding = AudioSubTypes.EncodingFromSubType( WaveFormatExtensible.SubTypeFromWaveFormat( this.WaveFormat ) );
 
             try
             {
                 #region " 初期化。"
                 //----------------
                 int バッファサイズframe = this._AudioClient.BufferSize;
-                var バッファ = new float[ バッファサイズframe * this.WaveFormat.Channels ];    // 前提１・this._レンダリング先（ミキサー）の出力は 32bit-float で固定。
+                var バッファ = new float[ バッファサイズframe * this.WaveFormat.Channels ];    // this._レンダリング先（ミキサー）の出力は 32bit-float で固定。
+
 
                 // このスレッドの MMCSS 型を登録する。
+
                 string mmcssType;
                 switch( this.再生遅延sec )
                 {
@@ -491,67 +312,75 @@ namespace FDK
                 }
                 元のMMCSS特性 = FDKUtilities.AvSetMmThreadCharacteristics( mmcssType, out int taskIndex );
 
-                // AudioClient を開始する。
-                this._AudioClient.Start();
-                lock( this._スレッド間同期 )
-                    this._レンダリング状態 = PlaybackState.Playing;
 
-                // 起動完了を通知する。
-                ( 起動完了通知 as EventWaitHandle )?.Set();
-                起動完了通知 = null;
+                // AudioClient を開始する。
+
+                this._AudioClient.Start();
                 //----------------
                 #endregion
 
-                #region " メインループ。"
+                this._レンダリング状態 = PlaybackState.Playing;
+                this._レンダリング起動完了通知.Set();
+                
+
+                #region " レンダリングループ。"
                 //----------------
                 var イベントs = new WaitHandle[] { this._レンダリングイベント };
 
                 while( true )
                 {
-                    // 終了？
-                    var 現在の状態 = PlaybackState.Playing;
-                    lock( this._スレッド間同期 )
-                        現在の状態 = this._レンダリング状態;
-
-                    if( 現在の状態 == PlaybackState.Stopped )
-                        break;  // 終わる。
-
                     // イベントs[] のいずれかのイベントが発火する（かタイムアウトする）まで待つ。
-                    int イベント番号 = WaitHandle.WaitAny(
+
+                    if( WaitHandle.WaitAny(
                         waitHandles: イベントs,
                         millisecondsTimeout: (int) ( 3000.0 * this.再生遅延sec ), // 適正値は レイテンシ×3 [ms] (MSDNより)
-                        exitContext: false );
+                        exitContext: false ) == WaitHandle.WaitTimeout )
+                    {
+                        continue;   // タイムアウトした＝まだどのイベントもきてない。
+                    }
 
-                    // タイムアウトした＝まだどのイベントもきてない。
-                    if( イベント番号 == WaitHandle.WaitTimeout )
-                        continue;
+
+                    // １ターン分をレンダリング。
 
                     lock( this._スレッド間同期 )
                     {
-                        if( this.レンダリング状態 != PlaybackState.Playing )
-                            continue;
+                        // 状態チェック。
+
+                        if( this._レンダリング状態 == PlaybackState.Stopped )
+                            break;      // ループを抜ける。
+
+                        if( this._レンダリング状態 == PlaybackState.Paused )
+                            continue;   // 何もしない。
+
+
+                        // バッファの空き容量を計算する。
 
                         int 未再生数frame = ( this._共有モード == AudioClientShareMode.Exclusive ) ? 0 : this._AudioClient.GetCurrentPadding();
                         int 空きframe = バッファサイズframe - 未再生数frame;
                         if( 5 >= 空きframe )
                             continue;   // あまりに空きが小さいなら、何もせずスキップする。
 
-                        // レンダリング先からデータを取得して AudioRenderClient へ出力する。
 
-                        int 読み込むサイズsample = 空きframe * this.WaveFormat.Channels; // 前提・レンダリング先.WaveFormat と this.WaveFormat は同一。
-                        読み込むサイズsample -= ( 読み込むサイズsample % ( this.WaveFormat.BlockAlign / this.WaveFormat.BytesPerSample ) );  // BlockAlign 境界にそろえる。
+                        // 今回の読み込みサイズ（サンプル単位）を計算する。
+
+                        int 読み込むサイズsample = FDKUtilities.位置をブロック境界単位にそろえて返す(
+                            空きframe * this.WaveFormat.Channels,       // 前提・レンダリング先.WaveFormat と this.WaveFormat は同一。
+                            this.WaveFormat.BlockAlign / this.WaveFormat.BytesPerSample );
+
                         if( 0 >= 読み込むサイズsample )
-                            continue;   // サンプルなし。スキップ。
+                            continue;   // 今回は読み込まない。スキップする。
+
 
                         // ミキサーからの出力（32bit-float）をバッファに取得する。
+
                         int 読み込んだサイズsample = this.Mixer.Read( バッファ, 0, 読み込むサイズsample );
 
+
                         // バッファのデータをレンダリングフォーマットに変換しつつ、AudioRenderClient へ出力する。
+
                         IntPtr bufferPtr = this._AudioRenderClient.GetBuffer( 空きframe );
                         try
                         {
-                            var encoding = AudioSubTypes.EncodingFromSubType( WaveFormatExtensible.SubTypeFromWaveFormat( this.WaveFormat ) );
-
                             switch( encoding )
                             {
                                 case AudioEncoding.IeeeFloat:
@@ -648,7 +477,8 @@ namespace FDK
                                 ( 0 < 出力したフレーム数 ) ? AudioClientBufferFlags.None : AudioClientBufferFlags.Silent );
                         }
 
-                        // レンダリング先からの出力がなくなったらおしまい。
+                        // ミキサーからの出力がなくなったらレンダリングを停止する。
+
                         if( 0 == 読み込んだサイズsample )
                             this._レンダリング状態 = PlaybackState.Stopped;
                     }
@@ -664,18 +494,14 @@ namespace FDK
 
                 // ハードウェアの再生が終わるくらいまで、少し待つ。
                 Thread.Sleep( (int) ( this.再生遅延sec * 1000 / 2 ) );
-
-                // このスレッドの MMCSS 特性を元に戻す。
-                FDKUtilities.AvRevertMmThreadCharacteristics( 元のMMCSS特性 );
-                元のMMCSS特性 = IntPtr.Zero;
                 //----------------
                 #endregion
+
+                this._レンダリング終了完了通知.Set();
             }
-            // 例外をcatchするとレンダリングスレッドが終了して無音になるだけなので、エラーに気づかない。なので、例外はそのままスローする。
-            //catch( Exception e )
+            //catch( Exception e )  ---> 例外をcatchするとスレッドが終了して無音になるだけなのでエラーに気づかない。例外はそのままスローする。
             //{
             //	Log.ERROR( $"例外が発生しました。レンダリングスレッドを中断します。[{e.Message}]" );
-            //	例外 = e;
             //}
             finally
             {
@@ -684,11 +510,166 @@ namespace FDK
                 if( 元のMMCSS特性 != IntPtr.Zero )
                     FDKUtilities.AvRevertMmThreadCharacteristics( 元のMMCSS特性 );
 
-                // 失敗時を想定して。
-                ( 起動完了通知 as EventWaitHandle )?.Set();
+                this._レンダリング起動完了通知.Set();
+                this._レンダリング終了完了通知.Set();
                 //----------------
                 #endregion
             }
+        }
+
+
+
+        // その他
+
+
+        /// <summary>
+        ///		現在のデバイス位置を返す[秒]。
+        /// </summary>
+        public double GetDevicePosition()
+        {
+            // AudioClock から現在のデバイス位置を取得する。
+            this.GetClock( out long position, out long qpcPosition, out long frequency );
+
+            // position ...... 現在のデバイス位置（デバイスからの報告）
+            // frequency ..... 現在のデバイス周波数（デバイスからの報告）
+            // qpcPosition ... デバイス位置を取得した時刻[100ns単位] → パフォーマンスカウンタの生値ではないので注意。
+
+            // デバイス位置÷デバイス周波数 で、秒単位に換算できる。
+            double デバイス位置sec = (double) position / frequency;
+
+            // デバイス位置の精度が荒い（階段状のとびとびの値になる）場合には、パフォーマンスカウンタで補間する。
+            if( position == this._最後のデバイス位置.position )
+            {
+                // (A) デバイス位置が前回と同じである場合：
+                // → 最後のデバイス位置における qpcPosition と今回の qpcPosition の差をデバイス位置secに加算する。
+                デバイス位置sec += FDKUtilities.変換_100ns単位からsec単位へ( qpcPosition - this._最後のデバイス位置.qpcPosition );
+            }
+            else
+            {
+                // (B) デバイス位置が前回と異なる場合：
+                // → 最後のデバイス位置を現在の値に更新する。今回のデバイス位置secは補間しない。
+                this._最後のデバイス位置 = (position, qpcPosition);
+            }
+
+            return デバイス位置sec;
+
+            // ボツ１：
+            // ↓サウンドデバイス固有のpositionを使う場合。なんかの拍子で、音飛びと同時に不連続になる？
+            //return ( (double) position / frequency );
+
+            // ボツ２：
+            // ↓パフォーマンスカウンタを使う場合。こちらで、音飛び＆不連続現象が消えるか否かを検証中。
+            // なお、qpcPosition には、生カウンタではなく、100ns単位に修正された値が格納されているので注意。（GetClockの仕様）
+            //return FDKUtilities.変換_100ns単位からsec単位へ( qpcPosition );
+        }
+
+
+
+        // private
+
+
+        private volatile PlaybackState _レンダリング状態 = PlaybackState.Stopped;
+
+        private AudioClientShareMode _共有モード;
+
+        private AudioClock _AudioClock = null;
+
+        private AudioRenderClient _AudioRenderClient = null;
+
+        private AudioClient _AudioClient = null;
+
+        private MMDevice _MMDevice = null;
+
+        private (long position, long qpcPosition) _最後のデバイス位置 = (0, 0);
+
+        private Thread _レンダリングスレッド = null;
+
+        private EventWaitHandle _レンダリングイベント = null;
+
+        private readonly object _スレッド間同期 = new object();
+
+        private ManualResetEvent _レンダリング起動完了通知;
+
+        private ManualResetEvent _レンダリング終了完了通知;
+
+
+        /// <summary>
+        ///		希望したフォーマットをもとに、適切なフォーマットを調べて返す。
+        /// </summary>
+        /// <param name="waveFormat">希望するフォーマット</param>
+        /// <param name="audioClient">AudioClient インスタンス。Initialize 前でも可。</param>
+        /// <returns>適切なフォーマット。見つからなかったら null。</returns>
+        private WaveFormat _適切なフォーマットを調べて返す( WaveFormat waveFormat )
+        {
+            Trace.Assert( null != this._AudioClient );
+
+            var 最も近いフォーマット = (WaveFormat) null;
+            var 最終的に決定されたフォーマット = (WaveFormat) null;
+
+            if( ( null != waveFormat ) && this._AudioClient.IsFormatSupported( this._共有モード, waveFormat, out 最も近いフォーマット ) )
+            {
+                // (A) そのまま使える。
+                最終的に決定されたフォーマット = waveFormat;
+            }
+            else if( null != 最も近いフォーマット )
+            {
+                // (B) AudioClient が推奨フォーマットを返してきたので、それを採択する。
+                最終的に決定されたフォーマット = 最も近いフォーマット;
+            }
+            else
+            {
+                // (C) AudioClient からの提案がなかったので、共有モードのフォーマットを採択してみる。
+
+                var 共有モードのフォーマット = this._AudioClient.GetMixFormat();
+
+                if( ( null != 共有モードのフォーマット ) && this._AudioClient.IsFormatSupported( this._共有モード, 共有モードのフォーマット ) )
+                {
+                    最終的に決定されたフォーマット = 共有モードのフォーマット;
+                }
+                else
+                {
+                    // (D) 共有モードのフォーマットも NG である場合は、以下から探す。
+
+                    bool found = this._AudioClient.IsFormatSupported( AudioClientShareMode.Exclusive,
+                        new WaveFormat( 48000, 24, 2, AudioEncoding.Pcm ),
+                        out WaveFormat closest );
+
+                    最終的に決定されたフォーマット = new[] {
+                        new WaveFormat( 48000, 32, 2, AudioEncoding.IeeeFloat ),
+                        new WaveFormat( 44100, 32, 2, AudioEncoding.IeeeFloat ),
+						/*
+						 * 24bit PCM には対応しない。
+						 * 
+						 * https://msdn.microsoft.com/ja-jp/library/cc371566.aspx
+						 * > wFormatTag が WAVE_FORMAT_PCM の場合、wBitsPerSample は 8 または 16 でなければならない。
+						 * > wFormatTag が WAVE_FORMAT_EXTENSIBLE の場合、この値は、任意の 8 の倍数を指定できる。
+						 * 
+						 * また、Realtek HD Audio の場合、IAudioClient.IsSupportedFormat() は 24bit PCM でも true を返してくるが、
+						 * 単純に 1sample = 3byte で書き込んでも正常に再生できない。
+						 * おそらく 32bit で包む必要があると思われるが、その方法は不明。
+						 */
+						//new WaveFormat( 48000, 24, 2, AudioEncoding.Pcm ),
+						//new WaveFormat( 44100, 24, 2, AudioEncoding.Pcm ),
+						new WaveFormat( 48000, 16, 2, AudioEncoding.Pcm ),
+                        new WaveFormat( 44100, 16, 2, AudioEncoding.Pcm ),
+                        new WaveFormat( 48000,  8, 2, AudioEncoding.Pcm ),
+                        new WaveFormat( 44100,  8, 2, AudioEncoding.Pcm ),
+                        new WaveFormat( 48000, 32, 1, AudioEncoding.IeeeFloat ),
+                        new WaveFormat( 44100, 32, 1, AudioEncoding.IeeeFloat ),
+						//new WaveFormat( 48000, 24, 1, AudioEncoding.Pcm ),
+						//new WaveFormat( 44100, 24, 1, AudioEncoding.Pcm ),
+						new WaveFormat( 48000, 16, 1, AudioEncoding.Pcm ),
+                        new WaveFormat( 44100, 16, 1, AudioEncoding.Pcm ),
+                        new WaveFormat( 48000,  8, 1, AudioEncoding.Pcm ),
+                        new WaveFormat( 44100,  8, 1, AudioEncoding.Pcm ),
+                    }
+                    .FirstOrDefault( ( format ) => ( this._AudioClient.IsFormatSupported( this._共有モード, format ) ) );
+
+                    // (E) それでも見つからなかったら null のまま。
+                }
+            }
+
+            return 最終的に決定されたフォーマット;
         }
 
         /// <summary>
@@ -696,7 +677,7 @@ namespace FDK
         /// </summary>
         private void GetClock( out long Pu64Position, out long QPCPosition, out long Pu64Frequency )
         {
-            //lock( this._スレッド間同期 )	なくてもいいっぽい。
+            lock( this._スレッド間同期 )
             {
                 this._AudioClock.GetFrequencyNative( out Pu64Frequency );
 
