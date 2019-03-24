@@ -55,8 +55,8 @@ namespace DTXMania
             }
             else
             {
-                this.StartPosition = FormStartPosition.Manual;
-                this.Location = new System.Drawing.Point( 20, 20 );
+                //this.StartPosition = FormStartPosition.Manual;
+                //this.Location = new System.Drawing.Point( 20, 20 );
                 this.ClientSize = new Size( 1024, 576 );
             }
 
