@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		曲ツリー階層において「戻る」を表すノード。

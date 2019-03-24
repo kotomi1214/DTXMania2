@@ -1,4 +1,4 @@
-﻿namespace DTXMania.ステージ.オプション設定
+﻿namespace DTXMania.オプション設定
 {
     partial class 曲読み込みフォルダ割り当てダイアログ
     {
@@ -136,7 +136,7 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "曲読み込みフォルダ";
             this.TopMost = true;
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this._FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.曲読み込みフォルダ割り当てダイアログ_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 

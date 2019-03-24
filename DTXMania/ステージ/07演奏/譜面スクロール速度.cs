@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
     /// <summary>
     ///     譜面スクロール速度の遷移と表示を行う。
@@ -26,43 +26,40 @@ namespace DTXMania.ステージ.演奏
     ///     
     ///     譜面上を流れるチップの表示位置計算には、本クラスで定義する <see cref="補間付き速度"/> プロパティの値を使うこと。
     /// </remarks>
-    class 譜面スクロール速度 : Activity
+    class 譜面スクロール速度 : IDisposable
     {
         public double 補間付き速度 { get; protected set; }
 
 
-        public 譜面スクロール速度()
+        
+        // 生成と終了
+
+
+        public 譜面スクロール速度( double ユーザ設定速度 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._文字画像 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml", 文字幅補正dpx: -3f ) );
+                this._文字画像 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml", 文字幅補正dpx: -3f );
+
+                this.補間付き速度 = ユーザ設定速度;
             }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.補間付き速度 = 1.0;
-                this._初めての進行描画 = true;
+                this._文字画像?.Dispose();
             }
         }
 
-        protected override void On非活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
+
+
+        // 進行と描画
+
 
         public void 進行する( double ユーザ設定速度 )
         {
-            if( this._初めての進行描画 )
-            {
-                this.補間付き速度 = ユーザ設定速度;
-                this._初めての進行描画 = false;
-            }
-
             #region " 現在の 補間付き速度 が ユーザ設定速度 と異なっているなら、近づける。"
             //----------------
             if( this.補間付き速度 < ユーザ設定速度 )
@@ -116,7 +113,7 @@ namespace DTXMania.ステージ.演奏
             #endregion
         }
 
-        public void 描画する( DeviceContext1 dc, double ユーザ設定速度 )
+        public void 描画する( DeviceContext dc, double ユーザ設定速度 )
         {
             var 表示領域 = new RectangleF( 482, 985f, 48f, 24f );
 
@@ -124,9 +121,11 @@ namespace DTXMania.ステージ.演奏
         }
 
 
-        private 画像フォント _文字画像 = null;
 
-        private bool _初めての進行描画 = true;
+        // private
+
+
+        private 画像フォント _文字画像 = null;
 
         private LoopCounter _スクロール倍率追い付き用カウンタ = null;
 

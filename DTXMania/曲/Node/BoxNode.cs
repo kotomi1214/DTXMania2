@@ -5,7 +5,7 @@ using System.Linq;
 using FDK;
 using SharpDX;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		BOXを表すノード。

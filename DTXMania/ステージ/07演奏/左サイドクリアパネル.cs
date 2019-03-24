@@ -6,35 +6,54 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class 左サイドクリアパネル : Activity
+    class 左サイドクリアパネル : IDisposable
     {
         public 描画可能テクスチャ クリアパネル { get; protected set; } = null;
+
+
+
+        // 生成と終了
 
 
         public 左サイドクリアパネル()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._背景 = new 画像( @"$(System)images\演奏\左サイドクリアパネル.png" ) );
-                this.子Activityを追加する( this.クリアパネル = new 描画可能テクスチャ( new Size2F( 388, 990 ) ) );  // this._背景.サイズはまだ設定されていない。
+                this._背景 = new 画像( @"$(System)images\演奏\左サイドクリアパネル.png" );
+                this.クリアパネル = new 描画可能テクスチャ( this._背景.サイズ );
             }
         }
 
-        /// <summary>
-        ///		クリアパネルに初期背景を上書きすることで、それまで描かれていた内容を消去する。
-        /// </summary>
+        public virtual void Dispose()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._背景?.Dispose();
+                this.クリアパネル?.Dispose();
+            }
+        }
+
+
+
+        // クリア
+
+
         public void クリアする()
         {
             this.クリアパネル.テクスチャへ描画する( ( dcp ) => {
-                dcp.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
-                dcp.PrimitiveBlend = PrimitiveBlend.Copy;
+                dcp.Clear( new Color4( Color3.Black, 0f ) );
                 dcp.DrawBitmap( this._背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
             } );
         }
 
-        public void 描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 描画する()
         {
             // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
 
@@ -47,6 +66,10 @@ namespace DTXMania.ステージ.演奏
 
             this.クリアパネル.描画する( 変換行列 );
         }
+
+
+
+        // private
 
 
         private 画像 _背景 = null;

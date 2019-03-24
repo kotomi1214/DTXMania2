@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{49864666-A028-4877-92A4-8200FE9D3C7E}</ProjectGuid>
+    <ProjectGuid>{23CEF290-CF3B-45D0-A0E0-AD6CF14D121B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FDKTests</RootNamespace>
@@ -70,8 +70,8 @@
       <HintPath>..\packages\SharpDX.Mathematics.4.2.0\lib\net45\SharpDX.Mathematics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="YamlDotNet, Version=5.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.5.4.0\lib\net45\YamlDotNet.dll</HintPath>
+    <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.6.0.0\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Choose>
@@ -83,37 +83,35 @@
     <Otherwise />
   </Choose>
   <ItemGroup>
-    <Compile Include="FDKUtilitiesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VariablePathTests.cs" />
-    <Compile Include="キャッシュデータレンタルTests.cs" />
-    <Compile Include="メディア\画像フォントTests.cs" />
-    <Compile Include="メディア\矩形リストTests.cs" />
+    <Compile Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\画像フォントTests.cs" />
+    <Compile Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\矩形リストTests.cs" />
+    <Compile Include="ユーティリティ\FDKUtilitiesTests.cs" />
+    <Compile Include="ユーティリティ\コレクション\キャッシュデータレンタルTests.cs" />
+    <Compile Include="ユーティリティ\ファイル、フォルダ\VariablePathTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\テストファイル\パラメータ文字_小.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\テストファイル\パラメータ文字_小.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\テストファイル\矩形リスト01.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\テストファイル\矩形リスト02.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FDK\FDK.csproj">
-      <Project>{0E35C4AC-6E28-4A09-A6CE-05D177800051}</Project>
+      <Project>{8df302d9-4ba8-4f0f-b673-ccf87ecee30e}</Project>
       <Name>FDK</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="メディア\テストファイル\パラメータ文字_小.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="メディア\テストファイル\矩形リスト01.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="メディア\テストファイル\矩形リスト02.xml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="メディア\テストファイル\パラメータ文字_小.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

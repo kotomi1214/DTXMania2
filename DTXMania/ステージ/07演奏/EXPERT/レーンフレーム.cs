@@ -7,13 +7,17 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.EXPERT
+namespace DTXMania.演奏.EXPERT
 {
     /// <summary>
     ///		チップの背景であり、レーン全体を示すフレーム画像。
     /// </summary>
-    class レーンフレーム : Activity
+    class レーンフレーム : IDisposable
     {
+
+        // static
+
+
         /// <summary>
         ///		画面全体に対する、レーンフレームの表示位置と範囲。
         /// </summary>
@@ -24,14 +28,11 @@ namespace DTXMania.ステージ.演奏.EXPERT
         internal static Dictionary<表示レーン種別, Color4> レーン色;
 
 
-        public レーンフレーム()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
 
-        protected override void On活性化()
+        // 生成と終了
+
+
+        public レーンフレーム()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -51,22 +52,29 @@ namespace DTXMania.ステージ.演奏.EXPERT
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
             }
         }
 
-        public void 描画する( DeviceContext1 dc, int BGAの透明度 )
+
+
+        // 進行と描画
+
+
+        public void 描画する( DeviceContext dc, int BGAの透明度 )
         {
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 // レーンエリアを描画する。
                 {
                     var color = Color4.Black;
                     color.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
-                    using( var laneBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, color ) )
+                    using( var laneBrush = new SolidColorBrush( dc, color ) )
                     {
                         dc.FillRectangle( レーンフレーム.領域, laneBrush );
                     }
@@ -82,7 +90,7 @@ namespace DTXMania.ステージ.演奏.EXPERT
                     var レーンライン色 = レーン色[ displayLaneType ];
                     レーンライン色.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
 
-                    using( var laneLineBrush = new SolidColorBrush( グラフィックデバイス.Instance.D2DDeviceContext, レーンライン色 ) )
+                    using( var laneLineBrush = new SolidColorBrush( dc, レーンライン色 ) )
                     {
                         var rc = new RectangleF( レーン中央位置X[ displayLaneType ] - 1, 0f, 3f, 領域.Height );
                         dc.FillRectangle( rc, laneLineBrush );
@@ -91,6 +99,10 @@ namespace DTXMania.ステージ.演奏.EXPERT
 
             } );
         }
+
+
+
+        // private
 
 
         private class YAMLマップ

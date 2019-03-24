@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     partial class Node
     {

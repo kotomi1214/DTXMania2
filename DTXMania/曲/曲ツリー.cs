@@ -8,15 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		選曲画面で使用される、曲ツリーを管理する。
     ///		曲ツリーは、<see cref="ユーザ"/>ごとに１つずつ持つことができる。
     /// </summary>
-    class 曲ツリー : Activity, IDisposable
+    class 曲ツリー : IDisposable
     {
+
         // プロパティ
+
 
         /// <summary>
         ///		曲ツリーのルートを表すノード。
@@ -106,7 +108,9 @@ namespace DTXMania.曲
         public int ユーザ希望難易度 { get; protected set; } = 3;
 
 
+
         // イベント
+
 
         /// <summary>
         ///     フォーカスノードが変更された場合に発生するイベント。
@@ -119,70 +123,32 @@ namespace DTXMania.曲
         public event EventHandler<(Node 選択されたNode, Node 選択が解除されたNode)> フォーカスノードが変更された;
 
 
-        // 構築・破棄
+
+        // 生成と終了
+
 
         public 曲ツリー()
         {
+            //this.ユーザ希望難易度 = 3;	-> 初期化せず、前回の値を継承する。
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                Debug.Assert( this.活性化していない );
-
-                // フォーカスリストを活性化する。
-                if( null != this.フォーカスリスト )
-                {
-                    foreach( var node in this.フォーカスリスト )
-                        node.活性化する();
-                }
-
-                //this.ユーザ希望難易度 = 3;	-> 初期化せず、前回の値を継承する。
-            }
-        }
-
-        protected override void On非活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                Debug.Assert( this.活性化している );
-
-                // フォーカスリストを非活性化する。
-                if( null != this.フォーカスリスト )
-                {
-                    foreach( var node in this.フォーカスリスト )
-                        node.非活性化する();
-                }
-            }
-        }
-
-        public void Dispose()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.すべてのノードを削除する();
-            }
+            this.すべてのノードを削除する();
         }
 
         public void すべてのノードを削除する()
         {
-            Debug.Assert( this.活性化していない );  // 活性化状態のノードが存在していないこと。
-
             this.フォーカスリスト = null;
 
             lock( this.ルートノード.子ノードリスト排他 )
                 this.ルートノード.子ノードリスト.Clear();
         }
 
-        public void 曲の検索を開始する( VariablePath フォルダパス )
-        {
-            this._検索フォルダを追加する( フォルダパス, this.ルートノード );
-        }
-
 
 
         // 難易度
+
 
         public void 難易度アンカをひとつ増やす()
         {
@@ -201,7 +167,9 @@ namespace DTXMania.曲
         }
 
         
+
         // フォーカス
+
 
         /// <summary>
         ///		指定されたノードをフォーカスする。
@@ -245,26 +213,18 @@ namespace DTXMania.曲
 
                         Log.Info( "フォーカスリストが変更されました。" );
 
-                        if( this.活性化している )
+                        if( null != 旧フォーカスリスト ) // 初回は null 。
                         {
-                            if( null != 旧フォーカスリスト ) // 初回は null 。
-                            {
-                                旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
-                                foreach( var node in 旧フォーカスリスト )
-                                    node.非活性化する();
-                            }
-
-                            foreach( var node in this.フォーカスリスト )
-                                node.活性化する();
-
-                            if( null != ノード )
-                                this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
-
-                            this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
-
-                            // 手動でイベントを発火。
-                            this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
+                            旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
                         }
+
+                        if( null != ノード )
+                            this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
+
+                        this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
+
+                        // 手動でイベントを発火。
+                        this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
                     }
                 }
             }
@@ -310,16 +270,14 @@ namespace DTXMania.曲
         }
 
 
+
         // 曲検索・構築タスク
 
-        private ConcurrentQueue<(Node parent, VariablePath path)> _検索フォルダキュー = new ConcurrentQueue<(Node parent, VariablePath path)>();
 
-        private AutoResetEvent _検索フォルダキュー投入通知 = new AutoResetEvent( false );    // キューに格納した際には必ず Set すること。
-
-        private Task _構築タスク = null;
-
-        private string[] _対応する拡張子 = { ".sstf", ".dtx", ".gda", ".g2d", "bms", "bme" };
-
+        public void 曲の検索を開始する( VariablePath フォルダパス )
+        {
+            this._検索フォルダを追加する( フォルダパス, this.ルートノード );
+        }
 
         /// <summary>
         ///     <see cref="_検索フォルダキュー"/> にフォルダを投入する。
@@ -332,14 +290,13 @@ namespace DTXMania.曲
             this._検索フォルダキュー.Enqueue( (追加先親ノード, フォルダパス) );
             this._検索フォルダキュー投入通知.Set();
 
+
             // 構築タスクを開始していなければ開始する。
 
             if( null == this._構築タスク )
             {
                 this._構築タスク = Task.Run( () => {
 
-                    #region " 構築タスクの内容；キューから取り出しては構築する。"
-                    //----------------
                     Log.現在のスレッドに名前をつける( "曲検索" );
                     Log.Info( $"曲ツリーの構築タスクを開始します。" );
 
@@ -357,8 +314,6 @@ namespace DTXMania.曲
                     }
 
                     Log.Info( $"曲ツリーの構築タスクを終了しました。" );
-                    //----------------
-                    #endregion
 
                 } );
             }
@@ -535,5 +490,14 @@ namespace DTXMania.曲
                 }
             }
         }
+
+
+        private ConcurrentQueue<(Node parent, VariablePath path)> _検索フォルダキュー = new ConcurrentQueue<(Node parent, VariablePath path)>();
+
+        private AutoResetEvent _検索フォルダキュー投入通知 = new AutoResetEvent( false );    // キューに格納した際には必ず Set すること。
+
+        private Task _構築タスク = null;
+
+        private string[] _対応する拡張子 = { ".sstf", ".dtx", ".gda", ".g2d", "bms", "bme" };
     }
 }

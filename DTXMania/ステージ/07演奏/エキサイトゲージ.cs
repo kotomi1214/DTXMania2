@@ -7,24 +7,22 @@ using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class エキサイトゲージ : Activity
+    class エキサイトゲージ : IDisposable
     {
+
+        // 生成と終了
+
+
         public エキサイトゲージ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._ゲージ枠通常 = new テクスチャ( @"$(System)images\演奏\エキサイトゲージ通常.png" ) );
-                this.子Activityを追加する( this._ゲージ枠DANGER = new テクスチャ( @"$(System)images\演奏\エキサイトゲージDANGER.png" ) );
-            }
-        }
+                this._ゲージ枠通常 = new テクスチャ( @"$(System)images\演奏\エキサイトゲージ通常.png" );
+                this._ゲージ枠DANGER = new テクスチャ( @"$(System)images\演奏\エキサイトゲージDANGER.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                var dc = グラフィックデバイス.Instance.D2DDeviceContext;
+                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
 
                 this._通常ブラシ = new SolidColorBrush( dc, new Color4( 0xfff9b200 ) );      // ABGR
                 this._DANGERブラシ = new SolidColorBrush( dc, new Color4( 0xff0000ff ) );
@@ -33,47 +31,39 @@ namespace DTXMania.ステージ.演奏
                 this._ゲージ量 = null;
                 this._ゲージ量のストーリーボード = null;
 
-                this._初めての進行描画 = true;
+                this._ゲージ量 = new Variable( グラフィックデバイス.Instance.アニメーション.Manager, initialValue: 0 );
+                this._ゲージ量のストーリーボード = null;
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._通常ブラシ?.Dispose();
-                this._通常ブラシ = null;
-
                 this._DANGERブラシ?.Dispose();
-                this._DANGERブラシ = null;
-
                 this._MAXブラシ?.Dispose();
-                this._MAXブラシ = null;
-
                 this._ゲージ量のストーリーボード?.Dispose();
-                this._ゲージ量のストーリーボード = null;
-
                 this._ゲージ量?.Dispose();
-                this._ゲージ量 = null;
+
+                this._ゲージ枠通常?.Dispose();
+                this._ゲージ枠DANGER?.Dispose();
             }
         }
+
+
+
+        // 進行と描画
+
 
         /// <param name="ゲージ量">
         ///		0～1。 0.0で0%、1.0で100%。
         /// </param>
-        public void 進行描画する( DeviceContext1 dc, double ゲージ量 )
+        public void 進行描画する( DeviceContext dc, double ゲージ量 )
         {
             ゲージ量 = Math.Max( Math.Min( ゲージ量, 1f ), 0f );
 
             var MAXゲージ領域 = new RectangleF( 557f, 971f, 628f, 26f );
-
-
-            if( this._初めての進行描画 )
-            {
-                this._ゲージ量 = new Variable( グラフィックデバイス.Instance.Animation.Manager, initialValue: ゲージ量 );
-                this._ゲージ量のストーリーボード = null;
-                this._初めての進行描画 = false;
-            }
 
 
             // 枠を描画。
@@ -93,7 +83,7 @@ namespace DTXMania.ステージ.演奏
 
             if( ゲージ量 != this._ゲージ量.FinalValue )
             {
-                var animation = グラフィックデバイス.Instance.Animation;
+                var animation = グラフィックデバイス.Instance.アニメーション;
 
                 this._ゲージ量のストーリーボード = new Storyboard( animation.Manager );
 
@@ -114,6 +104,8 @@ namespace DTXMania.ステージ.演奏
 
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+
                 var ゲージ領域 = MAXゲージ領域;
                 ゲージ領域.Width *= Math.Min( (float) this._ゲージ量.Value, 1.0f );
 
@@ -127,7 +119,9 @@ namespace DTXMania.ステージ.演奏
         }
 
 
-        private bool _初めての進行描画 = true;
+
+        // private
+
 
         private テクスチャ _ゲージ枠通常 = null;
 

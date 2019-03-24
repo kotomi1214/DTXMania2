@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using FDK;
-using DTXMania.データベース.ユーザ;
-using DTXMania.ステージ.演奏;
 
-using User = DTXMania.データベース.ユーザ.User09;
+using User = DTXMania.User09;
 
-namespace DTXMania.設定
+namespace DTXMania
 {
     /// <summary>
     ///		ユーザ別の設定項目。
@@ -133,6 +131,10 @@ namespace DTXMania.設定
         }
 
 
+
+        // 生成と終了
+
+
         public ユーザ設定()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -177,6 +179,11 @@ namespace DTXMania.設定
                 }
             }
         }
+
+
+
+        // 作成、保存
+
 
         /// <summary>
         ///		指定したユーザ情報を新しいユーザとしてデータベースに登録し、
@@ -236,6 +243,9 @@ namespace DTXMania.設定
         public override string ToString()
             => this._User.ToString();
 
+
+
+        // private
         
         private User _User = null;
 

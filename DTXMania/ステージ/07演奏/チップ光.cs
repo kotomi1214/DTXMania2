@@ -8,23 +8,21 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.演奏
+namespace DTXMania.演奏
 {
-    class チップ光 : Activity
+    class チップ光 : IDisposable
     {
+
+        // 生成と終了
+
+
         public チップ光()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._放射光 = new テクスチャ( @"$(System)images\演奏\チップ光.png" ) { 加算合成する = true } );
-                this.子Activityを追加する( this._光輪 = new テクスチャ( @"$(System)images\演奏\チップ光輪.png" ) { 加算合成する = true } );
-            }
-        }
+                this._放射光 = new テクスチャ( @"$(System)images\演奏\チップ光.png" ) { 加算合成する = true };
+                this._光輪 = new テクスチャ( @"$(System)images\演奏\チップ光輪.png" ) { 加算合成する = true };
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\チップ光.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -53,16 +51,23 @@ namespace DTXMania.ステージ.演奏
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 foreach( var kvp in this._レーンtoステータス )
                     kvp.Value.Dispose();
-
                 this._レーンtoステータス = null;
+
+                this._放射光?.Dispose();
+                this._光輪?.Dispose();
             }
         }
+
+
+
+        // 表示開始
+
 
         public void 表示を開始する( 表示レーン種別 lane )
         {
@@ -71,11 +76,16 @@ namespace DTXMania.ステージ.演奏
             status.現在の状態 = 表示レーンステータス.状態.表示開始;  // 描画スレッドへ通知。
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
             foreach( 表示レーン種別 レーン in Enum.GetValues( typeof( 表示レーン種別 ) ) )
             {
-                var animation = グラフィックデバイス.Instance.Animation;
+                var animation = グラフィックデバイス.Instance.アニメーション;
                 var status = this._レーンtoステータス[ レーン ];
 
                 switch( status.現在の状態 )
@@ -202,6 +212,10 @@ namespace DTXMania.ステージ.演奏
         }
 
 
+
+        // private
+
+
         private テクスチャ _放射光 = null;
 
         private テクスチャ _光輪 = null;
@@ -237,13 +251,13 @@ namespace DTXMania.ステージ.演奏
 
                 // 表示中央位置は、レーンごとに固定。
 
-                if( App.ユーザ管理.ログオン中のユーザ.演奏モード == 設定.PlayMode.BASIC )
+                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
                 {
                     this.表示中央位置dpx = new Vector2(
                         BASIC.レーンフレーム.領域.Left + BASIC.レーンフレーム.現在のレーン配置.表示レーンの左端位置dpx[ lane ] + BASIC.レーンフレーム.現在のレーン配置.表示レーンの幅dpx[ lane ] / 2f,
                         演奏ステージ.ヒット判定位置Ydpx );
                 }
-                if( App.ユーザ管理.ログオン中のユーザ.演奏モード == 設定.PlayMode.EXPERT )
+                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                 {
                     this.表示中央位置dpx = new Vector2(
                         EXPERT.レーンフレーム.レーン中央位置X[ lane ],
@@ -258,23 +272,14 @@ namespace DTXMania.ステージ.演奏
             public void アニメ用メンバを解放する()
             {
                 this.ストーリーボード?.Abandon();
-
                 this.ストーリーボード?.Dispose();
-                this.ストーリーボード = null;
-
                 this.放射光の回転角?.Dispose();
-                this.放射光の回転角 = null;
-
                 this.放射光の拡大率?.Dispose();
-                this.放射光の拡大率 = null;
-
                 this.光輪の拡大率?.Dispose();
-                this.光輪の拡大率 = null;
-
                 this.光輪の不透明度?.Dispose();
-                this.光輪の不透明度 = null;
             }
         }
+
         private Dictionary<表示レーン種別, 表示レーンステータス> _レーンtoステータス = null;
 
 

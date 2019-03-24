@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Windows.Forms;
 using SharpDX.Direct2D1;
 using FDK;
-using FDK.カウンタ;
-using DTXMania.設定;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     class オプション設定ステージ : ステージ
     {
@@ -19,36 +19,57 @@ namespace DTXMania.ステージ.オプション設定
             入力割り当て,
 			曲読み込みフォルダ割り当て,
 			再起動,
+            再起動待ち,
 			フェードアウト,
-            確定,
+            完了,
             キャンセル,
         }
 
         public フェーズ 現在のフェーズ { get; protected set; }
 
 
+
+        // 生成と終了
+
+
         public オプション設定ステージ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._舞台画像 = new 舞台画像() );
-                this.子Activityを追加する( this._パネルリスト = new パネルリスト() );
-                //this.子を追加する( this._ルートパネルフォルダ = new パネル_フォルダ( "Root", null, null ) ); --> 活性化のたびに、子パネルとまとめて動的に追加する。
-                this.子Activityを追加する( this._システム情報 = new システム情報() );
             }
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.現在のフェーズ = フェーズ.フェードイン;
-                this._初めての進行描画 = true;
+                if( this.活性化中 )
+                    this.非活性化する();
+            }
+        }
 
-                
+
+
+        // 活性化と非活性化
+
+
+        public override void 活性化する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                if( this.活性化中 )
+                    return;
+
+                this._舞台画像 = new 舞台画像();
+                this._パネルリスト = new パネルリスト();
+                this._システム情報 = new システム情報();
+
+                this.現在のフェーズ = フェーズ.フェードイン;
+
+
                 // パネルフォルダツリーを構築する。
 
-                var user = App.ユーザ管理.ログオン中のユーザ;
+                var user = App進行描画.ユーザ管理.ログオン中のユーザ;
                 this._ルートパネルフォルダ = new パネル_フォルダ( "Root", null );
 
                 // ツリー構築・オプションパート（ユーザ別）
@@ -165,7 +186,7 @@ namespace DTXMania.ステージ.オプション設定
                         値の変更処理:
                             ( panel ) => {
                                 user.全画面モードである = ( 1 == ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 );
-                                App.全画面モード = user.全画面モードである;
+                                App進行描画.Instance.AppForm.画面モード = user.全画面モードである ? 画面モード.全画面 : 画面モード.ウィンドウ;
                             }
                     ) );
                 //----------------
@@ -360,7 +381,7 @@ namespace DTXMania.ステージ.オプション設定
                 #region "「レーン配置」リスト "
                 //----------------
                 {
-                    var 選択肢リスト = 演奏.BASIC.レーンフレーム.レーン配置リスト.Keys.ToList();
+                   var 選択肢リスト = 演奏.BASIC.レーンフレーム.レーン配置リスト.Keys.ToList();
 
                     this._ルートパネルフォルダ.子パネルリスト.Add(
 
@@ -440,8 +461,8 @@ namespace DTXMania.ステージ.オプション設定
                                 user.再生速度 = ( (パネル_倍率) panel ).現在値;
 
                                 // キャッシュをすべて削除するために、世代を２つ進める。
-                                App.WAVキャッシュレンタル.世代を進める();
-                                App.WAVキャッシュレンタル.世代を進める();
+                                App進行描画.WAVキャッシュレンタル.世代を進める();
+                                App進行描画.WAVキャッシュレンタル.世代を進める();
                             }
                         ) );
                 //----------------
@@ -503,7 +524,7 @@ namespace DTXMania.ステージ.オプション設定
                             +99,
 
                         初期値:
-                            App.システム設定.判定位置調整ms,
+                            App進行描画.システム設定.判定位置調整ms,
 
                         増加減単位値:
                             1,
@@ -513,7 +534,7 @@ namespace DTXMania.ステージ.オプション設定
 
                         値の変更処理:
                             ( panel ) => {
-                                App.システム設定.判定位置調整ms = ( (パネル_整数) panel ).現在の値;
+                                App進行描画.システム設定.判定位置調整ms = ( (パネル_整数) panel ).現在の値;
                             }
                     ) );
                 //----------------
@@ -607,7 +628,7 @@ namespace DTXMania.ステージ.オプション設定
 
                             値の変更処理:
                                 new Action<パネル>( ( panel ) => {
-                                    App.システム設定を初期化する();
+                                    this._システム設定を初期化する();
                                     this.現在のフェーズ = フェーズ.再起動;
                                 } )
                         ) );
@@ -624,7 +645,7 @@ namespace DTXMania.ステージ.オプション設定
 
                             値の変更処理:
                                 new Action<パネル>( ( panel ) => {
-                                    App.曲データベースを初期化する();
+                                    this._曲データベースを初期化する();
                                     this.現在のフェーズ = フェーズ.再起動;
                                 } )
                         ) );
@@ -641,7 +662,7 @@ namespace DTXMania.ステージ.オプション設定
 
                             値の変更処理:
                                 new Action<パネル>( ( panel ) => {
-                                    App.ユーザデータベースを初期化する();
+                                    this._ユーザデータベースを初期化する();
                                     this.現在のフェーズ = フェーズ.再起動;
                                 } )
                         ) );
@@ -665,7 +686,7 @@ namespace DTXMania.ステージ.オプション設定
                         値の変更処理:
                             ( panel ) => {
                                 this._パネルリスト.フェードアウトを開始する();
-                                App.ステージ管理.アイキャッチを選択しクローズする( nameof( アイキャッチ.シャッター ) );
+                                App進行描画.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( シャッター ) );
                                 this.現在のフェーズ = フェーズ.フェードアウト;
                             }
                     ) );
@@ -679,162 +700,122 @@ namespace DTXMania.ステージ.オプション設定
                 // ルートパネルフォルダを最初のツリーとして表示する。
                 this._パネルリスト.パネルリストを登録する( this._ルートパネルフォルダ );
 
-                // ルートパネルフォルダを活性化する。
-                this._ルートパネルフォルダ.活性化する();
+
+                App進行描画.システムサウンド.再生する( システムサウンド種別.オプション設定ステージ_開始音 );
+
+                this._舞台画像.ぼかしと縮小を適用する( 0.5 );
 
 
-                App.システムサウンド.再生する( システムサウンド種別.オプション設定ステージ_開始音 );
+                base.活性化する();
             }
         }
 
-        protected override void On非活性化()
+        public override void 非活性化する()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                App.システム設定.保存する();
+                if( !this.活性化中 )
+                    return;
 
-                this._ルートパネルフォルダ.非活性化する();
+                App進行描画.システム設定.保存する();
+
                 this._ルートパネルフォルダ = null;
+
+                this._システム情報?.Dispose();
+                this._パネルリスト?.Dispose();
+                this._舞台画像?.Dispose();
+
+                base.非活性化する();
             }
         }
 
-        public override void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public override void 進行する()
         {
-            // (1) 全フェーズ共通の進行描画。
-
-            if( this._初めての進行描画 )
-            {
-                this._舞台画像.ぼかしと縮小を適用する( 0.5 );
-                this._初めての進行描画 = false;
-            }
-
-            this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
 
-            this._舞台画像.進行描画する( dc );
-            this._パネルリスト.進行描画する( dc, 613f, 0f );
-
-
-            // (2) フェーズ別の進行描画。
-
-            switch( this.現在のフェーズ )
-            {
-                case フェーズ.フェードイン:
-                    this._パネルリスト.フェードインを開始する();
-                    this.現在のフェーズ = フェーズ.表示;
-                    break;
-
-                case フェーズ.表示:
-                    break;
-
-                case フェーズ.入力割り当て:
-                    using( var dlg = new 入力割り当てダイアログ() )
-                        dlg.表示する();
-                    this._パネルリスト.フェードインを開始する();
-                    this.現在のフェーズ = フェーズ.表示;
-                    break;
-
-                case フェーズ.曲読み込みフォルダ割り当て:
-                    {
-                        bool 変更された = false;
-                        using( var dlg = new 曲読み込みフォルダ割り当てダイアログ() )
-                            変更された = dlg.表示する();
-                        this.現在のフェーズ = ( 変更された ) ? フェーズ.再起動 : フェーズ.表示;
-                    }
-                    break;
-
-                case フェーズ.再起動:
-                    break;
-
-                case フェーズ.フェードアウト:
-                    App.ステージ管理.現在のアイキャッチ.進行描画する( dc );
-                    if( App.ステージ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.アイキャッチ.フェーズ.クローズ完了 )
-                        this.現在のフェーズ = フェーズ.確定;
-                    break;
-
-                case フェーズ.確定:
-                case フェーズ.キャンセル:
-                    break;
-            }
-
-            this._システム情報.描画する( dc );
-
-
-            // (3) フェーズ別の入力。
-
-            App.入力管理.すべての入力デバイスをポーリングする();
+            App進行描画.入力管理.すべての入力デバイスをポーリングする();
 
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示:
 
-                    if( App.入力管理.キャンセルキーが入力された() )
+                    if( App進行描画.入力管理.キャンセルキーが入力された() )
                     {
                         #region " キャンセル "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.取消音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.取消音 );
 
                         if( null == this._パネルリスト.現在のパネルフォルダ.親パネル )
                         {
                             // (A) 親ツリーがないならステージをフェードアウトフェーズへ。
+
                             this._パネルリスト.フェードアウトを開始する();
-                            App.ステージ管理.アイキャッチを選択しクローズする( nameof( アイキャッチ.半回転黒フェード ) );
+
+                            App進行描画.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
+
                             this.現在のフェーズ = フェーズ.フェードアウト;
                         }
                         else
                         {
                             // (B) 親ツリーがあるなら親ツリーへ戻る。
+
                             this._パネルリスト.親のパネルを選択する();
+
                             this._パネルリスト.フェードインを開始する();
                         }
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.上移動キーが入力された() )
+                    else if( App進行描画.入力管理.上移動キーが入力された() )
                     {
                         #region " 上移動 "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.カーソル移動音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
 
                         this._パネルリスト.前のパネルを選択する();
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.下移動キーが入力された() )
+                    else if( App進行描画.入力管理.下移動キーが入力された() )
                     {
                         #region " 下移動 "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.カーソル移動音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
 
                         this._パネルリスト.次のパネルを選択する();
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.左移動キーが入力された() ) 
+                    else if( App進行描画.入力管理.左移動キーが入力された() )
                     {
                         #region " 左移動 "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.変更音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.変更音 );
 
                         this._パネルリスト.現在選択中のパネル.左移動キーが入力された();
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.右移動キーが入力された() )
+                    else if( App進行描画.入力管理.右移動キーが入力された() )
                     {
                         #region " 右移動 "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.変更音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.変更音 );
 
                         this._パネルリスト.現在選択中のパネル.右移動キーが入力された();
                         //----------------
                         #endregion
                     }
-                    else if( App.入力管理.確定キーが入力された() )
+                    else if( App進行描画.入力管理.確定キーが入力された() )
                     {
                         #region " 確定 "
                         //----------------
-                        App.システムサウンド.再生する( 設定.システムサウンド種別.変更音 );
+                        App進行描画.システムサウンド.再生する( システムサウンド種別.変更音 );
 
                         this._パネルリスト.現在選択中のパネル.確定キーが入力された();
                         //----------------
@@ -844,8 +825,111 @@ namespace DTXMania.ステージ.オプション設定
             }
         }
 
+        public override void 描画する()
+        {
+            this._システム情報.VPSをカウントする();
 
-        private bool _初めての進行描画 = true;
+            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+
+            this._舞台画像.進行描画する( dc );
+            this._パネルリスト.進行描画する( dc, 613f, 0f );
+
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.フェードイン:
+                    this._パネルリスト.フェードインを開始する();
+                    this.現在のフェーズ = フェーズ.表示;
+                    break;
+
+                case フェーズ.入力割り当て:
+                    {
+                        var 完了通知 = new ManualResetEvent( false );
+
+                        App進行描画.Instance.AppForm.BeginInvoke( new Action( () => {
+
+                            using( var dlg = new 入力割り当てダイアログ() )
+                            {
+                                Cursor.Show();  // いったんマウスカーソル表示
+
+                                dlg.表示する();
+
+                                if( App進行描画.Instance.AppForm.画面モード == 画面モード.全画面 )
+                                    Cursor.Hide();  // 全画面ならマウスカーソルを消す。
+                            }
+
+                            完了通知.Set();
+
+                        } ) );
+
+                        完了通知.WaitOne();
+                    }
+                    this._パネルリスト.フェードインを開始する();
+                    this.現在のフェーズ = フェーズ.表示;
+                    break;
+
+                case フェーズ.曲読み込みフォルダ割り当て:
+                    {
+                        var 完了通知 = new ManualResetEvent( false );
+
+                        App進行描画.Instance.AppForm.BeginInvoke( new Action( () => {
+
+                            using( var dlg = new 曲読み込みフォルダ割り当てダイアログ( App進行描画.システム設定.曲検索フォルダ ) )
+                            {
+                                Cursor.Show();  // いったんマウスカーソル表示
+
+                                if( dlg.ShowDialog() == DialogResult.OK &&
+                                    dlg.新しい曲検索フォルダリストを取得する( out List<VariablePath> 新フォルダリスト ) )
+                                {
+                                    // 曲検索フォルダを新しいリストに更新。
+                                    App進行描画.システム設定.曲検索フォルダ.Clear();
+                                    App進行描画.システム設定.曲検索フォルダ.AddRange( 新フォルダリスト );
+                                    App進行描画.システム設定.保存する();
+
+                                    // 再起動へ。
+                                    this.現在のフェーズ = フェーズ.再起動;
+                                }
+                                else
+                                {
+                                    this.現在のフェーズ = フェーズ.表示;
+                                }
+
+                                if( App進行描画.Instance.AppForm.画面モード == 画面モード.全画面 )
+                                    Cursor.Hide();  // 全画面ならマウスカーソルを消す。
+                            }
+
+                            完了通知.Set();
+
+                        } ) );
+
+                        完了通知.WaitOne();
+                    }
+                    break;
+
+                case フェーズ.再起動:
+                    App進行描画.Instance.AppForm.BeginInvoke( new Action( () => {
+                        App進行描画.Instance.AppForm.再起動する();
+                    } ) );
+                    this.現在のフェーズ = フェーズ.再起動待ち;
+                    break;
+
+                case フェーズ.再起動待ち:
+                    break;
+
+                case フェーズ.フェードアウト:
+                    App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
+                    if( App進行描画.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
+                        this.現在のフェーズ = フェーズ.完了;
+                    break;
+            }
+
+            this._システム情報.描画する( dc );
+        }
+
+
+
+        // private
+
 
         private 舞台画像 _舞台画像 = null;
 
@@ -857,5 +941,80 @@ namespace DTXMania.ステージ.オプション設定
         private List<パネル_ONOFFトグル> _パネル_自動演奏_ONOFFトグルリスト = null;
 
         private システム情報 _システム情報 = null;
+
+
+
+        // 初期化
+
+
+        private void _システム設定を初期化する()
+        {
+            // ファイルを削除する。
+
+            var vpath = システム設定.システム設定ファイルパス;
+
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"システム設定ファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+
+
+            // 再生成する。
+
+            App進行描画.システム設定 = システム設定.読み込む(); // ファイルがない場合、新規に作られる
+        }
+
+        private void _曲データベースを初期化する()
+        {
+            // 利用者を終了。
+
+            App進行描画.曲ツリー?.Dispose();
+
+
+            // ファイルを削除する。
+
+            var vpath = SongDB.曲DBファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"曲データベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+
+
+            // 再構築は各自で。
+        }
+
+        private void _ユーザデータベースを初期化する()
+        {
+            // 利用者を終了する。
+
+            App進行描画.ユーザ管理?.Dispose();
+
+
+            // ファイルを削除する。
+
+            var vpath = UserDB.ユーザDBファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"ユーザデータベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
+
+
+            // 再生成する。
+
+            App進行描画.ユーザ管理を再構築する();
+            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
+        }
     }
 }

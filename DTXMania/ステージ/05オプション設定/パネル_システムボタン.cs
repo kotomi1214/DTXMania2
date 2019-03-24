@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		システム制御用のボタン。「設定完了」「戻る」など。
@@ -14,32 +14,33 @@ namespace DTXMania.ステージ.オプション設定
     /// </summary>
     class パネル_システムボタン : パネル
     {
+
+        // 生成と終了
+
+
         public パネル_システムボタン( string パネル名, Action<パネル> 値の変更処理 = null )
             : base( パネル名, 値の変更処理 )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this._パネル名画像.前景色 = Color.Black;
-                Log.Info( $"システムボタンパネルを生成しました。[{this}]" );
-            }
+            this._パネル名画像.前景色 = Color.Black;
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            base.On活性化();   //忘れないこと
+            base.Dispose(); // 忘れずに
         }
 
-        protected override void On非活性化()
-        {
-            base.On非活性化();   //忘れないこと
-        }
 
-        public override void 進行描画する( DeviceContext1 dc, float left, float top, bool 選択中 )
+
+        // 進行と描画
+
+
+        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
         {
             float 拡大率Y = (float) this._パネルの高さ割合.Value;
 
             float テキストの上下マージン = 72f * ( 1f - 拡大率Y ) / 2f;
             var テキスト矩形 = new RectangleF( left + 32f, top + 12f + テキストの上下マージン, 294f, 72f * 拡大率Y );
+
 
             // (1) パネルの下地部分の描画。
 

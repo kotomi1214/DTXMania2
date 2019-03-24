@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		曲ツリー階層においてルートを表すノード。

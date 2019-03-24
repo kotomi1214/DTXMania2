@@ -7,9 +7,8 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
-using DTXMania.曲;
 
-namespace DTXMania.ステージ.選曲
+namespace DTXMania.選曲
 {
     /// <summary>
     ///		曲のリスト表示、選択、スクロール。
@@ -18,20 +17,17 @@ namespace DTXMania.ステージ.選曲
     ///     <see cref="曲ツリー.フォーカスリスト"/> を表示する。
     ///		画面に表示される曲は8行だが、スクロールを勘案して上下に１行ずつ追加し、計10行として扱う。
     /// </remarks>
-    class 曲リスト : Activity
+    class 曲リスト : IDisposable
     {
+
+        // 生成と終了
+
+
         public 曲リスト()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-            }
-        }
-
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                App.曲ツリー.フォーカスノードが変更された += this.曲ツリー_フォーカスノードが変更された;
+                App進行描画.曲ツリー.フォーカスノードが変更された += this.曲ツリー_フォーカスノードが変更された;
 
                 this._カーソル位置 = 4;
                 this._曲リスト全体のY軸移動オフセット = 0;
@@ -45,36 +41,37 @@ namespace DTXMania.ステージ.選曲
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 foreach( var kvp in this._ノードto曲名画像 )
-                    kvp.Value.非活性化する();
+                    kvp.Value?.Dispose();
                 this._ノードto曲名画像.Clear();
 
                 foreach( var kvp in this._ノードtoサブタイトル画像 )
-                    kvp.Value.非活性化する();
+                    kvp.Value?.Dispose();
                 this._ノードtoサブタイトル画像.Clear();
 
                 this._選択ノードの表示オフセットのストーリーボード?.Abandon();
-
                 this._選択ノードの表示オフセットdpx?.Dispose();
-                this._選択ノードの表示オフセットdpx = null;
-
                 this._選択ノードの表示オフセットのストーリーボード?.Dispose();
-                this._選択ノードの表示オフセットのストーリーボード = null;
             }
         }
 
-        public void 進行描画する( DeviceContext1 dc )
+
+
+        // 進行と描画
+
+
+        public void 進行描画する( DeviceContext dc )
         {
             // 進行
 
             if( this._初めての進行描画 )
             {
                 this._スクロール用カウンタ = new 定間隔進行();     // 生成と同時にカウント開始。
-                this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.Animation );
+                this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
                 this._初めての進行描画 = false;
             }
 
@@ -137,7 +134,7 @@ namespace DTXMania.ステージ.選曲
             // 描画
 
             // 現在のフォーカスノードを取得。
-            var 描画するノード = App.曲ツリー.フォーカスノード;
+            var 描画するノード = App進行描画.曲ツリー.フォーカスノード;
             if( null == 描画するノード )
                 return;
 
@@ -156,92 +153,12 @@ namespace DTXMania.ステージ.選曲
             }
         }
 
-        public void 前のノードを選択する()
-        {
-            this._カーソル位置--;     // 下限なし
-
-            App.曲ツリー.前のノードをフォーカスする();
-
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.Animation );
-        }
-
-        public void 次のノードを選択する()
-        {
-            this._カーソル位置++;     // 上限なし
-
-            App.曲ツリー.次のノードをフォーカスする();
-
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.Animation );
-        }
-
-        public void BOXに入る()
-        {
-            this._カーソル位置 = 4;
-
-            this._曲リスト全体のY軸移動オフセット = 0;
-
-            App.曲ツリー.フォーカスする( App.曲ツリー.フォーカスノード.子ノードリスト[ 0 ] );
-        }
-
-        public void BOXから出る()
-        {
-            this._カーソル位置 = 4;
-
-            this._曲リスト全体のY軸移動オフセット = 0;
-
-            App.曲ツリー.フォーカスする( App.曲ツリー.フォーカスノード.親ノード );
-        }
-
-        public void 難易度アンカをひとつ増やす()
-        {
-            App.曲ツリー.難易度アンカをひとつ増やす();
-        }
-
-
-        private bool _初めての進行描画 = true;
-        
-        /// <summary>
-        ///		曲リスト（10行分！）の合計表示領域の左上隅の座標。
-        ///		基準というのは、曲リストがスクロールしていないとき、という意味。
-        /// </summary>
-        private readonly Vector3 _曲リストの基準左上隅座標dpx = new Vector3( 1065f, 145f - _ノードの高さdpx, 0f );
-
-        private readonly Vector3 _サムネイル表示サイズdpx = new Vector3( 100f, 100f, 0f );
-
-        private const float _ノードの高さdpx = ( 913f / 8f );
-
-        private Dictionary<Node, 文字列画像> _ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
-
-        private Dictionary<Node, 文字列画像> _ノードtoサブタイトル画像 = new Dictionary<Node, 文字列画像>();
-        
-        /// <summary>
-        ///		静止時は 4 。曲リストがスクロールしているときは、4より大きい整数（下から上にスクロール中）か、
-        ///		または 4 より小さい整数（上から下にスクロール中）になる。
-        /// </summary>
-        private int _カーソル位置 = 4;
-
-        private 定間隔進行 _スクロール用カウンタ = null;
-        
-        /// <summary>
-        ///		-100～100。曲リスト全体の表示位置を、負数は 上 へ、正数は 下 へずらす 。（正負と上下の対応に注意。）
-        /// </summary>
-        private int _曲リスト全体のY軸移動オフセット = 0;
-        
-        /// <summary>
-        ///		選択中の曲ノードエリアを左にずらす度合い。
-        ///		-50f ～ 0f [dpx] 。
-        /// </summary>
-        private Variable _選択ノードの表示オフセットdpx = null;
-
-        private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
-
-
         /// <param name="行番号">
         ///		一番上:0 ～ 9:一番下。
         ///		「静止時の」可視範囲は 1～8。
         ///		4 がフォーカスノード。
         ///	</param>
-        private void _ノードを描画する( DeviceContext1 dc, int 行番号, Node ノード )
+        private void _ノードを描画する( DeviceContext dc, int 行番号, Node ノード )
         {
             Debug.Assert( 0 <= 行番号 && 9 >= 行番号 );
             Debug.Assert( null != ノード );
@@ -261,13 +178,15 @@ namespace DTXMania.ステージ.選曲
             //----------------
             グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
 
+                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+
                 if( ノード is BoxNode )
                 {
                     #region " BOXノードの背景 "
                     //----------------
                     using( var brush = new SolidColorBrush( dc, new Color4( 0xffa3647c ) ) )
                     {
-                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2DFactory ) )
+                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2D1Factory1 ) )
                         {
                             using( var sink = pathGeometry.Open() )
                             {
@@ -298,7 +217,7 @@ namespace DTXMania.ステージ.選曲
                     //----------------
                     using( var brush = new SolidColorBrush( dc, Color4.Black ) )
                     {
-                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2DFactory ) )
+                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2D1Factory1 ) )
                         {
                             using( var sink = pathGeometry.Open() )
                             {
@@ -372,9 +291,6 @@ namespace DTXMania.ステージ.選曲
                 {
                     #region " 既定のサムネイル画像 "
                     //----------------
-                    if( ノード.活性化していない )  // 後から検索追加された曲ノードは活性化されていない場合がある。
-                        ノード.活性化する();
-
                     var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
                     var サムネイル表示中央dpx = new Vector3(
@@ -416,7 +332,6 @@ namespace DTXMania.ステージ.選曲
                         前景色 = Color4.Black,
                         背景色 = Color4.White,
                     };
-                    曲名画像.活性化する();
 
                     this._ノードto曲名画像.Add( ノード, 曲名画像 );
                 }
@@ -438,12 +353,12 @@ namespace DTXMania.ステージ.選曲
 
             #region " サブタイトル文字列 "
             //----------------
-            if( ノード == App.曲ツリー.フォーカスノード )  // フォーカスノードのみ表示する。
+            if( ノード == App進行描画.曲ツリー.フォーカスノード )  // フォーカスノードのみ表示する。
             {
                 var サブタイトル画像 = (文字列画像) null;
 
                 // ノードが SetNode ならユーザ希望難易度に応じた MusicNode が対象。
-                var node = ( ノード is SetNode setnode ) ? App.曲ツリー.フォーカス曲ノード : ノード;
+                var node = ( ノード is SetNode setnode ) ? App進行描画.曲ツリー.フォーカス曲ノード : ノード;
 
                 // サブタイトル画像を取得する。未生成かつ指定があるなら生成する。
                 if( !( this._ノードtoサブタイトル画像.ContainsKey( node ) ) )
@@ -461,7 +376,6 @@ namespace DTXMania.ステージ.選曲
                             前景色 = Color4.Black,
                             背景色 = Color4.White,
                         };
-                        サブタイトル画像.活性化する();
 
                         this._ノードtoサブタイトル画像.Add( node, サブタイトル画像 );
                     }
@@ -492,7 +406,96 @@ namespace DTXMania.ステージ.選曲
             #endregion
         }
 
-        private void _選択ノードのオフセットアニメをリセットする( アニメーション管理 am )
+
+
+        // ノードの選択
+
+
+        public void 前のノードを選択する()
+        {
+            this._カーソル位置--;     // 下限なし
+
+            App進行描画.曲ツリー.前のノードをフォーカスする();
+
+            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+        }
+
+        public void 次のノードを選択する()
+        {
+            this._カーソル位置++;     // 上限なし
+
+            App進行描画.曲ツリー.次のノードをフォーカスする();
+
+            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+        }
+
+        public void BOXに入る()
+        {
+            this._カーソル位置 = 4;
+
+            this._曲リスト全体のY軸移動オフセット = 0;
+
+            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.子ノードリスト[ 0 ] );
+        }
+
+        public void BOXから出る()
+        {
+            this._カーソル位置 = 4;
+
+            this._曲リスト全体のY軸移動オフセット = 0;
+
+            App進行描画.曲ツリー.フォーカスする( App進行描画.曲ツリー.フォーカスノード.親ノード );
+        }
+
+        public void 難易度アンカをひとつ増やす()
+        {
+            App進行描画.曲ツリー.難易度アンカをひとつ増やす();
+        }
+
+
+
+        // private
+
+
+        private bool _初めての進行描画 = true;
+        
+        /// <summary>
+        ///		曲リスト（10行分！）の合計表示領域の左上隅の座標。
+        ///		基準というのは、曲リストがスクロールしていないとき、という意味。
+        /// </summary>
+        private readonly Vector3 _曲リストの基準左上隅座標dpx = new Vector3( 1065f, 145f - _ノードの高さdpx, 0f );
+
+        private readonly Vector3 _サムネイル表示サイズdpx = new Vector3( 100f, 100f, 0f );
+
+        private const float _ノードの高さdpx = ( 913f / 8f );
+
+        private Dictionary<Node, 文字列画像> _ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
+
+        private Dictionary<Node, 文字列画像> _ノードtoサブタイトル画像 = new Dictionary<Node, 文字列画像>();
+        
+        /// <summary>
+        ///		静止時は 4 。曲リストがスクロールしているときは、4より大きい整数（下から上にスクロール中）か、
+        ///		または 4 より小さい整数（上から下にスクロール中）になる。
+        /// </summary>
+        private int _カーソル位置 = 4;
+
+        private 定間隔進行 _スクロール用カウンタ = null;
+        
+        /// <summary>
+        ///		-100～100。曲リスト全体の表示位置を、負数は 上 へ、正数は 下 へずらす 。（正負と上下の対応に注意。）
+        /// </summary>
+        private int _曲リスト全体のY軸移動オフセット = 0;
+        
+        /// <summary>
+        ///		選択中の曲ノードエリアを左にずらす度合い。
+        ///		-50f ～ 0f [dpx] 。
+        /// </summary>
+        private Variable _選択ノードの表示オフセットdpx = null;
+
+        private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
+
+
+        private void _選択ノードのオフセットアニメをリセットする( アニメーション am )
         {
             this._選択ノードの表示オフセットdpx?.Dispose();
             this._選択ノードの表示オフセットdpx = new Variable( am.Manager, initialValue: 0.0 );

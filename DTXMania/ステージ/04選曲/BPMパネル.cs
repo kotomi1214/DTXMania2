@@ -5,46 +5,48 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania.曲;
-using DTXMania.データベース.曲;
 
-namespace DTXMania.ステージ.選曲
+namespace DTXMania.選曲
 {
-    class BPMパネル : Activity
+    class BPMパネル : IDisposable
     {
+        
+        // 生成と終了
+
+
         public BPMパネル()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._BPMパネル = new テクスチャ( @"$(System)images\選曲\BPMパネル.png" ) );
-                this.子Activityを追加する( this._パラメータ文字 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml", 文字幅補正dpx: 0f ) );
+                this._BPMパネル = new テクスチャ( @"$(System)images\選曲\BPMパネル.png" );
+                this._パラメータ文字 = new 画像フォント( @"$(System)images\パラメータ文字_小.png", @"$(System)images\パラメータ文字_小.yaml", 文字幅補正dpx: 0f );
             }
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._パラメータ文字?.Dispose();
+                this._BPMパネル?.Dispose();
             }
         }
 
-        protected override void On非活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-            }
-        }
 
-        public void 描画する( DeviceContext1 dc )
+
+        // 進行と描画
+
+
+        public void 描画する( DeviceContext dc )
         {
             var 領域 = new RectangleF( 78f, 455f, 357f, 55f );
 
 
-            if( App.曲ツリー.フォーカス曲ノード != this._現在表示しているノード )
+            if( App進行描画.曲ツリー.フォーカス曲ノード != this._現在表示しているノード )
             {
                 #region " フォーカスノードが変更されたので情報を更新する。"
                 //----------------
-                this._現在表示しているノード = App.曲ツリー.フォーカス曲ノード;
+                this._現在表示しているノード = App進行描画.曲ツリー.フォーカス曲ノード;
 
                 this._最小BPM = 120.0;
                 this._最大BPM = 120.0;
@@ -88,6 +90,10 @@ namespace DTXMania.ステージ.選曲
                 }
             }
         }
+
+
+
+        // private
 
 
         private テクスチャ _BPMパネル = null;

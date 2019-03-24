@@ -6,22 +6,20 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania.ステージ.演奏.BASIC
+namespace DTXMania.演奏.BASIC
 {
-    class レーンフラッシュ : Activity
+    class レーンフラッシュ : IDisposable
     {
+
+        // 生成と終了
+
+
         public レーンフラッシュ()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.子Activityを追加する( this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュBASIC.png" ) );
-            }
-        }
+                this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュBASIC.png" );
 
-        protected override void On活性化()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
                 var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\レーンフラッシュBASIC.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
@@ -50,18 +48,29 @@ namespace DTXMania.ステージ.演奏.BASIC
             }
         }
 
-        protected override void On非活性化()
+        public virtual void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._レーンtoレーンContext.Clear();
+                this._レーンフラッシュ画像?.Dispose();
             }
         }
+
+
+
+        // フラッシュ開始
+
 
         public void 開始する( 表示レーン種別 lane )
         {
             this._レーンtoレーンContext[ lane ].アニメカウンタ.開始する( 0, 250, 1 );
         }
+
+
+
+        // 進行と描画
+
 
         public void 進行描画する()
         {
@@ -80,12 +89,17 @@ namespace DTXMania.ステージ.演奏.BASIC
         }
 
 
+
+        // private
+
+
         private struct レーンContext
         {
             public Vector2 開始位置dpx;
             public RectangleF 転送元矩形;
             public Counter アニメカウンタ;
         };
+
         private Dictionary<表示レーン種別, レーンContext> _レーンtoレーンContext = null;
 
         private テクスチャ _レーンフラッシュ画像 = null;

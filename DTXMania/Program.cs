@@ -3,34 +3,42 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.ServiceModel;
+using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using FDK;
-using DTXMania.API;
 
 namespace DTXMania
 {
     static class Program
     {
-        public static App App { get; private set; }
-
-        public const int ログファイルの最大保存日数 = 30;
+        const int ログファイルの最大保存日数 = 30;
         public static string ログファイル名 = "";
 
-        // メインエントリ。
         [STAThread]
         static void Main( string[] args )
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault( false );
 
+#if DEBUG
+            SharpDX.Configuration.EnableReleaseOnFinalizer = true;          // ファイナライザの実行中、未解放のCOMを見つけたら解放を試みる。
+            SharpDX.Configuration.EnableTrackingReleaseOnFinalizer = true;  // その際には Trace にメッセージを出力する。
+#endif
+            // フォルダ変数を設定する。
+            var exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location );
+            VariablePath.フォルダ変数を追加または更新する( "Exe", $@"{exePath}\" );
+            VariablePath.フォルダ変数を追加または更新する( "System", Path.Combine( exePath, @"System\" ) );
+            VariablePath.フォルダ変数を追加または更新する( "AppData", Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" ) );
+            VariablePath.フォルダ変数を追加または更新する( "UserProfile", Environment.GetFolderPath( Environment.SpecialFolder.UserProfile ) + @"\" );
+
             #region " %USERPROFILE%/AppData/DTXMania2 フォルダがなければ作成する。"
             //----------------
-            var AppDataフォルダ名 = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), @"DTXMania2\" );
+            var AppDataフォルダ名 = new VariablePath( "$(AppData)" );
 
-            if( !( Directory.Exists( AppDataフォルダ名 ) ) )
-                Directory.CreateDirectory( AppDataフォルダ名 );
+            if( !( Directory.Exists( AppDataフォルダ名.変数なしパス ) ) )
+                Directory.CreateDirectory( AppDataフォルダ名.変数なしパス );
             //----------------
             #endregion
 
@@ -38,11 +46,11 @@ namespace DTXMania
             //----------------
             Trace.AutoFlush = true;
 
-            Program.ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
+            ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名.変数なしパス, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
 
             // ログファイルをTraceリスナとして追加。
             // 以降、Trace（ならびにFDK.Logクラス）による出力は、このリスナ（＝ログファイル）にも出力される。
-            Trace.Listeners.Add( new TraceLogListener( new StreamWriter( Program.ログファイル名, false, Encoding.GetEncoding( "utf-8" ) ) ) );
+            Trace.Listeners.Add( new TraceLogListener( new StreamWriter( ログファイル名, false, Encoding.GetEncoding( "utf-8" ) ) ) );
 
             // 最初の出力。
             Log.現在のスレッドに名前をつける( "UI" );
@@ -71,15 +79,20 @@ namespace DTXMania
 
                 #region " アプリ起動。"
                 //----------------
-                Program.App = new App();
+                using( var app = new App( options ) )
+                {
+                    if( app.WCFサービスをチェックする( options ) )
+                    {
+                        Application.Run( app );
 
-                if( Program.App.WCFサービスをチェックする( options ) )
-                {
-                    Application.Run( Program.App );
-                }
-                else
-                {
-                    // false ならアプリを起動しない。
+                        // フラグが立っていれば再起動する。
+                        if( app.再起動が必要 )
+                            Application.Restart();
+                    }
+                    else
+                    {
+                        // false ならアプリを起動しない。
+                    }
                 }
                 //----------------
                 #endregion

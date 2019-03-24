@@ -4,10 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 using FDK;
-using DTXMania.設定;
-using DTXMania.入力;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///     ドラム入力の割り当て画面。
@@ -23,232 +21,211 @@ namespace DTXMania.ステージ.オプション設定
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-				// (1) メインウィンドウ用の入力管理をいったん破棄し、このダイアログ用の入力管理を生成する。
+                using( var timer = new Timer() )
+                {
+                    #region " 設定値で初期化。"
+                    //----------------
+                    foreach( ドラム入力種別 drum in Enum.GetValues( typeof( ドラム入力種別 ) ) )
+                    {
+                        if( drum == ドラム入力種別.Unknown ||
+                            drum == ドラム入力種別.HiHat_Control )
+                            continue;   // 除外（設定変更不可）
 
-				App.入力管理.Dispose();
+                        this.comboBoxパッドリスト.Items.Add( drum.ToString() );
+                    }
 
-				using( var 入力管理 = new 入力管理( this.Handle ) )
-				{
-					入力管理.キーバインディングを取得する = () => App.システム設定.キーバインディング;
-					入力管理.キーバインディングを保存する = () => App.システム設定.保存する();
-					入力管理.初期化する();
+                    // 変更後のキーバインディングを、現在の設定値で初期化。
 
-
-                    // (2) ダイアログを表示。
-
-					using( var timer = new Timer() )
-					{
-						#region " 設定値で初期化。"
-						//----------------
-						foreach( ドラム入力種別 drum in Enum.GetValues( typeof( ドラム入力種別 ) ) )
-						{
-							if( drum == ドラム入力種別.Unknown ||
-								drum == ドラム入力種別.HiHat_Control )
-								continue;   // 除外（設定変更不可）
-
-							this.comboBoxパッドリスト.Items.Add( drum.ToString() );
-						}
-
-						// 変更後のキーバインディングを、現在の設定値で初期化。
-
-						this._変更後のキーバインディング = (キーバインディング) App.システム設定.キーバインディング.Clone();
+                    this._変更後のキーバインディング = (キーバインディング) App進行描画.システム設定.キー割り当て.Clone();
 
 
-						// 最初のパッドを選択し、割り当て済みリストを更新。
+                    // 最初のパッドを選択し、割り当て済みリストを更新。
 
-						this.comboBoxパッドリスト.SelectedIndex = 0;
-
-
-                        // その他の初期化。
-
-						this._前回の入力リスト追加時刻 = QPCTimer.生カウント相対値を秒へ変換して返す( QPCTimer.生カウント );
-
-						this._FootPedal現在値 = 0;
-
-						this.textBoxFootPedal現在値.Text = "0";
-						this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
-						this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
-
-						this._変更あり = false;
+                    this.comboBoxパッドリスト.SelectedIndex = 0;
 
 
-						// 初期メッセージを出力。
+                    // その他の初期化。
 
-						this.listView入力リスト.Items.Add( $"HID Keyboard の受付を開始しました。" );
-						for( int i = 0; i < 入力管理.MidiIn.DeviceName.Count; i++ )
-							this.listView入力リスト.Items.Add( $"MIDI IN [{i}] \"{入力管理.MidiIn.DeviceName[ i ]}\" の受付を開始しました。" );
-						this.listView入力リスト.Items.Add( "" );
-						this.listView入力リスト.Items.Add( "* タイミングクロック信号、アクティブ信号は無視します。" );
-						this.listView入力リスト.Items.Add( "* 入力と入力の間が500ミリ秒以上開いた場合は、間に空行を表示します。" );
-						this.listView入力リスト.Items.Add( "" );
-						this.listView入力リスト.Items.Add( "キーボードまたはMIDI信号を入力してください。" );
-						//----------------
-						#endregion
+                    this._前回の入力リスト追加時刻 = QPCTimer.生カウント相対値を秒へ変換して返す( QPCTimer.生カウント );
 
-						// タイマーイベントを使って、定期的に、入力値の表示とフットペダル開度ゲージの描画を行う。
-						timer.Interval = 100;
-						timer.Tick += ( sender, arg ) => {
+                    this._FootPedal現在値 = 0;
 
-							#region " キーボードをポーリングし、入力値を入力リストへ出力。"
-							//----------------
-							入力管理.HIDKeyboard.ポーリングする();
+                    this.textBoxFootPedal現在値.Text = "0";
+                    this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
+                    this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
 
-							for( int i = 0; i < 入力管理.HIDKeyboard.入力イベントリスト.Count; i++ )
-							{
-								var inputEvent = 入力管理.HIDKeyboard.入力イベントリスト[ i ];
+                    this._変更あり = false;
 
-								if( inputEvent.押された )
-								{
-									var item = new ListViewItem入力リスト用( InputDeviceType.Keyboard, inputEvent );
 
-									if( inputEvent.Key == (int) Keys.Escape )    // 割り当てされてほしくないキーはここへ。
-									{
-										item.割り当て可能 = false;
-									}
+                    // 初期メッセージを出力。
 
-                                    // 既に割り当てられていたらそのドラム種別を表示。
-                                    var drumType = this._変更後のキーバインディング.キーボードtoドラム
-                                        .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
-                                        .Select( ( kvp ) => kvp.Value );
-                                    if( 0 < drumType.Count() )
-                                        item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+                    this.listView入力リスト.Items.Add( $"HID Keyboard の受付を開始しました。" );
+                    for( int i = 0; i < App進行描画.入力管理.MIDI入力.DeviceName.Count; i++ )
+                        this.listView入力リスト.Items.Add( $"MIDI IN [{i}] \"{App進行描画.入力管理.MIDI入力.DeviceName[ i ]}\" の受付を開始しました。" );
+                    this.listView入力リスト.Items.Add( "" );
+                    this.listView入力リスト.Items.Add( "* タイミングクロック信号、アクティブ信号は無視します。" );
+                    this.listView入力リスト.Items.Add( "* 入力と入力の間が500ミリ秒以上開いた場合は、間に空行を表示します。" );
+                    this.listView入力リスト.Items.Add( "" );
+                    this.listView入力リスト.Items.Add( "キーボードまたはMIDI信号を入力してください。" );
+                    //----------------
+                    #endregion
 
-                                    this._一定時間が経っていれば空行を挿入する();
+                    // タイマーイベントを使って、定期的に、入力値の表示とフットペダル開度ゲージの描画を行う。
+                    timer.Interval = 100;
+                    timer.Tick += ( sender, arg ) => {
 
-									this.listView入力リスト.Items.Add( item );
-									this.listView入力リスト.EnsureVisible( this.listView入力リスト.Items.Count - 1 );
-								}
-								else if( inputEvent.離された )
-								{
-									// キーボードについては表示しない。
-								}
-							}
-                            //----------------
-                            #endregion
+                        #region " MIDI入力をポーリングし、入力値を入力リストへ出力。"
+                        //----------------
+                        // MidiInChecker の機能もかねて、NoteOFF や ControlChange も表示する。（割り当てはできない。）
 
-                            #region " MIDI入力をポーリングし、入力値を入力リストへ出力。"
-                            //----------------
-                            // MidiInChecker の機能もかねて、NoteOFF や ControlChange も表示する。（割り当てはできない。）
+                        App進行描画.入力管理.MIDI入力.ポーリングする();
 
-                            入力管理.MidiIn.ポーリングする();
+                        for( int i = 0; i < App進行描画.入力管理.MIDI入力.入力イベントリスト.Count; i++ )
+                        {
+                            var inputEvent = App進行描画.入力管理.MIDI入力.入力イベントリスト[ i ];
 
-							for( int i = 0; i < 入力管理.MidiIn.入力イベントリスト.Count; i++ )
-							{
-								var inputEvent = 入力管理.MidiIn.入力イベントリスト[ i ];
-
-								if( inputEvent.押された && ( 255 == inputEvent.Key ) && ( 4 == inputEvent.Control ) )
+                            if( inputEvent.押された && ( 255 == inputEvent.Key ) && ( 4 == inputEvent.Control ) )
+                            {
+                                #region " (A) フットペダルコントロールの場合　→　入力リストではなく専用のUIで表示。"
+                                //----------------
+                                if( this._FootPedal現在値 != inputEvent.Velocity )
                                 {
-                                    #region " (A) フットペダルコントロールの場合　→　入力リストではなく専用のUIで表示。"
-                                    //----------------
-                                    if( this._FootPedal現在値 != inputEvent.Velocity )
-									{
-										// 現在値
-										this._FootPedal現在値 = inputEvent.Velocity;
-										this.textBoxFootPedal現在値.Text = this._FootPedal現在値.ToString();
+                                    // 現在値
+                                    this._FootPedal現在値 = inputEvent.Velocity;
+                                    this.textBoxFootPedal現在値.Text = this._FootPedal現在値.ToString();
 
-										// 最大値
-										if( this._FootPedal現在値 > this._変更後のキーバインディング.FootPedal最大値 )
-										{
-											this._変更後のキーバインディング.FootPedal最大値 = this._FootPedal現在値;
-											this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
-										}
+                                    // 最大値
+                                    if( this._FootPedal現在値 > this._変更後のキーバインディング.FootPedal最大値 )
+                                    {
+                                        this._変更後のキーバインディング.FootPedal最大値 = this._FootPedal現在値;
+                                        this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
+                                    }
 
-										// 最小値
-										if( this._FootPedal現在値 <= this._変更後のキーバインディング.FootPedal最小値 )
-										{
-											this._変更後のキーバインディング.FootPedal最小値 = this._FootPedal現在値;
-											this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
-										}
-									}
-                                    //----------------
-                                    #endregion
+                                    // 最小値
+                                    if( this._FootPedal現在値 <= this._変更後のキーバインディング.FootPedal最小値 )
+                                    {
+                                        this._変更後のキーバインディング.FootPedal最小値 = this._FootPedal現在値;
+                                        this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
+                                    }
                                 }
-                                else
-								{
-                                    #region " (B) その他のMIDI入出力　→　入力リストに表示。"
-                                    //----------------
-                                    var item = new ListViewItem入力リスト用( InputDeviceType.MidiIn, inputEvent );
-
-                                    // 既に割り当てられていたらそのドラム種別を表示。
-                                    var drumType = this._変更後のキーバインディング.MIDItoドラム
-                                        .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
-                                        .Select( ( kvp ) => kvp.Value );
-                                    if( 0 < drumType.Count() )
-                                        item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
-
-                                    this._一定時間が経っていれば空行を挿入する();
-
-									this.listView入力リスト.Items.Add( item );
-									this.listView入力リスト.EnsureVisible( this.listView入力リスト.Items.Count - 1 );
-                                    //----------------
-                                    #endregion
-                                }
+                                //----------------
+                                #endregion
                             }
-                            //----------------
-                            #endregion
+                            else
+                            {
+                                #region " (B) その他のMIDI入出力　→　入力リストに表示。"
+                                //----------------
+                                var item = new ListViewItem入力リスト用( InputDeviceType.MidiIn, inputEvent );
 
-                            #region " MIDIフットペダルの開度ゲージを描画。"
-                            //----------------
-                            using( var g = pictureBoxFootPedal.CreateGraphics() )
-							{
-								var 全体矩形 = pictureBoxFootPedal.ClientRectangle;
-								var 背景色 = new System.Drawing.SolidBrush( pictureBoxFootPedal.BackColor );
-								var 最大値ゲージ色 = System.Drawing.Brushes.LightBlue;
-								var ゲージ色 = System.Drawing.Brushes.Blue;
+                                // 既に割り当てられていたらそのドラム種別を表示。
+                                var drumType = this._変更後のキーバインディング.MIDItoドラム
+                                    .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
+                                    .Select( ( kvp ) => kvp.Value );
+                                if( 0 < drumType.Count() )
+                                    item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
 
-								g.FillRectangle( 背景色, 全体矩形 );
+                                this._一定時間が経っていれば空行を挿入する();
 
-								int 最大値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._変更後のキーバインディング.FootPedal最大値 / 127.0 ) );
-								var 最大値ゲージ矩形 = new System.Drawing.Rectangle(
-									全体矩形.X,
-									全体矩形.Y + 最大値用差分,
-									全体矩形.Width,
-									全体矩形.Height - 最大値用差分 );
-								g.FillRectangle( 最大値ゲージ色, 最大値ゲージ矩形 );
-
-								int 現在値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._FootPedal現在値 / 127.0 ) );
-								var ゲージ矩形 = new System.Drawing.Rectangle(
-									全体矩形.X,
-									全体矩形.Y + 現在値用差分,
-									全体矩形.Width,
-									全体矩形.Height - 現在値用差分 );
-								g.FillRectangle( ゲージ色, ゲージ矩形 );
-							}
-							//----------------
-							#endregion
-						};
-
-                        timer.Start();
-
-						#region " ダイアログを表示。"
-						//----------------
-						Cursor.Show();
-
-                        var dr = this.ShowDialog( Program.App );
-
-                        if( App.全画面モード )
-							Cursor.Hide();
+                                this.listView入力リスト.Items.Add( item );
+                                this.listView入力リスト.EnsureVisible( this.listView入力リスト.Items.Count - 1 );
+                                //----------------
+                                #endregion
+                            }
+                        }
                         //----------------
                         #endregion
 
-                        timer.Stop();
+                        #region " MIDIフットペダルの開度ゲージを描画。"
+                        //----------------
+                        using( var g = pictureBoxFootPedal.CreateGraphics() )
+                        {
+                            var 全体矩形 = pictureBoxFootPedal.ClientRectangle;
+                            var 背景色 = new System.Drawing.SolidBrush( pictureBoxFootPedal.BackColor );
+                            var 最大値ゲージ色 = System.Drawing.Brushes.LightBlue;
+                            var ゲージ色 = System.Drawing.Brushes.Blue;
 
-                        if( dr == DialogResult.OK )
-						{
-							// 設定値を反映する。
-							App.システム設定.キーバインディング = (キーバインディング) this._変更後のキーバインディング.Clone();
-							入力管理.キーバインディングを保存する();
-						}
-					}
-				}
+                            g.FillRectangle( 背景色, 全体矩形 );
 
-                // (3) メインウィンドウ用の入力管理を復活する。
+                            int 最大値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._変更後のキーバインディング.FootPedal最大値 / 127.0 ) );
+                            var 最大値ゲージ矩形 = new System.Drawing.Rectangle(
+                                全体矩形.X,
+                                全体矩形.Y + 最大値用差分,
+                                全体矩形.Width,
+                                全体矩形.Height - 最大値用差分 );
+                            g.FillRectangle( 最大値ゲージ色, 最大値ゲージ矩形 );
 
-                App.入力管理 = new 入力管理( Program.App.Handle ) {
-                    キーバインディングを取得する = () => App.システム設定.キーバインディング,
-                    キーバインディングを保存する = () => App.システム設定.保存する(),
-                };
-                App.入力管理.初期化する();
+                            int 現在値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._FootPedal現在値 / 127.0 ) );
+                            var ゲージ矩形 = new System.Drawing.Rectangle(
+                                全体矩形.X,
+                                全体矩形.Y + 現在値用差分,
+                                全体矩形.Width,
+                                全体矩形.Height - 現在値用差分 );
+                            g.FillRectangle( ゲージ色, ゲージ矩形 );
+                        }
+                        //----------------
+                        #endregion
+                    };
+
+                    this.KeyPreview = true; // Control への入力を先に Form が受け取れるようにする。
+
+                    this.KeyDown += ( sender, arg ) => {    // ダイアログで RawInput を使う方法が分からないので KeyDown を使う
+
+                        #region " キーボードの入力値を入力リストへ出力。"
+                        //----------------
+                        var inputEvent = new InputEvent() {
+                            DeviceID = 0,
+                            Key = (int) arg.KeyCode,
+                            TimeStamp = 0,
+                            Velocity = 100,
+                            押された = true,
+                            Control = 0,
+                        };
+
+                        var item = new ListViewItem入力リスト用( InputDeviceType.Keyboard, inputEvent );
+
+                        if( inputEvent.Key == (int) Keys.Escape )    // 割り当てされてほしくないキーはここへ。
+                        {
+                            item.割り当て可能 = false;
+                        }
+
+                        // 既に割り当てられていたらそのドラム種別を表示。
+                        var drumType = this._変更後のキーバインディング.キーボードtoドラム
+                            .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
+                            .Select( ( kvp ) => kvp.Value );
+
+                        if( 0 < drumType.Count() )
+                            item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+
+                        this._一定時間が経っていれば空行を挿入する();
+
+                        this.listView入力リスト.Items.Add( item );
+                        this.listView入力リスト.EnsureVisible( this.listView入力リスト.Items.Count - 1 );
+                        //----------------
+                        #endregion
+                    };
+
+                    timer.Start();
+
+                    #region " ダイアログを表示。"
+                    //----------------
+                    Cursor.Show();
+
+                    var dr = this.ShowDialog( App進行描画.Instance.AppForm );
+
+                    if( App進行描画.Instance.AppForm.画面モード == 画面モード.全画面 )
+                        Cursor.Hide();
+                    //----------------
+                    #endregion
+
+                    timer.Stop();
+
+                    if( dr == DialogResult.OK )
+                    {
+                        // 設定値を反映する。
+                        App進行描画.システム設定.キー割り当て = (キーバインディング) this._変更後のキーバインディング.Clone();
+                        App進行描画.入力管理.キーバインディングを保存する();
+                    }
+                }
             }
         }
 

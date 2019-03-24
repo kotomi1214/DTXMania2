@@ -8,7 +8,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		曲ノードの基本クラス。
@@ -16,9 +16,11 @@ namespace DTXMania.曲
     /// <remarks>
     ///		曲ツリーを構成するすべてのノードは、このクラスを継承する。
     /// </remarks>
-    abstract partial class Node : FDK.Activity
+    abstract partial class Node : IDisposable
     {
+
         // プロパティ
+
 
         /// <summary>
         ///		ノードのタイトル。
@@ -47,7 +49,9 @@ namespace DTXMania.曲
         }
 
 
+
         // 曲ツリー関連
+
 
         /// <summary>
         ///		曲ツリー階層において、親となるノード。
@@ -117,7 +121,9 @@ namespace DTXMania.曲
         }
 
 
+
         // ノード画像関連
+
 
         /// <summary>
         ///		ノードの全体サイズ（設計単位）。
@@ -136,10 +142,7 @@ namespace DTXMania.曲
             get
             {
                 if( null == _既定のノード画像 )
-                {
                     _既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
-                    _既定のノード画像.活性化する();
-                }
 
                 return _既定のノード画像;
             }
@@ -148,16 +151,18 @@ namespace DTXMania.曲
         /// <summary>
         ///		ノードを表す画像。
         ///		null にすると、既定のノード画像が使用される。
-        ///		派生クラスで、適切な画像を割り当てること。
         /// </summary>
         /// <remarks>
+        ///		派生クラスで、適切な画像を割り当てること。（このクラスでは、生成も Dispose もしない。）
         ///		<see cref="SetNode"/> の場合のみ、扱いが異なる。
         ///		詳細は<see cref="SetNode.ノード画像"/>を参照のこと。
         /// </remarks>
         public virtual テクスチャ ノード画像 { get; set; }
 
 
+
         // プレビュー音声関連
+
 
         public virtual string プレビュー音声ファイルの絶対パス { get; protected set; } = null;
 
@@ -171,28 +176,36 @@ namespace DTXMania.曲
             this._プレビュー音声.停止する();
         }
 
+        private PreviewSound _プレビュー音声;  // null なら未使用
 
-        // Activity
+
+
+        // 生成と終了
+
 
         public Node()
         {
-            //this.子を追加する( this._ノード画像 );	--> 派生クラスのコンストラクタで追加することができる。
-            this.子Activityを追加する( this._曲名テクスチャ = new 曲名() );
-            this.子Activityを追加する( this._プレビュー音声 = new PreviewSound() );
+            this._曲名テクスチャ = new 曲名();
+            this._プレビュー音声 = new PreviewSound();
         }
 
-        protected override void On活性化()
+        public virtual void Dispose()
         {
+            //Node._既定のノード画像?.Dispose();     --> めんどくさいので破棄はしない。
+            //this.ノード画像?.Dispose();            --> 生成も解放も派生クラスに任せる。
+            this._曲名テクスチャ?.Dispose();
+            this._プレビュー音声?.Dispose();
         }
 
-        protected override void On非活性化()
-        {
-            this.プレビュー音声を停止する();
-        }
 
-        public virtual void 進行描画する( DeviceContext1 dc, Matrix ワールド変換行列, bool キャプション表示 = true )
+
+        // 描画
+
+
+        public virtual void 進行描画する( DeviceContext dc, Matrix ワールド変換行列, bool キャプション表示 = true )
         {
             // (1) ノード画像を描画する。
+
             if( null != this.ノード画像 )
             {
                 this.ノード画像.描画する( ワールド変換行列 );
@@ -202,10 +215,13 @@ namespace DTXMania.曲
                 Node.既定のノード画像.描画する( ワールド変換行列 );
             }
 
+
             // (2) キャプションを描画する。
+
             if( キャプション表示 )
             {
                 ワールド変換行列 *= Matrix.Translation( 0f, 0f, 1f );    // ノード画像よりZ方向手前にほんのり移動
+
                 this._曲名テクスチャ.タイトル = this.タイトル;
                 this._曲名テクスチャ.サブタイトル = this.サブタイトル;
                 this._曲名テクスチャ.描画する( ワールド変換行列, 不透明度0to1: 1f, new RectangleF( 0f, 138f, Node.全体サイズ.Width, Node.全体サイズ.Height - 138f + 27f ) );
@@ -213,14 +229,20 @@ namespace DTXMania.曲
         }
 
 
+
         // private
+
 
         protected 曲名 _曲名テクスチャ = null;
 
-        private PreviewSound _プレビュー音声;  // null なら未使用
 
         private float _難易度 = 0.0f;
 
-        private static テクスチャ _既定のノード画像 = null;  // めんどくさいので破棄はしない。
+
+
+        // private (static) 
+
+
+        private static テクスチャ _既定のノード画像 = null;
     }
 }

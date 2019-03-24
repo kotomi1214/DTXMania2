@@ -5,14 +5,14 @@ using System.Linq;
 using System.Threading;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
 	partial class Node
 	{
         /// <summary>
         ///     プレビュー音声の再生と停止。
         /// </summary>
-		class PreviewSound : Activity
+		class PreviewSound : IDisposable
 		{
             /// <summary>
             ///		プレビューサウンド。
@@ -23,15 +23,11 @@ namespace DTXMania.曲
 
             public PreviewSound()
             {
-            }
-
-            protected override void On活性化()
-            {
                 this.Sound = null;
                 this._SampleSource = null;
             }
 
-            protected override void On非活性化()
+            public virtual void Dispose()
             {
                 this.Sound?.Stop();
                 this.Sound?.Dispose();
@@ -40,6 +36,7 @@ namespace DTXMania.曲
                 this._SampleSource?.Dispose();
                 this._SampleSource = null;
             }
+
 
             /// <summary>
             ///		500ミリ秒待ってから、プレビュー音声を生成し、ループ再生する。
@@ -136,7 +133,7 @@ namespace DTXMania.曲
                 {
                     // 未生成の場合、生成する。
                     this._SampleSource = SampleSourceFactory.Create(
-                        App.サウンドデバイス,
+                        App進行描画.サウンドデバイス,
                         new VariablePath( this._音声ファイルパス ).変数なしパス,
                         再生速度: 1.0 );   // プレビューは常に再生速度 = 1.0
 
@@ -145,7 +142,7 @@ namespace DTXMania.曲
                 }
 
                 // (2) サンプルソースからサウンドを生成する。
-                this.Sound = new Sound( App.サウンドデバイス, this._SampleSource );
+                this.Sound = new Sound( App進行描画.サウンドデバイス, this._SampleSource );
             }
         }
     }

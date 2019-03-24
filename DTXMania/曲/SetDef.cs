@@ -6,9 +6,8 @@ using System.Linq;
 using System.Text;
 using SharpDX;
 using FDK;
-using SSTFormat.v4;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     class SetDef
     {
@@ -101,7 +100,7 @@ namespace DTXMania.曲
                         //---------------------
                         if( Utilities.コマンドのパラメータ文字列部分を返す( 行, @"FONTCOLOR", out パラメータ ) )
                         {
-                            var sysColor = System.Drawing.ColorTranslator.FromHtml( $"#{パラメータ}" );
+                            var sysColor = System.Drawing.ColorTranslator.FromHtml( $"{パラメータ}" );
                             block.FontColor = new Color( sysColor.R, sysColor.G, sysColor.B, sysColor.A );
                             blockが有効 = true;
                             continue;

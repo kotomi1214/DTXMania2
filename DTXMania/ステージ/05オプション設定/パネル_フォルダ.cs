@@ -5,7 +5,7 @@ using System.Linq;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.ステージ.オプション設定
+namespace DTXMania.オプション設定
 {
     /// <summary>
     ///		子パネルリストを持つフォルダ。
@@ -30,49 +30,46 @@ namespace DTXMania.ステージ.オプション設定
         }
 
 
+
+        // 生成と終了
+
+
         public パネル_フォルダ( string パネル名, パネル_フォルダ 親パネル, IEnumerable<パネル> 初期子パネルリスト = null, Action<パネル> 値の変更処理 = null )
             : base( パネル名, 値の変更処理, ヘッダ色種別.赤 )
         {
-            //using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            this.親パネル = 親パネル;
+            this.子パネルリスト = new SelectableList<パネル>();
+
+            if( null != 初期子パネルリスト )
             {
-                this.親パネル = 親パネル;
-                this.子パネルリスト = new SelectableList<パネル>();
+                foreach( var panel in 初期子パネルリスト )
+                    this.子パネルリスト.Add( panel );
 
-                if( null != 初期子パネルリスト )
-                {
-                    foreach( var panel in 初期子パネルリスト )
-                        this.子パネルリスト.Add( panel );
-
-                    this._子パネルリスト.SelectFirst();
-                }
-
-                Log.Info( $"フォルダパネルを生成しました。[{this}]" );
+                this._子パネルリスト.SelectFirst();
             }
         }
 
-        protected override void On活性化()
+        public override void Dispose()
         {
-            base.On活性化();   // 忘れないこと
-
-            foreach( var panel in this.子パネルリスト )
-                panel.活性化する();
+            base.Dispose(); // 忘れずに
         }
 
-        protected override void On非活性化()
-        {
-            foreach( var panel in this.子パネルリスト )
-                panel.非活性化する();
 
-            base.On非活性化();  // 忘れないこと
-        }
 
-        public override void 進行描画する( DeviceContext1 dc, float left, float top, bool 選択中 )
+        // 進行と描画
+
+
+        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
         {
             // パネルの下地と名前を描画。
             base.進行描画する( dc, left, top, 選択中 );
 
             // その他の描画があれば、ここに記述する。
         }
+
+
+
+        // protected
 
 
         protected SelectableList<パネル> _子パネルリスト = null;

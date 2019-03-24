@@ -6,8 +6,8 @@ using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using FDK;
 using SSTFormat.v4;
+using FDK;
 
 namespace SSTFEditor
 {

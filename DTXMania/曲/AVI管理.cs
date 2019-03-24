@@ -6,15 +6,18 @@ using System.Linq;
 using SSTFormat.v4;
 using FDK;
 
-namespace DTXMania.曲
+namespace DTXMania
 {
     /// <summary>
     ///		<see cref="スコア.AVIリスト"/> の各動画インスタンスを管理する。
     /// </summary>
-
     class AVI管理 : IDisposable
     {
         public IReadOnlyDictionary<int, Video> 動画リスト => this._動画リスト;
+
+
+
+        // 生成と終了
 
 
         public AVI管理()
@@ -39,13 +42,16 @@ namespace DTXMania.曲
             }
         }
 
+
+
+        // 登録、停止、再開
+
+
         /// <summary>
         ///		指定したAVI番号に動画ファイルを登録する。
         /// </summary>
         public void 登録する( int AVI番号, VariablePath 動画ファイルの絶対パス, double 再生速度 = 1.0 )
         {
-            #region " パラメータチェック "
-            //----------------
             if( 0 > AVI番号 || 36 * 36 <= AVI番号 )
                 throw new ArgumentOutOfRangeException( $"AVI番号が範囲(0～1295)を超えています。[{AVI番号}]" );
 
@@ -54,8 +60,6 @@ namespace DTXMania.曲
                 Log.WARNING( $"動画ファイルが存在しません。[{動画ファイルの絶対パス.変数付きパス}]" );
                 return;
             }
-            //----------------
-            #endregion
 
             // すでに登録済みなら解放する。
             if( this._動画リスト.ContainsKey( AVI番号 ) )
@@ -88,6 +92,10 @@ namespace DTXMania.曲
                 video.再開する();
             }
         }
+
+
+
+        // private
 
 
         /// <summary>
