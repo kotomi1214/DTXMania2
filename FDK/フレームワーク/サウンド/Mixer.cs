@@ -17,10 +17,8 @@ namespace FDK
         /// </summary>
         public float Volume
         {
-            get
-                => this._Volume;
-            set
-                => this._Volume =
+            get => this._Volume;
+            set => this._Volume =
                     ( 0.0f > value ) ? throw new ArgumentOutOfRangeException() :
                     //( 1.0f < value ) ? throw new ArgumentOutOfRangeException() :	--> 上限なし。
                     value;
@@ -29,18 +27,15 @@ namespace FDK
         /// <summary>
         ///		ミキサーのフォーマット。
         /// </summary>
-        public WaveFormat WaveFormat
-            => this._WaveFormat;
+        public WaveFormat WaveFormat { get; } = null;
 
         /// <summary>
         ///		ミキサーはループするので、Position には 非対応。
         /// </summary>
         public long Position
         {
-            get
-                => 0;
-            set
-                => throw new NotSupportedException();
+            get => 0;
+            set => throw new NotSupportedException();
         }
 
         /// <summary>
@@ -51,12 +46,14 @@ namespace FDK
         /// <summary>
         ///		ミキサーは無限にループするので、長さの概念はない。
         /// </summary>
-        public long Length
-            => throw new NotSupportedException();
+        public long Length => throw new NotSupportedException();
+
+
+
+        // 生成と終了
 
 
         /// <summary>
-        ///		コンストラクタ。
         ///		指定したフォーマットを持つミキサーを生成する。
         /// </summary>
         public Mixer( WaveFormat deviceWaveFormat )
@@ -64,7 +61,7 @@ namespace FDK
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 // ミキサーのフォーマットは、デバイスのフォーマットをそのまま使う。
-                this._WaveFormat = deviceWaveFormat.Clone() as WaveFormat;
+                this.WaveFormat = deviceWaveFormat.Clone() as WaveFormat;
             }
         }
 
@@ -77,6 +74,7 @@ namespace FDK
             {
                 //foreach( var sound in this._Sounds )
                 //	sound.Dispose();	--> Dispose()する ＝ Stop()する ＝ this._SoundsからRemoveするということなので、foreachは使えない。
+
                 var sound = (Sound) null;
                 while( null != ( sound = this._Sounds.Last?.Value ) )
                     sound.Dispose();
@@ -84,6 +82,11 @@ namespace FDK
                 this._Sounds.Clear();   // すでに空のはずだが念のため。
             }
         }
+
+
+
+        // サウンド管理
+
 
         /// <summary>
         ///		Sound をミキサーに追加する。
@@ -98,9 +101,7 @@ namespace FDK
             {
                 // すでに登録済み（まだ再生中）なら削除する。
                 if( this._Sounds.Contains( sound ) )
-                {
                     this._Sounds.Remove( sound );   // 再生も止まる。
-                }
 
                 // Soundのフォーマットがミキサーのフォーマットと適合するかをチェック。
                 if( !( this._フォーマットがミキサーと互換性がある( sound.WaveFormat ) ) )
@@ -144,6 +145,11 @@ namespace FDK
             }
         }
 
+
+
+        // サウンドデバイス用
+
+
         /// <summary>
         ///		バッファにサウンドサンプルを出力する。
         /// </summary>
@@ -161,12 +167,17 @@ namespace FDK
             lock( this._スレッド間同期 )
             {
                 // 中間バッファが十分あることを確認する。足りなければ新しく確保して戻ってくる。
+
                 this._中間バッファ = this._中間バッファ.CheckBuffer( 出力サンプル数 ); // サンプル数であり、フレーム数（サンプル数×チャンネル数）ではない。
 
+
                 // まずは無音で埋める。
+
                 Array.Clear( 出力バッファ, 0, 出力サンプル数 );
 
+
                 // その上に、ミキサに登録されているすべての Sound を加算合成する。
+
                 if( 0 < this._Sounds.Count )
                 {
                     var 再生終了したSound一覧 = new List<Sound>();
@@ -174,11 +185,14 @@ namespace FDK
                     foreach( var sound in this._Sounds )
                     {
                         // 中間バッファにサウンドデータを受け取る。
+
                         int 受け取ったサンプル数 = sound.Read( this._中間バッファ, 0, 出力サンプル数 );
+
 
                         if( 0 < 受け取ったサンプル数 )
                         {
                             // 中間バッファから出力バッファへ合成する。
+
                             for( int i = 出力バッファの出力開始位置, n = 0; n < 受け取ったサンプル数; i++, n++ )
                             {
                                 float data = this._中間バッファ[ n ] // 原音
@@ -186,17 +200,21 @@ namespace FDK
                                     * this._Volume;                 // マスタ音量（ミキサ）
 
                                 // 先に無音を出力済みなので、上書きかどうかを気にしないで常に加算。
+
                                 出力バッファ[ i ] += data;
                             }
                         }
                         else
                         {
                             // 再生終了。
+
                             再生終了したSound一覧.Add( sound );
                         }
                     }
 
+                    
                     // 再生が終了したSoundをサウンドリストから削除する。
+
                     foreach( var sound in 再生終了したSound一覧 )
                         sound.Stop();   // この中で自分でRemoveする
 
@@ -207,20 +225,27 @@ namespace FDK
             return 出力サンプル数;
         }
 
+
+
+        // private
+
+
         private readonly LinkedList<Sound> _Sounds = new LinkedList<Sound>();
+
         private float _Volume = 1.0f;
-        private WaveFormat _WaveFormat = null;
+
         private float[] _中間バッファ = null;
+
         private readonly object _スレッド間同期 = new object();
 
         private bool _フォーマットがミキサーと互換性がある( WaveFormat waveFormat )
         {
             // チャンネル数が違うと NG
-            if( waveFormat.Channels != this._WaveFormat.Channels )
+            if( waveFormat.Channels != this.WaveFormat.Channels )
                 return false;
 
             // サンプルレートが違うと NG
-            if( waveFormat.SampleRate != this._WaveFormat.SampleRate )
+            if( waveFormat.SampleRate != this.WaveFormat.SampleRate )
                 return false;
 
             // 以下、ミキサーフォーマットは IEEE Float であると想定。

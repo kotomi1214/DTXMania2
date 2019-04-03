@@ -54,8 +54,8 @@ namespace FDK
                 グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.CopyResource( resource, captureTexture );
             }
 
+            // Texture2D の本体（DXGIサーフェス）から Bitmap を生成する。
             var bitmap = (Bitmap) null;
-
             using( var dxgiSurface = captureTexture.QueryInterface<Surface>() )
             {
                 var dataRect = dxgiSurface.Map( SharpDX.DXGI.MapFlags.Read, out DataStream dataStream );

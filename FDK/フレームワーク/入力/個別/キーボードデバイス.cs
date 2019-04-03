@@ -24,15 +24,15 @@ namespace FDK
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                // 登録したいデバイス（ここでは１個）
+                // 登録したいデバイスの配列（ここでは１個）
                 var devs = new RawInputDevice[] {
-                new RawInputDevice {
-                    usUsagePage = UsagePage.Generic,
-                    usUsage = UsageId.GenericKeyboard,
-                    Flags = DeviceFlags.None,
-                    hwndTarget = IntPtr.Zero,
-                }
-            };
+                    new RawInputDevice {
+                        usUsagePage = UsagePage.Generic,
+                        usUsage = UsageId.GenericKeyboard,
+                        Flags = DeviceFlags.None,
+                        hwndTarget = IntPtr.Zero,
+                    }
+                };
 
                 // デバイスを登録。
                 RegisterRawInputDevices( devs, 1, Marshal.SizeOf<RawInputDevice>() );
@@ -55,7 +55,7 @@ namespace FDK
         /// </remarks>
         public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
         {
-            var rawInput = new RawInput();
+            RawInput rawInput;
             int csSize = Marshal.SizeOf<RawInput>();
 
             // データ取得。

@@ -29,15 +29,11 @@ namespace FDK
         public void Dispose()
         {
             this.TrasitionLibrary?.Dispose();
-            this.TrasitionLibrary = null;
-
             this.Timer?.Dispose();
-            this.Timer = null;
-
             this.Manager?.Dispose();
-            this.Manager = null;
         }
 
+        // 生成スレッドと同じスレッドで呼び出すこと！
         public void 進行する()
         {
             this.Manager.Update( this.Timer.Time );

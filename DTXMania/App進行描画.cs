@@ -78,7 +78,7 @@ namespace DTXMania
 
         protected override void On開始する()
         {
-            // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
+            // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときに行われる。）
 
             App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
             //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
@@ -111,7 +111,6 @@ namespace DTXMania
 
             this.現在のステージ = this.起動ステージ;
             this.現在のステージ.活性化する();
-            ;
         }
 
         // 起動ステージから呼び出される。
@@ -144,6 +143,7 @@ namespace DTXMania
         protected override void On終了する()
         {
             this.現在のステージ = null;
+
 
             // static なメンバの終了。
 
@@ -181,7 +181,7 @@ namespace DTXMania
 
         private void _アプリを終了する()
         {
-            this.AppForm.BeginInvoke( new Action( () => {
+            this.AppForm.BeginInvoke( new Action( () => {   // UIスレッドで実行する
                 this.AppForm.Close();
             } ) );
         }

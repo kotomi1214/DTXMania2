@@ -109,6 +109,7 @@ namespace FDK
                             case "1709": _Win10Version += "(Fall Creators Update)"; break;
                             case "1803": _Win10Version += "(April 2018 Update)"; break;
                             case "1809": _Win10Version += "(October 2018 Update)"; break;
+                            case "1903": _Win10Version += "(April 2019 Update)"; break;
                         }
                     }
                 }

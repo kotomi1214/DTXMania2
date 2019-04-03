@@ -32,10 +32,8 @@ namespace FDK
         /// </remarks>
         public long Position
         {
-            get
-                => this._Position;
-            set
-                => this._Position = Math.Min( Math.Max( value, 0 ), this.Length );
+            get => this._Position;
+            set => this._Position = Math.Min( Math.Max( value, 0 ), this.Length );
         }
 
         public long Length
@@ -49,10 +47,8 @@ namespace FDK
         /// </remarks>
         public float Volume
         {
-            get
-                => this._Volume;
-            set
-                => this._Volume = Math.Max( value, 0 );
+            get => this._Volume;
+            set => this._Volume = Math.Max( value, 0 );
         }
 
         public bool IsLoop { get; set; } = false;
@@ -61,6 +57,10 @@ namespace FDK
         ///     一時停止中なら true
         /// </summary>
         public bool IsPaused { get; set; } = false;
+
+
+
+        // 生成と終了
 
 
         public Sound( サウンドデバイス device, ISampleSource sampleSource )
@@ -86,6 +86,11 @@ namespace FDK
 
             this._DeviceRef = null;
         }
+
+
+
+        // 再生制御
+
 
         public void Play( long 再生開始位置frame = 0, bool ループ再生する = false )
         {
@@ -115,44 +120,6 @@ namespace FDK
 
         public void Play( double 再生開始位置sec, bool ループ再生する = false )
             => this.Play( this.秒ToFrame( 再生開始位置sec ), ループ再生する );
-
-        public int Read( float[] buffer, int offset, int count )
-        {
-            if( null == this._BaseSampleSource )
-                return 0;   // 再生終了
-
-            if( this._BaseSampleSource.Length <= this._Position )
-            {
-                // (A) 最後まで再生済み、または次のストリームデータが届いていない場合
-
-                if( this.IsLoop )
-                {
-                    // (A-a) ループする場合
-                    this._Position = 0;                     // 再生位置を先頭に戻す。
-                    Array.Clear( buffer, offset, count );   // 全部ゼロで埋めて返す。
-                    return count;
-                }
-                else
-                {
-                    // (A-b) ループしない場合
-                    return 0;   // 再生終了。
-                }
-            }
-            else
-            {
-                // (B) 読み込みできるストリームデータがある場合
-                
-                // １つの BaseSampleSource を複数の Sound で共有するために、Position は Sound ごとに管理している。
-                this._BaseSampleSource.Position = this._Position;
-                var readCount = this._BaseSampleSource.Read( buffer, offset, count );   // 読み込み。
-                this._Position = this._BaseSampleSource.Position;
-
-                if( 0 == readCount && this.IsLoop )
-                    this._Position = 0; // 再生をループ。
-
-                return readCount;
-            }
-        }
 
         public void Stop()
         {
@@ -184,12 +151,64 @@ namespace FDK
             }
         }
 
+
+
+        // ミキサー向け
+
+
+        public int Read( float[] buffer, int offset, int count )
+        {
+            // ソースが未設定(null)なら即再生終了
+            if( null == this._BaseSampleSource )
+                return 0;
+
+            if( this._BaseSampleSource.Length <= this._Position )
+            {
+                // (A) 最後まで再生済んだ、または次のストリームデータが届いていない場合
+
+                if( this.IsLoop )
+                {
+                    // (A-a) ループする場合
+
+                    this._Position = 0;                     // 再生位置を先頭に戻す。
+                    Array.Clear( buffer, offset, count );   // 全部ゼロで埋めて返す。
+                    return count;
+                }
+                else
+                {
+                    // (A-b) ループしない場合
+
+                    return 0;   // 再生終了。
+                }
+            }
+            else
+            {
+                // (B) 読み込みできるストリームデータがある場合
+
+                // １つの BaseSampleSource を複数の Sound で共有するために、Position は Sound ごとに管理している。
+                this._BaseSampleSource.Position = this._Position;
+                var readCount = this._BaseSampleSource.Read( buffer, offset, count );   // 読み込み。
+                this._Position = this._BaseSampleSource.Position;
+
+                if( 0 == readCount && this.IsLoop )
+                    this._Position = 0; // 再生をループ。
+
+                return readCount;
+            }
+        }
+
+
+
+        // その他
+
+
         public long 秒ToFrame( double 時間sec )
         {
             if( null == this._BaseSampleSource )
                 return 0;
 
             var wf = this._BaseSampleSource.WaveFormat;
+
             return (long) ( 時間sec * wf.SampleRate + 0.5 ); // +0.5 で四捨五入ができる
         }
 
@@ -199,8 +218,13 @@ namespace FDK
                 return 0;
 
             var wf = this._BaseSampleSource.WaveFormat;
+
             return (double) 時間frame / wf.SampleRate;
         }
+
+
+
+        // private
 
 
         private WeakReference<サウンドデバイス> _DeviceRef = null;

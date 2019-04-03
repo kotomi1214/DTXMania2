@@ -9,7 +9,7 @@ namespace FDK
 {
     /// <summary>
     ///     ビデオフレームの定義。
-    ///     ビデオフレームは、<see cref="IVideoSource.Read"/> で返される。
+    ///     ビデオフレームとは、<see cref="IVideoSource.Read"/> で返されるオブジェクトのこと。
     /// </summary>
     public class VideoFrame : IDisposable
     {
