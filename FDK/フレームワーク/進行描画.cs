@@ -33,8 +33,8 @@ namespace FDK
         {
             this.AppForm = form;
 
-            this._タスク = Task.Run( () => {
-                this._タスクエントリ( 物理画面サイズ, 設計画面サイズ, hWindow );
+            this._タスク = Task.Run( () => {   // 進行描画タスクを生成。
+                this._タスクエントリ( 物理画面サイズ, 設計画面サイズ, hWindow ); // このメソッドがから戻ると、進行描画タスクは終了。
             } );
         }
 

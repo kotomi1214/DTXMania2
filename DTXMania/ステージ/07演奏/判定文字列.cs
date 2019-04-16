@@ -132,6 +132,10 @@ namespace DTXMania.演奏
                                 // 開始
                                 status.光のストーリーボード.Schedule( animation.Timer.Time );
                             }
+                            else
+                            {
+                                status.光のストーリーボード = null;
+                            }
                             //----------------
                             #endregion
 

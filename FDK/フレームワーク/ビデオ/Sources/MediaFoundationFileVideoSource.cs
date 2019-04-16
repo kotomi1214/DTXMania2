@@ -71,14 +71,14 @@ namespace FDK
             #region " デコーダを選択し、完全メディアタイプを取得する。"
             //----------------
             // 部分メディアタイプを設定する。
-            using( var videoMediaType = new MediaType() )
+            using( var 部分MediaType = new MediaType() )
             {
                 // フォーマットは ARGB32 で固定とする。（SourceReaderEx を使わない場合、H264 では ARGB32 が選べないので注意。）
-                videoMediaType.Set( MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video );
-                videoMediaType.Set( MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Argb32 );
+                部分MediaType.Set( MediaTypeAttributeKeys.MajorType, MediaTypeGuids.Video );
+                部分MediaType.Set( MediaTypeAttributeKeys.Subtype, VideoFormatGuids.Argb32 );
 
                 // 部分メディアタイプを SourceReaderEx にセットする。SourceReaderEx は、必要なデコーダをロードするだろう。
-                this._SourceReaderEx.SetCurrentMediaType( SourceReaderIndex.FirstVideoStream, videoMediaType );
+                this._SourceReaderEx.SetCurrentMediaType( SourceReaderIndex.FirstVideoStream, 部分MediaType );
             }
 
             // 完成されたメディアタイプを取得する。
@@ -86,9 +86,9 @@ namespace FDK
             //----------------
             #endregion
 
-            #region " ビデオのフレームサイズを取得する。"
+            #region " ビデオのフレームサイズを取得する。（動画の途中でのサイズ変更は考慮しない。）"
             //----------------
-            long packedFrameSize = this._MediaType.Get( MediaTypeAttributeKeys.FrameSize ); // 動画の途中でのサイズ変更には対応しない。
+            long packedFrameSize = this._MediaType.Get( MediaTypeAttributeKeys.FrameSize );
             this.フレームサイズ = new Size2F( ( packedFrameSize >> 32 ) & 0xFFFFFFFF, ( packedFrameSize ) & 0xFFFFFFFF );
             //----------------
             #endregion
@@ -125,12 +125,12 @@ namespace FDK
             this._一時停止解除通知 = new ManualResetEventSlim( true );
 
             // (1) デコードタスク起動、デコード開始。
-            this._デコードタスク = Task.Factory.StartNew(  // Task.Factory.StartNew は常に MTAThreaas
+            this._デコードタスク = Task.Factory.StartNew(  // Task.Factory.StartNew は常に MTAThread
                 this._デコードタスクエントリ, 
                 (再生開始時刻sec, this.再生速度), 
                 this._デコードキャンセル.Token );
 
-            // (2) デコードから完了通知がくるまでブロック。
+            // (2) デコードから起動完了通知がくるまでブロック。
             this._デコード起動完了通知.Wait();
         }
 
@@ -306,7 +306,7 @@ namespace FDK
                 {
                     #region " 再生開始時刻までシーク(2)。"
                     //----------------
-                    var frame = this._FrameQueue.Peek();    // 今格納されたフレームを覗く
+                    var frame = this._FrameQueue.Peek();    // 今格納されたフレームを参照
 
                     if( frame.表示時刻100ns >= 再生開始時刻100ns )
                     {
@@ -321,7 +321,6 @@ namespace FDK
                         // 取り出して、すぐに破棄。
                         frame = this._FrameQueue.Take();
                         frame.Dispose();
-                        frame = null;
                     }
                     //----------------
                     #endregion

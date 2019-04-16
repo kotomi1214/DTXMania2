@@ -138,6 +138,7 @@ namespace FDK
         }
 
 
+
         // Raw Input
 
 
@@ -174,8 +175,8 @@ namespace FDK
         // フォームサイズの変更
 
         // 以下の２通りがある。
-        // ・ResizeEnd のタイミングで、サイズの変更を行う。（ユーザのドラッグによるサイズ変更）
-        // ・ResizeBegin～ResizeEnd の範囲外で発生した Resize でもサイズの変更を行う。（最大化、最小化など）
+        // ・ユーザのドラッグによるサイズ変更。→ ResizeEnd のタイミングで、サイズの変更を行う。
+        // ・最大化、最小化など。→ ResizeBegin～ResizeEnd の範囲外で発生した Resize でもサイズの変更を行う。
 
 
         protected override void OnResizeBegin( EventArgs e )
@@ -221,13 +222,14 @@ namespace FDK
         private bool _リサイズ中 = false;
 
 
+
         // 画面モードの変更
 
 
         public 画面モード 画面モード
         {
             get => this._画面モード;
-            set => this.BeginInvoke( new Action( () => this._画面モードを変更する( value ) ) );
+            set => this.BeginInvoke( new Action( () => this._画面モードを変更する( value ) ) );   // UIスレッドで実行
         }
 
         private void _画面モードを変更する( 画面モード 新モード )

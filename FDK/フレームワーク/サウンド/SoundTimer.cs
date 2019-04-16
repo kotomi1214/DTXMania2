@@ -8,6 +8,7 @@ namespace FDK
 {
     public class SoundTimer : IDisposable
     {
+
         /// <summary>
         ///		コンストラクタまたはリセットの時点からの相対経過時間[sec]。
         /// </summary>
@@ -33,6 +34,11 @@ namespace FDK
             }
         }
 
+
+
+        // 生成と終了
+
+
         public SoundTimer( サウンドデバイス device )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -41,6 +47,7 @@ namespace FDK
                 this.リセットする();
             }
         }
+
         public void Dispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -51,6 +58,12 @@ namespace FDK
                 }
             }
         }
+
+
+
+        // 操作
+
+
         public void リセットする( double 新しい現在時刻sec = 0.0 )
         {
             lock( this._スレッド間同期 )
@@ -63,6 +76,7 @@ namespace FDK
                 }
             }
         }
+
         public void 一時停止する()
         {
             lock( this._スレッド間同期 )
@@ -76,6 +90,7 @@ namespace FDK
                 }
             }
         }
+
         public void 再開する()
         {
             lock( this._スレッド間同期 )
@@ -87,10 +102,19 @@ namespace FDK
             }
         }
 
+
+
+        // private
+
+
         private WeakReference<サウンドデバイス> _DeviceRef = null;
+
         private int _停止回数 = 0;
+
         private double _開始位置sec = 0.0;
+
         private double _停止位置sec = 0.0;
+
         private readonly object _スレッド間同期 = new object();
     }
 }

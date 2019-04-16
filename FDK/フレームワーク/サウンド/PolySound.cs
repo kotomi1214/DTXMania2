@@ -29,6 +29,13 @@ namespace FDK
             }
         }
 
+        public bool いずれかが再生中である
+            => this.サウンドリスト.Any( ( sound ) => sound.再生中である );
+
+
+
+        // 生成と終了
+
 
         public PolySound( サウンドデバイス device, ISampleSource sampleSource, int 多重度 = 4 )
         {
@@ -49,6 +56,11 @@ namespace FDK
             this.サウンドリスト = null;
         }
 
+
+
+        // 再生制御
+
+
         public void Play( long 再生開始位置frame = 0, bool ループ再生する = false )
         {
             // サウンドを再生する。
@@ -68,14 +80,14 @@ namespace FDK
                 sound.Stop();
         }
 
-        public bool いずれかが再生中である
-            => this.サウンドリスト.Any( ( sound ) => sound.再生中である );
+
+
+        // protected, private
 
 
         protected int 多重度;
 
         protected Sound[] サウンドリスト = null;
-
 
         private int _次に再生するサウンドのインデックス = 0;
 

@@ -252,17 +252,18 @@ namespace FDK
                     // なお、デバッグを有効にしてアプリケーションを実行すると、速度が大幅に低下する。
                     SharpDX.Direct3D11.DeviceCreationFlags.Debug |
 #endif
-                SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
+                    SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
                     new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_1 } ) )
                 {
-                    // D3D11デバイス1 を取得する。
+                    // ID3D11Device1 を取得する。
                     this.D3D11Device1 = d3dDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
                 }
 
-                // ID3D11Device から ID3D11VideoDevice が取得できることを確認する。
+                // D3D11デバイスから ID3D11VideoDevice が取得できることを確認する。
+                // （DXVAを使った動画の再生で必須。Windows8 以降のPCで実装されている。）
                 using( var videoDevice = this.D3D11Device1.QueryInterfaceOrNull<SharpDX.Direct3D11.VideoDevice>() )
                 {
-                    if( null == videoDevice )   // Windows8 以降のPCで実装されている
+                    if( null == videoDevice )
                         throw new Exception( "Direct3D11デバイスが、ID3D11VideoDevice をサポートしていません。" );
                 }
 
@@ -274,13 +275,13 @@ namespace FDK
 
                     // 既定のDXGI出力を取得する。
                     using( var dxgiAdapter = dxgiDevice1.Adapter )
-                        this.DXGIOutput1 = dxgiAdapter.Outputs[ 0 ].QueryInterface<SharpDX.DXGI.Output1>();
+                        this.DXGIOutput1 = dxgiAdapter.Outputs[ 0 ].QueryInterface<SharpDX.DXGI.Output1>(); // 「現在のDXGI出力」を取得することはできないので[0]で固定。
 
                     // DXGIデバイスマネージャを生成し、D3Dデバイスを登録する。MediaFoundationで必須。
                     this.MFDXGIDeviceManager = new SharpDX.MediaFoundation.DXGIDeviceManager();
                     this.MFDXGIDeviceManager.ResetDevice( this.D3D11Device1 );
 
-                    // マルチスレッドモードを ON に設定する。Direct3D11 であっても、MediaFoundation でDXVAを使う場合は必須。
+                    // マルチスレッドモードを ON に設定する。基本的に Direct3D11 では設定不要だが、MediaFoundation でDXVAを使う場合は必須。
                     using( var multithread = this.D3D11Device1.QueryInterfaceOrNull<SharpDX.Direct3D.DeviceMultithread>() )
                     {
                         if( null == multithread )
@@ -289,7 +290,7 @@ namespace FDK
                         multithread.SetMultithreadProtected( true );
                     }
 
-                    // ID2D1Factory を生成する。
+                    // D2Dファクトリを作成する。
                     this.D2D1Factory1 = new SharpDX.Direct2D1.Factory1(
 
                         SharpDX.Direct2D1.FactoryType.MultiThreaded,
@@ -362,8 +363,8 @@ namespace FDK
                     BufferCount = 2,
                     Width = (int) this.物理画面サイズ.Width,
                     Height = (int) this.物理画面サイズ.Height,
-                    Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,    // D2D をサポートするなら B8G8R8A8 を使う必要がある。
-                    AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される（意味ない）
+                    Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,    // D2D をサポートするなら B8G8R8A8 を指定する必要がある。
+                    AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される。（意味ない）
                     Stereo = false,
                     SampleDescription = new SharpDX.DXGI.SampleDescription( 1, 0 ), // マルチサンプリングは使わない。
                     SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
@@ -491,8 +492,8 @@ namespace FDK
                         Y = 0.0f,                                                   //
                         Width = (float) backbufferTexture2D.Description.Width,      //
                         Height = (float) backbufferTexture2D.Description.Height,    //
-                        MinDepth = 0.0f,                                            // 近面Z: 0.0
-                        MaxDepth = 1.0f,                                            // 遠面Z: 1.0
+                        MinDepth = 0.0f,                                            // 近面Z: 0.0（最も近い）
+                        MaxDepth = 1.0f,                                            // 遠面Z: 1.0（最も遠い）
                     },
                 };
                     //----------------

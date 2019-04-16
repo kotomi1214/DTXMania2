@@ -169,10 +169,11 @@ namespace FDK
             if( null == this._VideoSource )
                 return;
 
-            VideoFrame 次のフレーム = null;
+            VideoFrame 次のフレーム;
 
             while( true )
             {
+                // 次のフレームを取得：
                 // デコードが間に合ってない場合にはブロックする。
                 // ブロックされたくない場合は、事前に Peek() でチェックしておくこと。
                 次のフレーム = this._VideoSource.Read();

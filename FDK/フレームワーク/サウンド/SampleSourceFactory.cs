@@ -8,12 +8,12 @@ using CSCore;
 namespace FDK
 {
     /// <summary>
-    ///     <see cref="ISampleSource"/> の生成を行う。
+    ///     <see cref="ISampleSource"/> オブジェクトの生成を行う。
     /// </summary>
     public static class SampleSourceFactory
     {
         /// <summary>
-        ///		指定されたファイルの音声をデコードし、<see cref="ISampleSource"/> を返す。
+        ///		指定されたファイルの音声をデコードし、<see cref="ISampleSource"/> オブジェクトを返す。
         ///		失敗すれば null 。
         /// </summary>
         public static ISampleSource Create( サウンドデバイス device, VariablePath ファイルパス, double 再生速度 = 1.0 )

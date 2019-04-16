@@ -13,19 +13,14 @@ namespace FDK
 {
     public class サウンドデバイス : IDisposable
     {
-        public PlaybackState レンダリング状態
-            => this._レンダリング状態;
+        public PlaybackState レンダリング状態 => this._レンダリング状態;
 
-        public double 再生遅延sec
-        {
-            get;
-            protected set;
-        }
+        public double 再生遅延sec { get; protected set; }
 
         /// <summary>
         ///		デバイスのレンダリングフォーマット。
         /// </summary>
-        public WaveFormat WaveFormat { get; } = null;
+        public WaveFormat WaveFormat { get; }
 
         /// <summary>
         ///		レンダリングボリューム。
@@ -104,7 +99,7 @@ namespace FDK
                     {
                         if( e.ErrorCode == FDKUtilities.AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED )
                         {
-                            // 排他モードかつイベント駆動 の場合、この例外が返されることがある。
+                            // 排他モードかつイベント駆動 の場合、このエラーコードが返されることがある。
                             // この場合、バッファサイズを調整して再度初期化する。
 
                             int サイズframe = this._AudioClient.GetBufferSize();   // アライメント済みサイズが取得できる。
@@ -139,7 +134,7 @@ namespace FDK
 
                     Log.Info( $"サウンドデバイスを生成しました。" );
 
-                    #region " ミキサーを生成する。 "
+                    #region " ミキサーを生成する。"
                     //----------------
                     this.Mixer = new Mixer( this.WaveFormat );
                     //----------------
@@ -329,7 +324,7 @@ namespace FDK
 
                 while( true )
                 {
-                    // イベントs[] のいずれかのイベントが発火する（かタイムアウトする）まで待つ。
+                    // イベントs[] のいずれかのイベントが発火する（またはタイムアウトする）まで待つ。
 
                     if( WaitHandle.WaitAny(
                         waitHandles: イベントs,
@@ -532,7 +527,7 @@ namespace FDK
 
             // position ...... 現在のデバイス位置（デバイスからの報告）
             // frequency ..... 現在のデバイス周波数（デバイスからの報告）
-            // qpcPosition ... デバイス位置を取得した時刻[100ns単位] → パフォーマンスカウンタの生値ではないので注意。
+            // qpcPosition ... デバイス位置を取得した時刻 [100ns単位; パフォーマンスカウンタの生値ではないので注意]
 
             // デバイス位置÷デバイス周波数 で、秒単位に換算できる。
             double デバイス位置sec = (double) position / frequency;
