@@ -222,40 +222,42 @@ namespace FDK
                 }
 
                 // 次のサンプルをひとつデコードする。
-                var サンプル = this._SourceReaderEx.ReadSample(
+                using( var サンプル = this._SourceReaderEx.ReadSample(
                     SharpDX.MediaFoundation.SourceReaderIndex.FirstAudioStream,
                     SharpDX.MediaFoundation.SourceReaderControlFlags.None,
                     out _,
                     out var ストリームフラグ,
-                    out long サンプルの表示時刻100ns );
-
-                // デコード結果を確認する。
-                if( ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Endofstream ) )
+                    out long サンプルの表示時刻100ns ) )
                 {
-                    Log.Info( $"ストリームが終了しました。[{this.Name}]" );
-                    break;
-                }
-                if( ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Error ) ||
-                    ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.AllEffectsremoved ) ||
-                    ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Currentmediatypechanged ) ||
-                    ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Nativemediatypechanged ) ||
-                    ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Newstream ) ||
-                    ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.StreamTick ) )
-                {
-                    Log.ERROR( $"デコード中にエラーが発生、または未対応の状態変化が発生しました。[{this.Name}]" );
-                    break;
-                }
 
-                // サンプルをロックし、オーディオデータへのポインタを取得して、オーディオデータをメモリストリームに書き込む。
-                using( var mediaBuffer = サンプル.ConvertToContiguousBuffer() )
-                {
-                    var audioData = mediaBuffer.Lock( out _, out int cbCurrentLength );
-                    byte[] dstData = new byte[ cbCurrentLength ];
-                    Marshal.Copy( audioData, dstData, 0, cbCurrentLength );
+                    // デコード結果を確認する。
+                    if( ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Endofstream ) )
+                    {
+                        Log.Info( $"ストリームが終了しました。[{this.Name}]" );
+                        break;
+                    }
+                    if( ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Error ) ||
+                        ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.AllEffectsremoved ) ||
+                        ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Currentmediatypechanged ) ||
+                        ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Nativemediatypechanged ) ||
+                        ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.Newstream ) ||
+                        ストリームフラグ.HasFlag( SharpDX.MediaFoundation.SourceReaderFlags.StreamTick ) )
+                    {
+                        Log.ERROR( $"デコード中にエラーが発生、または未対応の状態変化が発生しました。[{this.Name}]" );
+                        break;
+                    }
 
-                    this._DecodedWaveDataQueue.Write( dstData, 0, cbCurrentLength );
+                    // サンプルをロックし、オーディオデータへのポインタを取得して、オーディオデータをメモリストリームに書き込む。
+                    using( var mediaBuffer = サンプル.ConvertToContiguousBuffer() )
+                    {
+                        var audioData = mediaBuffer.Lock( out _, out int cbCurrentLength );
+                        byte[] dstData = new byte[ cbCurrentLength ];
+                        Marshal.Copy( audioData, dstData, 0, cbCurrentLength );
 
-                    mediaBuffer.Unlock();
+                        this._DecodedWaveDataQueue.Write( dstData, 0, cbCurrentLength );
+
+                        mediaBuffer.Unlock();
+                    }
                 }
             }
 
