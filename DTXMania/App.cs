@@ -39,7 +39,7 @@ namespace DTXMania
         {
             InitializeComponent();
 
-            this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( App.ビュアーモードである ? " [Viewer Mode]" : "" );
+            this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
 
             App進行描画.システム設定 = システム設定.読み込む();
 
