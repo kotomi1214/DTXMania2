@@ -74,6 +74,7 @@ namespace DTXMania.演奏
                     return;
 
                 this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
+                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
                 this._レーンフレームBASIC = new BASIC.レーンフレーム();
                 this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
                 this._曲名パネル = new 曲名パネル();
@@ -111,7 +112,6 @@ namespace DTXMania.演奏
                 this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
                 this._拍線色 = new SolidColorBrush( dc, Color.Gray );
                 this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
-                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
                 this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
                 this._演奏状態を初期化する();

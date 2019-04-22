@@ -1,4 +1,4 @@
-﻿# レーン配置TypeC: LC HH LP SD HT BD LT FT RC
+﻿# レーン配置TypeC: LC HH LP SD BD HT LT FT RC
 # レーンフレーム全領域の左端からみた、表示レーンの左端の相対X位置。
 左端位置:
     # 各 Name は 表示レーン種別 列挙子の名前であること。
