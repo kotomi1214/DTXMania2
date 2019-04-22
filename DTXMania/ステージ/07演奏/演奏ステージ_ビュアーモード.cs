@@ -203,6 +203,9 @@ namespace DTXMania.演奏
             foreach( var chip in App進行描画.演奏スコア.チップリスト )
                 this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
 
+            this._スコア指定の背景画像 = ( App進行描画.演奏スコア.背景画像ファイル名.Nullまたは空である() ) ? null :
+                new 画像( Path.Combine( App進行描画.演奏スコア.PATH_WAV, App進行描画.演奏スコア.背景画像ファイル名 ) );
+
 
             // WAVを生成する。
 
@@ -517,6 +520,12 @@ namespace DTXMania.演奏
 
                         this._譜面スクロール速度.進行する( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
 
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
+                        {
+                            this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
+                                X方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                                Y方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                        }
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
                         {
                             #region " AVI（動画）の進行描画を行う。"
@@ -701,6 +710,8 @@ namespace DTXMania.演奏
 
 
         private 画像 _背景画像 = null;
+
+        private 画像 _スコア指定の背景画像 = null;
 
         private 曲名パネル _曲名パネル = null;
 

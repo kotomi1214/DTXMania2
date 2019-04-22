@@ -9,15 +9,15 @@ using FDK;
 namespace DTXMania
 {
     using User02 = データベース.ユーザ.old.User02;
-    using User = User09;        // 最新バージョンを指定（１／２）
-    using Record = Record06;    //
+    using User = User10;        // 最新バージョンを指定（１／３）
+    using Record = Record06;    // 最新バージョンを指定（２／３）
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 9;  // 最新バージョンを指定（２／２）
+        public const long VERSION = 10;  // 最新バージョンを指定（３／３）
 
         public static readonly VariablePath ユーザDBファイルパス = @"$(AppData)UserDB.sqlite3";
 
@@ -321,6 +321,37 @@ namespace DTXMania
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN PlaySpeed READ NOT NULL DEFAULT 1.0" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowPartLine INTEGER NOT NULL DEFAULT 1" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowPartNumber INTEGER NOT NULL DEFAULT 1" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            this.DataContext.ExecuteCommand( "VACUUM" );    // Vacuum はトランザクションの外で。
+                            this.DataContext.SubmitChanges();
+                            Log.Info( $"Users テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 9:
+                    #region " 9 → 10 "
+                    //----------------
+                    // 変更点:
+                    // ・Users テーブルに ShorScoreWall を追加。
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // データベースにカラムを追加する。
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowScoreWall INTEGER NOT NULL DEFAULT 1" );
                             this.DataContext.SubmitChanges();
 
                             // 成功。

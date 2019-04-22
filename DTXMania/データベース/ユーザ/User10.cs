@@ -11,7 +11,7 @@ namespace DTXMania
     ///		ユーザテーブルのエンティティクラス。
     /// </summary>
     [Table( Name = "Users" )]   // テーブル名は複数形
-    class User09 : ICloneable
+    class User10 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別する文字列。主キー。
@@ -216,13 +216,20 @@ namespace DTXMania
         [Column( DbType = "INT", CanBeNull = false )]
         public int ShowPartNumber { get; set; }
 
+        /// <summary>
+        ///		スコア指定の背景画像の表示
+        ///		0: OFF, その他: ON
+        /// </summary>
+        [Column( DbType = "INT", CanBeNull = false )]
+        public int ShowScoreWall { get; set; }
+
 
         ///////////////////////////
 
         /// <summary>
         ///		既定値で初期化。
         /// </summary>
-        public User09()
+        public User10()
         {
             this.Id = "Anonymous";
             this.Name = "Anonymous";
@@ -256,9 +263,9 @@ namespace DTXMania
         }
 
         // ICloneable 実装
-        public User09 Clone()
+        public User10 Clone()
         {
-            return (User09) this.MemberwiseClone();
+            return (User10) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
@@ -304,6 +311,7 @@ namespace DTXMania
             @", PlaySpeed REAL NOT NULL" +
             @", ShowPartLine INTEGER NOT NULL" +
             @", ShowPartNumber INTEGER NOT NULL" +
+            @", ShowScoreWall INTEGER NOT NULL" +
             @")";
     }
 }

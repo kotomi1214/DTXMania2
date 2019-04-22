@@ -650,6 +650,10 @@ namespace SSTFormat.v4
                     現在の.BGMWAVリスト.Add( WAV番号 );
                 }
             }
+            internal static void _コマンド_BACKGROUND()
+            {
+                現在の.スコア.背景画像ファイル名 = 現在の.パラメータ;
+            }
             internal static void _コマンド_オブジェクト記述()
             {
                 #region " 小節番号とチャンネル番号を取得する。"
@@ -977,26 +981,28 @@ namespace SSTFormat.v4
             private static readonly Dictionary<string, (bool ヘッダである, Action 解析アクション)> _コマンドtoアクションマップ = new Dictionary<string, (bool, Action)> {
                 #region " *** "
                 //----------------
-                // コマンド名,    ヘッダである,  解析アクション
-                [ "title" ] =    ( true,   _コマンド_TITLE ),
-                [ "artist" ] =   ( true,   _コマンド_ARTIST ),
-                [ "comment" ] =  ( true,   _コマンド_COMMENT ),
-                [ "path_wav" ] = ( true,   _コマンド_PATH_WAV ),
-                [ "wav" ] =      ( false,  _コマンド_WAVzz ),
-                [ "panel" ] =    ( false,  _コマンド_PANEL ),
-                [ "pan" ] =      ( false,  _コマンド_PANzz_WAVPANzz ),
-                [ "wavpan" ] =   ( false,  _コマンド_PANzz_WAVPANzz ),
-                [ "volume" ] =   ( false,  _コマンド_VOLUMEzz_WAVVOLzz ),
-                [ "wavvol" ] =   ( false,  _コマンド_VOLUMEzz_WAVVOLzz ),
-                [ "basebpm" ] =  ( true,   _コマンド_BASEBPM ),
-                [ "bpm" ] =      ( true,   _コマンド_BPM_BPMzz ),
-                [ "dlevel" ] =   ( true,   _コマンド_DLEVEL_PLAYLEVEL ),
-                [ "playlevel" ] =( true,   _コマンド_DLEVEL_PLAYLEVEL ),
-                [ "preview" ] =  ( true,   _コマンド_PREVIEW ),
-                [ "preimage" ] = ( true,   _コマンド_PREIMAGE ),
-                [ "premovie" ] = ( true,   _コマンド_PREMOVIE ),
-                [ "avi" ] =      ( true,   _コマンド_AVIzz ),
-                [ "bgmwav" ] =   ( true,   _コマンド_BGMWAV ),
+                // コマンド名,  ヘッダである,  解析アクション
+                [ "title" ] =      ( true,   _コマンド_TITLE ),
+                [ "artist" ] =     ( true,   _コマンド_ARTIST ),
+                [ "comment" ] =    ( true,   _コマンド_COMMENT ),
+                [ "path_wav" ] =   ( true,   _コマンド_PATH_WAV ),
+                [ "wav" ] =        ( false,  _コマンド_WAVzz ),
+                [ "panel" ] =      ( false,  _コマンド_PANEL ),
+                [ "pan" ] =        ( false,  _コマンド_PANzz_WAVPANzz ),
+                [ "wavpan" ] =     ( false,  _コマンド_PANzz_WAVPANzz ),
+                [ "volume" ] =     ( false,  _コマンド_VOLUMEzz_WAVVOLzz ),
+                [ "wavvol" ] =     ( false,  _コマンド_VOLUMEzz_WAVVOLzz ),
+                [ "basebpm" ] =    ( true,   _コマンド_BASEBPM ),
+                [ "bpm" ] =        ( true,   _コマンド_BPM_BPMzz ),
+                [ "dlevel" ] =     ( true,   _コマンド_DLEVEL_PLAYLEVEL ),
+                [ "playlevel" ] =  ( true,   _コマンド_DLEVEL_PLAYLEVEL ),
+                [ "preview" ] =    ( true,   _コマンド_PREVIEW ),
+                [ "preimage" ] =   ( true,   _コマンド_PREIMAGE ),
+                [ "premovie" ] =   ( true,   _コマンド_PREMOVIE ),
+                [ "avi" ] =        ( true,   _コマンド_AVIzz ),
+                [ "bgmwav" ] =     ( true,   _コマンド_BGMWAV ),
+                [ "background" ] = ( true,   _コマンド_BACKGROUND ),
+                [ "wall" ]       = ( true,   _コマンド_BACKGROUND ),
                 //----------------
                 #endregion
             };
