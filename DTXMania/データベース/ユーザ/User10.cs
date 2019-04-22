@@ -223,6 +223,13 @@ namespace DTXMania
         [Column( DbType = "INT", CanBeNull = false )]
         public int ShowScoreWall { get; set; }
 
+        /// <summary>
+        ///		演奏中の背景動画の表示サイズ
+        ///		0: 全画面, 1: 中央寄せ
+        /// </summary>
+        [Column( DbType = "INT", CanBeNull = false )]
+        public int BackgroundMovieSize { get; set; }
+
 
         ///////////////////////////
 
@@ -312,6 +319,7 @@ namespace DTXMania
             @", ShowPartLine INTEGER NOT NULL" +
             @", ShowPartNumber INTEGER NOT NULL" +
             @", ShowScoreWall INTEGER NOT NULL" +
+            @", BackgroundMovieType INTEGER NOT NULL" +
             @")";
     }
 }

@@ -329,6 +329,7 @@
     <Compile Include="設定\種別\入力グループプリセット種別.cs" />
     <Compile Include="設定\種別\入力グループ種別.cs" />
     <Compile Include="設定\種別\判定種別.cs" />
+    <Compile Include="設定\種別\動画の表示サイズ.cs" />
     <Compile Include="設定\種別\消音グループ種別.cs" />
     <Compile Include="設定\種別\表示チップ種別.cs" />
     <Compile Include="設定\種別\表示レーンの左右.cs" />

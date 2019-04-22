@@ -344,7 +344,7 @@ namespace DTXMania
                     #region " 9 → 10 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに ShorScoreWall を追加。
+                    // ・Users テーブルに ShorScoreWall, BackgroundMovieSize を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -352,6 +352,7 @@ namespace DTXMania
                         {
                             // データベースにカラムを追加する。
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowScoreWall INTEGER NOT NULL DEFAULT 1" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN BackgroundMovieSize INTEGER NOT NULL DEFAULT 1" );
                             this.DataContext.SubmitChanges();
 
                             // 成功。

@@ -136,6 +136,12 @@ namespace DTXMania
             set => this._User.ShowScoreWall = value ? 1 : 0;
         }
 
+        public 動画の表示サイズ 動画の表示サイズ
+        {
+            get => (動画の表示サイズ)this._User.BackgroundMovieSize;
+            set => this._User.BackgroundMovieSize = (int)value;
+        }
+
 
 
         // 生成と終了

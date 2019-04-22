@@ -805,29 +805,36 @@ namespace DTXMania.演奏
 
                                 if( video.再生中 )
                                 {
-                                    // (A) 75%縮小表示
+                                    switch( App進行描画.ユーザ管理.ログオン中のユーザ.動画の表示サイズ )
                                     {
-                                        float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                        float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                        case 動画の表示サイズ.全画面:
+                                            {
+                                                // 100%全体表示
+                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
+                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
+                                            }
+                                            break;
 
-                                        // (1) 画面いっぱいに描画。
-                                        video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                        case 動画の表示サイズ.中央寄せ:
+                                            {
+                                                // 75%縮小表示
+                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
+                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
 
-                                        float 拡大縮小率 = 0.75f;
-                                        float 上移動 = 100.0f;
+                                                // (1) 画面いっぱいに描画。
+                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
 
-                                        // (2) ちょっと縮小して描画。
-                                        video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
-                                            w * ( 1f - 拡大縮小率 ) / 2f,
-                                            h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
-                                            w * 拡大縮小率,
-                                            h * 拡大縮小率 ) );
-                                    }
-                                    // (B) 100%全体表示のみ --> 今は未対応
-                                    {
-                                        //float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                        //float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
-                                        //video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                                // (2) ちょっと縮小して描画。
+                                                float 拡大縮小率 = 0.75f;
+                                                float 上移動 = 100.0f;
+                                                video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
+                                                    w * ( 1f - 拡大縮小率 ) / 2f,
+                                                    h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
+                                                    w * 拡大縮小率,
+                                                    h * 拡大縮小率 ) );
+                                            }
+                                            break;
                                     }
                                 }
                             }
