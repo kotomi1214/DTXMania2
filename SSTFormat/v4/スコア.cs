@@ -100,6 +100,11 @@ namespace SSTFormat.v4
         public string BGMファイル名 { get; set; }
 
         /// <summary>
+        ///     この曲の背景画像として描画する画像ファイルの、<see cref="譜面ファイルのあるフォルダ"/> からの相対パス。
+        /// </summary>
+        public string 背景画像ファイル名 { get; set; }
+
+        /// <summary>
         ///		譜面ファイルの絶対パス。
         /// </summary>
         public string 譜面ファイルの絶対パス { get; set; } = null;
@@ -279,6 +284,8 @@ namespace SSTFormat.v4
             this.プレビュー動画ファイル名 = null;
 
             this.BGVファイル名 = null;
+            this.BGMファイル名 = null;
+            this.背景画像ファイル名 = null;
             this.譜面ファイルの絶対パス = null;
             this._PATH_WAV = "";
 

@@ -74,6 +74,7 @@ namespace DTXMania.演奏
                     return;
 
                 this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
+                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
                 this._レーンフレームBASIC = new BASIC.レーンフレーム();
                 this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
                 this._曲名パネル = new 曲名パネル();
@@ -111,7 +112,6 @@ namespace DTXMania.演奏
                 this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
                 this._拍線色 = new SolidColorBrush( dc, Color.Gray );
                 this._プレイヤー名表示.名前 = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名;
-                BASIC.レーンフレーム.レーン配置を設定する( App進行描画.ユーザ管理.ログオン中のユーザ.レーン配置 );
                 this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
                 this._演奏状態を初期化する();
@@ -201,6 +201,9 @@ namespace DTXMania.演奏
             this._チップの演奏状態 = new Dictionary<チップ, チップの演奏状態>();
             foreach( var chip in App進行描画.演奏スコア.チップリスト )
                 this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
+
+            this._スコア指定の背景画像 = (App進行描画.演奏スコア.背景画像ファイル名.Nullまたは空である() ) ? null : 
+                new 画像( Path.Combine( App進行描画.演奏スコア.PATH_WAV, App進行描画.演奏スコア.背景画像ファイル名 ) );
 
 
             // WAVを生成する。
@@ -728,6 +731,13 @@ namespace DTXMania.演奏
                 case フェーズ.フェードイン:
                 case フェーズ.キャンセル完了:
                     {
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
+                        {
+                            this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
+                                X方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                                Y方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                        }
+
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
@@ -778,6 +788,12 @@ namespace DTXMania.演奏
 
                         this._譜面スクロール速度.進行する( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
 
+                        if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
+                        {
+                            this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
+                                X方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                                Y方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                        }
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
                         {
                             #region " AVI（動画）の進行描画を行う。"
@@ -789,29 +805,36 @@ namespace DTXMania.演奏
 
                                 if( video.再生中 )
                                 {
-                                    // (A) 75%縮小表示
+                                    switch( App進行描画.ユーザ管理.ログオン中のユーザ.動画の表示サイズ )
                                     {
-                                        float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                        float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                        case 動画の表示サイズ.全画面:
+                                            {
+                                                // 100%全体表示
+                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
+                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
+                                            }
+                                            break;
 
-                                        // (1) 画面いっぱいに描画。
-                                        video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                        case 動画の表示サイズ.中央寄せ:
+                                            {
+                                                // 75%縮小表示
+                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
+                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
 
-                                        float 拡大縮小率 = 0.75f;
-                                        float 上移動 = 100.0f;
+                                                // (1) 画面いっぱいに描画。
+                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
 
-                                        // (2) ちょっと縮小して描画。
-                                        video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
-                                            w * ( 1f - 拡大縮小率 ) / 2f,
-                                            h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
-                                            w * 拡大縮小率,
-                                            h * 拡大縮小率 ) );
-                                    }
-                                    // (B) 100%全体表示のみ --> 今は未対応
-                                    {
-                                        //float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                        //float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
-                                        //video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                                // (2) ちょっと縮小して描画。
+                                                float 拡大縮小率 = 0.75f;
+                                                float 上移動 = 100.0f;
+                                                video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
+                                                    w * ( 1f - 拡大縮小率 ) / 2f,
+                                                    h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
+                                                    w * 拡大縮小率,
+                                                    h * 拡大縮小率 ) );
+                                            }
+                                            break;
                                     }
                                 }
                             }
@@ -934,6 +957,8 @@ namespace DTXMania.演奏
 
 
         private 画像 _背景画像 = null;
+
+        private 画像 _スコア指定の背景画像 = null;
 
         private 曲名パネル _曲名パネル = null;
 

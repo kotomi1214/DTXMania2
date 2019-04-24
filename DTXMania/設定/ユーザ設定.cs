@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.User09;
+using User = DTXMania.User10;
 
 namespace DTXMania
 {
@@ -128,6 +128,18 @@ namespace DTXMania
         {
             get => ( 0 != this._User.ShowPartNumber );
             set => this._User.ShowPartNumber = value ? 1 : 0;
+        }
+
+        public bool スコア指定の背景画像を表示する
+        {
+            get => ( 0 != this._User.ShowScoreWall );
+            set => this._User.ShowScoreWall = value ? 1 : 0;
+        }
+
+        public 動画の表示サイズ 動画の表示サイズ
+        {
+            get => (動画の表示サイズ)this._User.BackgroundMovieSize;
+            set => this._User.BackgroundMovieSize = (int)value;
         }
 
 

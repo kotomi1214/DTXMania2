@@ -271,8 +271,9 @@
     <Compile Include="データベース\ユーザ\old\User06.cs" />
     <Compile Include="データベース\ユーザ\old\User07.cs" />
     <Compile Include="データベース\ユーザ\old\User08.cs" />
+    <Compile Include="データベース\ユーザ\old\User09.cs" />
     <Compile Include="データベース\ユーザ\Record06.cs" />
-    <Compile Include="データベース\ユーザ\User09.cs" />
+    <Compile Include="データベース\ユーザ\User10.cs" />
     <Compile Include="データベース\ユーザ\UserDB.cs" />
     <Compile Include="データベース\曲\old\Song01.cs" />
     <Compile Include="データベース\曲\old\Song02.cs" />
@@ -328,6 +329,7 @@
     <Compile Include="設定\種別\入力グループプリセット種別.cs" />
     <Compile Include="設定\種別\入力グループ種別.cs" />
     <Compile Include="設定\種別\判定種別.cs" />
+    <Compile Include="設定\種別\動画の表示サイズ.cs" />
     <Compile Include="設定\種別\消音グループ種別.cs" />
     <Compile Include="設定\種別\表示チップ種別.cs" />
     <Compile Include="設定\種別\表示レーンの左右.cs" />
