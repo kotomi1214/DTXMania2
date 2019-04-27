@@ -44,7 +44,7 @@ namespace DTXMania
             App進行描画.システム設定 = システム設定.読み込む();
 
             App.ビュアーモードである = options.ビュアーモードである;
-            App.サービスメッセージキュー = new ServiceMessageQueue();   // WCFサービス用
+            App.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
 
             if( App.ビュアーモードである )
             {
@@ -137,7 +137,7 @@ namespace DTXMania
 
         private ServiceHost _wcfServiceHost;
 
-        public static ServiceMessageQueue サービスメッセージキュー { get; protected set; }
+        public static DTXManiaServiceMessageQueue サービスメッセージキュー { get; protected set; }
 
         /// <summary>
         ///     WCFサービスの存在チェックと起動。

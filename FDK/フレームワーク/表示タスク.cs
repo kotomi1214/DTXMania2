@@ -18,7 +18,7 @@ namespace FDK
         public bool ただいま表示中
         {
             get => ( 0 != Interlocked.Read(ref this._ただいま表示中 ) );
-            set => Interlocked.Exchange( ref this._ただいま表示中, ( value ) ? 1 : 0 );
+            protected set => Interlocked.Exchange( ref this._ただいま表示中, ( value ) ? 1 : 0 );
         }
 
         /// <summary>

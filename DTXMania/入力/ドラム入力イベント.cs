@@ -10,7 +10,7 @@ namespace DTXMania
     ///		単一の入力イベントを表す。
     /// </summary>
     /// <remarks>
-    ///		FDK の InputEvent に、それからマッピングされた ドラム入力種別 を付与したもの。
+    ///		FDK の <see cref="FDK.InputEvent"/> に、それからマッピングされた <see cref="ドラム入力種別"/> を付与したもの。
     ///		ただし、継承や拡張ではなく包含。
     /// </remarks>
     class ドラム入力イベント

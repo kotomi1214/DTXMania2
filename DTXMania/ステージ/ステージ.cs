@@ -7,6 +7,9 @@ using SSTFormat.v4;
 
 namespace DTXMania
 {
+    /// <summary>
+    ///     ステージの抽象クラス。
+    /// </summary>
     abstract class ステージ : Activity, IDisposable
     {
 

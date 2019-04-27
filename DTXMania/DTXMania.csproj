@@ -285,8 +285,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WCF\IDTXManiaService.cs" />
-    <Compile Include="WCF\ServiceMessage.cs" />
-    <Compile Include="WCF\ServiceMessageQueue.cs" />
+    <Compile Include="WCF\DTXManiaServiceMessage.cs" />
+    <Compile Include="WCF\DTXManiaServiceMessageQueue.cs" />
     <Compile Include="ユーティリティ\Utilities.cs" />
     <Compile Include="入力\ドラム入力イベント.cs" />
     <Compile Include="入力\ドラム入力種別.cs" />
