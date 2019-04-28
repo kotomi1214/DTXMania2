@@ -40,6 +40,8 @@ namespace DTXMania
 
         public static アイキャッチ管理 アイキャッチ管理 { get; protected set; }
 
+        public static Effekseer Effekseer { get; protected set; }
+
 
 
         // 演奏ごとのプロパティ(static)
@@ -119,6 +121,7 @@ namespace DTXMania
             テクスチャ.全インスタンスで共有するリソースを作成する();
 
             App進行描画.アイキャッチ管理 = new アイキャッチ管理();
+            App進行描画.Effekseer = new Effekseer( グラフィックデバイス.Instance.D3D11Device1 );
 
 
             // 起動ステージ以外のステージを生成。
@@ -165,6 +168,7 @@ namespace DTXMania
 
             // グローバルリソースを解放。
 
+            App進行描画.Effekseer?.Dispose();
             App進行描画.アイキャッチ管理?.Dispose();
             App進行描画.ドラムサウンド?.Dispose();
             App進行描画.入力管理?.Dispose();
