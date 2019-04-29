@@ -36,5 +36,6 @@ namespace DTXMania
         RightCrash,
         //LeftCymbal_Mute,	--> （YAMAHAでは）入力信号じゃない
         //RightCymbal_Mute,	--> （YAMAHAでは）入力信号じゃない
+        Pause_Resume,
     }
 }
