@@ -9,11 +9,21 @@ This product contains:
     The MIT License (MIT)
     https://github.com/dotnet/corefx/blob/master/LICENSE.TXT
 
+bjxa (BandJAM XA audio codec)
+    Copyright (C) 2018  Dridi Boukelmoune
+    GNU Lesser General Public License Version 2.1 (LGPLv2.1)
+    https://github.com/Dridi/bjxa/blob/master/lgpl-2.1.txt
+
 CSCore
     Florian R.
     Microsoft Public Licence (Ms-PL)
     https://github.com/filoe/cscore/blob/master/license.md
 
+Effekseer
+    Copyright (c) 2011 Effekseer Project
+    The MIT License (MIT)
+    https://github.com/effekseer/Effekseer/blob/master/LICENSE
+    
 EntityFramework
     Copyright (C) Microsoft Open Technologies, Inc.
     Apache Licence, Version 2.0
@@ -23,11 +33,6 @@ NVorbis
     Copyright (c) 2015 Andrew Ward
     Microsoft Public Licence (Ms-PL)
     https://github.com/ioctlLR/NVorbis/blob/master/LICENSE
-
-bjxa (BandJAM XA audio codec)
-    Copyright (C) 2018  Dridi Boukelmoune
-    GNU Lesser General Public License Version 2.1 (LGPLv2.1)
-    https://github.com/Dridi/bjxa/blob/master/lgpl-2.1.txt
 
 protobuf-net
     Copyright 2008 Marc Gravell
@@ -44,12 +49,12 @@ System.Data.SQLite
     Public Domain
     https://system.data.sqlite.org/index.html/doc/trunk/www/copyright.wiki
 
-Windows-API-Code-Pack
-    Microsoft
-    Micrsoft software Licence
-    https://github.com/contre/Windows-API-Code-Pack-1.1/blob/master/LICENSE
-
 YamlDotNet
     Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014 Antoine Aubry and contributors
     The MIT License (MIT)
     https://github.com/aaubry/YamlDotNet/blob/master/LICENSE
+
+Windows-API-Code-Pack
+    Microsoft
+    Micrsoft software Licence
+    https://github.com/contre/Windows-API-Code-Pack-1.1/blob/master/LICENSE
