@@ -319,7 +319,7 @@ namespace DTXMania
             @", ShowPartLine INTEGER NOT NULL" +
             @", ShowPartNumber INTEGER NOT NULL" +
             @", ShowScoreWall INTEGER NOT NULL" +
-            @", BackgroundMovieType INTEGER NOT NULL" +
+            @", BackgroundMovieSize INTEGER NOT NULL" +
             @")";
     }
 }
