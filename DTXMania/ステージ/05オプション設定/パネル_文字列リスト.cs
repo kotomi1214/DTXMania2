@@ -14,7 +14,7 @@ namespace DTXMania.オプション設定
     /// </summary>
     class パネル_文字列リスト : パネル
     {
-        public int 現在選択されている選択肢の番号 { get; protected set; } = 0;
+        public int 現在選択されている選択肢の番号 { get; set; } = 0;
 
         public List<string> 選択肢リスト { get; protected set; } = new List<string>();
 
