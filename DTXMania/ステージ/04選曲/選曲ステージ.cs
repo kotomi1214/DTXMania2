@@ -166,6 +166,11 @@ namespace DTXMania.選曲
                         }
                         else if( null != App進行描画.曲ツリー.フォーカスノード )
                         {
+                            if( App進行描画.曲ツリー.フォーカスノード is RandomSelectNode randomNode )
+                            {
+                                randomNode.選択曲を変更する();
+                            }
+
                             // 選曲する
 
                             App進行描画.曲ツリー.フォーカスノード?.プレビュー音声を停止する();

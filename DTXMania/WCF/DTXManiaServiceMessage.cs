@@ -7,9 +7,10 @@ using FDK;
 namespace DTXMania.WCF
 {
     /// <summary>
-    ///		DTXMania に対する制御メッセージ。
+    ///		DTXMania に対するサービスメッセージ。
+    ///		<see cref="IDTXManiaService"/> のメソッドと対応する。
     /// </summary>
-    class ServiceMessage
+    class DTXManiaServiceMessage
     {
         public enum 指示種別
         {

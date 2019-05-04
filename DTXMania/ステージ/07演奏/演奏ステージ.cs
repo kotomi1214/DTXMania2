@@ -645,7 +645,6 @@ namespace DTXMania.演奏
                             //----------------
                             #endregion
                         }
-
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Up ) )
                         {
                             if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
@@ -701,6 +700,14 @@ namespace DTXMania.演奏
                             {
                                 this._ドラムキットとヒットバーEXPERT.ハイハットの開度を設定する( ev.Velocity );
                             }
+                            //----------------
+                            #endregion
+                        }
+                        if( App進行描画.入力管理.ドラムが入力された( ドラム入力種別.Pause_Resume ) )
+                        {
+                            #region " Pause/Resumu パッド → 演奏の一時停止または再開 "
+                            //----------------
+                            this._演奏を一時停止または再開する();
                             //----------------
                             #endregion
                         }
@@ -1277,6 +1284,31 @@ namespace DTXMania.演奏
                 }
 
             } );
+        }
+
+
+        private bool _一時停止中 = false;
+
+        private void _演奏を一時停止または再開する()
+        {
+            if( !this._一時停止中 )
+            {
+                this._一時停止中 = true;
+
+                App進行描画.サウンドタイマ.一時停止する();
+
+                App進行描画.AVI管理?.再生中の動画をすべて一時停止する();
+                App進行描画.WAV管理?.再生中の音声をすべて一時停止する();
+            }
+            else
+            {
+                this._一時停止中 = false;
+
+                App進行描画.AVI管理?.一時停止中の動画をすべて再開する();
+                App進行描画.WAV管理?.一時停止中の音声をすべて再開する();
+
+                App進行描画.サウンドタイマ.再開する();
+            }
         }
     }
 }

@@ -74,7 +74,7 @@ namespace DTXMania
 
 
 
-        // 効果
+        // 効果アニメーション
 
 
         public void ぼかしと縮小を適用する( double 完了までの最大時間sec = 1.0 )

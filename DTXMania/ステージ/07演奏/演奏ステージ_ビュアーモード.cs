@@ -446,14 +446,19 @@ namespace DTXMania.演奏
 
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Escape ) )
                         {
-                            // ビュアーモードでは無効。
+                            #region " ESC → 演奏中段（ビュアーモードでは無効）"
+                            //----------------
+                            //----------------
+                            #endregion
                         }
-
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Up ) )
                         {
                             if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                // Shift+上 → BGMAdjust 増加 （ビュアーモードでは無効）
+                                #region " Shift+上 → BGMAdjust 増加 （ビュアーモードでは無効）"
+                                //----------------
+                                //----------------
+                                #endregion
                             }
                             else
                             {
@@ -465,12 +470,14 @@ namespace DTXMania.演奏
                                 #endregion
                             }
                         }
-
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Down ) )
                         {
                             if( App進行描画.入力管理.キーボード.キーが押されている( 0, Keys.ShiftKey ) )
                             {
-                                // Shift+下 → BGMAdjust 減少（ビュアーモードでは無効）
+                                #region " Shift+下 → BGMAdjust 減少（ビュアーモードでは無効） "
+                                //----------------
+                                //----------------
+                                #endregion
                             }
                             else
                             {
@@ -482,11 +489,20 @@ namespace DTXMania.演奏
                                 #endregion
                             }
                         }
-
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                         {
-                            // ハイハットの開閉 （ビュアーモードでは無効）
-                        
+                            #region " ハイハットの開閉 （ビュアーモードでは無効）"
+                            //----------------
+                            //----------------
+                            #endregion
+                        }
+                        if( App進行描画.入力管理.ドラムが入力された( ドラム入力種別.Pause_Resume ) )
+                        {
+                            #region " Pause/Resumu パッド → 演奏の一時停止または再開 "
+                            //----------------
+                            this._演奏を一時停止または再開する();
+                            //----------------
+                            #endregion
                         }
 
                         break;
@@ -860,8 +876,6 @@ namespace DTXMania.演奏
 
         private Dictionary<チップ, チップの演奏状態> _チップの演奏状態 = null;
 
-        private bool _一時停止中 = false;
-
         private double _演奏開始からの経過時間secを返す()
             => App進行描画.サウンドタイマ.現在時刻sec;
 
@@ -1122,24 +1136,7 @@ namespace DTXMania.演奏
         {
             if( e.Button == MouseButtons.Right )
             {
-                if( !this._一時停止中 )
-                {
-                    this._一時停止中 = true;
-
-                    App進行描画.サウンドタイマ.一時停止する();
-
-                    App進行描画.AVI管理?.再生中の動画をすべて一時停止する();
-                    App進行描画.WAV管理?.再生中の音声をすべて一時停止する();
-                }
-                else
-                {
-                    this._一時停止中 = false;
-
-                    App進行描画.AVI管理?.一時停止中の動画をすべて再開する();
-                    App進行描画.WAV管理?.一時停止中の音声をすべて再開する();
-
-                    App進行描画.サウンドタイマ.再開する();
-                }
+                this._演奏を一時停止または再開する();
             }
         }
 
@@ -1150,6 +1147,31 @@ namespace DTXMania.演奏
         {
             public Dictionary<string, float[]> 矩形リスト { get; set; }
             public float 縦方向中央位置 { get; set; }
+        }
+
+
+        private bool _一時停止中 = false;
+
+        private void _演奏を一時停止または再開する()
+        {
+            if( !this._一時停止中 )
+            {
+                this._一時停止中 = true;
+
+                App進行描画.サウンドタイマ.一時停止する();
+
+                App進行描画.AVI管理?.再生中の動画をすべて一時停止する();
+                App進行描画.WAV管理?.再生中の音声をすべて一時停止する();
+            }
+            else
+            {
+                this._一時停止中 = false;
+
+                App進行描画.AVI管理?.一時停止中の動画をすべて再開する();
+                App進行描画.WAV管理?.一時停止中の音声をすべて再開する();
+
+                App進行描画.サウンドタイマ.再開する();
+            }
         }
     }
 }

@@ -44,7 +44,7 @@ namespace DTXMania
             App進行描画.システム設定 = システム設定.読み込む();
 
             App.ビュアーモードである = options.ビュアーモードである;
-            App.サービスメッセージキュー = new ServiceMessageQueue();   // WCFサービス用
+            App.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
 
             if( App.ビュアーモードである )
             {
@@ -90,8 +90,11 @@ namespace DTXMania
             // F11 キーで、全画面／ウィンドウモードを切り替える。
             if( e.KeyCode == Keys.F11 )
             {
+                // this.画面モード.set() は非同期処理なので、すぐに値が反映されるとは限らない。
+                // なので、ログオン中のユーザへの設定は、その変更より先に行なっておく。
+                App進行描画.ユーザ管理.ログオン中のユーザ.全画面モードである = ( this.画面モード != 画面モード.全画面 );
+
                 this.画面モード = ( this.画面モード == 画面モード.ウィンドウ ) ? 画面モード.全画面 : 画面モード.ウィンドウ;
-                //App.ユーザ管理.ログオン中のユーザ.全画面モードである = App.全画面モード;
             }
 
             base.OnKeyDown( e );
@@ -137,7 +140,7 @@ namespace DTXMania
 
         private ServiceHost _wcfServiceHost;
 
-        public static ServiceMessageQueue サービスメッセージキュー { get; protected set; }
+        public static DTXManiaServiceMessageQueue サービスメッセージキュー { get; protected set; }
 
         /// <summary>
         ///     WCFサービスの存在チェックと起動。

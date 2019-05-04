@@ -65,17 +65,29 @@ namespace DTXMania
         {
             get
             {
-                if( this.フォーカスノード is MusicNode musicnode )
+                switch( this.フォーカスノード )
                 {
-                    return musicnode;
-                }
-                if( this.フォーカスノード is SetNode setnode )
-                {
-                    return setnode.MusicNodes[ this.フォーカス難易度 ];
-                }
-                else
-                {
-                    return null;
+                    case MusicNode musicNode:
+                        return musicNode;
+
+                    case SetNode setNode:
+                        return setNode.MusicNodes[ this.フォーカス難易度 ];
+
+                    case RandomSelectNode randomNode:
+                        switch( randomNode.選択曲 )
+                        {
+                            case MusicNode musicNode:
+                                return musicNode;
+
+                            case SetNode setNode:
+                                return setNode.MusicNodes[ this.フォーカス難易度 ];
+
+                            default:
+                                return null;
+                        }
+
+                    default:
+                        return null;
                 }
             }
         }
@@ -97,7 +109,7 @@ namespace DTXMania
                 }
                 else
                 {
-                    return 0;   // BoxNode, BackNode など
+                    return 0;   // BoxNode, BackNode, RandomSelectNode など
                 }
             }
         }
@@ -274,8 +286,14 @@ namespace DTXMania
         // 曲検索・構築タスク
 
 
+        public void ランダムセレクトノードを追加する( Node 親ノード )
+        {
+            親ノード.子ノードリスト.Add( new RandomSelectNode( 親ノード ) );
+        }
+
         public void 曲の検索を開始する( VariablePath フォルダパス )
         {
+            // 指定されたフォルダパスをルートノードとして追加
             this._検索フォルダを追加する( フォルダパス, this.ルートノード );
         }
 
@@ -297,6 +315,8 @@ namespace DTXMania
             {
                 this._構築タスク = Task.Run( () => {
 
+                    #region " 曲検索・構築タスク "
+                    //----------------
                     Log.現在のスレッドに名前をつける( "曲検索" );
                     Log.Info( $"曲ツリーの構築タスクを開始します。" );
 
@@ -314,6 +334,8 @@ namespace DTXMania
                     }
 
                     Log.Info( $"曲ツリーの構築タスクを終了しました。" );
+                    //----------------
+                    #endregion
 
                 } );
             }
@@ -332,7 +354,7 @@ namespace DTXMania
             }
 
             // 以下(A)～(C)で生成したノードはいったんこのノードリストに格納し、あとでまとめて曲ツリーに登録する(D)。
-            List<Node> ノードリスト = new List<Node>();
+            List<Node> 一時ノードリスト = new List<Node>();
 
             var dirInfo = new DirectoryInfo( 基点フォルダパス.変数なしパス );
             var boxDefPath = new VariablePath( Path.Combine( 基点フォルダパス.変数なしパス, @"box.def" ) );
@@ -347,18 +369,18 @@ namespace DTXMania
                 {
                     // BOXノードを作成。
                     var boxNode = new BoxNode( boxDefPath, null );
-                    ノードリスト.Add( boxNode );
+                    一時ノードリスト.Add( boxNode );
 
-                    // BOXノード内に "戻る" ノードを追加。
+                    // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
                     lock( boxNode.子ノードリスト排他 )
                     {
-                        var backNode = new BackNode( boxNode );
-                        boxNode.子ノードリスト.Add( backNode );
+                        boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
+                        boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
                     }
 
                     // box.defを無効にして、このフォルダを対象として、再度構築する。
                     // 構築結果のノードリストは、BOXノードの子として付与される。
-                    this._構築する( boxNode, 基点フォルダパス, false );
+                    this._構築する( boxNode, 基点フォルダパス, boxDefファイル有効: false );
 
                     // box.def があった場合、サブフォルダは検索しない。
                     サブフォルダを検索する = false;
@@ -385,7 +407,7 @@ namespace DTXMania
                         // Setノードを作成し、追加。
                         var setNode = new SetNode( block, 基点フォルダパス, null );
                         if( 0 < setNode.子ノードリスト.Count ) // L1～L5のいずれかが有効であるときのみ登録する。
-                            ノードリスト.Add( setNode );
+                            一時ノードリスト.Add( setNode );
                     }
 
                     // set.def があった場合、サブフォルダは検索しない。
@@ -414,7 +436,7 @@ namespace DTXMania
                     {
                         // Musicノードを作成し、追加。
                         var music = new MusicNode( vpath, null );
-                        ノードリスト.Add( music );
+                        一時ノードリスト.Add( music );
                     }
                     catch
                     {
@@ -432,7 +454,7 @@ namespace DTXMania
             //----------------
             lock( 親ノード.子ノードリスト排他 )  // lock は、ノードリスト単位で行う（ノード単位ではない）。
             {
-                foreach( var item in ノードリスト )
+                foreach( var item in 一時ノードリスト )
                 {
                     item.親ノード = 親ノード;
                     親ノード.子ノードリスト.Add( item );
@@ -455,11 +477,11 @@ namespace DTXMania
                         lock( 親ノード.子ノードリスト排他 )
                             親ノード.子ノードリスト.Add( boxNode );
 
-                        // BOXノード内に "戻る" ノードを追加。
+                        // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
                         lock( boxNode.子ノードリスト排他 )
                         {
-                            var backNode = new BackNode( boxNode );
-                            boxNode.子ノードリスト.Add( backNode );
+                            boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
+                            boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
                         }
 
                         // BOXノードを親として、検索予約をキューに投入。

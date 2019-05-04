@@ -77,7 +77,7 @@ namespace DTXMania.認証
                 };
 
 
-                this._光彩アニメカウンタをリセットする();
+                this._光彩アニメーションを開始する();
             }
         }
 
@@ -159,8 +159,7 @@ namespace DTXMania.認証
         {
             this.選択中のユーザ = ( this.選択中のユーザ - 1 + App進行描画.ユーザ管理.ユーザリスト.Count ) % App進行描画.ユーザ管理.ユーザリスト.Count;  // 前がないなら末尾へ
 
-            // アニメーションリセット
-            this._光彩アニメカウンタをリセットする();
+            this._光彩アニメーションを開始する();
         }
 
         /// <summary>
@@ -170,8 +169,7 @@ namespace DTXMania.認証
         {
             this.選択中のユーザ = ( this.選択中のユーザ + 1 ) % App進行描画.ユーザ管理.ユーザリスト.Count;   // 次がないなら先頭へ
 
-            // アニメーションリセット
-            this._光彩アニメカウンタをリセットする();
+            this._光彩アニメーションを開始する();
         }
 
 
@@ -190,7 +188,7 @@ namespace DTXMania.認証
         private 文字列画像 _ユーザ名 = null;
 
 
-        private void _光彩アニメカウンタをリセットする()
+        private void _光彩アニメーションを開始する()
         {
             this._光彩アニメカウンタ = new LoopCounter( 0, 200, 5 );
         }

@@ -211,9 +211,9 @@ namespace DTXMania.選曲
                     //----------------
                     #endregion
                 }
-                else if( ノード is BackNode )
+                else if( ノード is BackNode || ノード is RandomSelectNode )
                 {
-                    #region " BACKノードの背景 "
+                    #region " BACK/RandomSelectノードの背景 "
                     //----------------
                     using( var brush = new SolidColorBrush( dc, Color4.Black ) )
                     {
@@ -283,9 +283,9 @@ namespace DTXMania.選曲
                     //----------------
                     #endregion
                 }
-                else if( ノード is BackNode )
+                else if( ノード is BackNode || ノード is RandomSelectNode )
                 {
-                    // BACKノードはサムネイル画像なし
+                    // BACK/RandomSelectノードはサムネイル画像なし
                 }
                 else
                 {

@@ -172,6 +172,9 @@ namespace DTXMania.起動
                         App進行描画.曲ツリー = new 曲ツリー();
 
                         // 曲ツリーの構築を開始。
+
+                        App進行描画.曲ツリー.ランダムセレクトノードを追加する( App進行描画.曲ツリー.ルートノード );
+
                         foreach( var varpath in App進行描画.システム設定.曲検索フォルダ )
                             App進行描画.曲ツリー.曲の検索を開始する( varpath );
                     }
