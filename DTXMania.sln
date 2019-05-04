@@ -136,16 +136,16 @@ Global
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Debug|x86.Build.0 = Debug|x86
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x64.ActiveCfg = Release|x64
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x64.Build.0 = Release|x64
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x86.ActiveCfg = Release|Any CPU
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x86.Build.0 = Release|Any CPU
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x86.ActiveCfg = Release|x86
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.Release|x86.Build.0 = Release|x86
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x64.ActiveCfg = Debug|x64
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x64.Build.0 = Debug|x64
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x86.ActiveCfg = RemoteDebug|Any CPU
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x86.Build.0 = RemoteDebug|Any CPU
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x86.ActiveCfg = RemoteDebug|x86
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteDebug|x86.Build.0 = RemoteDebug|x86
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x64.ActiveCfg = RemoteRelease|x64
 		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x64.Build.0 = RemoteRelease|x64
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x86.ActiveCfg = RemoteRelease|Any CPU
-		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x86.Build.0 = RemoteRelease|Any CPU
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x86.ActiveCfg = RemoteRelease|x86
+		{9AB944AE-D0C4-4022-B407-A497160E2BD6}.RemoteRelease|x86.Build.0 = RemoteRelease|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
