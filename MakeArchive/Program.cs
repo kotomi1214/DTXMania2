@@ -25,9 +25,9 @@ namespace MakeArchive
 #endif
 
             var ZIPファイル名 = $@"dtxmania2_{DTXMania.Version.Major.ToString( "000" )}.zip";    // 必要あれば変更する
-            var solutionDir = Path.Combine( exePath, @"..\..\.." );                              // 必要あれば変更する
-            var dtxmaniaBinDir = Path.Combine( solutionDir, @"DTXMania\bin\Release" );           // 必要あれば変更する
-            var editorBinDir = Path.Combine( solutionDir, @"SSTFEditor\bin\Release" );           // 必要あれば変更する
+            var solutionDir = Path.Combine( exePath, @"..\..\..\.." );                           // 必要あれば変更する
+            var dtxmaniaBinDir = Path.Combine( solutionDir, @"DTXMania\bin\x86\Release" );       // 必要あれば変更する
+            var editorBinDir = Path.Combine( solutionDir, @"SSTFEditor\bin\x86\Release" );       // 必要あれば変更する
             var 出力フォルダパス = Path.Combine( $@"{solutionDir}", "アーカイブ" );              // 必要あれば変更する
 
             Console.WriteLine( "開始します。" );
