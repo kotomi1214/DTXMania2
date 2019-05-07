@@ -65,26 +65,18 @@ namespace DTXMania
         {
             get
             {
-                switch( this.フォーカスノード )
+                var node = this.フォーカスノード;
+
+                if( node is RandomSelectNode randomNode )
+                    node = randomNode.選択曲;
+
+                switch( node )
                 {
                     case MusicNode musicNode:
                         return musicNode;
 
                     case SetNode setNode:
                         return setNode.MusicNodes[ this.フォーカス難易度 ];
-
-                    case RandomSelectNode randomNode:
-                        switch( randomNode.選択曲 )
-                        {
-                            case MusicNode musicNode:
-                                return musicNode;
-
-                            case SetNode setNode:
-                                return setNode.MusicNodes[ this.フォーカス難易度 ];
-
-                            default:
-                                return null;
-                        }
 
                     default:
                         return null;
@@ -99,17 +91,21 @@ namespace DTXMania
         {
             get
             {
-                if( this.フォーカスノード is MusicNode musicnode )
+                var node = this.フォーカスノード;
+
+                if( node is RandomSelectNode randomNode )
+                    node = randomNode.選択曲;
+
+                switch( node )
                 {
-                    return 3;   // MASTER 相当で固定
-                }
-                else if( this.フォーカスノード is SetNode setnode )
-                {
-                    return setnode.ユーザ希望難易度に最も近い難易度レベルを返す( this.ユーザ希望難易度 );
-                }
-                else
-                {
-                    return 0;   // BoxNode, BackNode, RandomSelectNode など
+                    case MusicNode musicNode:
+                        return 3;   // MASTER 相当で固定
+
+                    case SetNode setNode:
+                        return setNode.ユーザ希望難易度に最も近い難易度レベルを返す( this.ユーザ希望難易度 );
+
+                    default:
+                        return 0;   // BoxNode, BackNode, RandomSelectNode など
                 }
             }
         }
