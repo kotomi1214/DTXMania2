@@ -34,7 +34,9 @@ namespace FDK
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._未初期化 = false;
+
                 TimeGetTime.timeBeginPeriod( 1 );
+
                 PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
 
                 this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
@@ -50,6 +52,7 @@ namespace FDK
                 this.進行描画.終了する().WaitOne();  // 終了するまで待つ
 
                 PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
+
                 TimeGetTime.timeEndPeriod( 1 );
 
                 this._未初期化 = true;
