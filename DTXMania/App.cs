@@ -67,7 +67,7 @@ namespace DTXMania
 
         protected override void OnLoad( EventArgs e )
         {
-            this.画面モード = 画面モード.ウィンドウ;   // ビュアーモードでは常にウィンドウモード
+            this.画面モード = 画面モード.ウィンドウ;   // 常にウィンドウモード
 
             base.OnLoad( e );
         }
@@ -151,7 +151,9 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                // WCFサービスホストを起動する。
+                
+                // WCFサービスホストの起動を試みる。
+
                 this._wcfServiceHost = null;
                 try
                 {
@@ -161,7 +163,13 @@ namespace DTXMania
                 }
                 catch( AddressAlreadyInUseException )
                 {
+                    // 田プロセスによって既に起動されている場合はこの例外が発生し、
+                    // _wcfServiceHost は null のままである。
                 }
+
+
+                // WCFサービスを起動できたかどうか、ならびに
+                // オプションでビュアーモードが指定されているか否かにより処理分岐。
 
                 if( null == this._wcfServiceHost )
                 {
@@ -170,6 +178,7 @@ namespace DTXMania
                     if( ビュアーモードである )
                     {
                         // (A-a) ビュアーモードなら OK。既に別のWCFサービスが立ち上がっているので、そのサービスでオプションを処理して、終了する。
+
                         this._WCFサービスを取得する( out var factory, out var service, out var serviceChannel );
                         this._WCFサービスでオプションを処理する( service, options );
                         this._WCFサービスを解放する( factory, service, serviceChannel );
@@ -178,6 +187,7 @@ namespace DTXMania
                     else
                     {
                         // (A-b) 通常モードなら二重起動で NG。
+
                         MessageBox.Show( "DTXMania はすでに起動しています。多重起動はできません。", "DTXMania Runtime Error", MessageBoxButtons.OK, MessageBoxIcon.Error );
                         return false;
                     }

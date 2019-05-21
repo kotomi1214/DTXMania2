@@ -61,9 +61,21 @@ namespace FDK
             using( var resampler = new DmoResampler( waveSource, waveFormtForResampling ) )
             {
                 var サイズbyte = resampler.Length;
-
                 this._DecodedWaveData = new byte[ サイズbyte ];
-                resampler.Read( this._DecodedWaveData, 0, (int) サイズbyte );
+
+                //resampler.Read( this._DecodedWaveData, 0, (int) サイズbyte );
+                //　→ 一気にReadすると、内部の Marshal.AllocCoTaskMem() に OutOfMemory例外を出されることがある。
+                // 　　よって、２秒ずつ分解しながら受け取る。
+                int sizeOf2秒 = FDKUtilities.位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
+                long 変換済byte = 0;
+                long 変換残byte = サイズbyte;
+                while( 0 < 変換残byte )
+                {
+                    int 今回の変換byte = (int)FDKUtilities.位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残byte ), resampler.WaveFormat.BlockAlign );
+                    int 今回の変換済byte = resampler.Read( this._DecodedWaveData, (int)変換済byte, 今回の変換byte );
+                    変換済byte += 今回の変換byte;
+                    変換残byte -= 今回の変換byte;
+                }
             }
         }
 
