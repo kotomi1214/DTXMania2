@@ -18,7 +18,7 @@ namespace DTXMania.結果
             完了,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -41,10 +41,11 @@ namespace DTXMania.結果
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                base.OnDispose();
             }
         }
 
@@ -53,13 +54,10 @@ namespace DTXMania.結果
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._背景 = new 舞台画像();
                 this._曲名パネル = new 画像( @"$(System)images\結果\曲名パネル.png" );
                 this._曲名画像 = new 文字列画像() {
@@ -109,17 +107,14 @@ namespace DTXMania.結果
 
                 this.現在のフェーズ = フェーズ.表示;
 
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 App進行描画.システムサウンド.停止する( システムサウンド種別.ステージクリア );
 
                 this._結果 = null;
@@ -140,7 +135,7 @@ namespace DTXMania.結果
                 this._ランク?.Dispose();
                 this._システム情報?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

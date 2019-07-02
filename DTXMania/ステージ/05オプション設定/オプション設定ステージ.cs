@@ -25,7 +25,7 @@ namespace DTXMania.オプション設定
             キャンセル,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -39,12 +39,11 @@ namespace DTXMania.オプション設定
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -53,13 +52,10 @@ namespace DTXMania.オプション設定
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._舞台画像 = new 舞台画像();
                 this._パネルリスト = new パネルリスト();
                 this._システム情報 = new システム情報();
@@ -746,18 +742,14 @@ namespace DTXMania.オプション設定
 
                 this._舞台画像.ぼかしと縮小を適用する( 0.5 );
 
-
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 App進行描画.システム設定.保存する();
                 App進行描画.ユーザ管理.ログオン中のユーザ.保存する();
 
@@ -767,7 +759,7 @@ namespace DTXMania.オプション設定
                 this._パネルリスト?.Dispose();
                 this._舞台画像?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

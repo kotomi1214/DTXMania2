@@ -22,7 +22,7 @@ namespace DTXMania.選曲
             キャンセル,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.確定_選曲;
 
 
 
@@ -36,12 +36,11 @@ namespace DTXMania.選曲
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -50,13 +49,10 @@ namespace DTXMania.選曲
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._舞台画像 = new 舞台画像( @"$(System)images\舞台_暗.jpg" );
                 this._システム情報 = new システム情報();
                 this._曲リスト = new 曲リスト();
@@ -70,8 +66,8 @@ namespace DTXMania.選曲
                 this._表示方法選択パネル = new 表示方法選択パネル();
                 this._SongNotFound = new 文字列画像() {
                     表示文字列 =
-                    "Song not found...\n" +
-                    "Hit BDx2 (in default SPACEx2) to select song folders."
+                        "Song not found...\n" +
+                        "Hit BDx2 (in default SPACEx2) to select song folders."
                 };
 
                 // 外部接続。
@@ -99,17 +95,14 @@ namespace DTXMania.選曲
 
                 this.現在のフェーズ = フェーズ.フェードイン;
 
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 this._灰透過?.Dispose();
                 this._黒透過?.Dispose();
                 this._黒?.Dispose();
@@ -132,7 +125,7 @@ namespace DTXMania.選曲
                 this._システム情報?.Dispose();
                 this._舞台画像?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

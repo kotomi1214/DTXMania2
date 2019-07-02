@@ -26,7 +26,7 @@ namespace DTXMania.演奏
             クリア,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.クリア;
 
         public 成績 成績 { get; protected set; } = null;
 
@@ -42,12 +42,11 @@ namespace DTXMania.演奏
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -56,13 +55,10 @@ namespace DTXMania.演奏
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._背景画像 = new 画像( @"$(System)images\演奏\演奏画面.png" );
                 this._レーンフレームBASIC = new BASIC.レーンフレーム();
                 this._レーンフレームEXPERT = new EXPERT.レーンフレーム();
@@ -114,17 +110,14 @@ namespace DTXMania.演奏
 
                 this.現在のフェーズ = フェーズ.クリア;
 
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 // マウスクリックイベント登録解除
                 App進行描画.Instance.AppForm.MouseDown -= this.App_MouseDown;
 
@@ -177,7 +170,7 @@ namespace DTXMania.演奏
                 this._システム情報?.Dispose();
                 this._数字フォント中グレー48x64?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

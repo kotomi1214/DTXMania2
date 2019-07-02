@@ -17,7 +17,7 @@ namespace DTXMania.タイトル
             完了,
             キャンセル,
         }
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -31,12 +31,11 @@ namespace DTXMania.タイトル
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -45,13 +44,10 @@ namespace DTXMania.タイトル
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._舞台画像 = new 舞台画像();
                 this._タイトルロゴ = new 画像( @"$(System)images\タイトルロゴ.png" );
                 this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り };
@@ -64,26 +60,21 @@ namespace DTXMania.タイトル
 
                 this.現在のフェーズ = フェーズ.表示;
 
-
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 this._帯ブラシ?.Dispose();
 
                 App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_開始音 );
                 App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_ループBGM );
                 //App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_確定音 );  --> ならしっぱなしでいい
 
-
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

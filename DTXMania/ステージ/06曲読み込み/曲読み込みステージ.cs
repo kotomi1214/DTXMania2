@@ -21,7 +21,7 @@ namespace DTXMania.曲読み込み
             キャンセル,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
         
@@ -35,12 +35,11 @@ namespace DTXMania.曲読み込み
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -49,13 +48,10 @@ namespace DTXMania.曲読み込み
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._舞台画像 = new 舞台画像();
                 this._注意文 = new 画像( @"$(System)images\曲読み込み\ご注意ください.png" );
                 this._曲名画像 = new 文字列画像() {
@@ -95,17 +91,14 @@ namespace DTXMania.曲読み込み
 
                 this.現在のフェーズ = フェーズ.フェードイン;
 
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 //App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_開始音 ); --> なりっぱなしでいい
                 App進行描画.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_ループBGM );
 
@@ -116,7 +109,7 @@ namespace DTXMania.曲読み込み
                 this._注意文?.Dispose();
                 this._舞台画像?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 

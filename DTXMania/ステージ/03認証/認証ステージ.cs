@@ -22,7 +22,7 @@ namespace DTXMania.認証
             キャンセル,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -36,12 +36,11 @@ namespace DTXMania.認証
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -50,13 +49,10 @@ namespace DTXMania.認証
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._舞台画像 = new 舞台画像();
                 this._ウィンドウ画像 = new 画像( @"$(System)images\認証\ユーザ選択ウィンドウ.png" );
                 this._プレイヤーを選択してください = new 文字列画像() {
@@ -74,18 +70,14 @@ namespace DTXMania.認証
 
                 this.現在のフェーズ = フェーズ.フェードイン;
 
-
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 this._システム情報?.Dispose();
                 this._ユーザリスト?.Dispose();
                 this._プレイヤーを選択してください?.Dispose();
@@ -96,7 +88,7 @@ namespace DTXMania.認証
                 App進行描画.システムサウンド.停止する( システムサウンド種別.認証ステージ_ループBGM );
                 //App進行描画.システムサウンド.停止する( システムサウンド種別.認証ステージ_ログイン音 );    // --> なりっぱなしでいい
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 
