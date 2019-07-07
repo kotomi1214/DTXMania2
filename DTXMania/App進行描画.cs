@@ -502,7 +502,7 @@ namespace DTXMania
                 startPart = startPart,
                 drumSound = drumsSound,
             };
-            this._メッセージキュー.Enqueue( msg );
+            this.メッセージキュー.Enqueue( msg );
             return msg.完了通知;
         }
 
@@ -520,7 +520,7 @@ namespace DTXMania
         public AutoResetEvent ViewerStop()
         {
             var msg = new ViewerStopメッセージ();
-            this._メッセージキュー.Enqueue( msg );
+            this.メッセージキュー.Enqueue( msg );
             return msg.完了通知;
         }
 

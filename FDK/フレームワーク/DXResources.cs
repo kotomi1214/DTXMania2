@@ -62,6 +62,8 @@ namespace FDK
         /// </remarks>
         public Size2F 物理画面サイズ { get; protected set; } = new Size2F( 1024f, 576f );
 
+        // 設計-物理サイズ間の変換
+
         public float 拡大率DPXtoPX横 => ( this.物理画面サイズ.Width / this.設計画面サイズ.Width );
         public float 拡大率DPXtoPX縦 => ( this.物理画面サイズ.Height / this.設計画面サイズ.Height );
         public float 拡大率PXtoDPX横 => ( this.設計画面サイズ.Width / this.物理画面サイズ.Width );
@@ -70,7 +72,7 @@ namespace FDK
         public Matrix3x2 拡大行列PXtoDPX => Matrix3x2.Scaling( this.拡大率PXtoDPX横, this.拡大率PXtoDPX縦 );
 
         /// <summary>
-        ///     3D視点で見る画面左上の座標。
+        ///     等倍3D平面での画面左上の3D座標。
         /// </summary>
         public Vector3 画面左上dpx => new Vector3( -this.設計画面サイズ.Width / 2f, +this.設計画面サイズ.Height / 2f, 0f );
 
@@ -120,7 +122,7 @@ namespace FDK
 
         public SharpDX.DirectWrite.Factory DWriteFactory { get; private set; } = null;
 
-        public アニメーション アニメーション { get; private set; } = null;
+        public Animation アニメーション { get; private set; } = null;
 
 
 
@@ -328,7 +330,7 @@ namespace FDK
                 this.DWriteFactory = new SharpDX.DirectWrite.Factory( SharpDX.DirectWrite.FactoryType.Shared );
 
                 // Windows Animation を生成する。
-                this.アニメーション = new アニメーション();
+                this.アニメーション = new Animation();
             }
         }
         private void _スワップチェーンに依存しないグラフィックリソースを解放する()

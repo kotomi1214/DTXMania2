@@ -27,7 +27,7 @@ namespace FDK
             public AutoResetEvent 完了通知 = new AutoResetEvent( false );
         }
 
-        protected ConcurrentQueue<通知メッセージ> _メッセージキュー;
+        protected ConcurrentQueue<通知メッセージ> メッセージキュー;
 
         protected virtual void メッセージを処理する( 通知メッセージ msg )
         {
@@ -55,7 +55,7 @@ namespace FDK
 
         public App進行描画Base()
         {
-            this._メッセージキュー = new ConcurrentQueue<通知メッセージ>();
+            this.メッセージキュー = new ConcurrentQueue<通知メッセージ>();
         }
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace FDK
 
                     bool メインループを抜ける = false;
 
-                    while( this._メッセージキュー.TryDequeue( out 通知メッセージ msg ) )
+                    while( this.メッセージキュー.TryDequeue( out 通知メッセージ msg ) )
                     {
                         if( msg is 終了メッセージ )
                         {
@@ -183,7 +183,7 @@ namespace FDK
         public AutoResetEvent 終了を通知する()
         {
             var msg = new 終了メッセージ();
-            this._メッセージキュー.Enqueue( msg );
+            this.メッセージキュー.Enqueue( msg );
 
             return msg.完了通知;
         }
@@ -224,7 +224,7 @@ namespace FDK
             var msg = new サイズ変更メッセージ {
                 新物理画面サイズ = 新物理画面サイズ,
             };
-            this._メッセージキュー.Enqueue( msg );
+            this.メッセージキュー.Enqueue( msg );
 
             return msg.完了通知;
         }

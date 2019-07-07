@@ -74,7 +74,7 @@ namespace DTXMania.演奏
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext dc, アニメーション am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext dc, Animation am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             // 進行。
 
@@ -169,7 +169,7 @@ namespace DTXMania.演奏
                 this.Yオフセット?.Dispose();
             }
 
-            public void 跳ね開始( アニメーション am, double 遅延sec )
+            public void 跳ね開始( Animation am, double 遅延sec )
             {
                 this.Dispose();
 

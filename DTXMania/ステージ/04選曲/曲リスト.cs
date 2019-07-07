@@ -495,7 +495,7 @@ namespace DTXMania.選曲
         private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
 
 
-        private void _選択ノードのオフセットアニメをリセットする( アニメーション am )
+        private void _選択ノードのオフセットアニメをリセットする( Animation am )
         {
             this._選択ノードの表示オフセットdpx?.Dispose();
             this._選択ノードの表示オフセットdpx = new Variable( am.Manager, initialValue: 0.0 );
