@@ -24,7 +24,7 @@ namespace FDK
         /// <summary>
         ///     表示スレッドを生成して、そこで垂直帰線同期とスワップチェーンの表示を行う。
         /// </summary>
-        public void 表示開始()
+        public void 表示を開始する()
         {
             this.ただいま表示中 = true;    // 表示開始
 

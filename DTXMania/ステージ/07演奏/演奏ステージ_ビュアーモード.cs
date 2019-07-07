@@ -718,7 +718,7 @@ namespace DTXMania.演奏
             msg.完了通知.Set();
         }
 
-        private ConcurrentQueue<App進行描画.通知メッセージ> _メッセージキュー = new ConcurrentQueue<進行描画.通知メッセージ>();
+        private ConcurrentQueue<App進行描画.通知メッセージ> _メッセージキュー = new ConcurrentQueue<App進行描画Base.通知メッセージ>();
 
 
 

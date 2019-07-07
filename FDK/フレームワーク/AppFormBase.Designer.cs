@@ -1,6 +1,6 @@
 ﻿namespace FDK
 {
-    partial class AppForm
+    partial class AppFormBase
     {
         /// <summary>
         /// Required designer variable.

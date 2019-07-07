@@ -5,6 +5,16 @@ using System.Linq;
 
 namespace FDK
 {
+    /// <summary>
+    ///     活性化状態とグラフィックリソースを持つオブジェクト。
+    /// </summary>
+    /// <remarks>
+    ///     このオブジェクトは活性化状態を持ち、「活性化済み」または「活性化していない」状態のいずれかにある。
+    ///     何をもって活性化とするか、また、活性化・非活性化時に何の処理を行うかについては、アプリで任意に設計すること。
+    ///     また、このクラスが「スワップチェーンに依存したグラフィックリソース」を持つ場合は、適切なタイミングで
+    ///     リソースの解放・復元メソッドが呼び出されることを想定し、それぞれのメソッドに該当リソースの解放・復元処理を
+    ///     実装すること。また、このクラスの保持者は、適切なタイミングでそれぞれのメソッドを呼び出すこと。
+    /// </remarks>
     public class Activity : IDisposable
     {
         public bool 活性化済み { get; protected set; } = false;
@@ -39,6 +49,7 @@ namespace FDK
 
             this.非活性化する();
             this.OnDispose();
+
             this._Dispose済み = true;
         }
 
@@ -60,6 +71,7 @@ namespace FDK
                 return;
 
             this.On活性化();
+
             this.活性化済み = true;
         }
 
@@ -69,6 +81,7 @@ namespace FDK
                 return;
 
             this.On非活性化();
+
             this.活性化していない = true;
         }
 
@@ -93,6 +106,7 @@ namespace FDK
                 return;
 
             this.Onスワップチェーンに依存するリソースの解放();
+
             this.リソース解放済み = true;
         }
 
@@ -102,6 +116,7 @@ namespace FDK
                 return;
 
             this.Onスワップチェーンに依存するリソースの復元();
+
             this.リソースを解放していない = true;
         }
 

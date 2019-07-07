@@ -11,7 +11,7 @@ using FDK;
 
 namespace DTXMania
 {
-    class App進行描画 : FDK.進行描画
+    class App進行描画 : FDK.App進行描画Base
     {
 
         // グローバルリソース(static)
@@ -78,7 +78,7 @@ namespace DTXMania
             App進行描画.Instance = this;
         }
 
-        protected override void On開始する()
+        protected override void On開始()
         {
             // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときに行われる。）
 
@@ -143,7 +143,7 @@ namespace DTXMania
             演奏.BASIC.レーンフレーム.初期化する();
         }
 
-        protected override void On終了する()
+        protected override void On終了()
         {
             this.現在のステージ = null;
 
@@ -203,7 +203,7 @@ namespace DTXMania
 
         protected ステージ 現在のステージ;
 
-        protected override void 進行する()
+        protected override void On進行()
         {
             // ステージを進行する。
 
@@ -411,7 +411,7 @@ namespace DTXMania
             }
         }
 
-        protected override void 描画する()
+        protected override void On描画()
         {
             #region " 画面クリア "
             //----------------
@@ -478,12 +478,12 @@ namespace DTXMania
         // サイズ変更
 
 
-        protected override void スワップチェーンに依存するグラフィックリソースを作成する()
+        protected override void Onスワップチェーンに依存するグラフィックリソースの作成()
         {
             this.現在のステージ?.スワップチェーンに依存するリソースを復元する();
         }
 
-        protected override void スワップチェーンに依存するグラフィックリソースを解放する()
+        protected override void Onスワップチェーンに依存するグラフィックリソースの解放()
         {
             this.現在のステージ?.スワップチェーンに依存するリソースを解放する();
         }
