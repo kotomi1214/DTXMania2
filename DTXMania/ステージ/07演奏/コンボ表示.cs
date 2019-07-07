@@ -111,7 +111,7 @@ namespace DTXMania.演奏
             
             // １桁ずつ描画。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;

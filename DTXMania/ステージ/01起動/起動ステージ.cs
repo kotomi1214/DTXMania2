@@ -188,8 +188,8 @@ namespace DTXMania.起動
 
         public override void 描画する()
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             // 文字列表示
             for( int i = 0; i < this._コンソール表示内容.Count; i++ )

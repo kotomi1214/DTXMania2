@@ -43,7 +43,7 @@ namespace DTXMania.オプション設定
 
             this._パネル名画像 = new 文字列画像() { 表示文字列 = this.パネル名, フォントサイズpt = 34f, 前景色 = Color4.White };
 
-            this._パネルの高さ割合 = new Variable( グラフィックデバイス.Instance.アニメーション.Manager, initialValue: 1.0 );
+            this._パネルの高さ割合 = new Variable( DXResources.Instance.アニメーション.Manager, initialValue: 1.0 );
             this._パネルのストーリーボード = null;
         }
 
@@ -69,7 +69,7 @@ namespace DTXMania.オプション設定
         {
             double 秒( double v ) => ( v / 速度倍率 );
 
-            var animation = グラフィックデバイス.Instance.アニメーション;
+            var animation = DXResources.Instance.アニメーション;
 
             this._パネルの高さ割合?.Dispose();
             this._パネルの高さ割合 = new Variable( animation.Manager, initialValue: 1.0 );
@@ -93,7 +93,7 @@ namespace DTXMania.オプション設定
         {
             double 秒( double v ) => ( v / 速度倍率 );
 
-            var animation = グラフィックデバイス.Instance.アニメーション;
+            var animation = DXResources.Instance.アニメーション;
 
             if( null == this._パネルの高さ割合 )    // 未生成のときだけ生成。生成済みなら、その現状を引き継ぐ。
                 this._パネルの高さ割合 = new Variable( animation.Manager, initialValue: 1.0 );
@@ -135,7 +135,7 @@ namespace DTXMania.オプション設定
 
             // (1) パネルの下地部分の描画。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 using( var パネル背景色 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var ヘッダ背景色 = new SolidColorBrush( dc, this.ヘッダ色 ) )

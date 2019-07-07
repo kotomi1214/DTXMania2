@@ -160,7 +160,7 @@ namespace FDK
 
                     if( null == drawingEffect )
                     {
-                        drawingEffect = new DrawingEffect( グラフィックデバイス.Instance.既定のD2D1DeviceContext ) {
+                        drawingEffect = new DrawingEffect( DXResources.Instance.既定のD2D1DeviceContext ) {
                             文字の色 = this._既定の文字色,
                             背景の色 = this._既定の背景色,
                         };
@@ -172,7 +172,7 @@ namespace FDK
 
                     var renderTarget =
                         drawingEffect.renderTarget ??                           // 指定されたレンダーターゲットを使う。
-                        グラフィックデバイス.Instance.既定のD2D1DeviceContext;  // 指定がなければ既定のDC。
+                        DXResources.Instance.既定のD2D1DeviceContext;  // 指定がなければ既定のDC。
 
                     this._現在の変換行列 = renderTarget.Transform;
                     this._現在のDPI = renderTarget.DotsPerInch.Width;

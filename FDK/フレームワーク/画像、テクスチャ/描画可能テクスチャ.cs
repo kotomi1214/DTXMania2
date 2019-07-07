@@ -56,7 +56,7 @@ namespace FDK
                     BitmapOptions = BitmapOptions.Target | BitmapOptions.CannotDraw,
                 };
 
-                return new Bitmap1( グラフィックデバイス.Instance.既定のD2D1DeviceContext, dxgiSurface, bmpProp );
+                return new Bitmap1( DXResources.Instance.既定のD2D1DeviceContext, dxgiSurface, bmpProp );
             }
         }
 
@@ -67,9 +67,9 @@ namespace FDK
 
         public void テクスチャへ描画する( Action<SharpDX.Direct2D1.DeviceContext> 描画アクション )
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.Target = this._Bitmap;           // 描画先
                 dc.Transform = Matrix3x2.Identity;  // 等倍描画（dpx to dpx）
@@ -77,7 +77,7 @@ namespace FDK
 
                 描画アクション( dc );
 
-                dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
+                dc.Target = DXResources.Instance.既定のD2D1RenderBitmap1;
 
             } );
         }

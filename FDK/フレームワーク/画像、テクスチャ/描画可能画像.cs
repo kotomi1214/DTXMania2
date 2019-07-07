@@ -42,11 +42,11 @@ namespace FDK
 
             this.Bitmap?.Dispose();
             this.Bitmap = new Bitmap1(
-                グラフィックデバイス.Instance.既定のD2D1DeviceContext,
+                DXResources.Instance.既定のD2D1DeviceContext,
                 new Size2( (int) this._サイズ.Width, (int) this._サイズ.Height ),
                 new BitmapProperties1() {
                     PixelFormat = new PixelFormat(
-                        グラフィックデバイス.Instance.既定のD2D1DeviceContext.PixelFormat.Format,
+                        DXResources.Instance.既定のD2D1DeviceContext.PixelFormat.Format,
                         AlphaMode.Premultiplied ),
                     BitmapOptions = BitmapOptions.Target,
                 } );
@@ -73,9 +73,9 @@ namespace FDK
         /// <param name="描画アクション">Bitmap に対して行いたい操作。</param>
         public void 画像へ描画する( Action<DeviceContext> 描画アクション )
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.Target = this.Bitmap;            // 描画先
                 dc.Transform = Matrix3x2.Identity;  // 等倍（dpx to dpx）
@@ -83,7 +83,7 @@ namespace FDK
 
                 描画アクション( dc );
 
-                dc.Target = グラフィックデバイス.Instance.既定のD2D1RenderBitmap1;
+                dc.Target = DXResources.Instance.既定のD2D1RenderBitmap1;
 
             } );
         }

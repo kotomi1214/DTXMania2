@@ -13,7 +13,7 @@ namespace FDK
     internal class 表示タスク
     {
         /// <summary>
-        ///     false なら描画処理が可能、true なら描画処理は不可（スワップチェーンの表示待機中のため）。
+        ///     スワップチェーンの表示待機中なら true。
         /// </summary>
         public bool ただいま表示中
         {
@@ -22,7 +22,7 @@ namespace FDK
         }
 
         /// <summary>
-        ///     表示スレッドを生成して、そこで垂直帰線同期とスワップチェーンの表示を行う。
+        ///     表示用の専用タスクを生成して、そこで垂直帰線同期とスワップチェーンの表示を行う。
         /// </summary>
         public void 表示を開始する()
         {
@@ -30,8 +30,9 @@ namespace FDK
 
             Task.Run( () => {
 
-                グラフィックデバイス.Instance.DXGIOutput1.WaitForVerticalBlank();
-                グラフィックデバイス.Instance.DXGISwapChain1.Present( 0, SharpDX.DXGI.PresentFlags.None );
+                // SwapChain.Present での垂直帰線待ちは広範囲のリソースを巻き込んで処理を停滞させるため、DXGIで行うようにする。
+                DXResources.Instance.DXGIOutput1.WaitForVerticalBlank();
+                DXResources.Instance.DXGISwapChain1.Present( 0, SharpDX.DXGI.PresentFlags.None );
 
                 this.ただいま表示中 = false;   // 表示完了
             } );

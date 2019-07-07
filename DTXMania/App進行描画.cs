@@ -121,7 +121,7 @@ namespace DTXMania
             テクスチャ.全インスタンスで共有するリソースを作成する();
 
             App進行描画.アイキャッチ管理 = new アイキャッチ管理();
-            App進行描画.Effekseer = new Effekseer( グラフィックデバイス.Instance.D3D11Device1 );
+            App進行描画.Effekseer = new Effekseer( DXResources.Instance.D3D11Device1 );
 
 
             // 起動ステージ以外のステージを生成。
@@ -416,11 +416,11 @@ namespace DTXMania
             #region " 画面クリア "
             //----------------
             // 既定のD3Dレンダーターゲットビューを黒でクリアする。
-            グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.ClearRenderTargetView( グラフィックデバイス.Instance.既定のD3D11RenderTargetView, Color4.Black );
+            DXResources.Instance.D3D11Device1.ImmediateContext.ClearRenderTargetView( DXResources.Instance.既定のD3D11RenderTargetView, Color4.Black );
 
             // 深度バッファを 1.0f でクリアする。
-            グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.ClearDepthStencilView(
-                グラフィックデバイス.Instance.既定のD3D11DepthStencilView,
+            DXResources.Instance.D3D11Device1.ImmediateContext.ClearDepthStencilView(
+                DXResources.Instance.既定のD3D11DepthStencilView,
                 SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
                 depth: 1.0f,
                 stencil: 0 );

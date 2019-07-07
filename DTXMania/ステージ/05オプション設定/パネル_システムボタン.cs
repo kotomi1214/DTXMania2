@@ -44,7 +44,7 @@ namespace DTXMania.オプション設定
 
             // (1) パネルの下地部分の描画。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 using( var テキスト背景色 = new SolidColorBrush( dc, Color.LightGray ) )
                     dc.FillRectangle( テキスト矩形, テキスト背景色 );

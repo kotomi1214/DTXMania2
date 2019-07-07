@@ -73,7 +73,7 @@ namespace FDK
                 Thread.CurrentThread.Name = "進行描画";
                 Debug.Assert( Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA, "MTAThread で実行してください。" );
 
-                グラフィックデバイス.インスタンスを生成する( hWindow, 物理画面サイズ, 設計画面サイズ );
+                DXResources.CreateInstance( hWindow, 物理画面サイズ, 設計画面サイズ );
 
                 this.On開始();
 
@@ -111,7 +111,7 @@ namespace FDK
 
                     // (2) 進行する。
 
-                    グラフィックデバイス.Instance.アニメーション.進行する();
+                    DXResources.Instance.アニメーション.進行する();
                     this.On進行();
 
 
@@ -136,7 +136,7 @@ namespace FDK
 
                 this.On終了();
 
-                グラフィックデバイス.インスタンスを解放する();
+                DXResources.ReleaseInstance();
                 this.AppForm = null;
                 //----------------
                 #endregion
@@ -240,7 +240,7 @@ namespace FDK
             this.Onスワップチェーンに依存するグラフィックリソースの解放();
 
             // スワップチェーンを再構築して、
-            グラフィックデバイス.Instance.サイズを変更する( msg.新物理画面サイズ );
+            DXResources.Instance.物理画面サイズを変更する( msg.新物理画面サイズ );
 
             // リソースを再作成する。
             this.Onスワップチェーンに依存するグラフィックリソースの作成();

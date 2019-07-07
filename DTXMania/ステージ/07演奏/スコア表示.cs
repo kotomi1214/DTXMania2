@@ -96,7 +96,7 @@ namespace DTXMania.演奏
             var 文字間隔補正 = -10f;
             var 文字の位置 = new Vector2( -( 全体のサイズ.X / 2f ), 0f );
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;

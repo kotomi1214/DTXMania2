@@ -22,7 +22,7 @@ namespace DTXMania.結果
             {
                 this._フルコンボ再生済み = false;
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this._パラメータアニメ = new パラメータアニメ( animation.Manager );
                 this._パラメータアニメ.X位置オフセット = new Variable[ 6 ];
@@ -86,7 +86,7 @@ namespace DTXMania.結果
                 this._フルコンボ再生済み = true; // 再生してようがしてまいが
             }
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var 拡大率 = new Size2F( 1.4f, 1.3f ); // 画像が小さいので少々拡大。
 

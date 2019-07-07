@@ -122,7 +122,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this.現在のフェーズ = フェーズ.クローズ;
 
@@ -229,7 +229,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -265,7 +265,7 @@ namespace DTXMania
                     bar.棒の太さ = 20.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -301,7 +301,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -337,7 +337,7 @@ namespace DTXMania
                     bar.棒の太さ = 20.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -373,7 +373,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.1f, 0.1f, 0.5f, 0.5f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.1f, 0.1f, 0.5f, 0.5f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -409,7 +409,7 @@ namespace DTXMania
                     bar.棒の太さ = 10.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 0.5f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 0.5f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -445,7 +445,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -481,7 +481,7 @@ namespace DTXMania
                     bar.棒の太さ = 20.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -517,7 +517,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -553,7 +553,7 @@ namespace DTXMania
                     bar.棒の太さ = 20.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -589,7 +589,7 @@ namespace DTXMania
                     bar.棒の太さ = 50.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.1f, 0.1f, 0.5f, 0.5f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.1f, 0.1f, 0.5f, 0.5f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -625,7 +625,7 @@ namespace DTXMania
                     bar.棒の太さ = 10.0;
                     bar.回転角rad = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 0.5f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 0.5f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 1200.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
@@ -665,7 +665,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 50.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -687,7 +687,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 50.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -709,7 +709,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 50.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -731,7 +731,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 50.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.下辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -753,7 +753,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 1f, 1f, 1f, 1f ) ); // 白
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 棒の太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -775,7 +775,7 @@ namespace DTXMania
                     bar.棒の太さ = new Variable( animation.Manager, initialValue: 0.0 );
                     bar.回転角rad = Math.PI * 0.25;
                     bar.辺の種類 = 辺の種類.上辺;
-                    bar.ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
+                    bar.ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0.5f, 0.5f, 1f, 1f ) ); // 青
                     bar.ストーリーボード = new Storyboard( animation.Manager );
 
                     using( var 棒の太さの遷移 = animation.TrasitionLibrary.Linear( duration: 秒( 0.18 ), finalValue: 2200.0 ) )
@@ -801,7 +801,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this.現在のフェーズ = フェーズ.オープン;
                 var basetime = animation.Timer.Time;
@@ -844,7 +844,7 @@ namespace DTXMania
         {
             bool すべて完了 = true;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 
@@ -938,7 +938,7 @@ namespace DTXMania
             //----------------
             #endregion
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 

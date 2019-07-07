@@ -218,9 +218,9 @@
     <Compile Include="ユーティリティ\カウンタ、タイマ\FPS.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\LoopCounter.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\QPCTimer.cs" />
-    <Compile Include="フレームワーク\QueueTimer.cs" />
+    <Compile Include="ユーティリティ\カウンタ、タイマ\QueueTimer.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\TimeGetTime.cs" />
-    <Compile Include="フレームワーク\アニメーション.cs" />
+    <Compile Include="ユーティリティ\アニメーション\アニメーション.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\定間隔進行.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\経過時間測定.cs" />
     <Compile Include="ユーティリティ\シリアライズ\XML\SerializableDictionary.cs" />
@@ -228,7 +228,7 @@
     <Compile Include="ユーティリティ\シリアライズ\YAML\CommentGatheringTypeInspector.cs" />
     <Compile Include="ユーティリティ\シリアライズ\YAML\CommentsObjectDescriptor.cs" />
     <Compile Include="ユーティリティ\シリアライズ\YAML\CommentsObjectGraphVisitor.cs" />
-    <Compile Include="フレームワーク\グラフィックデバイス.cs" />
+    <Compile Include="フレームワーク\DXResources.cs" />
     <Compile Include="フレームワーク\表示タスク.cs" />
     <Compile Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\XML.cs" />
     <Compile Include="フレームワーク\画像、テクスチャ\フォント、文字列画像\カスタムTextRenderer.cs" />

@@ -11,23 +11,23 @@ namespace FDK
     /// <summary>
     ///     グラフィック関連のリソース。
     /// </summary>
-    public class グラフィックデバイス : IDisposable
+    public class DXResources : IDisposable
     {
 
         // static
 
 
-        public static グラフィックデバイス Instance { get; protected set; } = null;
+        public static DXResources Instance { get; protected set; } = null;
 
-        public static void インスタンスを生成する( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ )
+        public static void CreateInstance( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ )
         {
             if( null != Instance )
                 throw new Exception( "インスタンスはすでに生成済みです。" );
 
-            Instance = new グラフィックデバイス( 設計画面サイズ, 物理画面サイズ, hWindow, hWindow );
+            Instance = new DXResources( 設計画面サイズ, 物理画面サイズ, hWindow, hWindow );
         }
 
-        public static void インスタンスを解放する()
+        public static void ReleaseInstance()
         {
             Instance?.Dispose();
             Instance = null;
@@ -73,11 +73,6 @@ namespace FDK
         ///     3D視点で見る画面左上の座標。
         /// </summary>
         public Vector3 画面左上dpx => new Vector3( -this.設計画面サイズ.Width / 2f, +this.設計画面サイズ.Height / 2f, 0f );
-
-        /// <summary>
-        ///     3Dビューの視野角[度]。
-        /// </summary>
-        public float 視野角deg { get; set; } = 45.0f;
 
         /// <summary>
         ///		現在時刻から、DirectComposition Engine による次のフレーム表示時刻までの間隔[秒]を返す。
@@ -167,7 +162,7 @@ namespace FDK
         // 生成と終了
 
 
-        public グラフィックデバイス( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow, IntPtr hControl )
+        protected DXResources( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow, IntPtr hControl )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -212,10 +207,14 @@ namespace FDK
 
 
         /// <summary>
-        ///		バックバッファ（スワップチェーン）のサイズを変更する。
+        ///		物理画面サイズ（スワップチェーンのバックバッファのサイズ）を変更する。
         /// </summary>
         /// <param name="newSize">新しいサイズ。</param>
-        public void サイズを変更する( Size newSize )
+        /// <remarks>
+        ///     スワップチェーンを ResizeBuffer() する前に、バックバッファに依存するリソースをすべて解放しなければならない。
+        ///     また、ResizeBuffer() の後には、バックバッファまたはそのサイズに依存するリソースをすべて再構築しなければならない。
+        /// </remarks>
+        public void 物理画面サイズを変更する( Size newSize )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -540,16 +539,18 @@ namespace FDK
 
 
         /// <summary>
-        ///     平面描画用のビュー行列と射影行列を生成して返す。
+        ///     等倍3D平面描画用のビュー行列と射影行列を生成して返す。
         /// </summary>
         /// <remarks>
-        ///     Z = 0 におけるビューポートサイズが <see cref="設計画面サイズ"/> に一致するように調整された
-        ///     ビュー行列と射影行列を生成して返す。
-        ///     例えば、設計画面サイズが 1024x720 の場合、z = 0 における表示可能な x, y の値域は (-512, -360)～(+512, +360) となる。
+        ///     Z = 0 におけるビューポートサイズが <see cref="設計画面サイズ"/> に一致する平面を、「等倍3D平面」と称する。
+        ///     例えば、設計画面サイズが 1024x720 の場合、等倍3D平面の表示可能な x, y の値域は (-512, -360)～(+512, +360) となる。
+        ///     本メソッドは、等倍3D平面を実現するためのビュー行列と射影行列を返す。
         /// </remarks>
-        public void 平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 )
+        public void 等倍3D平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 )
         {
-            var dz = (float) ( this.設計画面サイズ.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( this.視野角deg / 2.0f ) ) ) );
+            const float 視野角deg = 45.0f;
+
+            var dz = (float) ( this.設計画面サイズ.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
 
             var カメラの位置 = new Vector3( 0f, 0f, -2f * dz );
             var カメラの注視点 = new Vector3( 0f, 0f, 0f );
@@ -559,26 +560,26 @@ namespace FDK
             転置済みビュー行列.Transpose();  // 転置
 
             転置済み射影行列 = Matrix.PerspectiveFovLH(
-                MathUtil.DegreesToRadians( this.視野角deg ),
+                MathUtil.DegreesToRadians( 視野角deg ),
                 設計画面サイズ.Width / 設計画面サイズ.Height,   // アスペクト比
                 -dz,                                            // 前方投影面までの距離
-                dz );                                           // 後方投影面までの距離
+                +dz );                                          // 後方投影面までの距離
             転置済み射影行列.Transpose();  // 転置
         }
 
         /// <summary>
-        ///		指定したレンダーターゲットに対して描画処理をバッチ実行する。
+        ///		指定したレンダーターゲットに対して、D2D描画処理をバッチ実行する。
         /// </summary>
         /// <remarks>
-        ///		描画処理は、レンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
-        ///		描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
+        ///		D2D描画処理は、レンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
+        ///		D2D描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
         /// </remarks>
         /// <param name="rt">レンダリングターゲット。</param>
-        /// <param name="描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
-        public void D2DBatchDraw( SharpDX.Direct2D1.RenderTarget rt, Action 描画処理 )
+        /// <param name="D2D描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
+        public void D2DBatchDraw( SharpDX.Direct2D1.RenderTarget rt, Action D2D描画処理 )
         {
-            // リストになかったらこの rt を使うのは初回なので、BeginDraw/EndDraw() の呼び出しを行う。
-            // もしリストに登録されていたら、この rt は他の誰かが BeginDraw して EndDraw してない状態
+            // リストになかったらこの RenderTarget を使うのは初回なので、BeginDraw/EndDraw() の呼び出しを行う。
+            // もしリストに登録されていたら、この RenderTarget は他の誰かが BeginDraw して EndDraw してない状態
             // （D2DBatcDraw() の最中に D2DBatchDraw() が呼び出されている状態）なので、これらを呼び出してはならない。
             bool BeginとEndを行う = !( this._BatchDraw中のレンダーターゲットリスト.Contains( rt ) );
 
@@ -593,7 +594,7 @@ namespace FDK
                     rt.BeginDraw();
                 }
 
-                描画処理();
+                D2D描画処理();
             }
             finally
             {
@@ -608,7 +609,6 @@ namespace FDK
                 }
             }
         }
-
 
         private List<SharpDX.Direct2D1.RenderTarget> _BatchDraw中のレンダーターゲットリスト = new List<SharpDX.Direct2D1.RenderTarget>();
     }

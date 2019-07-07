@@ -102,7 +102,7 @@ namespace DTXMania.演奏
                    文字幅補正dpx: -16f,
                    不透明度: 0.3f );
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._小節線色 = new SolidColorBrush( dc, Color.White );
                 this._小節線影色 = new SolidColorBrush( dc, Color.Blue );
@@ -721,8 +721,8 @@ namespace DTXMania.演奏
 
         public override void 描画する()
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             var playMode = App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード;
 
@@ -734,14 +734,14 @@ namespace DTXMania.演奏
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
                         {
                             this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
-                                X方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                                Y方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                                X方向拡大率: DXResources.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                                Y方向拡大率: DXResources.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
                         }
 
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
+                            this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
                             this._曲別SKILL.進行描画する( dcp, 0f );
@@ -784,15 +784,15 @@ namespace DTXMania.演奏
                 case フェーズ.表示:
                 case フェーズ.キャンセル時フェードアウト:
                     {
-                        double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + グラフィックデバイス.Instance.次のDComp表示までの残り時間sec;
+                        double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + DXResources.Instance.次のDComp表示までの残り時間sec;
 
                         this._譜面スクロール速度.進行する( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
 
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
                         {
                             this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
-                                X方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                                Y方向拡大率: グラフィックデバイス.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                                X方向拡大率: DXResources.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                                Y方向拡大率: DXResources.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
                         }
                         if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
                         {
@@ -810,8 +810,8 @@ namespace DTXMania.演奏
                                         case 動画の表示サイズ.全画面:
                                             {
                                                 // 100%全体表示
-                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                                float w = DXResources.Instance.設計画面サイズ.Width;
+                                                float h = DXResources.Instance.設計画面サイズ.Height;
                                                 video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
                                             }
                                             break;
@@ -819,8 +819,8 @@ namespace DTXMania.演奏
                                         case 動画の表示サイズ.中央寄せ:
                                             {
                                                 // 75%縮小表示
-                                                float w = グラフィックデバイス.Instance.設計画面サイズ.Width;
-                                                float h = グラフィックデバイス.Instance.設計画面サイズ.Height;
+                                                float w = DXResources.Instance.設計画面サイズ.Width;
+                                                float h = DXResources.Instance.設計画面サイズ.Height;
 
                                                 // (1) 画面いっぱいに描画。
                                                 video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
@@ -845,7 +845,7 @@ namespace DTXMania.演奏
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
+                            this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
                             this._曲別SKILL.進行描画する( dcp, this.成績.Skill );
@@ -854,7 +854,7 @@ namespace DTXMania.演奏
 
                         this._右サイドクリアパネル.クリアする();
                         this._右サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
-                            this._コンボ表示.進行描画する( dcp, グラフィックデバイス.Instance.アニメーション, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
+                            this._コンボ表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
                         } );
                         this._右サイドクリアパネル.描画する();
 
@@ -1042,7 +1042,7 @@ namespace DTXMania.演奏
         {
             // 小節線・拍線 と チップ は描画階層（奥行き）が異なるので、別々のメソッドに分ける。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
@@ -1248,13 +1248,13 @@ namespace DTXMania.演奏
         {
             Debug.Assert( null != this.キャプチャ画面, "キャプチャ画面が設定されていません。" );
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 dc.DrawBitmap(
                     this.キャプチャ画面,
-                    new RectangleF( 0f, 0f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height ),
+                    new RectangleF( 0f, 0f, DXResources.Instance.設計画面サイズ.Width, DXResources.Instance.設計画面サイズ.Height ),
                     不透明度,
                     BitmapInterpolationMode.Linear );
             } );

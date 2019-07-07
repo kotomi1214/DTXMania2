@@ -163,8 +163,8 @@ namespace DTXMania.認証
 
             var 描画領域 = new RectangleF( 566f, 60f, 784f, 943f );
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {

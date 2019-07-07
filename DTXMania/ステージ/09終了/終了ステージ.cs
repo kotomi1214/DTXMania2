@@ -96,8 +96,8 @@ namespace DTXMania.終了
 
         public override void 描画する()
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {

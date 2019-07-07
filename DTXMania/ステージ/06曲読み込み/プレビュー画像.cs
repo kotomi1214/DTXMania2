@@ -46,8 +46,8 @@ namespace DTXMania.曲読み込み
                     this._プレビュー画像表示サイズdpx.Y / preimage.サイズ.Height,
                     0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
+                    DXResources.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
+                    DXResources.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
                     0f );
 
             preimage.描画する( 変換行列 );

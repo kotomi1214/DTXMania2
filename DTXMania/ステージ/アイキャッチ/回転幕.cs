@@ -56,7 +56,7 @@ namespace DTXMania
                 this._画面BC_アイキャッチ遷移画面1_回転中 = new 舞台画像();
                 this._画面D_アイキャッチ遷移画面2_逆回転中 = new 舞台画像();
 
-                this._斜めジオメトリマスク = new PathGeometry( グラフィックデバイス.Instance.D2D1Factory1 );
+                this._斜めジオメトリマスク = new PathGeometry( DXResources.Instance.D2D1Factory1 );
                 using( var sink = this._斜めジオメトリマスク.Open() )
                 {
                     // 長方形。これを、縮小＆45°回転してマスクさせる。
@@ -119,7 +119,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this.現在のフェーズ = フェーズ.クローズ;
 
@@ -293,7 +293,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this.現在のフェーズ = フェーズ.オープン;
 
@@ -529,7 +529,7 @@ namespace DTXMania
                                         Matrix3x2.Rotation( (float) ( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
                                         Matrix3x2.Rotation( (float) ( Math.PI / 4.0 ) ) // 45°
                                     ) *
-                                    Matrix3x2.Translation( グラフィックデバイス.Instance.設計画面サイズ.Width / 2.0f, グラフィックデバイス.Instance.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
+                                    Matrix3x2.Translation( DXResources.Instance.設計画面サイズ.Width / 2.0f, DXResources.Instance.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
 
                                 this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, layerParameters1: this._斜めレイヤーパラメータ );
                                 this._ロゴを描画する( dc );
@@ -582,7 +582,7 @@ namespace DTXMania
                                         Matrix3x2.Rotation( (float) ( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
                                         Matrix3x2.Rotation( (float) ( Math.PI / 4.0 ) ) // 45°
                                     ) *
-                                    Matrix3x2.Translation( グラフィックデバイス.Instance.設計画面サイズ.Width / 2.0f, グラフィックデバイス.Instance.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
+                                    Matrix3x2.Translation( DXResources.Instance.設計画面サイズ.Width / 2.0f, DXResources.Instance.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
 
                                 this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, layerParameters1: this._斜めレイヤーパラメータ );
                                 this._ロゴを描画する( dc );
@@ -627,7 +627,7 @@ namespace DTXMania
 
             #region " 黒帯（全シーンで共通）"
             //----------------
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 

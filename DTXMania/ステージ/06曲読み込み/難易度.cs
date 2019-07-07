@@ -20,7 +20,7 @@ namespace DTXMania.曲読み込み
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大.png", @"$(System)images\パラメータ文字_大.yaml", 文字幅補正dpx: 0f );
-                this._見出し用TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "Century Gothic", 50f );
+                this._見出し用TextFormat = new TextFormat( DXResources.Instance.DWriteFactory, "Century Gothic", 50f );
             }
         }
 
@@ -52,7 +52,7 @@ namespace DTXMania.曲読み込み
 
             // 難易度のラベルと値を描画する。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

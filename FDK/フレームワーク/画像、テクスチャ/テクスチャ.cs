@@ -55,7 +55,7 @@ namespace FDK
                 }
 
                 var テクスチャリソース = FDKUtilities.CreateShaderResourceViewFromFile(
-                    グラフィックデバイス.Instance.D3D11Device1,
+                    DXResources.Instance.D3D11Device1,
                     this._bindFlags,
                     this._画像ファイルパス );
 
@@ -85,7 +85,7 @@ namespace FDK
             }
 
             var テクスチャリソース = FDKUtilities.CreateShaderResourceView(
-                グラフィックデバイス.Instance.D3D11Device1,
+                DXResources.Instance.D3D11Device1,
                 this._bindFlags,
                 new Size2( (int) this.ユーザ指定サイズ.Width, (int) this.ユーザ指定サイズ.Height ) );
 
@@ -109,7 +109,7 @@ namespace FDK
         private SharpDX.Direct3D11.Buffer _定数バッファを作成する()
         {
             return new SharpDX.Direct3D11.Buffer(
-                グラフィックデバイス.Instance.D3D11Device1,
+                DXResources.Instance.D3D11Device1,
                 new BufferDescription() {
                     Usage = ResourceUsage.Dynamic,              // 動的使用法
                     BindFlags = BindFlags.ConstantBuffer,       // 定数バッファ
@@ -135,8 +135,8 @@ namespace FDK
             var 変換行列 =
                 Matrix.Scaling( X方向拡大率, Y方向拡大率, 0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + ( 左位置 + X方向拡大率 * srcRect.Width / 2f ),
-                    グラフィックデバイス.Instance.画面左上dpx.Y - ( 上位置 + Y方向拡大率 * srcRect.Height / 2f ),
+                    DXResources.Instance.画面左上dpx.X + ( 左位置 + X方向拡大率 * srcRect.Width / 2f ),
+                    DXResources.Instance.画面左上dpx.Y - ( 上位置 + Y方向拡大率 * srcRect.Height / 2f ),
                     0f );
 
             this.描画する( 変換行列, 不透明度0to1, 転送元矩形 );
@@ -169,7 +169,7 @@ namespace FDK
                 this._定数バッファの転送元データ.World = ワールド行列変換;
 
                 // ビュー変換行列と射影変換行列
-                グラフィックデバイス.Instance.平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 );
+                DXResources.Instance.等倍3D平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 );
                 this._定数バッファの転送元データ.View = 転置済みビュー行列;
                 this._定数バッファの転送元データ.Projection = 転置済み射影行列;
 
@@ -186,18 +186,18 @@ namespace FDK
                 this._定数バッファの転送元データ.dummy3 = 0f;
 
                 // 定数バッファへ書き込む。
-                var dataBox = グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.MapSubresource(
+                var dataBox = DXResources.Instance.D3D11Device1.ImmediateContext.MapSubresource(
                     resourceRef: this._定数バッファ,
                     subresource: 0,
                     mapType: MapMode.WriteDiscard,
                     mapFlags: MapFlags.None );
                 SharpDX.Utilities.Write( dataBox.DataPointer, ref this._定数バッファの転送元データ );
-                グラフィックデバイス.Instance.D3D11Device1.ImmediateContext.UnmapSubresource( this._定数バッファ, 0 );
+                DXResources.Instance.D3D11Device1.ImmediateContext.UnmapSubresource( this._定数バッファ, 0 );
             }
             //----------------
             #endregion
 
-            var dc = グラフィックデバイス.Instance.D3D11Device1.ImmediateContext;
+            var dc = DXResources.Instance.D3D11Device1.ImmediateContext;
 
             #region " 3Dパイプラインを設定する。"
             //----------------
@@ -220,7 +220,7 @@ namespace FDK
                 dc.GeometryShader.Set( null );
 
                 // ラスタライザ
-                dc.Rasterizer.SetViewports( グラフィックデバイス.Instance.既定のD3D11ViewPort );
+                dc.Rasterizer.SetViewports( DXResources.Instance.既定のD3D11ViewPort );
                 dc.Rasterizer.State = テクスチャ._RasterizerState;
 
                 // ピクセルシェーダ
@@ -230,12 +230,12 @@ namespace FDK
                 dc.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
 
                 // 出力マージャ
-                dc.OutputMerger.SetTargets( グラフィックデバイス.Instance.既定のD3D11DepthStencilView, グラフィックデバイス.Instance.既定のD3D11RenderTargetView );
+                dc.OutputMerger.SetTargets( DXResources.Instance.既定のD3D11DepthStencilView, DXResources.Instance.既定のD3D11RenderTargetView );
                 dc.OutputMerger.SetBlendState(
                     ( this.加算合成する ) ? テクスチャ._BlendState加算合成 : テクスチャ._BlendState通常合成,
                     new Color4( 0f, 0f, 0f, 0f ),
                     -1 );
-                dc.OutputMerger.SetDepthStencilState( グラフィックデバイス.Instance.既定のD3D11DepthStencilState, 0 );
+                dc.OutputMerger.SetDepthStencilState( DXResources.Instance.既定のD3D11DepthStencilState, 0 );
             }
             //----------------
             #endregion
@@ -299,7 +299,7 @@ namespace FDK
             _全インスタンスで共有するリソースを作成済み = true;
 
 
-            var d3dDevice = グラフィックデバイス.Instance.D3D11Device1;
+            var d3dDevice = DXResources.Instance.D3D11Device1;
 
             var シェーダコンパイルのオプション =
                 ShaderFlags.Debug |

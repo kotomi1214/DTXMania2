@@ -108,7 +108,7 @@ namespace DTXMania.演奏
 
         public void 進行描画する( DeviceContext dc )
         {
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

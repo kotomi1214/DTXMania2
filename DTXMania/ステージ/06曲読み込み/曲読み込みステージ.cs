@@ -124,8 +124,8 @@ namespace DTXMania.曲読み込み
 
         public override void 描画する()
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             this._舞台画像.進行描画する( dc );
             this._注意文.描画する( dc, 0f, 760f );
@@ -163,7 +163,7 @@ namespace DTXMania.曲読み込み
             var 表示位置dpx = new Vector2( 782f, 409f );
 
             // 拡大率を計算して描画する。
-            float 最大幅dpx = グラフィックデバイス.Instance.設計画面サイズ.Width - 表示位置dpx.X;
+            float 最大幅dpx = DXResources.Instance.設計画面サイズ.Width - 表示位置dpx.X;
 
             this._曲名画像.描画する(
                 dc,
@@ -177,7 +177,7 @@ namespace DTXMania.曲読み込み
             var 表示位置dpx = new Vector2( 782f, 520f );
 
             // 拡大率を計算して描画する。
-            float 最大幅dpx = グラフィックデバイス.Instance.設計画面サイズ.Width - 表示位置dpx.X;
+            float 最大幅dpx = DXResources.Instance.設計画面サイズ.Width - 表示位置dpx.X;
 
             this._サブタイトル画像.描画する(
                 dc,

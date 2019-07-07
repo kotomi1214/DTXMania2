@@ -74,7 +74,7 @@ namespace DTXMania.選曲
                 this._難易度と成績.青い線を取得する = () => this._青い線;
 
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._白 = new SolidColorBrush( dc, Color4.White );
                 this._黒 = new SolidColorBrush( dc, Color4.Black );
@@ -279,8 +279,8 @@ namespace DTXMania.選曲
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             if( null != App進行描画.曲ツリー.フォーカスノード )
             {
@@ -376,7 +376,7 @@ namespace DTXMania.選曲
 
         private void _その他パネルを描画する( DeviceContext dc )
         {
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
@@ -415,8 +415,8 @@ namespace DTXMania.選曲
                     this._プレビュー画像表示サイズdpx.Y / 画像.サイズ.Height,
                     0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
+                    DXResources.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
+                    DXResources.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
                     0f );
 
             画像.描画する( 変換行列 );
@@ -471,7 +471,7 @@ namespace DTXMania.選曲
 
         private void _導線アニメをリセットする()
         {
-            var animation = グラフィックデバイス.Instance.アニメーション;
+            var animation = DXResources.Instance.アニメーション;
 
             this._選択曲枠ランナー.リセットする();
 

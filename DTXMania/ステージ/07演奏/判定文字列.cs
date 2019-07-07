@@ -93,7 +93,7 @@ namespace DTXMania.演奏
                         {
                             status.アニメ用メンバを解放する();
 
-                            var animation = グラフィックデバイス.Instance.アニメーション;
+                            var animation = DXResources.Instance.アニメーション;
 
                             #region " (1) 光 アニメーションを構築 "
                             //----------------
@@ -282,8 +282,8 @@ namespace DTXMania.演奏
                                     Matrix.RotationZ(
                                         MathUtil.DegreesToRadians( (float) status.光の回転角.Value ) ) *
                                     Matrix.Translation(
-                                        グラフィックデバイス.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
-                                        グラフィックデバイス.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
+                                        DXResources.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
+                                        DXResources.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
                                         0f );
 
                                 this._判定文字列画像.描画する( 変換行列, 転送元矩形: 転送元矩形 );

@@ -53,7 +53,7 @@ namespace DTXMania.タイトル
                 this._パッドを叩いてください = new 文字列画像() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像.効果.縁取り };
                 this._システム情報 = new システム情報();
 
-                this._帯ブラシ = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
+                this._帯ブラシ = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
 
                 App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_開始音 );
                 App進行描画.システムサウンド.再生する( システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );
@@ -123,8 +123,8 @@ namespace DTXMania.タイトル
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {
@@ -134,8 +134,8 @@ namespace DTXMania.タイトル
                     this._舞台画像.進行描画する( dc );
                     this._タイトルロゴ.描画する(
                         dc,
-                        ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                        ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+                        ( DXResources.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
+                        ( DXResources.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
                     this._帯メッセージを描画する( dc );
                     //----------------
                     #endregion
@@ -147,14 +147,14 @@ namespace DTXMania.タイトル
                     this._舞台画像.進行描画する( dc );
                     this._タイトルロゴ.描画する(
                         dc,
-                        ( グラフィックデバイス.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                        ( グラフィックデバイス.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+                        ( DXResources.Instance.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
+                        ( DXResources.Instance.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
                     this._帯メッセージを描画する( dc );
                     //----------------
                     #endregion
                     #region " アイキャッチを描画する。"
                     //----------------
-                    App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( グラフィックデバイス.Instance.既定のD2D1DeviceContext );
+                    App進行描画.アイキャッチ管理.現在のアイキャッチ.進行描画する( DXResources.Instance.既定のD2D1DeviceContext );
 
                     if( App進行描画.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
                     {
@@ -186,9 +186,9 @@ namespace DTXMania.タイトル
 
         private void _帯メッセージを描画する( DeviceContext dc )
         {
-            var 領域 = new RectangleF( 0f, 800f, グラフィックデバイス.Instance.設計画面サイズ.Width, 80f );
+            var 領域 = new RectangleF( 0f, 800f, DXResources.Instance.設計画面サイズ.Width, 80f );
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
                 dc.FillRectangle( 領域, this._帯ブラシ );
             } );
 

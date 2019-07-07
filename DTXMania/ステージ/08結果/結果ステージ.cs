@@ -98,7 +98,7 @@ namespace DTXMania.結果
                 this._曲名画像.表示文字列 = 選択曲.タイトル;
                 this._サブタイトル画像.表示文字列 = 選択曲.サブタイトル;
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._黒マスクブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.75f ) );
                 this._プレビュー枠ブラシ = new SolidColorBrush( dc, new Color4( 0xFF209292 ) );
@@ -229,11 +229,11 @@ namespace DTXMania.結果
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
             this._背景.進行描画する( dc );
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
-                dc.FillRectangle( new RectangleF( 0f, 36f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
+            DXResources.Instance.D2DBatchDraw( dc, () => {
+                dc.FillRectangle( new RectangleF( 0f, 36f, DXResources.Instance.設計画面サイズ.Width, DXResources.Instance.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
             } );
             this._プレビュー画像を描画する( dc );
             this._曲名パネル.描画する( dc, 660f, 796f );
@@ -260,7 +260,7 @@ namespace DTXMania.結果
 
             // 枠
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
                 const float 枠の太さdpx = 5f;
                 dc.FillRectangle(
                     new RectangleF(
@@ -279,8 +279,8 @@ namespace DTXMania.結果
                     this._プレビュー画像表示サイズdpx.Y / preimage.サイズ.Height,
                     0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
+                    DXResources.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
+                    DXResources.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
                     0f );
 
             preimage.描画する( 変換行列 );

@@ -39,7 +39,7 @@ namespace DTXMania
                 this._Renderer.SetCameraMatrix( SharpDX.Matrix.LookAtRH( position, new SharpDX.Vector3( 0f, 0f, 0f ), new SharpDX.Vector3( 0f, 1f, 0f ) ) );
 
                 // 投影行列を設定（右手系）
-                this._Renderer.SetProjectionMatrix( SharpDX.Matrix.PerspectiveFovRH( 90.0f / 180.0f * MathUtil.Pi, グラフィックデバイス.Instance.設計画面サイズ.Width / グラフィックデバイス.Instance.設計画面サイズ.Height, 1.0f, 50.0f ) );
+                this._Renderer.SetProjectionMatrix( SharpDX.Matrix.PerspectiveFovRH( 90.0f / 180.0f * MathUtil.Pi, DXResources.Instance.設計画面サイズ.Width / DXResources.Instance.設計画面サイズ.Height, 1.0f, 50.0f ) );
             }
         }
 

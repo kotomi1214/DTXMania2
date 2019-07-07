@@ -874,8 +874,8 @@ namespace DTXMania.オプション設定
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             this._舞台画像.進行描画する( dc );
             this._パネルリスト.進行描画する( dc, 613f, 0f );
