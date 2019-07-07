@@ -87,9 +87,10 @@ namespace DTXMania
             App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
                 ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
             };
-            App進行描画.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
-                音量 = 0.5f, // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
-            };
+            App進行描画.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
+            App進行描画.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
+            // ※↑「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（挙動は不明）
+
             App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.ドラムサウンド = new ドラムサウンド();
             App進行描画.システムサウンド = new システムサウンド();
