@@ -11,7 +11,7 @@ using CSCore.Win32;
 
 namespace FDK
 {
-    public class サウンドデバイス : IDisposable
+    public class SoundDevice : IDisposable
     {
         public PlaybackState レンダリング状態 => this._レンダリング状態;
 
@@ -53,7 +53,7 @@ namespace FDK
         /// <summary>
         ///		デバイスを初期化し、レンダリングを開始する。
         /// </summary>
-        public サウンドデバイス( AudioClientShareMode 共有モード, double バッファサイズsec = 0.010, WaveFormat 希望フォーマット = null )
+        public SoundDevice( AudioClientShareMode 共有モード, double バッファサイズsec = 0.010, WaveFormat 希望フォーマット = null )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {

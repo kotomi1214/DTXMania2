@@ -10,7 +10,7 @@ namespace FDK
     public class Sound : ISampleSource
     {
         public bool 再生中である
-            => this._DeviceRef.TryGetTarget( out サウンドデバイス device ) && device.Mixer.Contains( this );
+            => this._DeviceRef.TryGetTarget( out SoundDevice device ) && device.Mixer.Contains( this );
         public bool 再生中ではない
             => !( this.再生中である );
 
@@ -63,18 +63,18 @@ namespace FDK
         // 生成と終了
 
 
-        public Sound( サウンドデバイス device, ISampleSource sampleSource )
+        public Sound( SoundDevice device, ISampleSource sampleSource )
             : this( device )
         {
             this._BaseSampleSource = sampleSource ?? throw new ArgumentNullException();
         }
 
-        protected Sound( サウンドデバイス device )
+        protected Sound( SoundDevice device )
         {
             if( null == device )
                 throw new ArgumentNullException();
 
-            this._DeviceRef = new WeakReference<サウンドデバイス>( device );
+            this._DeviceRef = new WeakReference<SoundDevice>( device );
         }
 
         public void Dispose()
@@ -97,7 +97,7 @@ namespace FDK
             if( null == this._BaseSampleSource )
                 throw new InvalidOperationException( "サンプルソースが null です。" );
 
-            if( this._DeviceRef.TryGetTarget( out サウンドデバイス device ) )
+            if( this._DeviceRef.TryGetTarget( out SoundDevice device ) )
             {
                 // BaseSampleSource の位置を、再生開始位置へ移動。
                 if( this._BaseSampleSource.CanSeek )
@@ -123,7 +123,7 @@ namespace FDK
 
         public void Stop()
         {
-            if( ( null != this._DeviceRef ) && this._DeviceRef.TryGetTarget( out サウンドデバイス device ) )
+            if( ( null != this._DeviceRef ) && this._DeviceRef.TryGetTarget( out SoundDevice device ) )
             {
                 device.Mixer?.RemoveSound( this );
             }
@@ -227,7 +227,7 @@ namespace FDK
         // private
 
 
-        private WeakReference<サウンドデバイス> _DeviceRef = null;
+        private WeakReference<SoundDevice> _DeviceRef = null;
 
         private ISampleSource _BaseSampleSource = null;
 

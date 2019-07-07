@@ -54,15 +54,15 @@ namespace FDK
                 AudioEncoding.IeeeFloat );      // IeeeFloat 固定
         }
 
-        public int Read( float[] buffer, int offset, int count )
-        {
-            return this._vorbisReader.ReadSamples( buffer, offset, count );
-        }
-
         public void Dispose()
         {
             this._vorbisReader?.Dispose();
             this._vorbisReader = null;
+        }
+
+        public int Read( float[] buffer, int offset, int count )
+        {
+            return this._vorbisReader.ReadSamples( buffer, offset, count );
         }
     }
 }

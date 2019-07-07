@@ -220,7 +220,7 @@
     <Compile Include="ユーティリティ\カウンタ、タイマ\QPCTimer.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\QueueTimer.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\TimeGetTime.cs" />
-    <Compile Include="ユーティリティ\アニメーション\アニメーション.cs" />
+    <Compile Include="ユーティリティ\カウンタ、タイマ\Animation.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\定間隔進行.cs" />
     <Compile Include="ユーティリティ\カウンタ、タイマ\経過時間測定.cs" />
     <Compile Include="ユーティリティ\シリアライズ\XML\SerializableDictionary.cs" />
@@ -240,7 +240,7 @@
     <Compile Include="フレームワーク\サウンド\Sources\NVorbisOnStreamingSampleSource.cs" />
     <Compile Include="フレームワーク\サウンド\SampleSourceFactory.cs" />
     <Compile Include="フレームワーク\サウンド\Sound.cs" />
-    <Compile Include="フレームワーク\サウンド\サウンドデバイス.cs" />
+    <Compile Include="フレームワーク\サウンド\SoundDevice.cs" />
     <Compile Include="フレームワーク\サウンド\SoundTimer.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\ResampledOnMemoryWaveSource.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\WavOnMemoryWaveSource.cs" />
