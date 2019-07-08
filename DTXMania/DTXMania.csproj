@@ -47,7 +47,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RemoteRelease|x64'">
-    <OutputPath>bin\x64\RemoteRelease\</OutputPath>
+    <OutputPath>\\DRUMS-PC\DTXMania2リモートデバッグ\x64\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -91,7 +91,7 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RemoteRelease|x86'">
-    <OutputPath>bin\x86\RemoteRelease\</OutputPath>
+    <OutputPath>\\DRUMS-PC\DTXMania2リモートデバッグ\x86\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
