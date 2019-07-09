@@ -194,11 +194,11 @@
       <DependentUpon>AppFormBase.cs</DependentUpon>
     </Compile>
     <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
-    <Compile Include="フレームワーク\スレッド間通知\サイズ変更通知.cs" />
-    <Compile Include="フレームワーク\スレッド間通知\例外発生通知.cs" />
-    <Compile Include="フレームワーク\スレッド間通知\終了通知.cs" />
-    <Compile Include="フレームワーク\スレッド間通知\通知.cs" />
-    <Compile Include="フレームワーク\スレッド間通知\通知キュー.cs" />
+    <Compile Include="ユーティリティ\スレッド間通知\サイズ変更通知.cs" />
+    <Compile Include="ユーティリティ\スレッド間通知\例外発生通知.cs" />
+    <Compile Include="ユーティリティ\スレッド間通知\終了通知.cs" />
+    <Compile Include="ユーティリティ\スレッド間通知\通知.cs" />
+    <Compile Include="ユーティリティ\スレッド間通知\通知キュー.cs" />
     <Compile Include="フレームワーク\画面モード.cs" />
     <Compile Include="フレームワーク\App進行描画Base.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />

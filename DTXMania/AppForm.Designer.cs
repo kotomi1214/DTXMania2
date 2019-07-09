@@ -1,6 +1,6 @@
 ﻿namespace DTXMania
 {
-    partial class App
+    partial class AppForm
     {
         /// <summary>
         /// 必要なデザイナー変数です。

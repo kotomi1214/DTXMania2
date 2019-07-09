@@ -133,7 +133,14 @@ namespace FDK
 
 
 
-        // 通知とウィンドウメッセージ
+        // スレッド間通知、ウィンドウメッセージ
+
+        /* 通知とメッセージについて：
+         * 
+         * スレッド間で通知を連絡するために、受信スレッドでは通知キューを実装し、ポーリングを行う。
+         * このフォームでは、定期的なポーリングチェックを行わないので、通知キューに通知を投入した後に
+         * WM_APP_MESSAGE_ARRIVED イベントを送信する必要がある。
+         */
 
 
         /// <summary>
@@ -156,7 +163,6 @@ namespace FDK
 
             return msg.完了通知;
         }
-
 
         private const int WM_INPUT = 0x00FF;
         private const int WM_APP = 0x8000;
@@ -221,13 +227,14 @@ namespace FDK
         
         // フォームサイズの変更
 
-        // 以下の２通りがある。
-        //
-        // ・ユーザのドラッグによるサイズ変更。
-        //      → ResizeBegin ～ ResizeEnd が発生するので、ResizeEnd のタイミングでサイズの変更を行う。
-        //
-        // ・最大化、最小化など。
-        //      → ResizeBegin ～ ResizeEnd の範囲外で Resize が発生するので、そのタイミングでサイズの変更を行う。
+        /* 以下の２通りがある。
+         * 
+         * ・ユーザのドラッグによるサイズ変更。
+         *      → ResizeBegin ～ ResizeEnd が発生するので、ResizeEnd のタイミングでサイズの変更を行う。
+         * 
+         * ・最大化、最小化など。
+         *      → ResizeBegin ～ ResizeEnd の範囲外で Resize が発生するので、そのタイミングでサイズの変更を行う。
+         */
 
 
         protected override void OnResizeBegin( EventArgs e )
@@ -291,6 +298,7 @@ namespace FDK
                 new Action( () => this._画面モードを変更する( value ) ) );
         }
 
+
         private void _画面モードを変更する( 画面モード 新モード )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
@@ -344,7 +352,6 @@ namespace FDK
                 }
             }
         }
-
 
         private 画面モード _画面モード = 画面モード.ウィンドウ;
 

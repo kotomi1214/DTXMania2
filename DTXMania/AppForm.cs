@@ -15,7 +15,7 @@ using System.ComponentModel;
 namespace DTXMania
 {
     [ServiceBehavior( InstanceContextMode = InstanceContextMode.Single )]   // WCFサービスインターフェースをシングルスレッドで呼び出す。
-    partial class App : AppFormBase, IDTXManiaService
+    partial class AppForm : AppFormBase, IDTXManiaService
     {
 
         // statc 
@@ -34,19 +34,19 @@ namespace DTXMania
         // 生成と終了
 
 
-        public App( CommandLineOptions options )
+        public AppForm( CommandLineOptions options )
             : base( new App進行描画() )
         {
             InitializeComponent();
 
-            this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
+            this.Text = "DTXMania2 release" + AppForm.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
 
             DTXMania.App進行描画.システム設定 = システム設定.読み込む();
 
-            App.ビュアーモードである = options.ビュアーモードである;
-            App.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
+            AppForm.ビュアーモードである = options.ビュアーモードである;
+            AppForm.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
 
-            if( App.ビュアーモードである )
+            if( AppForm.ビュアーモードである )
             {
                 // 前回の位置とサイズを復元する。
                 this.StartPosition = FormStartPosition.Manual;
@@ -74,7 +74,7 @@ namespace DTXMania
 
         protected override void OnClosing( CancelEventArgs e )
         {
-            if( App.ビュアーモードである )
+            if( AppForm.ビュアーモードである )
             {
                 // 今回の位置とサイズを保存する。
                 DTXMania.App進行描画.システム設定.ウィンドウ表示位置Viewerモード用 = this.Location;

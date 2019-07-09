@@ -56,7 +56,7 @@ namespace DTXMania.起動
             {
                 this._コンソールフォント = new 画像フォント( @"$(System)images\コンソールフォント20x32.png", @"$(System)images\コンソールフォント20x32.yaml", 文字幅補正dpx: -6f );
 
-                if( !App.ビュアーモードである )
+                if( !AppForm.ビュアーモードである )
                 {
                     App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_開始音 );     // この２つを先行読み込み。残りはシステムサウンド構築フェーズにて。 
                     App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_ループBGM );  //
@@ -66,8 +66,8 @@ namespace DTXMania.起動
                 }
 
                 this._コンソール表示内容 = new List<string>() {
-                    $"{App.属性<AssemblyTitleAttribute>().Title} Release {App.リリース番号:000} - Beats with your heart.",
-                    $"{App.属性<AssemblyCopyrightAttribute>().Copyright}",
+                    $"{AppForm.属性<AssemblyTitleAttribute>().Title} Release {AppForm.リリース番号:000} - Beats with your heart.",
+                    $"{AppForm.属性<AssemblyCopyrightAttribute>().Copyright}",
                     $"",
                 };
 
@@ -149,7 +149,7 @@ namespace DTXMania.起動
                 case フェーズ.曲ツリー構築中:
                     #region " 曲検索タスクを起動する。"
                     //----------------
-                    if( App.ビュアーモードである )
+                    if( AppForm.ビュアーモードである )
                     {
                         // ビュアーモードならスキップ。
                     }

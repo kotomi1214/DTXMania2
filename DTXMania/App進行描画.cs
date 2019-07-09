@@ -11,7 +11,7 @@ using FDK;
 
 namespace DTXMania
 {
-    class App進行描画 : FDK.App進行描画Base
+    class App進行描画 : App進行描画Base
     {
 
         // グローバルリソース(static)
@@ -48,7 +48,7 @@ namespace DTXMania
         public static MusicNode ビュアー用曲ノード { get; set; } // ビュアーモード時のみ使用。
 
         public static MusicNode 演奏曲ノード
-            => App.ビュアーモードである ? App進行描画.ビュアー用曲ノード : App進行描画.曲ツリー.フォーカス曲ノード; // MusicNode 以外は null が返される
+            => DTXMania.AppForm.ビュアーモードである ? App進行描画.ビュアー用曲ノード : App進行描画.曲ツリー.フォーカス曲ノード; // MusicNode 以外は null が返される
 
         /// <summary>
         ///     現在演奏中のスコア。
@@ -226,7 +226,7 @@ namespace DTXMania
                     {
                         stage.非活性化する();
 
-                        if( App.ビュアーモードである )
+                        if( DTXMania.AppForm.ビュアーモードである )
                         {
                             // (A) ビュアーモードなら 演奏ステージ_ビュアーモード へ
                             this.現在のステージ = this.演奏ステージ_ビュアーモード;
@@ -367,7 +367,7 @@ namespace DTXMania
                     //----------------
                     if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.クリア )
                     {
-                        if( App.ビュアーモードである )
+                        if( DTXMania.AppForm.ビュアーモードである )
                         {
                             // ビュアーモードならクリアフェーズを維持。（サービスメッセージ待ち。）
                         }
@@ -432,12 +432,12 @@ namespace DTXMania
             switch( msg )
             {
                 case ViewerPlayメッセージ msg2:
-                    if( App.ビュアーモードである )
+                    if( DTXMania.AppForm.ビュアーモードである )
                         this.演奏ステージ_ビュアーモード.ViewerPlay( msg2 );
                     break;
 
                 case ViewerStopメッセージ msg2:
-                    if( App.ビュアーモードである )
+                    if( DTXMania.AppForm.ビュアーモードである )
                         this.演奏ステージ_ビュアーモード.ViewerStop( msg2 );
                     break;
             }

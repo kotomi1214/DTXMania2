@@ -10,7 +10,7 @@ namespace DTXMania
         public bool ビュアーモードである => ( this.再生開始 || this.再生停止 );
 
         public readonly string Usage =
-            "DTXMania " + App.リリース番号.ToString( "000" ) + "\n" +
+            "DTXMania " + AppForm.リリース番号.ToString( "000" ) + "\n" +
             "Usage: dtxmania.exe [options] [filename]\n" +
             "-Vvvv,ppp,\"soundfilename\"    サウンドファイルの再生 vvv=volume, ppp=pan \n" +
             "-S                           DTXV再生停止 \n" +

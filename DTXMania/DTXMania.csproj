@@ -174,11 +174,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="App.cs">
+    <Compile Include="AppForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="App.Designer.cs">
-      <DependentUpon>App.cs</DependentUpon>
+    <Compile Include="AppForm.Designer.cs">
+      <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Version.cs" />
     <Compile Include="ステージ\03認証\ユーザリスト.cs" />

@@ -11,7 +11,7 @@ namespace DTXMania
 {
     /// <summary>
     ///		<see cref="スコア.WAVリスト"/> の各サウンドインスタンスを管理する。
-    ///		サウンドの作成には <see cref="App.WAVキャッシュレンタル"/> を使用する。
+    ///		サウンドの作成には <see cref="AppForm.WAVキャッシュレンタル"/> を使用する。
     /// </summary>
     class WAV管理 : IDisposable
     {

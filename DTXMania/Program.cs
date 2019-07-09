@@ -64,7 +64,7 @@ namespace DTXMania
 
                 // 最初の出力。
                 Log.現在のスレッドに名前をつける( "UI" );
-                Log.WriteLine( Application.ProductName + " " + App.リリース番号.ToString( "000" ) );  // アプリ名とバージョン
+                Log.WriteLine( Application.ProductName + " " + AppForm.リリース番号.ToString( "000" ) );  // アプリ名とバージョン
                 Log.システム情報をログ出力する();
                 Log.WriteLine( "" );
                 //----------------
@@ -90,7 +90,7 @@ namespace DTXMania
                 #region " アプリ起動。"
                 //----------------
                 // Appインスタンスを生成、初期化。
-                using( var app = new App( options ) )
+                using( var app = new AppForm( options ) )
                 {
                     if( app.WCFサービスをチェックする( options ) )
                     {

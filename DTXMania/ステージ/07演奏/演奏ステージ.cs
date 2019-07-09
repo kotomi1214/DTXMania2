@@ -177,7 +177,7 @@ namespace DTXMania.演奏
         }
 
         /// <summary>
-        ///     <see cref="App.演奏スコア"/> に対して、ステージを初期化する。
+        ///     <see cref="AppForm.演奏スコア"/> に対して、ステージを初期化する。
         /// </summary>
         private void _演奏状態を初期化する()
         {
