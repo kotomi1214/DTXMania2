@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -132,21 +133,36 @@ namespace FDK
 
 
 
-        // Raw Input
+        // 通知とウィンドウメッセージ
 
-
-        public キーボードデバイス キーボード { get; protected set; }
-
-        private const int WM_INPUT = 0x00FF;
 
         /// <summary>
-        ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
+        ///     いずれかのスレッドで例外が発生したことを通知する。
         /// </summary>
-        /// <param name="msg">WM_INPUT のメッセージ。</param>
-        protected virtual void OnInput( in Message msg )
+        /// <returns>通知が受信されれば set されるイベント。</returns>
+        /// <remarks>
+        ///     メインスレッド以外のスレッドで致命的な例外が発生した場合に
+        ///     このメソッドを呼び出すこと。
+        /// </remarks>
+        public AutoResetEvent 例外を通知する( Exception ex )
         {
-            this.キーボード.WM_INPUTを処理する( msg );
+            var msg = new 例外発生通知() { 発生した例外 = ex };
+            this.通知キュー.Enqueue( msg );
+
+            // 通知したことをウィンドウメッセージで伝える。
+            this.BeginInvoke( new Action( () => {   // UIスレッドで実行する
+                PostMessage( this.Handle, WM_APP_MESSAGE_ARRIVED, 0, 0 );
+            } ) );
+
+            return msg.完了通知;
         }
+
+
+        private const int WM_INPUT = 0x00FF;
+        private const int WM_APP = 0x8000;
+        private const int WM_APP_MESSAGE_ARRIVED = WM_APP + 1;
+
+        protected 通知キュー 通知キュー = new 通知キュー();
 
         /// <summary>
         ///     このフォームのウィンドウメッセージ処理。
@@ -158,13 +174,51 @@ namespace FDK
                 case WM_INPUT:
                     this.OnInput( msg );
                     break;
+
+                case WM_APP_MESSAGE_ARRIVED:
+                    this.OnAppMessageArrivec( msg );
+                    break;
             }
 
             base.WndProc( ref msg );
         }
 
+        /// <summary>
+        ///     <see cref="WM_APP_MESSAGE_ARRIVED"/> ハンドラ。
+        /// </summary>
+        protected virtual void OnAppMessageArrivec( in Message msg )
+        {
+            if( this.通知キュー.TryDequeue( out 通知 threadMessage ) )
+            {
+                switch( threadMessage )
+                {
+                    case 例外発生通知 msg2:
+                        throw new Exception( "スレッド内で例外が発生しました。", msg2.発生した例外 );
+                }
+            }
+        }
+
+        [DllImport( "user32.dll", SetLastError = true )]
+        private static extern bool PostMessage( IntPtr hWnd, int Msg, int wParam, int lParam );
 
 
+
+        // Raw Input
+
+
+        public キーボードデバイス キーボード { get; protected set; }
+
+        /// <summary>
+        ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
+        /// </summary>
+        /// <param name="msg">WM_INPUT のメッセージ。</param>
+        protected virtual void OnInput( in Message msg )
+        {
+            this.キーボード.WM_INPUTを処理する( msg );
+        }
+
+        
+        
         // フォームサイズの変更
 
         // 以下の２通りがある。

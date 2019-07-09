@@ -427,7 +427,7 @@ namespace DTXMania
             this.現在のステージ.描画する();
         }
 
-        protected override void メッセージを処理する( 通知メッセージ msg )
+        protected override void メッセージを処理する( 通知 msg )
         {
             switch( msg )
             {
@@ -503,7 +503,7 @@ namespace DTXMania
             return msg.完了通知;
         }
 
-        public class ViewerPlayメッセージ : 通知メッセージ
+        public class ViewerPlayメッセージ : 通知
         {
             public string path = "";
             public int startPart = 0;
@@ -521,7 +521,7 @@ namespace DTXMania
             return msg.完了通知;
         }
 
-        public class ViewerStopメッセージ : 通知メッセージ
+        public class ViewerStopメッセージ : 通知
         {
         }
         //----------------

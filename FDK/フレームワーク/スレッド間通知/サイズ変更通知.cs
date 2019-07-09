@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace FDK
 {
-    public class サイズ変更通知メッセージ : 通知メッセージ
+    public class サイズ変更通知 : 通知
     {
         public System.Drawing.Size 新物理画面サイズ;
     }

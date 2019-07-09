@@ -7,9 +7,9 @@ using System.Linq;
 namespace FDK
 {
     /// <summary>
-    ///     <see cref="通知メッセージ"/> を扱うスレッドセーフなキュー。
+    ///     <see cref="通知"/> を扱うスレッドセーフなキュー。
     /// </summary>
-    public class 通知メッセージキュー : ConcurrentQueue<通知メッセージ>
+    public class 通知キュー : ConcurrentQueue<通知>
     {
     }
 }

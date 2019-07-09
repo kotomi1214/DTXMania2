@@ -718,7 +718,7 @@ namespace DTXMania.演奏
             msg.完了通知.Set();
         }
 
-        private 通知メッセージキュー _メッセージキュー = new 通知メッセージキュー();
+        private 通知キュー _メッセージキュー = new 通知キュー();
 
 
 

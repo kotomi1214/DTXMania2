@@ -5,7 +5,8 @@ using System.Linq;
 
 namespace FDK
 {
-    public class 終了通知メッセージ : 通知メッセージ
+    public class 例外発生通知 : 通知
     {
+        public Exception 発生した例外;
     }
 }

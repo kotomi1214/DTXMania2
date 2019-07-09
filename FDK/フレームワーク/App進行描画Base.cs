@@ -22,18 +22,18 @@ namespace FDK
         // スレッド間メッセージ
 
 
-        protected 通知メッセージキュー メッセージキュー = new 通知メッセージキュー();
+        protected 通知キュー メッセージキュー = new 通知キュー();
 
-        protected virtual void メッセージを処理する( 通知メッセージ msg )
+        protected virtual void メッセージを処理する( 通知 msg )
         {
             // ※ 派生クラスでオーバーライドできるように、独立したメソッドにしておく。
 
             switch( msg )
             {
-                case 終了通知メッセージ _:
+                case 終了通知 _:
                     break;  // 特別にメインループ内で処理するのでここでは何もしない。
 
-                case サイズ変更通知メッセージ msg2:
+                case サイズ変更通知 msg2:
                     this._サイズを変更する( msg2 );
                     break;
 
@@ -62,78 +62,85 @@ namespace FDK
             // 進行描画タスクを生成する。
             this._タスク = Task.Run( () => {   // MTAThread
 
-                #region " 初期化 "
-                //----------------
-                Thread.CurrentThread.Name = "進行描画";
-                Debug.Assert( Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA, "MTAThread で実行してください。" );
-
-                DXResources.CreateInstance( hWindow, 物理画面サイズ, 設計画面サイズ );
-
-                this.On開始();
-
-                this._Tick通知 = new AutoResetEvent( false );
-                this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );
-                //----------------
-                #endregion
-
-                #region " メインループ "
-                //----------------
-                var 表示タスク = new 表示タスク();
-
-                while( this._Tick通知.WaitOne() )     // Tick 通知が来るまで待機。
+                try
                 {
-                    // (1) メッセージがあれば全部処理する。
+                    #region " 初期化 "
+                    //----------------
+                    Thread.CurrentThread.Name = "進行描画";
+                    Debug.Assert( Thread.CurrentThread.GetApartmentState() == ApartmentState.MTA, "MTAThread で実行してください。" );
 
-                    bool メインループを抜ける = false;
+                    DXResources.CreateInstance( hWindow, 物理画面サイズ, 設計画面サイズ );
 
-                    while( this.メッセージキュー.TryDequeue( out 通知メッセージ msg ) )
+                    this.On開始();
+
+                    this._Tick通知 = new AutoResetEvent( false );
+                    this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );
+                    //----------------
+                    #endregion
+
+                    #region " メインループ "
+                    //----------------
+                    var 表示タスク = new 表示タスク();
+
+                    while( this._Tick通知.WaitOne() )     // Tick 通知が来るまで待機。
                     {
-                        if( msg is 終了通知メッセージ )
+                        // (1) メッセージがあれば全部処理する。
+
+                        bool メインループを抜ける = false;
+
+                        while( this.メッセージキュー.TryDequeue( out 通知 msg ) )
                         {
-                            msg.完了通知.Set();
-                            メインループを抜ける = true;
+                            if( msg is 終了通知 )
+                            {
+                                msg.完了通知.Set();
+                                メインループを抜ける = true;
+                                break;
+                            }
+                            else
+                            {
+                                this.メッセージを処理する( msg );
+                            }
+                        }
+                        if( メインループを抜ける )
                             break;
+
+
+                        // (2) 進行する。
+
+                        DXResources.Instance.アニメーション.進行する();
+                        this.On進行();
+
+
+                        // (3) 描画する。
+
+                        if( 表示タスク.表示待機中 )
+                        {
+                            // 表示タスクが表示待ちに入ってるなら、今回は描画しない。
                         }
                         else
                         {
-                            this.メッセージを処理する( msg );
+                            this.On描画();
+                            表示タスク.表示を開始する();
                         }
                     }
-                    if( メインループを抜ける )
-                        break;
+                    //----------------
+                    #endregion
 
+                    #region " 終了 "
+                    //----------------
+                    this._タイマ?.Dispose();   // 進行用タイマを停止する。
 
-                    // (2) 進行する。
+                    this.On終了();
 
-                    DXResources.Instance.アニメーション.進行する();
-                    this.On進行();
-
-
-                    // (3) 描画する。
-
-                    if( 表示タスク.表示待機中 )
-                    {
-                        // 表示タスクが表示待ちに入ってるなら、今回は描画しない。
-                    }
-                    else
-                    {
-                        this.On描画();
-                        表示タスク.表示を開始する();
-                    }
+                    DXResources.ReleaseInstance();
+                    this.AppForm = null;
+                    //----------------
+                    #endregion
                 }
-                //----------------
-                #endregion
-
-                #region " 終了 "
-                //----------------
-                this._タイマ?.Dispose();   // 進行用タイマを停止する。
-
-                this.On終了();
-
-                DXResources.ReleaseInstance();
-                this.AppForm = null;
-                //----------------
-                #endregion
+                catch( Exception e )
+                {
+                    form.例外を通知する( e );
+                }
 
             } );
         }
@@ -176,7 +183,7 @@ namespace FDK
         /// <returns>通知が受信されれば set されるイベント。</returns>
         public AutoResetEvent 終了を通知する()
         {
-            var msg = new 終了通知メッセージ();
+            var msg = new 終了通知();
             this.メッセージキュー.Enqueue( msg );
 
             return msg.完了通知;
@@ -213,7 +220,7 @@ namespace FDK
         /// <returns>通知が受信されれば set されるイベント。</returns>
         public AutoResetEvent サイズ変更を通知する( Size 新物理画面サイズ )
         {
-            var msg = new サイズ変更通知メッセージ {
+            var msg = new サイズ変更通知 {
                 新物理画面サイズ = 新物理画面サイズ,
             };
             this.メッセージキュー.Enqueue( msg );
@@ -221,7 +228,7 @@ namespace FDK
             return msg.完了通知;
         }
 
-        protected void _サイズを変更する( サイズ変更通知メッセージ msg )
+        protected void _サイズを変更する( サイズ変更通知 msg )
         {
             // リソースを解放して、
             this.Onスワップチェーンに依存するグラフィックリソースの解放();
