@@ -289,7 +289,7 @@ namespace DTXMania.選曲
             var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
             dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
 
-            if( null != App進行描画.曲ツリー.フォーカスノード )
+            if( 1 < App進行描画.曲ツリー.フォーカスリスト.Count )
             {
                 // (A) 曲がある場合　→　通常画面
 

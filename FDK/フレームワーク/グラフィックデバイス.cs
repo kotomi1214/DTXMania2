@@ -253,7 +253,7 @@ namespace FDK
                     SharpDX.Direct3D11.DeviceCreationFlags.Debug |
 #endif
                     SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
-                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_1 } ) )
+                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 } ) )
                 {
                     // ID3D11Device1 を取得する。
                     this.D3D11Device1 = d3dDevice.QueryInterface<SharpDX.Direct3D11.Device1>();

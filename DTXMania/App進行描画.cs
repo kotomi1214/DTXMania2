@@ -40,8 +40,6 @@ namespace DTXMania
 
         public static アイキャッチ管理 アイキャッチ管理 { get; protected set; }
 
-        public static Effekseer Effekseer { get; protected set; }
-
 
 
         // 演奏ごとのプロパティ(static)
@@ -87,9 +85,10 @@ namespace DTXMania
             App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
                 ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
             };
-            App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared ) {
-                音量 = 0.5f, // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
-            };
+            App進行描画.サウンドデバイス = new サウンドデバイス( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
+            App進行描画.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
+            // ※↑「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（挙動は不明）
+
             App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
             App進行描画.ドラムサウンド = new ドラムサウンド();
             App進行描画.システムサウンド = new システムサウンド();
@@ -121,7 +120,6 @@ namespace DTXMania
             テクスチャ.全インスタンスで共有するリソースを作成する();
 
             App進行描画.アイキャッチ管理 = new アイキャッチ管理();
-            App進行描画.Effekseer = new Effekseer( グラフィックデバイス.Instance.D3D11Device1 );
 
 
             // 起動ステージ以外のステージを生成。
@@ -168,7 +166,6 @@ namespace DTXMania
 
             // グローバルリソースを解放。
 
-            App進行描画.Effekseer?.Dispose();
             App進行描画.アイキャッチ管理?.Dispose();
             App進行描画.ドラムサウンド?.Dispose();
             App進行描画.入力管理?.Dispose();
