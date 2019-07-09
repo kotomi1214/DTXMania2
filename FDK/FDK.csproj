@@ -194,6 +194,10 @@
       <DependentUpon>AppFormBase.cs</DependentUpon>
     </Compile>
     <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
+    <Compile Include="フレームワーク\メッセージ\サイズ変更通知メッセージ.cs" />
+    <Compile Include="フレームワーク\メッセージ\終了通知メッセージ.cs" />
+    <Compile Include="フレームワーク\メッセージ\通知メッセージ.cs" />
+    <Compile Include="フレームワーク\メッセージ\通知メッセージキュー.cs" />
     <Compile Include="フレームワーク\画面モード.cs" />
     <Compile Include="フレームワーク\App進行描画Base.cs" />
     <Compile Include="ユーティリティ\ログ、メッセージ表示\Console.cs" />

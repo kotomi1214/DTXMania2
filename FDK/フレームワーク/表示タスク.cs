@@ -15,7 +15,7 @@ namespace FDK
         /// <summary>
         ///     スワップチェーンの表示待機中なら true。
         /// </summary>
-        public bool ただいま表示中
+        public bool 表示待機中
         {
             get => ( 0 != Interlocked.Read(ref this._ただいま表示中 ) );
             protected set => Interlocked.Exchange( ref this._ただいま表示中, ( value ) ? 1 : 0 );
@@ -26,7 +26,7 @@ namespace FDK
         /// </summary>
         public void 表示を開始する()
         {
-            this.ただいま表示中 = true;    // 表示開始
+            this.表示待機中 = true;    // 表示開始
 
             Task.Run( () => {
 
@@ -34,7 +34,7 @@ namespace FDK
                 DXResources.Instance.DXGIOutput1.WaitForVerticalBlank();
                 DXResources.Instance.DXGISwapChain1.Present( 0, SharpDX.DXGI.PresentFlags.None );
 
-                this.ただいま表示中 = false;   // 表示完了
+                this.表示待機中 = false;   // 表示完了
             } );
         }
 

@@ -19,15 +19,10 @@ namespace FDK
 
 
 
-        // メッセージとキュー
+        // スレッド間メッセージ
 
 
-        public abstract class 通知メッセージ
-        {
-            public AutoResetEvent 完了通知 = new AutoResetEvent( false );
-        }
-
-        protected ConcurrentQueue<通知メッセージ> メッセージキュー;
+        protected 通知メッセージキュー メッセージキュー = new 通知メッセージキュー();
 
         protected virtual void メッセージを処理する( 通知メッセージ msg )
         {
@@ -35,10 +30,10 @@ namespace FDK
 
             switch( msg )
             {
-                case 終了メッセージ msg2:
+                case 終了通知メッセージ _:
                     break;  // 特別にメインループ内で処理するのでここでは何もしない。
 
-                case サイズ変更メッセージ msg2:
+                case サイズ変更通知メッセージ msg2:
                     this._サイズを変更する( msg2 );
                     break;
 
@@ -55,7 +50,6 @@ namespace FDK
 
         public App進行描画Base()
         {
-            this.メッセージキュー = new ConcurrentQueue<通知メッセージ>();
         }
 
         /// <summary>
@@ -94,7 +88,7 @@ namespace FDK
 
                     while( this.メッセージキュー.TryDequeue( out 通知メッセージ msg ) )
                     {
-                        if( msg is 終了メッセージ )
+                        if( msg is 終了通知メッセージ )
                         {
                             msg.完了通知.Set();
                             メインループを抜ける = true;
@@ -117,7 +111,7 @@ namespace FDK
 
                     // (3) 描画する。
 
-                    if( 表示タスク.ただいま表示中 )
+                    if( 表示タスク.表示待機中 )
                     {
                         // 表示タスクが表示待ちに入ってるなら、今回は描画しない。
                     }
@@ -182,7 +176,7 @@ namespace FDK
         /// <returns>通知が受信されれば set されるイベント。</returns>
         public AutoResetEvent 終了を通知する()
         {
-            var msg = new 終了メッセージ();
+            var msg = new 終了通知メッセージ();
             this.メッセージキュー.Enqueue( msg );
 
             return msg.完了通知;
@@ -192,8 +186,6 @@ namespace FDK
         {
             // 追加処理があれば、派生クラスで実装する。
         }
-
-        private class 終了メッセージ : 通知メッセージ { }
 
 
 
@@ -221,7 +213,7 @@ namespace FDK
         /// <returns>通知が受信されれば set されるイベント。</returns>
         public AutoResetEvent サイズ変更を通知する( Size 新物理画面サイズ )
         {
-            var msg = new サイズ変更メッセージ {
+            var msg = new サイズ変更通知メッセージ {
                 新物理画面サイズ = 新物理画面サイズ,
             };
             this.メッセージキュー.Enqueue( msg );
@@ -229,12 +221,7 @@ namespace FDK
             return msg.完了通知;
         }
 
-        protected class サイズ変更メッセージ : 通知メッセージ
-        {
-            public Size 新物理画面サイズ;
-        }
-
-        protected void _サイズを変更する( サイズ変更メッセージ msg )
+        protected void _サイズを変更する( サイズ変更通知メッセージ msg )
         {
             // リソースを解放して、
             this.Onスワップチェーンに依存するグラフィックリソースの解放();
