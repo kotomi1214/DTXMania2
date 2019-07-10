@@ -50,8 +50,8 @@ namespace DTXMania
             {
                 // 前回の位置とサイズを復元する。
                 this.StartPosition = FormStartPosition.Manual;
-                this.Location = App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置;
-                this.ClientSize = App進行描画.システム設定.ビュアーモード時のウィンドウサイズ;
+                this.Location = App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置.ToDrawingPoint();
+                this.ClientSize = App進行描画.システム設定.ビュアーモード時のウィンドウサイズ.ToDrawingSize();
             }
             else
             {
@@ -67,7 +67,7 @@ namespace DTXMania
 
         protected override void OnLoad( EventArgs e )
         {
-            this.画面モード = 画面モード.ウィンドウ;   // 常にウィンドウモード
+            this.画面モード = App進行描画.システム設定.全画面モードである ? 画面モード.全画面 : 画面モード.ウィンドウ;
 
             base.OnLoad( e );
         }
@@ -77,8 +77,8 @@ namespace DTXMania
             if( AppForm.ビュアーモードである )
             {
                 // 今回の位置とサイズを保存する。
-                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location;
-                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize;
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location.ToSharpDXPoint();
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize.ToSharpDXSize2();
                 DTXMania.App進行描画.システム設定.保存する();
             }
 
@@ -92,7 +92,7 @@ namespace DTXMania
             {
                 // this.画面モード.set() は非同期処理なので、すぐに値が反映されるとは限らない。
                 // なので、ログオン中のユーザへの設定は、その変更より先に行なっておく。
-                DTXMania.App進行描画.ユーザ管理.ログオン中のユーザ.全画面モードである = ( this.画面モード != 画面モード.全画面 );
+                DTXMania.App進行描画.システム設定.全画面モードである = ( this.画面モード != 画面モード.全画面 );
 
                 this.画面モード = ( this.画面モード == 画面モード.ウィンドウ ) ? 画面モード.全画面 : 画面モード.ウィンドウ;
             }

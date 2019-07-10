@@ -24,12 +24,6 @@ namespace DTXMania
 
         public string ユーザ名 => this._User.Name;
 
-        public bool 全画面モードである
-        {
-            get => ( 0 != this._User.Fullscreen );
-            set => this._User.Fullscreen = value ? 1 : 0;
-        }
-
         public double 譜面スクロール速度
         {
             get => this._User.ScrollSpeed;
