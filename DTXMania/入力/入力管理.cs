@@ -33,15 +33,6 @@ namespace DTXMania
 
 
 
-        // 外部依存アクション
-
-
-        public Func<キーバインディング> キーバインディングを取得する = null;
-
-        public Action キーバインディングを保存する = null;
-
-
-
         // 生成と終了
 
 
@@ -50,26 +41,17 @@ namespace DTXMania
         /// </summary>
         /// <param name="keyboard">キーボードデバイス。キーボードはフォームに依存するため、外部から共有する。</param>
         ///	<param name="最大入力履歴数">１つのシーケンスの最大入力サイズ。</param>
-        public 入力管理( キーボードデバイス keyboard, int 最大入力履歴数 = 32 )
+        public 入力管理( システム設定 systemConfig, キーボードデバイス keyboard, int 最大入力履歴数 = 32 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._SystemConfig = systemConfig;
+
                 this.キーボード = keyboard;
+                this.MIDI入力 = new MIDI入力デバイス();
 
                 Trace.Assert( 0 < 最大入力履歴数 );
                 this._最大入力履歴数 = 最大入力履歴数;
-            }
-        }
-
-        /// <remarks>
-        ///		コンストラクタの実行時点では外部依存アクションが設定されていないので、初期化にはこのメソッドを呼び出すこと。
-        /// </remarks>
-        public void 初期化する()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                //this.キーボード = new キーボード();     --> キーボードはフォームに依存するため、外部から登録する（コンストラクタで受領済み）。
-                this.MIDI入力 = new MIDI入力デバイス();
 
                 this.ポーリング結果.Clear();
                 this._入力履歴 = new List<ドラム入力イベント>( this._最大入力履歴数 );
@@ -78,7 +60,6 @@ namespace DTXMania
                 if( 0 < this.MIDI入力.DeviceName.Count )
                 {
                     var デバイスリスト = new Dictionary<int, string>();    // <デバイスID, デバイス名>
-                    var キーバインディング = this.キーバインディングを取得する();
 
                     #region " (1) 先に列挙された実際のデバイスに合わせて、デバイスリスト（配列番号がデバイス番号）を作成する。"
                     //----------------
@@ -88,7 +69,7 @@ namespace DTXMania
                     #endregion
                     #region " (2) キーバインディングのデバイスリストとマージして、新しいデバイスリストを作成する。"
                     //----------------
-                    foreach( var kvp in キーバインディング.MIDIデバイス番号toデバイス名 )
+                    foreach( var kvp in this._SystemConfig.MIDIデバイス番号toデバイス名 )
                     {
                         var キーバインディング側のデバイス名 = kvp.Value;
 
@@ -106,38 +87,38 @@ namespace DTXMania
                     #endregion
                     #region " (3) キーバインディングのデバイスから新しいデバイスへ、キーのIDを付け直す。"
                     //----------------
-                    var 中間バッファ = new Dictionary<キーバインディング.IdKey, ドラム入力種別>();
+                    var 中間バッファ = new Dictionary<システム設定.IdKey, ドラム入力種別>();
 
-                    foreach( var kvp in キーバインディング.MIDItoドラム )
+                    foreach( var kvp in this._SystemConfig.MIDItoドラム )
                     {
                         var キーのデバイスID = kvp.Key.deviceId;
 
                         // キーバインディングのデバイス番号 から、デバイスリストのデバイス番号 へ付け替える。
-                        if( キーバインディング.MIDIデバイス番号toデバイス名.TryGetValue( キーのデバイスID, out string キーのデバイス名 ) )
+                        if( this._SystemConfig.MIDIデバイス番号toデバイス名.TryGetValue( キーのデバイスID, out string キーのデバイス名 ) )
                         {
                             キーのデバイスID = デバイスリスト.First( ( kvp2 ) => ( kvp2.Value == キーのデバイス名 ) ).Key;    // マージしたので、必ず存在する。
                         }
 
-                        中間バッファ.Add( new キーバインディング.IdKey( キーのデバイスID, kvp.Key.key ), kvp.Value );    // デバイスID以外は変更なし。
+                        中間バッファ.Add( new システム設定.IdKey( キーのデバイスID, kvp.Key.key ), kvp.Value );    // デバイスID以外は変更なし。
                     }
 
-                    キーバインディング.MIDItoドラム.Clear();
+                    this._SystemConfig.MIDItoドラム.Clear();
 
                     for( int i = 0; i < 中間バッファ.Count; i++ )
                     {
                         var kvp = 中間バッファ.ElementAt( i );
-                        キーバインディング.MIDItoドラム.Add( new キーバインディング.IdKey( kvp.Key.deviceId, kvp.Key.key ), kvp.Value );
+                        this._SystemConfig.MIDItoドラム.Add( new システム設定.IdKey( kvp.Key.deviceId, kvp.Key.key ), kvp.Value );
                     }
                     //----------------
                     #endregion
                     #region " (4) 新しいデバイスリストをキーバインディングに格納して、保存する。"
                     //----------------
-                    キーバインディング.MIDIデバイス番号toデバイス名.Clear();
+                    this._SystemConfig.MIDIデバイス番号toデバイス名.Clear();
 
                     for( int i = 0; i < デバイスリスト.Count; i++ )
-                        キーバインディング.MIDIデバイス番号toデバイス名.Add( i, デバイスリスト[ i ] );
+                        this._SystemConfig.MIDIデバイス番号toデバイス名.Add( i, デバイスリスト[ i ] );
 
-                    this.キーバインディングを保存する();
+                    this._SystemConfig.保存する();
                     //----------------
                     #endregion
                 }
@@ -152,13 +133,12 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.キーバインディングを取得する = null;
-                this.キーバインディングを保存する = null;
-
                 this.MIDI入力?.Dispose();
                 //this.キーボード?.Dispose();        --> 借り物なのでDisposeしない。
             }
         }
+
+        private システム設定 _SystemConfig;
 
 
 
@@ -186,10 +166,8 @@ namespace DTXMania
 
             this.ポーリング結果.Clear();
 
-            var キーバインディング = this.キーバインディングを取得する();
-
-            this._入力デバイスをポーリングする( this.キーボード, キーバインディング.キーボードtoドラム, 入力履歴を記録する );
-            this._入力デバイスをポーリングする( this.MIDI入力, キーバインディング.MIDItoドラム, 入力履歴を記録する );
+            this._入力デバイスをポーリングする( this.キーボード, this._SystemConfig.キーボードtoドラム, 入力履歴を記録する );
+            this._入力デバイスをポーリングする( this.MIDI入力, this._SystemConfig.MIDItoドラム, 入力履歴を記録する );
 
 
             // タイムスタンプの小さい順にソートする。
@@ -229,7 +207,7 @@ namespace DTXMania
         /// <param name="入力デバイス">ポーリングを行う入力デバイス。</param>
         /// <param name="デバイスtoドラム対応表">ドラム入力イベントへ変換するためのマッピング。</param>
         /// <param name="入力履歴を記録する">ドラム入力イベントを入力履歴に登録するなら true。</param>
-        private void _入力デバイスをポーリングする( IInputDevice 入力デバイス, Dictionary<キーバインディング.IdKey, ドラム入力種別> デバイスtoドラム対応表, bool 入力履歴を記録する )
+        private void _入力デバイスをポーリングする( IInputDevice 入力デバイス, Dictionary<システム設定.IdKey, ドラム入力種別> デバイスtoドラム対応表, bool 入力履歴を記録する )
         {
             入力デバイス.ポーリングする();
 
@@ -238,7 +216,7 @@ namespace DTXMania
             foreach( var ev in 入力デバイス.入力イベントリスト )
             {
                 // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
-                var evKey = new キーバインディング.IdKey( ev );
+                var evKey = new システム設定.IdKey( ev );
 
                 if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
                     continue;   // 使われないならスキップ。

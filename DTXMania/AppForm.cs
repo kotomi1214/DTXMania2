@@ -41,7 +41,7 @@ namespace DTXMania
 
             this.Text = "DTXMania2 release" + AppForm.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
 
-            DTXMania.App進行描画.システム設定 = システム設定.読み込む();
+            App進行描画.システム設定 = システム設定.読み込む();
 
             AppForm.ビュアーモードである = options.ビュアーモードである;
             AppForm.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
@@ -50,8 +50,8 @@ namespace DTXMania
             {
                 // 前回の位置とサイズを復元する。
                 this.StartPosition = FormStartPosition.Manual;
-                this.Location = DTXMania.App進行描画.システム設定.ウィンドウ表示位置Viewerモード用;
-                this.ClientSize = DTXMania.App進行描画.システム設定.ウィンドウサイズViewerモード用;
+                this.Location = App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置;
+                this.ClientSize = App進行描画.システム設定.ビュアーモード時のウィンドウサイズ;
             }
             else
             {
@@ -77,8 +77,8 @@ namespace DTXMania
             if( AppForm.ビュアーモードである )
             {
                 // 今回の位置とサイズを保存する。
-                DTXMania.App進行描画.システム設定.ウィンドウ表示位置Viewerモード用 = this.Location;
-                DTXMania.App進行描画.システム設定.ウィンドウサイズViewerモード用 = this.ClientSize;
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location;
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize;
                 DTXMania.App進行描画.システム設定.保存する();
             }
 

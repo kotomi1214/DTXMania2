@@ -9,9 +9,9 @@ using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.設定.システム設定.old
 {
-    class キーバインディング : ICloneable
+    class キーバインディング02 : ICloneable
     {
         /// <summary>
         ///		入力コードのマッピング用 Dictionary のキーとなる型。
@@ -88,7 +88,7 @@ namespace DTXMania
         /// <summary>
         ///		コンストラクタ。
         /// </summary>
-        public キーバインディング()
+        public キーバインディング02()
         {
             this.FootPedal最小値 = 0;
             this.FootPedal最大値 = 90; // VH-11 の Normal Resolution での最大値
@@ -150,7 +150,7 @@ namespace DTXMania
         /// </summary>
         public object Clone()
         {
-            var clone = new キーバインディング();
+            var clone = new キーバインディング02();
 
 
             clone.MIDIデバイス番号toデバイス名 = new Dictionary<int, string>();

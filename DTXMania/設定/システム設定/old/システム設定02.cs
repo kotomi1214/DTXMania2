@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using FDK;
 
-namespace DTXMania
+namespace DTXMania.設定.システム設定.old
 {
     /// <summary>
     ///		システム設定。
@@ -15,9 +15,9 @@ namespace DTXMania
     /// <remarks>
     ///		ユーザ別の項目は<see cref="ユーザ設定"/>で管理すること。
     /// </remarks>
-    class システム設定
+    class システム設定02
     {
-        public static readonly VariablePath システム設定ファイルパス = @"$(AppData)Configuration.yaml";
+        // プロパティ
 
         /// <summary>
         ///     このクラスのバージョン。
@@ -27,7 +27,7 @@ namespace DTXMania
         /// <remarks>
         ///		キーバインディングは全ユーザで共通。
         /// </remarks>
-        public キーバインディング キー割り当て { get; set; } = null;
+        public キーバインディング02 キー割り当て { get; set; } = null;
 
         /// <summary>
         ///		曲ファイルを検索するフォルダのリスト。
@@ -51,37 +51,30 @@ namespace DTXMania
 
 
 
-        // 生成と終了
+        // static
 
 
-        public システム設定()
-        {
-            this.キー割り当て = new キーバインディング();
-            this.曲検索フォルダ = new List<VariablePath>() { @"$(Exe)" };
-            this.ウィンドウ表示位置Viewerモード用 = new Point( 100, 100 );
-            this.ウィンドウサイズViewerモード用 = new Size( 640, 360 );
-            this.判定位置調整ms = 0;
-        }
+        public static readonly VariablePath システム設定ファイルパス = @"$(AppData)Configuration.yaml";
 
-        public static システム設定 読み込む()
+        public static システム設定02 読み込む()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 // (1) 読み込み or 新規作成
 
-                var config = (システム設定) null;
+                var config = (システム設定02) null;
 
                 try
                 {
                     var yaml = File.ReadAllText( システム設定ファイルパス.変数なしパス );
                     var deserializer = new YamlDotNet.Serialization.Deserializer();
-                    config = deserializer.Deserialize<システム設定>( yaml );
+                    config = deserializer.Deserialize<システム設定02>( yaml );
 
                     switch( config.Version )
                     {
                         case 1:
                             Log.ERROR( $"バージョン 2 を新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
-                            config = new システム設定();
+                            config = new システム設定02();
                             config.保存する();
                             break;
 
@@ -90,7 +83,7 @@ namespace DTXMania
 
                         default:
                             Log.ERROR( $"未対応のバージョンです。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
-                            config = new システム設定();
+                            config = new システム設定02();
                             config.保存する();
                             break;
                     }
@@ -98,13 +91,13 @@ namespace DTXMania
                 catch( FileNotFoundException )
                 {
                     Log.Info( $"ファイルが存在しないため、新規に作成します。[{システム設定ファイルパス.変数付きパス}]" );
-                    config = new システム設定();
+                    config = new システム設定02();
                     config.保存する();
                 }
                 catch
                 {
                     Log.ERROR( $"ファイルの内容に誤りがあります。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
-                    config = new システム設定();
+                    config = new システム設定02();
                     config.保存する();
                 }
 
@@ -117,6 +110,20 @@ namespace DTXMania
 
                 return config;
             }
+        }
+
+
+
+        // 生成と終了
+
+
+        public システム設定02()
+        {
+            this.キー割り当て = new キーバインディング02();
+            this.曲検索フォルダ = new List<VariablePath>() { @"$(Exe)" };
+            this.ウィンドウ表示位置Viewerモード用 = new Point( 100, 100 );
+            this.ウィンドウサイズViewerモード用 = new Size( 640, 360 );
+            this.判定位置調整ms = 0;
         }
 
         public void 保存する()

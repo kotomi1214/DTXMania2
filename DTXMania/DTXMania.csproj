@@ -313,6 +313,8 @@
     <Compile Include="未処理例外検出ダイアログ.designer.cs">
       <DependentUpon>未処理例外検出ダイアログ.cs</DependentUpon>
     </Compile>
+    <Compile Include="設定\システム設定\old\キーバインディング02.cs" />
+    <Compile Include="設定\システム設定\old\システム設定02.cs" />
     <Compile Include="設定\成績.cs" />
     <Compile Include="曲\曲DB.cs" />
     <Compile Include="曲\曲名.cs" />
@@ -323,8 +325,7 @@
     <Compile Include="設定\種別\PlayMode.cs" />
     <Compile Include="設定\システムサウンド.cs" />
     <Compile Include="設定\種別\システムサウンド種別.cs" />
-    <Compile Include="設定\キーバインディング.cs" />
-    <Compile Include="設定\システム設定.cs" />
+    <Compile Include="設定\システム設定\システム設定.cs" />
     <Compile Include="App進行描画.cs" />
     <Compile Include="設定\ドラムチッププロパティ.cs" />
     <Compile Include="設定\ドラムチッププロパティ管理.cs" />
