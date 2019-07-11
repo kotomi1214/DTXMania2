@@ -151,7 +151,6 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                
                 // WCFサービスホストの起動を試みる。
 
                 this._wcfServiceHost = null;
@@ -163,7 +162,7 @@ namespace DTXMania
                 }
                 catch( AddressAlreadyInUseException )
                 {
-                    // 田プロセスによって既に起動されている場合はこの例外が発生し、
+                    // 他プロセスによって既に起動されている場合はこの例外が発生し、
                     // _wcfServiceHost は null のままである。
                 }
 
@@ -199,12 +198,15 @@ namespace DTXMania
                     if( ビュアーモードである )
                     {
                         // (B-a) ビュアーモードなら、オプションを自分で処理する。
+
                         _WCFサービスでオプションを処理する( this, options );
+
                         return true;
                     }
                     else
                     {
                         // (B-b) 通常起動。
+
                         return true;
                     }
                 }
@@ -214,15 +216,18 @@ namespace DTXMania
         private void _WCFサービスホストを起動する( out ServiceHost serviceHost )
         {
             // アプリのWCFサービスホストを生成する。
+
             serviceHost = new ServiceHost( this, new Uri( serviceUri ) );
 
             // 名前付きパイプにバインドしたエンドポイントをサービスホストへ追加する。
+
             serviceHost.AddServiceEndpoint(
                 typeof( WCF.IDTXManiaService ),                             // 公開するインターフェース
                 new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ),   // 名前付きパイプ
                 endPointName );                                             // 公開するエンドポイント
 
             // WCFサービスの受付を開始する。
+
             serviceHost.Open();
         }
 

@@ -274,7 +274,6 @@ namespace FDK
         /// <summary>
         ///		WASAPIイベント駆動スレッドのエントリ。
         /// </summary>
-        /// <param name="起動完了通知">無事に起動できたら、これを Set して（スレッドの生成元に）知らせる。</param>
         private void _レンダリングスレッドエントリ()
         {
             var 元のMMCSS特性 = IntPtr.Zero;

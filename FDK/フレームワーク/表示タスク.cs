@@ -17,7 +17,7 @@ namespace FDK
         /// </summary>
         public bool 表示待機中
         {
-            get => ( 0 != Interlocked.Read(ref this._ただいま表示中 ) );
+            get => ( 0 != Interlocked.Read( ref this._ただいま表示中 ) );
             protected set => Interlocked.Exchange( ref this._ただいま表示中, ( value ) ? 1 : 0 );
         }
 

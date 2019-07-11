@@ -54,7 +54,7 @@ namespace FDK
         ///     画面に実際に表示される画面のサイズ[px]。
         /// </summary>
         /// <remarks>
-        ///     物理画面サイズは、表示先コントロールのクライアントサイズを表す。
+        ///     物理画面サイズは、表示先コントロールのクライアントサイズ（＝スワップチェーンのサイズ）を表す。
         ///     物理画面サイズは、ユーザが自由に変更することができるという点に留意すること。
         ///     プログラム内では物理画面におけるピクセルの単位として「px」と称することがある。
         ///     なお、int より float での利用が多いので、Size や Size2 ではなく Size2F を使う。
@@ -74,6 +74,9 @@ namespace FDK
         /// <summary>
         ///     等倍3D平面での画面左上の3D座標。
         /// </summary>
+        /// <remarks>
+        ///     等倍3D平面については <see cref="等倍3D平面描画用の変換行列を取得する(out Matrix, out Matrix)"/> を参照。
+        /// </remarks>
         public Vector3 画面左上dpx => new Vector3( -this.設計画面サイズ.Width / 2f, +this.設計画面サイズ.Height / 2f, 0f );
 
         /// <summary>
@@ -250,13 +253,13 @@ namespace FDK
                     SharpDX.Direct3D.DriverType.Hardware,
 #if DEBUG
                     // D3D11 Debugメッセージは、Visual Studio のプロジェクトプロパティで「ネイティブコードのデバッグを有効にする」を ON にしないと表示されない。
-                    // なお、デバッグを有効にしてアプリケーションを実行すると、速度が大幅に低下する。
+                    // なお、「ネイティブコードのデバッグを有効にする」を有効にしてアプリケーションを実行すると、速度が恐ろしく低下する。
                     SharpDX.Direct3D11.DeviceCreationFlags.Debug |
 #endif
-                    SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
-                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 } ) )
+                    SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport, // D2Dで必須
+                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 } ) )    // D3D11.1 を使うが機能レベルは 11_0 でいい
                 {
-                    // ID3D11Device1 を取得する。
+                    // ID3D11Device1 を取得する。（Windows8.1 以降のPCで実装されている。）
                     this.D3D11Device1 = d3dDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
                 }
 
@@ -402,6 +405,7 @@ namespace FDK
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                // Visual のコンテンツから解除してコミット。
                 this.DCompVisual2ForSwapChain.Content = null;
                 this.DCompDevice2.Commit();
 
@@ -488,15 +492,15 @@ namespace FDK
                     #region " バックバッファに対する既定のビューポートを作成する。"
                     //----------------
                     this.既定のD3D11ViewPort = new SharpDX.Mathematics.Interop.RawViewportF[] {
-                    new SharpDX.Mathematics.Interop.RawViewportF() {
-                        X = 0.0f,                                                   // バックバッファと同じサイズ
-                        Y = 0.0f,                                                   //
-                        Width = (float) backbufferTexture2D.Description.Width,      //
-                        Height = (float) backbufferTexture2D.Description.Height,    //
-                        MinDepth = 0.0f,                                            // 近面Z: 0.0（最も近い）
-                        MaxDepth = 1.0f,                                            // 遠面Z: 1.0（最も遠い）
-                    },
-                };
+                        new SharpDX.Mathematics.Interop.RawViewportF() {
+                            X = 0.0f,                                                   // バックバッファと同じサイズ
+                            Y = 0.0f,                                                   //
+                            Width = (float) backbufferTexture2D.Description.Width,      //
+                            Height = (float) backbufferTexture2D.Description.Height,    //
+                            MinDepth = 0.0f,                                            // 近面Z: 0.0（最も近い）
+                            MaxDepth = 1.0f,                                            // 遠面Z: 1.0（最も遠い）
+                        },
+                    };
                     //----------------
                     #endregion
 

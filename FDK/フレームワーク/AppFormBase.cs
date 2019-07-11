@@ -106,11 +106,6 @@ namespace FDK
         protected App進行描画Base App進行描画;
 
         /// <summary>
-        ///     このフォームと進行描画タスク間での排他用。
-        /// </summary>
-        protected readonly object 進行描画排他ロック = new object();
-
-        /// <summary>
         ///     起動直後は true, OnLoad されて false, OnClosing で true。
         /// </summary>
         private bool _未初期化 = true;
@@ -273,6 +268,7 @@ namespace FDK
         {
             if( !this._未初期化 && !this._リサイズ中 )   // 未初期化、またはリサイズ中なら無視。
             {
+                // スワップチェーンとその依存リソースを解放し、改めて作成しなおす。
                 this.App進行描画.サイズ変更を通知する( this.ClientSize ).WaitOne();   // 完了するまで待つ
             }
 

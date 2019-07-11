@@ -8,12 +8,7 @@ namespace DTXMania
 {
     /// <summary>
     ///		曲テーブルのエンティティクラス。
-    ///		バージョン 3。
     /// </summary>
-    /// <remarks>
-    ///		変更点：
-    ///		・テーブルの末尾に Artist カラムを追加。
-    /// </remarks>
     [Table( Name = "Songs" )]   // テーブル名は複数形
     class Song05 : ICloneable
     {

@@ -74,7 +74,7 @@ namespace FDK
                     this.On開始();
 
                     this._Tick通知 = new AutoResetEvent( false );
-                    this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );
+                    this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );   // 1ms ごとに Tick通知を set する
                     //----------------
                     #endregion
 
@@ -115,7 +115,7 @@ namespace FDK
 
                         if( 表示タスク.表示待機中 )
                         {
-                            // 表示タスクが表示待ちに入ってるなら、今回は描画しない。
+                            // 表示タスクがすでに起動されていて表示待ち状態になっているなら、今回は描画しない。
                         }
                         else
                         {
@@ -128,11 +128,12 @@ namespace FDK
 
                     #region " 終了 "
                     //----------------
-                    this._タイマ?.Dispose();   // 進行用タイマを停止する。
+                    this._タイマ?.Dispose();
 
                     this.On終了();
 
                     DXResources.ReleaseInstance();
+
                     this.AppForm = null;
                     //----------------
                     #endregion
@@ -159,13 +160,10 @@ namespace FDK
         /// <summary>
         ///     進行描画用タイマ。
         /// </summary>
-        /// <remarks>
-        ///     一定間隔で <see cref="_Tick通知"/> を Set する。
-        /// </remarks>
         private QueueTimer _タイマ;
 
         /// <summary>
-        ///     一定時間ごとに set されるイベント。
+        ///     一定時間ごとに set されることを想定したイベント。
         /// </summary>
         /// <remarks>
         ///     このイベントが Set されるごとに、進行または描画が１回行われる。
