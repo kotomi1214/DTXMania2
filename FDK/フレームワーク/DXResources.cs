@@ -279,7 +279,8 @@ namespace FDK
 
                     // 既定のDXGI出力を取得する。
                     using( var dxgiAdapter = dxgiDevice1.Adapter )
-                        this.DXGIOutput1 = dxgiAdapter.Outputs[ 0 ].QueryInterface<SharpDX.DXGI.Output1>(); // 「現在のDXGI出力」を取得することはできないので[0]で固定。
+                    using( var output = dxgiAdapter.Outputs[ 0 ] )
+                        this.DXGIOutput1 = output.QueryInterface<SharpDX.DXGI.Output1>(); // 「現在のDXGI出力」を取得することはできないので[0]で固定。
 
                     // DXGIデバイスマネージャを生成し、D3Dデバイスを登録する。MediaFoundationで必須。
                     this.MFDXGIDeviceManager = new SharpDX.MediaFoundation.DXGIDeviceManager();
@@ -353,13 +354,17 @@ namespace FDK
                 this.DXGIOutput1?.Dispose();
 #if DEBUG
                 // ReportLiveDeviceObjects
-                this.D3D11Device1.ImmediateContext.Flush();
-                this.D3D11Device1.ImmediateContext.ClearState();
+                using( var d3ddc = this.D3D11Device1.ImmediateContext )
+                {
+                    d3ddc.Flush();
+                    d3ddc.ClearState();
+                }
                 using( var debug = new SharpDX.Direct3D11.DeviceDebug( this.D3D11Device1 ) )
-                    debug.ReportLiveDeviceObjects( SharpDX.Direct3D11.ReportingLevel.Summary | SharpDX.Direct3D11.ReportingLevel.IgnoreInternal );
+                {
+                    this.D3D11Device1?.Dispose();
+                    debug.ReportLiveDeviceObjects( SharpDX.Direct3D11.ReportingLevel.Detail | SharpDX.Direct3D11.ReportingLevel.IgnoreInternal );
+                }
 #endif
-                this.D3D11Device1?.Dispose();
-
                 // MediaFoundation をシャットダウンする。
                 SharpDX.MediaFoundation.MediaManager.Shutdown();
             }

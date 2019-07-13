@@ -152,96 +152,96 @@ namespace FDK
             if( null == this.Texture )
                 return;
 
-            this.不透明度 = MathUtil.Clamp( 不透明度0to1, 0f, 1f );
-
-            var srcRect = 転送元矩形 ?? new RectangleF( 0f, 0f, this.サイズ.Width, this.サイズ.Height );
-
-            #region " 定数バッファを更新する。"
-            //----------------
+            using( var d3ddc = DXResources.Instance.D3D11Device1.ImmediateContext )
             {
-                // 1x1のモデルサイズをテクスチャの描画矩形サイズへスケーリングする行列を前方に乗じる。
-                ワールド行列変換 =
-                    Matrix.Scaling( srcRect.Width, srcRect.Height, 0f ) *
-                    ワールド行列変換;
+                this.不透明度 = MathUtil.Clamp( 不透明度0to1, 0f, 1f );
+                var srcRect = 転送元矩形 ?? new RectangleF( 0f, 0f, this.サイズ.Width, this.サイズ.Height );
 
-                // ワールド変換行列
-                ワールド行列変換.Transpose();    // 転置
-                this._定数バッファの転送元データ.World = ワールド行列変換;
+                #region " 定数バッファを更新する。"
+                //----------------
+                {
+                    // 1x1のモデルサイズをテクスチャの描画矩形サイズへスケーリングする行列を前方に乗じる。
+                    ワールド行列変換 =
+                        Matrix.Scaling( srcRect.Width, srcRect.Height, 0f ) *
+                        ワールド行列変換;
 
-                // ビュー変換行列と射影変換行列
-                DXResources.Instance.等倍3D平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 );
-                this._定数バッファの転送元データ.View = 転置済みビュー行列;
-                this._定数バッファの転送元データ.Projection = 転置済み射影行列;
+                    // ワールド変換行列
+                    ワールド行列変換.Transpose();    // 転置
+                    this._定数バッファの転送元データ.World = ワールド行列変換;
 
-                // 描画元矩形（x,y,zは0～1で指定する（UV座標））
-                this._定数バッファの転送元データ.TexLeft = srcRect.Left / this.サイズ.Width;
-                this._定数バッファの転送元データ.TexTop = srcRect.Top / this.サイズ.Height;
-                this._定数バッファの転送元データ.TexRight = srcRect.Right / this.サイズ.Width;
-                this._定数バッファの転送元データ.TexBottom = srcRect.Bottom / this.サイズ.Height;
+                    // ビュー変換行列と射影変換行列
+                    DXResources.Instance.等倍3D平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 );
+                    this._定数バッファの転送元データ.View = 転置済みビュー行列;
+                    this._定数バッファの転送元データ.Projection = 転置済み射影行列;
 
-                // アルファ
-                this._定数バッファの転送元データ.TexAlpha = this.不透明度;
-                this._定数バッファの転送元データ.dummy1 = 0f;
-                this._定数バッファの転送元データ.dummy2 = 0f;
-                this._定数バッファの転送元データ.dummy3 = 0f;
+                    // 描画元矩形（x,y,zは0～1で指定する（UV座標））
+                    this._定数バッファの転送元データ.TexLeft = srcRect.Left / this.サイズ.Width;
+                    this._定数バッファの転送元データ.TexTop = srcRect.Top / this.サイズ.Height;
+                    this._定数バッファの転送元データ.TexRight = srcRect.Right / this.サイズ.Width;
+                    this._定数バッファの転送元データ.TexBottom = srcRect.Bottom / this.サイズ.Height;
 
-                // 定数バッファへ書き込む。
-                var dataBox = DXResources.Instance.D3D11Device1.ImmediateContext.MapSubresource(
-                    resourceRef: this._定数バッファ,
-                    subresource: 0,
-                    mapType: MapMode.WriteDiscard,
-                    mapFlags: MapFlags.None );
-                SharpDX.Utilities.Write( dataBox.DataPointer, ref this._定数バッファの転送元データ );
-                DXResources.Instance.D3D11Device1.ImmediateContext.UnmapSubresource( this._定数バッファ, 0 );
+                    // アルファ
+                    this._定数バッファの転送元データ.TexAlpha = this.不透明度;
+                    this._定数バッファの転送元データ.dummy1 = 0f;
+                    this._定数バッファの転送元データ.dummy2 = 0f;
+                    this._定数バッファの転送元データ.dummy3 = 0f;
+
+                    // 定数バッファへ書き込む。
+                    var dataBox = d3ddc.MapSubresource(
+                        resourceRef: this._定数バッファ,
+                        subresource: 0,
+                        mapType: MapMode.WriteDiscard,
+                        mapFlags: MapFlags.None );
+                    SharpDX.Utilities.Write( dataBox.DataPointer, ref this._定数バッファの転送元データ );
+                    d3ddc.UnmapSubresource( this._定数バッファ, 0 );
+                }
+                //----------------
+                #endregion
+
+                #region " 3Dパイプラインを設定する。"
+                //----------------
+                {
+                    // 入力アセンブラ
+                    d3ddc.InputAssembler.InputLayout = null;
+                    d3ddc.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
+
+                    // 頂点シェーダ
+                    d3ddc.VertexShader.Set( テクスチャ._VertexShader );
+                    d3ddc.VertexShader.SetConstantBuffers( 0, this._定数バッファ );
+
+                    // ハルシェーダ
+                    d3ddc.HullShader.Set( null );
+
+                    // ドメインシェーダ
+                    d3ddc.DomainShader.Set( null );
+
+                    // ジオメトリシェーダ
+                    d3ddc.GeometryShader.Set( null );
+
+                    // ラスタライザ
+                    d3ddc.Rasterizer.SetViewports( DXResources.Instance.既定のD3D11ViewPort );
+                    d3ddc.Rasterizer.State = テクスチャ._RasterizerState;
+
+                    // ピクセルシェーダ
+                    d3ddc.PixelShader.Set( テクスチャ._PixelShader );
+                    d3ddc.PixelShader.SetConstantBuffers( 0, this._定数バッファ );
+                    d3ddc.PixelShader.SetShaderResources( 0, 1, this._ShaderResourceView );
+                    d3ddc.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
+
+                    // 出力マージャ
+                    d3ddc.OutputMerger.SetTargets( DXResources.Instance.既定のD3D11DepthStencilView, DXResources.Instance.既定のD3D11RenderTargetView );
+                    d3ddc.OutputMerger.SetBlendState(
+                        ( this.加算合成する ) ? テクスチャ._BlendState加算合成 : テクスチャ._BlendState通常合成,
+                        new Color4( 0f, 0f, 0f, 0f ),
+                        -1 );
+                    d3ddc.OutputMerger.SetDepthStencilState( DXResources.Instance.既定のD3D11DepthStencilState, 0 );
+                }
+                //----------------
+                #endregion
+
+                // 頂点バッファとインデックスバッファを使わずに 4 つの頂点を描画する。
+                d3ddc.Draw( vertexCount: 4, startVertexLocation: 0 );
             }
-            //----------------
-            #endregion
-
-            var dc = DXResources.Instance.D3D11Device1.ImmediateContext;
-
-            #region " 3Dパイプラインを設定する。"
-            //----------------
-            {
-                // 入力アセンブラ
-                dc.InputAssembler.InputLayout = null;
-                dc.InputAssembler.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-
-                // 頂点シェーダ
-                dc.VertexShader.Set( テクスチャ._VertexShader );
-                dc.VertexShader.SetConstantBuffers( 0, this._定数バッファ );
-
-                // ハルシェーダ
-                dc.HullShader.Set( null );
-
-                // ドメインシェーダ
-                dc.DomainShader.Set( null );
-
-                // ジオメトリシェーダ
-                dc.GeometryShader.Set( null );
-
-                // ラスタライザ
-                dc.Rasterizer.SetViewports( DXResources.Instance.既定のD3D11ViewPort );
-                dc.Rasterizer.State = テクスチャ._RasterizerState;
-
-                // ピクセルシェーダ
-                dc.PixelShader.Set( テクスチャ._PixelShader );
-                dc.PixelShader.SetConstantBuffers( 0, this._定数バッファ );
-                dc.PixelShader.SetShaderResources( 0, 1, this._ShaderResourceView );
-                dc.PixelShader.SetSamplers( 0, 1, テクスチャ._SamplerState );
-
-                // 出力マージャ
-                dc.OutputMerger.SetTargets( DXResources.Instance.既定のD3D11DepthStencilView, DXResources.Instance.既定のD3D11RenderTargetView );
-                dc.OutputMerger.SetBlendState(
-                    ( this.加算合成する ) ? テクスチャ._BlendState加算合成 : テクスチャ._BlendState通常合成,
-                    new Color4( 0f, 0f, 0f, 0f ),
-                    -1 );
-                dc.OutputMerger.SetDepthStencilState( DXResources.Instance.既定のD3D11DepthStencilState, 0 );
-            }
-            //----------------
-            #endregion
-
-            // 頂点バッファとインデックスバッファを使わずに 4 つの頂点を描画する。
-            dc.Draw( vertexCount: 4, startVertexLocation: 0 );
         }
 
 
