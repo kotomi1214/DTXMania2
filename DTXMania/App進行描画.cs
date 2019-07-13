@@ -163,6 +163,7 @@ namespace DTXMania
             // グローバルリソースを解放。
 
             App進行描画.アイキャッチ管理?.Dispose();
+            App進行描画.曲ツリー?.Dispose();
             App進行描画.ドラムサウンド?.Dispose();
             App進行描画.入力管理?.Dispose();
             App進行描画.ユーザ管理?.Dispose();
@@ -408,15 +409,19 @@ namespace DTXMania
         {
             #region " 画面クリア "
             //----------------
-            // 既定のD3Dレンダーターゲットビューを黒でクリアする。
-            DXResources.Instance.D3D11Device1.ImmediateContext.ClearRenderTargetView( DXResources.Instance.既定のD3D11RenderTargetView, Color4.Black );
+            {
+                var d3ddc = DXResources.Instance.D3D11Device1.ImmediateContext;
 
-            // 深度バッファを 1.0f でクリアする。
-            DXResources.Instance.D3D11Device1.ImmediateContext.ClearDepthStencilView(
-                DXResources.Instance.既定のD3D11DepthStencilView,
-                SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
-                depth: 1.0f,
-                stencil: 0 );
+                // 既定のD3Dレンダーターゲットビューを黒でクリアする。
+                d3ddc.ClearRenderTargetView( DXResources.Instance.既定のD3D11RenderTargetView, Color4.Black );
+
+                // 深度バッファを 1.0f でクリアする。
+                d3ddc.ClearDepthStencilView(
+                    DXResources.Instance.既定のD3D11DepthStencilView,
+                    SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
+                    depth: 1.0f,
+                    stencil: 0 );
+            }
             //----------------
             #endregion
 
