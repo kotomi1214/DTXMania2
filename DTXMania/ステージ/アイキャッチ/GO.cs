@@ -21,13 +21,15 @@ namespace DTXMania
             {
                 this.現在のフェーズ = フェーズ.未定;
 
+                this.文字画像 = new 画像[ 3 ] {
+                    new 画像( @"$(System)images\アイキャッチ\G.png" ) { 加算合成 = true },
+                    new 画像( @"$(System)images\アイキャッチ\O.png" ) { 加算合成 = true },
+                    new 画像( @"$(System)images\アイキャッチ\!.png" ) { 加算合成 = true },
+                };
+
                 #region " Go! "
                 //----------------
-                this._文字アニメーション = new 文字[ 3 ] {
-					new 文字() { 画像 = new 画像( @"$(System)images\アイキャッチ\G.png" ) { 加算合成 = true } },
-					new 文字() { 画像 = new 画像( @"$(System)images\アイキャッチ\O.png" ) { 加算合成 = true }},
-					new 文字() { 画像 = new 画像( @"$(System)images\アイキャッチ\!.png" ) { 加算合成 = true }},
-				};
+                this._文字アニメーション = new 文字[ 3 ];
                 //----------------
                 #endregion
 
@@ -66,7 +68,7 @@ namespace DTXMania
                 if( null != this._文字アニメーション )
                 {
                     foreach( var s in this._文字アニメーション )
-                        s.Dispose();
+                        s?.Dispose();   // 一度も実行されなければ null なので注意
 
                     this._文字アニメーション = null;
                 }
@@ -103,6 +105,10 @@ namespace DTXMania
                 this._フェードインアニメーション = null;
                 //----------------
                 #endregion
+
+                foreach( var image in this.文字画像 )
+                    image.Dispose();
+                this.文字画像 = null;
             }
 
             base.Dispose();
@@ -133,16 +139,14 @@ namespace DTXMania
                 #region " 「G」のアニメーション構築 "
                 //----------------
                 {
-                    var 文字 = this._文字アニメーション[ (int) 文字名.G ];
-
-                    文字.Dispose();
-
-                    文字.中心位置X = new Variable( animation.Manager, 0.0 - 400.0 );
-                    文字.中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 170.0 );
-                    文字.拡大率 = new Variable( animation.Manager, 1.0 );
-
-                    文字.ストーリーボード = new Storyboard( animation.Manager );
-
+                    var 文字 = this._文字アニメーション[ (int) 文字名.G ] = new 文字() {
+                        画像 = this.文字画像[ (int) 文字名.G ],
+                        中心位置X = new Variable( animation.Manager, 0.0 - 400.0 ),
+                        中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 170.0 ),
+                        拡大率 = new Variable( animation.Manager, 1.0 ),
+                        ストーリーボード = new Storyboard( animation.Manager ),
+                    };
+                   
                     using( var 中心位置Xの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.23 ), finalValue: 1920.0 / 2.0 - 260.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                         文字.ストーリーボード.AddTransition( 文字.中心位置X, 中心位置Xの遷移 );
 
@@ -159,15 +163,13 @@ namespace DTXMania
                 #region " 「O」のアニメーション構築 "
                 //----------------
                 {
-                    var 文字 = this._文字アニメーション[ (int) 文字名.O ];
-
-                    文字.Dispose();
-
-                    文字.中心位置X = new Variable( animation.Manager, 1920.0 + 200.0 );
-                    文字.中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 80.0 );
-                    文字.拡大率 = new Variable( animation.Manager, 1.0 );
-
-                    文字.ストーリーボード = new Storyboard( animation.Manager );
+                    var 文字 = this._文字アニメーション[ (int) 文字名.O ] = new 文字() {
+                        画像 = this.文字画像[ (int) 文字名.O ],
+                        中心位置X = new Variable( animation.Manager, 1920.0 + 200.0 ),
+                        中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 80.0 ),
+                        拡大率 = new Variable( animation.Manager, 1.0 ),
+                        ストーリーボード = new Storyboard( animation.Manager ),
+                    };
 
                     using( var 中心位置Xの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.23 ), finalValue: 1920.0 / 2.0 - 20.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                         文字.ストーリーボード.AddTransition( 文字.中心位置X, 中心位置Xの遷移 );
@@ -185,15 +187,13 @@ namespace DTXMania
                 #region " 「!」のアニメーション構築 "
                 //----------------
                 {
-                    var 文字 = this._文字アニメーション[ (int) 文字名.Exc ];
-
-                    文字.Dispose();
-
-                    文字.中心位置X = new Variable( animation.Manager, 1920.0 / 2.0 + 140.0 );
-                    文字.中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 + 100.0 );
-                    文字.拡大率 = new Variable( animation.Manager, 0.1 );
-
-                    文字.ストーリーボード = new Storyboard( animation.Manager );
+                    var 文字 = this._文字アニメーション[ (int) 文字名.Exc ] = new 文字() {
+                        画像 = this.文字画像[ (int) 文字名.Exc ],
+                        中心位置X = new Variable( animation.Manager, 1920.0 / 2.0 + 140.0 ),
+                        中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 + 100.0 ),
+                        拡大率 = new Variable( animation.Manager, 0.1 ),
+                        ストーリーボード = new Storyboard( animation.Manager ),
+                    };
 
                     using( var 中心位置Yの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.14 ), finalValue: 1080.0 / 2.0 - 340.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                     using( var 拡大率の遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.14 ), finalValue: 1.5, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
@@ -1010,6 +1010,7 @@ namespace DTXMania
 
         // protected, private
 
+        private 画像[] 文字画像;
 
         /// <summary>
         ///     G, O, ! のアニメーション情報
@@ -1024,10 +1025,9 @@ namespace DTXMania
 
             public void Dispose()
             {
+                this.画像 = null; // Disposeしない
+
                 this.ストーリーボード?.Abandon();
-
-                //this.画像 = null;
-
                 this.ストーリーボード?.Dispose();
                 this.ストーリーボード = null;
 
@@ -1036,6 +1036,9 @@ namespace DTXMania
 
                 this.中心位置X?.Dispose();
                 this.中心位置X = null;
+
+                this.拡大率?.Dispose();
+                this.拡大率 = null;
             }
         }
         private 文字[] _文字アニメーション = null;
@@ -1057,11 +1060,10 @@ namespace DTXMania
 
             public void Dispose()
             {
-                this.ストーリーボード?.Abandon();
-
                 this.ブラシ?.Dispose();
                 this.ブラシ = null;
 
+                this.ストーリーボード?.Abandon();
                 this.ストーリーボード?.Dispose();
                 this.ストーリーボード = null;
 
@@ -1091,11 +1093,10 @@ namespace DTXMania
 
             public void Dispose()
             {
-                this.ストーリーボード?.Abandon();
-
                 this.ブラシ?.Dispose();
                 this.ブラシ = null;
 
+                this.ストーリーボード?.Abandon();
                 this.ストーリーボード?.Dispose();
                 this.ストーリーボード = null;
 
@@ -1119,12 +1120,11 @@ namespace DTXMania
             public void Dispose()
             {
                 this.ストーリーボード?.Abandon();
+                this.ストーリーボード?.Dispose();
+                this.ストーリーボード = null;
 
                 this.不透明度?.Dispose();
                 this.不透明度 = null;
-
-                this.ストーリーボード?.Dispose();
-                this.ストーリーボード = null;
             }
         }
         private フェードイン _フェードインアニメーション = null;

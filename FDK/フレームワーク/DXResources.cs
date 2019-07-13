@@ -353,7 +353,8 @@ namespace FDK
                 this.MFDXGIDeviceManager?.Dispose();
                 this.DXGIOutput1?.Dispose();
 #if DEBUG
-                // ReportLiveDeviceObjects
+                // ReportLiveDeviceObjects。
+                // デバッガの「ネイティブデバッグを有効にする」をオンにすれば表示される。
                 using( var d3ddc = this.D3D11Device1.ImmediateContext )
                 {
                     d3ddc.Flush();

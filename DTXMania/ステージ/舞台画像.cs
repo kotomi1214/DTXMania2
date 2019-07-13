@@ -69,6 +69,8 @@ namespace DTXMania
                 this._拡大エフェクト?.Dispose();
                 this._ガウスぼかしエフェクト黒幕付き用?.Dispose();
                 this._ガウスぼかしエフェクト?.Dispose();
+                this._背景黒幕付き画像?.Dispose();
+                this._背景画像?.Dispose();
             }
         }
 

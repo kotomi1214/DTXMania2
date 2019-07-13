@@ -35,6 +35,9 @@ namespace DTXMania.タイトル
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化済み )
+                    this.非活性化する();
+
                 base.OnDispose();
             }
         }
@@ -69,6 +72,10 @@ namespace DTXMania.タイトル
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._帯ブラシ?.Dispose();
+                this._システム情報?.Dispose();
+                this._パッドを叩いてください?.Dispose();
+                this._タイトルロゴ?.Dispose();
+                this._舞台画像?.Dispose();
 
                 App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_開始音 );
                 App進行描画.システムサウンド.停止する( システムサウンド種別.タイトルステージ_ループBGM );

@@ -75,6 +75,8 @@ namespace FDK
 
                     this._Tick通知 = new AutoResetEvent( false );
                     this._タイマ = new QueueTimer( 1, 1, () => this._Tick通知.Set() );   // 1ms ごとに Tick通知を set する
+
+                    通知 終了通知 = null;
                     //----------------
                     #endregion
 
@@ -92,7 +94,7 @@ namespace FDK
                         {
                             if( msg is 終了通知 )
                             {
-                                msg.完了通知.Set();
+                                終了通知 = msg;
                                 メインループを抜ける = true;
                                 break;
                             }
@@ -135,6 +137,8 @@ namespace FDK
                     DXResources.ReleaseInstance();
 
                     this.AppForm = null;
+
+                    終了通知?.完了通知.Set();
                     //----------------
                     #endregion
                 }

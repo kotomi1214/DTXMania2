@@ -204,6 +204,9 @@ namespace DTXMania
                 this._ロゴ不透明度?.Dispose();
                 this._ロゴ不透明度 = null;
 
+                this._ロゴ?.Dispose();
+                this._ロゴ = null;
+
                 base.Dispose();
             }
         }

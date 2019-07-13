@@ -34,6 +34,9 @@ namespace DTXMania.終了
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                if( this.活性化済み )
+                    this.非活性化する();
+
                 base.OnDispose();
             }
         }

@@ -78,103 +78,112 @@ namespace DTXMania
 
         protected override void On開始()
         {
-            // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときに行われる。）
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                // グローバルリソースを生成。（最低限。残りは起動ステージから グローバルリソースを生成する() が呼び出されたときに行われる。）
 
-            App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
-            //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
-            App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
-                ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
-            };
-            App進行描画.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
-            App進行描画.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
-            // ※↑「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（挙動は不明）
+                App進行描画.乱数 = new Random( DateTime.Now.Millisecond );
+                //App進行描画.システム設定 = システム設定.読み込む();   --> App() で初期化する。
+                App進行描画.WAVキャッシュレンタル = new キャッシュデータレンタル<CSCore.ISampleSource>() {
+                    ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( App進行描画.サウンドデバイス, path, App進行描画.ユーザ管理.ログオン中のユーザ.再生速度 ),
+                };
+                App進行描画.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
+                App進行描画.サウンドデバイス.音量 = 0.5f; // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
+                                            // ※↑「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（挙動は不明）
 
-            App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
-            App進行描画.ドラムサウンド = new ドラムサウンド();
-            App進行描画.システムサウンド = new システムサウンド();
-            //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
-            App進行描画.入力管理 = new 入力管理( App進行描画.システム設定, this.AppForm.キーボード );
-            App進行描画.ユーザ管理 = new ユーザ管理();
-            App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
-
-
-            // ステージを生成。（残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
-
-            this.起動ステージ = new 起動.起動ステージ();
-            this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();
+                App進行描画.サウンドタイマ = new SoundTimer( App進行描画.サウンドデバイス );
+                App進行描画.ドラムサウンド = new ドラムサウンド();
+                App進行描画.システムサウンド = new システムサウンド();
+                //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
+                App進行描画.入力管理 = new 入力管理( App進行描画.システム設定, this.AppForm.キーボード );
+                App進行描画.ユーザ管理 = new ユーザ管理();
+                App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
 
 
-            // 最初のステージを設定し、活性化する。
+                // ステージを生成。（残りは起動ステージから グローバルリソースを生成する() が呼び出されたときにおこなれる。）
 
-            this.現在のステージ = this.起動ステージ;
-            this.現在のステージ.活性化する();
+                this.起動ステージ = new 起動.起動ステージ();
+                this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();
+
+
+                // 最初のステージを設定し、活性化する。
+
+                this.現在のステージ = this.起動ステージ;
+                this.現在のステージ.活性化する();
+            }
         }
 
         // 起動ステージから呼び出される。
         public void グローバルリソースを生成する()
         {
-            テクスチャ.全インスタンスで共有するリソースを作成する();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                テクスチャ.全インスタンスで共有するリソースを作成する();
 
-            App進行描画.アイキャッチ管理 = new アイキャッチ管理();
+                App進行描画.アイキャッチ管理 = new アイキャッチ管理();
 
 
-            // 起動ステージ以外のステージを生成。
+                // 起動ステージ以外のステージを生成。
 
-            this.タイトルステージ = new タイトル.タイトルステージ();
-            this.認証ステージ = new 認証.認証ステージ();
-            this.選曲ステージ = new 選曲.選曲ステージ();
-            this.オプション設定ステージ = new オプション設定.オプション設定ステージ();
-            this.曲読み込みステージ = new 曲読み込み.曲読み込みステージ();
-            this.演奏ステージ = new 演奏.演奏ステージ();
-            //this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();    --> On開始する() で生成
-            this.結果ステージ = new 結果.結果ステージ() {
-                BGMを停止する = () => 演奏ステージ.BGMを停止する(),
-                結果を取得する = () => 演奏ステージ.成績,
-            };
-            this.終了ステージ = new 終了.終了ステージ();
+                this.タイトルステージ = new タイトル.タイトルステージ();
+                this.認証ステージ = new 認証.認証ステージ();
+                this.選曲ステージ = new 選曲.選曲ステージ();
+                this.オプション設定ステージ = new オプション設定.オプション設定ステージ();
+                this.曲読み込みステージ = new 曲読み込み.曲読み込みステージ();
+                this.演奏ステージ = new 演奏.演奏ステージ();
+                //this.演奏ステージ_ビュアーモード = new 演奏.演奏ステージ_ビュアーモード();    --> On開始する() で生成
+                this.結果ステージ = new 結果.結果ステージ() {
+                    BGMを停止する = () => 演奏ステージ.BGMを停止する(),
+                    結果を取得する = () => 演奏ステージ.成績,
+                };
+                this.終了ステージ = new 終了.終了ステージ();
 
-            // static なメンバの初期化。
-            演奏.BASIC.レーンフレーム.初期化する();
+                // static なメンバの初期化。
+                演奏.BASIC.レーンフレーム.初期化する();
+            }
         }
 
         protected override void On終了()
         {
-            this.現在のステージ = null;
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.現在のステージ = null;
 
 
-            // static なメンバの終了。
+                // static なメンバの終了。
 
-            演奏.BASIC.レーンフレーム.終了する();
-
-
-            // ステージを解放。
-
-            this.起動ステージ?.Dispose();
-            this.タイトルステージ?.Dispose();
-            this.認証ステージ?.Dispose();
-            this.選曲ステージ?.Dispose();
-            this.オプション設定ステージ?.Dispose();
-            this.曲読み込みステージ?.Dispose();
-            this.演奏ステージ?.Dispose();
-            this.結果ステージ?.Dispose();
-            this.終了ステージ?.Dispose();
+                演奏.BASIC.レーンフレーム.終了する();
 
 
-            // グローバルリソースを解放。
+                // ステージを解放。
 
-            App進行描画.アイキャッチ管理?.Dispose();
-            App進行描画.曲ツリー?.Dispose();
-            App進行描画.ドラムサウンド?.Dispose();
-            App進行描画.入力管理?.Dispose();
-            App進行描画.ユーザ管理?.Dispose();
-            App進行描画.システムサウンド?.Dispose();
-            App進行描画.サウンドタイマ?.Dispose();
-            App進行描画.サウンドデバイス?.Dispose();
-            App進行描画.WAVキャッシュレンタル?.Dispose();    // サウンドデバイスより後
+                this.起動ステージ?.Dispose();
+                this.タイトルステージ?.Dispose();
+                this.認証ステージ?.Dispose();
+                this.選曲ステージ?.Dispose();
+                this.オプション設定ステージ?.Dispose();
+                this.曲読み込みステージ?.Dispose();
+                this.演奏ステージ?.Dispose();
+                this.結果ステージ?.Dispose();
+                this.終了ステージ?.Dispose();
 
-            テクスチャ.全インスタンスで共有するリソースを解放する();
 
-            App進行描画.Instance = null;
+                // グローバルリソースを解放。
+
+                App進行描画.アイキャッチ管理?.Dispose();
+                App進行描画.曲ツリー?.Dispose();
+                App進行描画.ドラムサウンド?.Dispose();
+                App進行描画.入力管理?.Dispose();
+                App進行描画.ユーザ管理?.Dispose();
+                App進行描画.システムサウンド?.Dispose();
+                App進行描画.サウンドタイマ?.Dispose();
+                App進行描画.サウンドデバイス?.Dispose();
+                App進行描画.WAVキャッシュレンタル?.Dispose();    // サウンドデバイスより後
+
+                テクスチャ.全インスタンスで共有するリソースを解放する();
+
+                App進行描画.Instance = null;
+            }
         }
 
         private void _アプリを終了する()
@@ -397,6 +406,8 @@ namespace DTXMania
                     //----------------
                     if( stage.現在のフェーズ == 終了.終了ステージ.フェーズ.完了 )
                     {
+                        stage.非活性化する();
+                        this.現在のステージ = null;
                         this._アプリを終了する();
                     }
                     //----------------
@@ -425,7 +436,7 @@ namespace DTXMania
             //----------------
             #endregion
 
-            this.現在のステージ.描画する();
+            this.現在のステージ?.描画する();
         }
 
         protected override void メッセージを処理する( 通知 msg )

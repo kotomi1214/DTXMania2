@@ -73,6 +73,8 @@ namespace FDK
                 dxgiSurface.Unmap();
             }
 
+            captureTexture?.Dispose();
+
             return bitmap;
         }
     }
