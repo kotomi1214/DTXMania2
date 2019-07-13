@@ -45,7 +45,7 @@ namespace FDK
                 throw new ArgumentException( "Stream is not readable.", "stream" );
 
             this._stream = stream;
-            this._vorbisReader = new VorbisReader( stream, false );
+            this._vorbisReader = new VorbisReader( stream, true );
 
             this._waveFormat = new WaveFormat(
                 this._vorbisReader.SampleRate,

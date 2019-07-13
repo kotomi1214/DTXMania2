@@ -101,11 +101,10 @@ namespace FDK
             this._既定の背景色 = 既定の背景色;
         }
 
-        public new void Dispose()
+        protected override void Dispose( bool disposing )
         {
-            this._wrFactory = null;
-
-            //base.Dispose();
+            if( disposing )
+                this._wrFactory = null;
         }
 
         /// <summary>

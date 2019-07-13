@@ -137,6 +137,7 @@ namespace DTXMania
             }
 #endif
 
+            System.Threading.Tasks.Task.Delay( 1000 ).Wait();
             Log.WriteLine( "" );
             Log.WriteLine( "遊んでくれてありがとう！" );
         }

@@ -351,6 +351,13 @@ namespace FDK
                 this.D2D1Factory1?.Dispose();
                 this.MFDXGIDeviceManager?.Dispose();
                 this.DXGIOutput1?.Dispose();
+#if DEBUG
+                // ReportLiveDeviceObjects
+                this.D3D11Device1.ImmediateContext.Flush();
+                this.D3D11Device1.ImmediateContext.ClearState();
+                using( var debug = new SharpDX.Direct3D11.DeviceDebug( this.D3D11Device1 ) )
+                    debug.ReportLiveDeviceObjects( SharpDX.Direct3D11.ReportingLevel.Summary | SharpDX.Direct3D11.ReportingLevel.IgnoreInternal );
+#endif
                 this.D3D11Device1?.Dispose();
 
                 // MediaFoundation をシャットダウンする。
