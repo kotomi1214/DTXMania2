@@ -15,7 +15,7 @@ using System.ComponentModel;
 namespace DTXMania
 {
     [ServiceBehavior( InstanceContextMode = InstanceContextMode.Single )]   // WCFサービスインターフェースをシングルスレッドで呼び出す。
-    partial class App : AppForm, IDTXManiaService
+    partial class AppForm : AppFormBase, IDTXManiaService
     {
 
         // statc 
@@ -34,24 +34,24 @@ namespace DTXMania
         // 生成と終了
 
 
-        public App( CommandLineOptions options )
+        public AppForm( CommandLineOptions options )
             : base( new App進行描画() )
         {
             InitializeComponent();
 
-            this.Text = "DTXMania2 release" + App.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
+            this.Text = "DTXMania2 release" + AppForm.リリース番号.ToString( "000" ) + ( options.ビュアーモードである ? " [Viewer Mode]" : "" );
 
             App進行描画.システム設定 = システム設定.読み込む();
 
-            App.ビュアーモードである = options.ビュアーモードである;
-            App.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
+            AppForm.ビュアーモードである = options.ビュアーモードである;
+            AppForm.サービスメッセージキュー = new DTXManiaServiceMessageQueue();   // WCFサービス用
 
-            if( App.ビュアーモードである )
+            if( AppForm.ビュアーモードである )
             {
                 // 前回の位置とサイズを復元する。
                 this.StartPosition = FormStartPosition.Manual;
-                this.Location = App進行描画.システム設定.ウィンドウ表示位置Viewerモード用;
-                this.ClientSize = App進行描画.システム設定.ウィンドウサイズViewerモード用;
+                this.Location = App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置.ToDrawingPoint();
+                this.ClientSize = App進行描画.システム設定.ビュアーモード時のウィンドウサイズ.ToDrawingSize();
             }
             else
             {
@@ -63,23 +63,23 @@ namespace DTXMania
             this.キーボード = new キーボードデバイス();
         }
 
-        private new App進行描画 進行描画 => (App進行描画) base.進行描画;
+        private new App進行描画 App進行描画 => (App進行描画) base.App進行描画;
 
         protected override void OnLoad( EventArgs e )
         {
-            this.画面モード = 画面モード.ウィンドウ;   // 常にウィンドウモード
+            this.画面モード = App進行描画.システム設定.全画面モードである ? 画面モード.全画面 : 画面モード.ウィンドウ;
 
             base.OnLoad( e );
         }
 
         protected override void OnClosing( CancelEventArgs e )
         {
-            if( App.ビュアーモードである )
+            if( AppForm.ビュアーモードである )
             {
                 // 今回の位置とサイズを保存する。
-                App進行描画.システム設定.ウィンドウ表示位置Viewerモード用 = this.Location;
-                App進行描画.システム設定.ウィンドウサイズViewerモード用 = this.ClientSize;
-                App進行描画.システム設定.保存する();
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location.ToSharpDXPoint();
+                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize.ToSharpDXSize2();
+                DTXMania.App進行描画.システム設定.保存する();
             }
 
             base.OnClosing( e );
@@ -92,7 +92,7 @@ namespace DTXMania
             {
                 // this.画面モード.set() は非同期処理なので、すぐに値が反映されるとは限らない。
                 // なので、ログオン中のユーザへの設定は、その変更より先に行なっておく。
-                App進行描画.ユーザ管理.ログオン中のユーザ.全画面モードである = ( this.画面モード != 画面モード.全画面 );
+                DTXMania.App進行描画.システム設定.全画面モードである = ( this.画面モード != 画面モード.全画面 );
 
                 this.画面モード = ( this.画面モード == 画面モード.ウィンドウ ) ? 画面モード.全画面 : 画面モード.ウィンドウ;
             }
@@ -113,21 +113,21 @@ namespace DTXMania
         /// <param name="startPart">演奏開始小節番号(0～)</param>
         /// <param name="drumsSound">ドラムチップ音を発声させるなら true。</param>
         public void ViewerPlay( string path, int startPart = 0, bool drumsSound = true )
-            => this.進行描画.ViewerPlay( path, startPart, drumsSound );
+            => this.App進行描画.ViewerPlay( path, startPart, drumsSound );
 
         /// <summary>
         ///		現在の演奏を停止する。
         ///		ビュアーモードのときのみ有効。
         /// </summary>
         public void ViewerStop()
-            => this.進行描画.ViewerStop();
+            => this.App進行描画.ViewerStop();
 
         /// <summary>
         ///		サウンドデバイスの発声遅延[ms]を返す。
         /// </summary>
         /// <returns>遅延量[ms]</returns>
         public float GetSoundDelay()
-            => this.進行描画.GetSoundDelay();
+            => this.App進行描画.GetSoundDelay();
 
 
 
@@ -151,7 +151,6 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                
                 // WCFサービスホストの起動を試みる。
 
                 this._wcfServiceHost = null;
@@ -163,7 +162,7 @@ namespace DTXMania
                 }
                 catch( AddressAlreadyInUseException )
                 {
-                    // 田プロセスによって既に起動されている場合はこの例外が発生し、
+                    // 他プロセスによって既に起動されている場合はこの例外が発生し、
                     // _wcfServiceHost は null のままである。
                 }
 
@@ -199,12 +198,15 @@ namespace DTXMania
                     if( ビュアーモードである )
                     {
                         // (B-a) ビュアーモードなら、オプションを自分で処理する。
+
                         _WCFサービスでオプションを処理する( this, options );
+
                         return true;
                     }
                     else
                     {
                         // (B-b) 通常起動。
+
                         return true;
                     }
                 }
@@ -214,15 +216,18 @@ namespace DTXMania
         private void _WCFサービスホストを起動する( out ServiceHost serviceHost )
         {
             // アプリのWCFサービスホストを生成する。
+
             serviceHost = new ServiceHost( this, new Uri( serviceUri ) );
 
             // 名前付きパイプにバインドしたエンドポイントをサービスホストへ追加する。
+
             serviceHost.AddServiceEndpoint(
                 typeof( WCF.IDTXManiaService ),                             // 公開するインターフェース
                 new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ),   // 名前付きパイプ
                 endPointName );                                             // 公開するエンドポイント
 
             // WCFサービスの受付を開始する。
+
             serviceHost.Open();
         }
 

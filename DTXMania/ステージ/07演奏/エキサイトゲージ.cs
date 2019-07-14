@@ -22,7 +22,7 @@ namespace DTXMania.演奏
                 this._ゲージ枠通常 = new テクスチャ( @"$(System)images\演奏\エキサイトゲージ通常.png" );
                 this._ゲージ枠DANGER = new テクスチャ( @"$(System)images\演奏\エキサイトゲージDANGER.png" );
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._通常ブラシ = new SolidColorBrush( dc, new Color4( 0xfff9b200 ) );      // ABGR
                 this._DANGERブラシ = new SolidColorBrush( dc, new Color4( 0xff0000ff ) );
@@ -31,7 +31,7 @@ namespace DTXMania.演奏
                 this._ゲージ量 = null;
                 this._ゲージ量のストーリーボード = null;
 
-                this._ゲージ量 = new Variable( グラフィックデバイス.Instance.アニメーション.Manager, initialValue: 0 );
+                this._ゲージ量 = new Variable( DXResources.Instance.アニメーション.Manager, initialValue: 0 );
                 this._ゲージ量のストーリーボード = null;
             }
         }
@@ -83,7 +83,7 @@ namespace DTXMania.演奏
 
             if( ゲージ量 != this._ゲージ量.FinalValue )
             {
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 this._ゲージ量のストーリーボード = new Storyboard( animation.Manager );
 
@@ -102,7 +102,7 @@ namespace DTXMania.演奏
             
             // ゲージの描画。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

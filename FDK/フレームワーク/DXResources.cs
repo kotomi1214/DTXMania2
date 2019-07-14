@@ -11,23 +11,23 @@ namespace FDK
     /// <summary>
     ///     グラフィック関連のリソース。
     /// </summary>
-    public class グラフィックデバイス : IDisposable
+    public class DXResources : IDisposable
     {
 
         // static
 
 
-        public static グラフィックデバイス Instance { get; protected set; } = null;
+        public static DXResources Instance { get; protected set; } = null;
 
-        public static void インスタンスを生成する( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ )
+        public static void CreateInstance( IntPtr hWindow, Size 設計画面サイズ, Size 物理画面サイズ )
         {
             if( null != Instance )
                 throw new Exception( "インスタンスはすでに生成済みです。" );
 
-            Instance = new グラフィックデバイス( 設計画面サイズ, 物理画面サイズ, hWindow, hWindow );
+            Instance = new DXResources( 設計画面サイズ, 物理画面サイズ, hWindow, hWindow );
         }
 
-        public static void インスタンスを解放する()
+        public static void ReleaseInstance()
         {
             Instance?.Dispose();
             Instance = null;
@@ -54,13 +54,15 @@ namespace FDK
         ///     画面に実際に表示される画面のサイズ[px]。
         /// </summary>
         /// <remarks>
-        ///     物理画面サイズは、表示先コントロールのクライアントサイズを表す。
+        ///     物理画面サイズは、表示先コントロールのクライアントサイズ（＝スワップチェーンのサイズ）を表す。
         ///     物理画面サイズは、ユーザが自由に変更することができるという点に留意すること。
         ///     プログラム内では物理画面におけるピクセルの単位として「px」と称することがある。
         ///     なお、int より float での利用が多いので、Size や Size2 ではなく Size2F を使う。
         ///     （int 同士ということを忘れて、割り算しておかしくなるケースも多発したので。）
         /// </remarks>
         public Size2F 物理画面サイズ { get; protected set; } = new Size2F( 1024f, 576f );
+
+        // 設計-物理サイズ間の変換
 
         public float 拡大率DPXtoPX横 => ( this.物理画面サイズ.Width / this.設計画面サイズ.Width );
         public float 拡大率DPXtoPX縦 => ( this.物理画面サイズ.Height / this.設計画面サイズ.Height );
@@ -70,14 +72,12 @@ namespace FDK
         public Matrix3x2 拡大行列PXtoDPX => Matrix3x2.Scaling( this.拡大率PXtoDPX横, this.拡大率PXtoDPX縦 );
 
         /// <summary>
-        ///     3D視点で見る画面左上の座標。
+        ///     等倍3D平面での画面左上の3D座標。
         /// </summary>
+        /// <remarks>
+        ///     等倍3D平面については <see cref="等倍3D平面描画用の変換行列を取得する(out Matrix, out Matrix)"/> を参照。
+        /// </remarks>
         public Vector3 画面左上dpx => new Vector3( -this.設計画面サイズ.Width / 2f, +this.設計画面サイズ.Height / 2f, 0f );
-
-        /// <summary>
-        ///     3Dビューの視野角[度]。
-        /// </summary>
-        public float 視野角deg { get; set; } = 45.0f;
 
         /// <summary>
         ///		現在時刻から、DirectComposition Engine による次のフレーム表示時刻までの間隔[秒]を返す。
@@ -125,7 +125,7 @@ namespace FDK
 
         public SharpDX.DirectWrite.Factory DWriteFactory { get; private set; } = null;
 
-        public アニメーション アニメーション { get; private set; } = null;
+        public Animation アニメーション { get; private set; } = null;
 
 
 
@@ -167,7 +167,7 @@ namespace FDK
         // 生成と終了
 
 
-        public グラフィックデバイス( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow, IntPtr hControl )
+        protected DXResources( Size 物理画面サイズ, Size 設計画面サイズ, IntPtr hWindow, IntPtr hControl )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -212,10 +212,14 @@ namespace FDK
 
 
         /// <summary>
-        ///		バックバッファ（スワップチェーン）のサイズを変更する。
+        ///		物理画面サイズ（スワップチェーンのバックバッファのサイズ）を変更する。
         /// </summary>
         /// <param name="newSize">新しいサイズ。</param>
-        public void サイズを変更する( Size newSize )
+        /// <remarks>
+        ///     スワップチェーンを ResizeBuffer() する前に、バックバッファに依存するリソースをすべて解放しなければならない。
+        ///     また、ResizeBuffer() の後には、バックバッファまたはそのサイズに依存するリソースをすべて再構築しなければならない。
+        /// </remarks>
+        public void 物理画面サイズを変更する( Size newSize )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -249,13 +253,13 @@ namespace FDK
                     SharpDX.Direct3D.DriverType.Hardware,
 #if DEBUG
                     // D3D11 Debugメッセージは、Visual Studio のプロジェクトプロパティで「ネイティブコードのデバッグを有効にする」を ON にしないと表示されない。
-                    // なお、デバッグを有効にしてアプリケーションを実行すると、速度が大幅に低下する。
+                    // なお、「ネイティブコードのデバッグを有効にする」を有効にしてアプリケーションを実行すると、速度が恐ろしく低下する。
                     SharpDX.Direct3D11.DeviceCreationFlags.Debug |
 #endif
-                    SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport,
-                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 } ) )
+                    SharpDX.Direct3D11.DeviceCreationFlags.BgraSupport, // D2Dで必須
+                    new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_0 } ) )    // D3D11.1 を使うが機能レベルは 11_0 でいい
                 {
-                    // ID3D11Device1 を取得する。
+                    // ID3D11Device1 を取得する。（Windows8.1 以降のPCで実装されている。）
                     this.D3D11Device1 = d3dDevice.QueryInterface<SharpDX.Direct3D11.Device1>();
                 }
 
@@ -275,7 +279,8 @@ namespace FDK
 
                     // 既定のDXGI出力を取得する。
                     using( var dxgiAdapter = dxgiDevice1.Adapter )
-                        this.DXGIOutput1 = dxgiAdapter.Outputs[ 0 ].QueryInterface<SharpDX.DXGI.Output1>(); // 「現在のDXGI出力」を取得することはできないので[0]で固定。
+                    using( var output = dxgiAdapter.Outputs[ 0 ] )
+                        this.DXGIOutput1 = output.QueryInterface<SharpDX.DXGI.Output1>(); // 「現在のDXGI出力」を取得することはできないので[0]で固定。
 
                     // DXGIデバイスマネージャを生成し、D3Dデバイスを登録する。MediaFoundationで必須。
                     this.MFDXGIDeviceManager = new SharpDX.MediaFoundation.DXGIDeviceManager();
@@ -329,7 +334,7 @@ namespace FDK
                 this.DWriteFactory = new SharpDX.DirectWrite.Factory( SharpDX.DirectWrite.FactoryType.Shared );
 
                 // Windows Animation を生成する。
-                this.アニメーション = new アニメーション();
+                this.アニメーション = new Animation();
             }
         }
         private void _スワップチェーンに依存しないグラフィックリソースを解放する()
@@ -347,8 +352,20 @@ namespace FDK
                 this.D2D1Factory1?.Dispose();
                 this.MFDXGIDeviceManager?.Dispose();
                 this.DXGIOutput1?.Dispose();
-                this.D3D11Device1?.Dispose();
-
+#if DEBUG
+                // ReportLiveDeviceObjects。
+                // デバッガの「ネイティブデバッグを有効にする」をオンにすれば表示される。
+                using( var d3ddc = this.D3D11Device1.ImmediateContext )
+                {
+                    d3ddc.Flush();
+                    d3ddc.ClearState();
+                }
+                using( var debug = new SharpDX.Direct3D11.DeviceDebug( this.D3D11Device1 ) )
+                {
+                    this.D3D11Device1?.Dispose();
+                    debug.ReportLiveDeviceObjects( SharpDX.Direct3D11.ReportingLevel.Detail | SharpDX.Direct3D11.ReportingLevel.IgnoreInternal );
+                }
+#endif
                 // MediaFoundation をシャットダウンする。
                 SharpDX.MediaFoundation.MediaManager.Shutdown();
             }
@@ -401,6 +418,7 @@ namespace FDK
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                // Visual のコンテンツから解除してコミット。
                 this.DCompVisual2ForSwapChain.Content = null;
                 this.DCompDevice2.Commit();
 
@@ -487,15 +505,15 @@ namespace FDK
                     #region " バックバッファに対する既定のビューポートを作成する。"
                     //----------------
                     this.既定のD3D11ViewPort = new SharpDX.Mathematics.Interop.RawViewportF[] {
-                    new SharpDX.Mathematics.Interop.RawViewportF() {
-                        X = 0.0f,                                                   // バックバッファと同じサイズ
-                        Y = 0.0f,                                                   //
-                        Width = (float) backbufferTexture2D.Description.Width,      //
-                        Height = (float) backbufferTexture2D.Description.Height,    //
-                        MinDepth = 0.0f,                                            // 近面Z: 0.0（最も近い）
-                        MaxDepth = 1.0f,                                            // 遠面Z: 1.0（最も遠い）
-                    },
-                };
+                        new SharpDX.Mathematics.Interop.RawViewportF() {
+                            X = 0.0f,                                                   // バックバッファと同じサイズ
+                            Y = 0.0f,                                                   //
+                            Width = (float) backbufferTexture2D.Description.Width,      //
+                            Height = (float) backbufferTexture2D.Description.Height,    //
+                            MinDepth = 0.0f,                                            // 近面Z: 0.0（最も近い）
+                            MaxDepth = 1.0f,                                            // 遠面Z: 1.0（最も遠い）
+                        },
+                    };
                     //----------------
                     #endregion
 
@@ -540,16 +558,18 @@ namespace FDK
 
 
         /// <summary>
-        ///     平面描画用のビュー行列と射影行列を生成して返す。
+        ///     等倍3D平面描画用のビュー行列と射影行列を生成して返す。
         /// </summary>
         /// <remarks>
-        ///     Z = 0 におけるビューポートサイズが <see cref="設計画面サイズ"/> に一致するように調整された
-        ///     ビュー行列と射影行列を生成して返す。
-        ///     例えば、設計画面サイズが 1024x720 の場合、z = 0 における表示可能な x, y の値域は (-512, -360)～(+512, +360) となる。
+        ///     Z = 0 におけるビューポートサイズが <see cref="設計画面サイズ"/> に一致する平面を、「等倍3D平面」と称する。
+        ///     例えば、設計画面サイズが 1024x720 の場合、等倍3D平面の表示可能な x, y の値域は (-512, -360)～(+512, +360) となる。
+        ///     本メソッドは、等倍3D平面を実現するためのビュー行列と射影行列を返す。
         /// </remarks>
-        public void 平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 )
+        public void 等倍3D平面描画用の変換行列を取得する( out Matrix 転置済みビュー行列, out Matrix 転置済み射影行列 )
         {
-            var dz = (float) ( this.設計画面サイズ.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( this.視野角deg / 2.0f ) ) ) );
+            const float 視野角deg = 45.0f;
+
+            var dz = (float) ( this.設計画面サイズ.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
 
             var カメラの位置 = new Vector3( 0f, 0f, -2f * dz );
             var カメラの注視点 = new Vector3( 0f, 0f, 0f );
@@ -559,26 +579,26 @@ namespace FDK
             転置済みビュー行列.Transpose();  // 転置
 
             転置済み射影行列 = Matrix.PerspectiveFovLH(
-                MathUtil.DegreesToRadians( this.視野角deg ),
+                MathUtil.DegreesToRadians( 視野角deg ),
                 設計画面サイズ.Width / 設計画面サイズ.Height,   // アスペクト比
                 -dz,                                            // 前方投影面までの距離
-                dz );                                           // 後方投影面までの距離
+                +dz );                                          // 後方投影面までの距離
             転置済み射影行列.Transpose();  // 転置
         }
 
         /// <summary>
-        ///		指定したレンダーターゲットに対して描画処理をバッチ実行する。
+        ///		指定したレンダーターゲットに対して、D2D描画処理をバッチ実行する。
         /// </summary>
         /// <remarks>
-        ///		描画処理は、レンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
-        ///		描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
+        ///		D2D描画処理は、レンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
+        ///		D2D描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
         /// </remarks>
         /// <param name="rt">レンダリングターゲット。</param>
-        /// <param name="描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
-        public void D2DBatchDraw( SharpDX.Direct2D1.RenderTarget rt, Action 描画処理 )
+        /// <param name="D2D描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
+        public void D2DBatchDraw( SharpDX.Direct2D1.RenderTarget rt, Action D2D描画処理 )
         {
-            // リストになかったらこの rt を使うのは初回なので、BeginDraw/EndDraw() の呼び出しを行う。
-            // もしリストに登録されていたら、この rt は他の誰かが BeginDraw して EndDraw してない状態
+            // リストになかったらこの RenderTarget を使うのは初回なので、BeginDraw/EndDraw() の呼び出しを行う。
+            // もしリストに登録されていたら、この RenderTarget は他の誰かが BeginDraw して EndDraw してない状態
             // （D2DBatcDraw() の最中に D2DBatchDraw() が呼び出されている状態）なので、これらを呼び出してはならない。
             bool BeginとEndを行う = !( this._BatchDraw中のレンダーターゲットリスト.Contains( rt ) );
 
@@ -593,7 +613,7 @@ namespace FDK
                     rt.BeginDraw();
                 }
 
-                描画処理();
+                D2D描画処理();
             }
             finally
             {
@@ -608,7 +628,6 @@ namespace FDK
                 }
             }
         }
-
 
         private List<SharpDX.Direct2D1.RenderTarget> _BatchDraw中のレンダーターゲットリスト = new List<SharpDX.Direct2D1.RenderTarget>();
     }

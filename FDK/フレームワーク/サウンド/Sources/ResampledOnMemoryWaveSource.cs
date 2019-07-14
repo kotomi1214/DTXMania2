@@ -51,13 +51,14 @@ namespace FDK
                 deviceFormat.Channels,
                 AudioEncoding.IeeeFloat );
 
-            // しかしサウンドデータは、指定された再生速度を乗したサンプルレートで生成する。
+            // しかしサウンドデータは、指定された再生速度を乗じたサンプルレートで生成する。
             var waveFormtForResampling = new WaveFormat(
                 (int) ( this.WaveFormat.SampleRate / 再生速度 ),
                 this.WaveFormat.BitsPerSample,
                 this.WaveFormat.Channels,
                 AudioEncoding.IeeeFloat );
 
+            // リサンプルを行う。
             using( var resampler = new DmoResampler( waveSource, waveFormtForResampling ) )
             {
                 var サイズbyte = resampler.Length;

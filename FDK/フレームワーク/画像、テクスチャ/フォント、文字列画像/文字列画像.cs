@@ -243,14 +243,14 @@ namespace FDK
         {
             // 必要なプロパティは呼び出し元で設定すること。
 
-            this._TextRenderer = new カスタムTextRenderer( グラフィックデバイス.Instance.D2D1Factory1, Color.White, Color.Transparent );    // ビットマップの生成前に。
+            this._TextRenderer = new カスタムTextRenderer( DXResources.Instance.D2D1Factory1, Color.White, Color.Transparent );    // ビットマップの生成前に。
 
             this._ビットマップを更新せよ = true;
             this._TextFormatを更新せよ = true;
             this._TextLayoutを更新せよ = true;
 
             if( this.レイアウトサイズdpx == Size2F.Zero )
-                this.レイアウトサイズdpx = グラフィックデバイス.Instance.設計画面サイズ; // 初期サイズとして設計画面サイズを設定。
+                this.レイアウトサイズdpx = DXResources.Instance.設計画面サイズ; // 初期サイズとして設計画面サイズを設定。
 
             // 画像を生成する。
 
@@ -276,7 +276,7 @@ namespace FDK
                 //----------------
                 this.TextFormat?.Dispose();
                 this.TextFormat = new TextFormat(
-                    グラフィックデバイス.Instance.DWriteFactory,
+                    DXResources.Instance.DWriteFactory,
                     this.フォント名,
                     this.フォント幅,
                     this.フォントスタイル,
@@ -289,7 +289,7 @@ namespace FDK
                 };
 
                 // 行間は、プロパティではなくメソッドで設定する。
-                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( グラフィックデバイス.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
+                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( DXResources.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
 
                 // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.Baseline = this.LineSpacing * 0.8f;
@@ -306,7 +306,7 @@ namespace FDK
                 //----------------
                 this.TextLayout?.Dispose();
                 this.TextLayout = new TextLayout(
-                    グラフィックデバイス.Instance.DWriteFactory,
+                    DXResources.Instance.DWriteFactory,
                     this.表示文字列,
                     this.TextFormat,
                     this.レイアウトサイズdpx.Width,
@@ -328,7 +328,7 @@ namespace FDK
                 #region " 古いビットマップレンダーターゲットを解放し、新しく生成する。"
                 //----------------
                 // D2DContext1.Target が設定済みでない場合、例外も出さずに落ちてしまうので、明示的に弾く。
-                using( var target = グラフィックデバイス.Instance.既定のD2D1DeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
+                using( var target = DXResources.Instance.既定のD2D1DeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
                     Debug.Assert( null != target );
 
                 if( this.ParagraphAlignment != ParagraphAlignment.Near ||
@@ -355,7 +355,7 @@ namespace FDK
 
                 this._Bitmap?.Dispose();
                 this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget(
-                    グラフィックデバイス.Instance.既定のD2D1DeviceContext, 
+                    DXResources.Instance.既定のD2D1DeviceContext, 
                     CompatibleRenderTargetOptions.None,
                     this.画像サイズdpx );
                 //----------------
@@ -365,7 +365,7 @@ namespace FDK
                 //----------------
                 var rt = this._Bitmap;
 
-                グラフィックデバイス.Instance.D2DBatchDraw( rt, () => {
+                DXResources.Instance.D2DBatchDraw( rt, () => {
 
                     using( var 前景色ブラシ = new SolidColorBrush( this._Bitmap, this.前景色 ) )
                     using( var 背景色ブラシ = new SolidColorBrush( this._Bitmap, this.背景色 ) )
@@ -450,7 +450,7 @@ namespace FDK
             if( null == this._Bitmap )
                 return;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 

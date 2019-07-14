@@ -60,8 +60,8 @@ namespace DTXMania.演奏
             var 変換行列 =
                 Matrix.RotationY( MathUtil.DegreesToRadians( -48f ) ) *
                 Matrix.Translation( 
-                    グラフィックデバイス.Instance.画面左上dpx.X + 230f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - 530f,
+                    DXResources.Instance.画面左上dpx.X + 230f,
+                    DXResources.Instance.画面左上dpx.Y - 530f,
                     0f );
 
             this.クリアパネル.描画する( 変換行列 );

@@ -37,6 +37,12 @@ namespace FDK
             this._WaveFileReader = new WaveFileReader( ファイルパス.変数なしパス );
         }
 
+        public void Dispose()
+        {
+            this._WaveFileReader?.Dispose();
+            this._WaveFileReader = null;
+        }
+
         /// <summary>
         ///		連続したデータを読み込み、<see cref="Position"/> を読み込んだ数だけ進める。
         /// </summary>
@@ -46,12 +52,6 @@ namespace FDK
         /// <returns><paramref name="buffer"/> に読み込んだデータの総数。</returns>
         public int Read( byte[] buffer, int offset, int count )
             => this._WaveFileReader.Read( buffer, offset, count );
-
-        public void Dispose()
-        {
-            this._WaveFileReader?.Dispose();
-            this._WaveFileReader = null;
-        }
 
 
         private WaveFileReader _WaveFileReader = null;

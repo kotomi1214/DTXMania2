@@ -73,7 +73,7 @@ namespace DTXMania.演奏.BASIC
             #region " チップが描画開始チップであり、かつ、そのY座標が画面下端を超えたなら、描画開始チップ番号を更新する。"
             //----------------
             if( ( index == 描画開始チップ番号 ) &&
-                ( グラフィックデバイス.Instance.設計画面サイズ.Height + 40.0 < たて中央位置dpx ) )   // +40 はチップが隠れるであろう適当なマージン。
+                ( DXResources.Instance.設計画面サイズ.Height + 40.0 < たて中央位置dpx ) )   // +40 はチップが隠れるであろう適当なマージン。
             {
                 描画開始チップ番号++;
 
@@ -166,8 +166,8 @@ namespace DTXMania.演奏.BASIC
                         // 変換(2) 移動
                         変換行列 = 変換行列 *
                             Matrix.Translation(
-                                グラフィックデバイス.Instance.画面左上dpx.X + 中央位置Xdpx,
-                                グラフィックデバイス.Instance.画面左上dpx.Y - たて中央位置dpx,
+                                DXResources.Instance.画面左上dpx.X + 中央位置Xdpx,
+                                DXResources.Instance.画面左上dpx.Y - たて中央位置dpx,
                                 0f );
 
                         // 描画。
@@ -199,8 +199,8 @@ namespace DTXMania.演奏.BASIC
                         var 変換行列 =
                             Matrix.Scaling( sx, sy, 0f ) *
                             Matrix.Translation(
-                                グラフィックデバイス.Instance.画面左上dpx.X + 中央位置Xdpx,
-                                グラフィックデバイス.Instance.画面左上dpx.Y - たて中央位置dpx,
+                                DXResources.Instance.画面左上dpx.X + 中央位置Xdpx,
+                                DXResources.Instance.画面左上dpx.Y - たて中央位置dpx,
                                 0f );
 
                         this._ドラムチップ画像.描画する(

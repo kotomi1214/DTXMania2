@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,77 +12,90 @@ using System.Windows.Forms;
 
 namespace FDK
 {
-    public partial class AppForm : Form
+    /// <summary>
+    ///     アプリケーションフォームの基本クラス。
+    ///     GUIスレッドとメッセージディスパッチを受け持つ。
+    /// </summary>
+    public partial class AppFormBase : Form
     {
         /// <summary>
-        ///     アプリの再起動が指示されたときはこれを true にするので、Program 側で適切に確認して処理すること。
+        ///     アプリケーション再起動指示フラグ。
         /// </summary>
+        /// <remarks>
+        ///     インスタンスの終了時にこのフラグが true になっている場合には、
+        ///     このインスタンスの保持者（おそらくProgramクラス）は適切に再起動（<see cref="Application.Restart"/>）を行うこと。
+        /// </remarks>
         public bool 再起動が必要 { get; protected set; } = false;
+
 
 
         // 起動、終了
 
 
-        public AppForm( 進行描画 work )
+        /// <summary>
+        ///     コンストラクタ。
+        ///     <see cref="App進行描画Base"/> インスタンスを受け取る。
+        /// </summary>
+        public AppFormBase( App進行描画Base work )
         {
             InitializeComponent();
 
-            this.進行描画 = work;
+            this.App進行描画 = work;
         }
 
-        public virtual void 開始する()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this._未初期化 = false;
-
-                TimeGetTime.timeBeginPeriod( 1 );
-
-                PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
-
-                this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
-
-                this.進行描画.開始する( this, this.ClientSize, new Size( 1920, 1080 ), this.Handle );
-            }
-        }
-
-        public virtual void 終了する()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.進行描画.終了する().WaitOne();  // 終了するまで待つ
-
-                PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
-
-                TimeGetTime.timeEndPeriod( 1 );
-
-                this._未初期化 = true;
-            }
-        }
-
-        public void 再起動する()
-        {
-            this.再起動が必要 = true;
-            this.Close();
-        }
-
-        // 開始のトリガ
+        // アプリケーション開始のトリガ。
         protected override void OnLoad( EventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.開始する();
                 base.OnLoad( e );
+
+                this._未初期化 = false;
+
+                TimeGetTime.timeBeginPeriod( 1 );
+                PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
+                this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
+
+                this.On開始();
+
+                this.App進行描画.開始する( this, this.ClientSize, new Size( 1920, 1080 ), this.Handle );
             }
         }
 
-        // 終了のトリガ
+        // アプリケーション終了のトリガ。
         protected override void OnClosing( CancelEventArgs e )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this.終了する();
+                this.On終了();
+
+                this.App進行描画.終了を通知する().WaitOne();  // 終了するまで待つ
+
+                PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
+                TimeGetTime.timeEndPeriod( 1 );
+
+                this._未初期化 = true;
+
                 base.OnClosing( e );
+            }
+        }
+
+        protected virtual void On開始()
+        {
+            // 必要あれば、派生クラスで実装する。
+        }
+
+        protected virtual void On終了()
+        {
+            // 必要あれば、派生クラスで実装する。
+        }
+
+        public void 再起動する()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.再起動が必要 = true;
+                this.Close();
             }
         }
 
@@ -89,17 +103,12 @@ namespace FDK
         /// <summary>
         ///     進行描画タスクのインスタンス。
         /// </summary>
-        protected 進行描画 進行描画;
+        protected App進行描画Base App進行描画;
 
         /// <summary>
         ///     起動直後は true, OnLoad されて false, OnClosing で true。
         /// </summary>
         private bool _未初期化 = true;
-
-        /// <summary>
-        ///     このフォームと進行描画タスク間での排他用。
-        /// </summary>
-        protected readonly object 進行描画排他ロック = new object();
 
         /// <summary>
         ///		フォーム生成時のパラメータを編集して返す。
@@ -119,44 +128,42 @@ namespace FDK
 
 
 
-        // ウィンドウアクティベート
+        // スレッド間通知、ウィンドウメッセージ
 
+        /* 通知とメッセージについて：
+         * 
+         * スレッド間で通知を連絡するために、受信スレッドでは通知キューを実装し、ポーリングを行う。
+         * このフォームでは、定期的なポーリングチェックを行わないので、通知キューに通知を投入した後に
+         * WM_APP_MESSAGE_ARRIVED イベントを送信する必要がある。
+         */
 
-        public bool ウィンドウがアクティブである { get; set; } = false;
-
-        protected override void OnActivated( EventArgs e )
-        {
-            this.ウィンドウがアクティブである = true;
-            Log.Info( "ウィンドウがアクティブ化されました。" );
-
-            base.OnActivated( e );
-        }
-
-        protected override void OnDeactivate( EventArgs e )
-        {
-            this.ウィンドウがアクティブである = false;
-            Log.Info( "ウィンドウが非アクティブ化されました。" );
-
-            base.OnDeactivate( e );
-        }
-
-
-
-        // Raw Input
-
-
-        public キーボードデバイス キーボード { get; protected set; }
-
-        private const int WM_INPUT = 0x00FF;
 
         /// <summary>
-        ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
+        ///     いずれかのスレッドで例外が発生したことを通知する。
         /// </summary>
-        /// <param name="msg">WM_INPUT のメッセージ。</param>
-        protected virtual void OnInput( in Message msg )
+        /// <returns>通知が受信されれば set されるイベント。</returns>
+        /// <remarks>
+        ///     メインスレッド以外のスレッドで致命的な例外が発生した場合に
+        ///     このメソッドを呼び出すこと。
+        /// </remarks>
+        public AutoResetEvent 例外を通知する( Exception ex )
         {
-            this.キーボード.WM_INPUTを処理する( msg );
+            var msg = new 例外発生通知() { 発生した例外 = ex };
+            this.通知キュー.Enqueue( msg );
+
+            // 通知したことをウィンドウメッセージで伝える。
+            this.BeginInvoke( new Action( () => {   // UIスレッドで実行する
+                PostMessage( this.Handle, WM_APP_MESSAGE_ARRIVED, 0, 0 );
+            } ) );
+
+            return msg.完了通知;
         }
+
+        private const int WM_INPUT = 0x00FF;
+        private const int WM_APP = 0x8000;
+        private const int WM_APP_MESSAGE_ARRIVED = WM_APP + 1;
+
+        protected 通知キュー 通知キュー = new 通知キュー();
 
         /// <summary>
         ///     このフォームのウィンドウメッセージ処理。
@@ -168,18 +175,61 @@ namespace FDK
                 case WM_INPUT:
                     this.OnInput( msg );
                     break;
+
+                case WM_APP_MESSAGE_ARRIVED:
+                    this.OnAppMessageArrivec( msg );
+                    break;
             }
 
             base.WndProc( ref msg );
         }
 
+        /// <summary>
+        ///     <see cref="WM_APP_MESSAGE_ARRIVED"/> ハンドラ。
+        /// </summary>
+        protected virtual void OnAppMessageArrivec( in Message msg )
+        {
+            if( this.通知キュー.TryDequeue( out 通知 threadMessage ) )
+            {
+                switch( threadMessage )
+                {
+                    case 例外発生通知 msg2:
+                        throw new Exception( "スレッド内で例外が発生しました。", msg2.発生した例外 );
+                }
+            }
+        }
+
+        [DllImport( "user32.dll", SetLastError = true )]
+        private static extern bool PostMessage( IntPtr hWnd, int Msg, int wParam, int lParam );
 
 
+
+        // Raw Input
+
+
+        public キーボードデバイス キーボード { get; protected set; }
+
+        /// <summary>
+        ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
+        /// </summary>
+        /// <param name="msg">WM_INPUT のメッセージ。</param>
+        protected virtual void OnInput( in Message msg )
+        {
+            this.キーボード.WM_INPUTを処理する( msg );
+        }
+
+        
+        
         // フォームサイズの変更
 
-        // 以下の２通りがある。
-        // ・ユーザのドラッグによるサイズ変更。→ ResizeEnd のタイミングで、サイズの変更を行う。
-        // ・最大化、最小化など。→ ResizeBegin～ResizeEnd の範囲外で発生した Resize でもサイズの変更を行う。
+        /* 以下の２通りがある。
+         * 
+         * ・ユーザのドラッグによるサイズ変更。
+         *      → ResizeBegin ～ ResizeEnd が発生するので、ResizeEnd のタイミングでサイズの変更を行う。
+         * 
+         * ・最大化、最小化など。
+         *      → ResizeBegin ～ ResizeEnd の範囲外で Resize が発生するので、そのタイミングでサイズの変更を行う。
+         */
 
 
         protected override void OnResizeBegin( EventArgs e )
@@ -208,7 +258,7 @@ namespace FDK
             else
             {
                 // (D) スワップチェーンとその依存リソースを解放し、改めて作成しなおす。
-                this.進行描画.サイズを変更する( this.ClientSize ).WaitOne();   // 完了するまで待つ
+                this.App進行描画.サイズ変更を通知する( this.ClientSize ).WaitOne();   // 完了するまで待つ
             }
 
             base.OnResizeEnd( e );
@@ -217,10 +267,14 @@ namespace FDK
         protected override void OnResize( EventArgs e )
         {
             if( !this._未初期化 && !this._リサイズ中 )   // 未初期化、またはリサイズ中なら無視。
-                this.進行描画.サイズを変更する( this.ClientSize ).WaitOne();   // 完了するまで待つ
+            {
+                // スワップチェーンとその依存リソースを解放し、改めて作成しなおす。
+                this.App進行描画.サイズ変更を通知する( this.ClientSize ).WaitOne();   // 完了するまで待つ
+            }
 
             base.OnResize( e );
         }
+
 
         private bool _リサイズ中 = false;
 
@@ -229,11 +283,17 @@ namespace FDK
         // 画面モードの変更
 
 
+        /// <summary>
+        ///     現在の画面モード。
+        ///     値を set することで画面モードを変更することができる。
+        /// </summary>
         public 画面モード 画面モード
         {
             get => this._画面モード;
-            set => this.BeginInvoke( new Action( () => this._画面モードを変更する( value ) ) );   // UIスレッドで実行
+            set => this.BeginInvoke(    // UIスレッドでの実行を保証。
+                new Action( () => this._画面モードを変更する( value ) ) );
         }
+
 
         private void _画面モードを変更する( 画面モード 新モード )
         {

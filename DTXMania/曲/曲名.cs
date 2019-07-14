@@ -41,16 +41,16 @@ namespace DTXMania
             this._前回のタイトル = null;
 
             this._textFormat = new TextFormat(
-                グラフィックデバイス.Instance.DWriteFactory,
+                DXResources.Instance.DWriteFactory,
                 this._fontName,
                 this._fontWeight,
                 this._fontStyle,
                 this._fontSizePt ) {
                 TextAlignment = this._textAlignment
             };
-            this._titleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._titleFontColor );
-            this._subtitleFontBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._subtitleFontColor );
-            this._backBrush = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, this._backColor );
+            this._titleFontBrush = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, this._titleFontColor );
+            this._subtitleFontBrush = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, this._subtitleFontColor );
+            this._backBrush = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, this._backColor );
         }
 
         public override void Dispose()
@@ -93,7 +93,7 @@ namespace DTXMania
                 this._前回のサブタイトル = this.サブタイトル;
 
                 using( var タイトルレイアウト = new TextLayout(
-                    グラフィックデバイス.Instance.DWriteFactory,
+                    DXResources.Instance.DWriteFactory,
                     this.タイトル,
                     this._textFormat,
                     タイトル文字矩形.Width,
@@ -107,7 +107,7 @@ namespace DTXMania
                     サブタイトル文字矩形.Y += タイトルサイズ.Height; // サブタイトルの位置は、タイトルの縦幅分だけ下へ移動。
 
                     using( var サブタイトルレイアウト = new TextLayout(
-                        グラフィックデバイス.Instance.DWriteFactory,
+                        DXResources.Instance.DWriteFactory,
                         this.サブタイトル,
                         this._textFormat,
                         サブタイトル文字矩形.Width,

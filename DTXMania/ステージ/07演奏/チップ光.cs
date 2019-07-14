@@ -85,7 +85,7 @@ namespace DTXMania.演奏
         {
             foreach( 表示レーン種別 レーン in Enum.GetValues( typeof( 表示レーン種別 ) ) )
             {
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
                 var status = this._レーンtoステータス[ レーン ];
 
                 switch( status.現在の状態 )
@@ -173,8 +173,8 @@ namespace DTXMania.演奏
                                 Matrix.Scaling( (float) status.放射光の拡大率.Value, (float) status.放射光の拡大率.Value, 0f ) *
                                 Matrix.RotationZ( MathUtil.DegreesToRadians( (float) status.放射光の回転角.Value ) ) *
                                 Matrix.Translation(
-                                    グラフィックデバイス.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
-                                    グラフィックデバイス.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
+                                    DXResources.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
+                                    DXResources.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
                                     0f );
 
                             const float 不透明度 = 0.5f;    // 眩しいので減光
@@ -189,8 +189,8 @@ namespace DTXMania.演奏
                             var 変換行列 =
                                 Matrix.Scaling( (float) status.光輪の拡大率.Value, (float) status.光輪の拡大率.Value, 0f ) *
                                 Matrix.Translation(
-                                    グラフィックデバイス.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
-                                    グラフィックデバイス.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
+                                    DXResources.Instance.画面左上dpx.X + ( status.表示中央位置dpx.X ),
+                                    DXResources.Instance.画面左上dpx.Y - ( status.表示中央位置dpx.Y ),
                                     0f );
 
                             this._光輪.描画する( 変換行列, 転送元矩形: 転送元矩形dpx, 不透明度0to1: (float) status.光輪の不透明度.Value );

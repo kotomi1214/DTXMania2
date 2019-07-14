@@ -153,7 +153,7 @@ namespace DTXMania.演奏.BASIC
 
         public void 描画する( DeviceContext dc, int BGAの透明度 )
         {
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

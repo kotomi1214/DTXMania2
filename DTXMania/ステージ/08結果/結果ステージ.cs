@@ -18,7 +18,7 @@ namespace DTXMania.結果
             完了,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -41,10 +41,11 @@ namespace DTXMania.結果
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                base.OnDispose();
             }
         }
 
@@ -53,13 +54,10 @@ namespace DTXMania.結果
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
                 this._背景 = new 舞台画像();
                 this._曲名パネル = new 画像( @"$(System)images\結果\曲名パネル.png" );
                 this._曲名画像 = new 文字列画像() {
@@ -100,7 +98,7 @@ namespace DTXMania.結果
                 this._曲名画像.表示文字列 = 選択曲.タイトル;
                 this._サブタイトル画像.表示文字列 = 選択曲.サブタイトル;
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._黒マスクブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.75f ) );
                 this._プレビュー枠ブラシ = new SolidColorBrush( dc, new Color4( 0xFF209292 ) );
@@ -109,17 +107,14 @@ namespace DTXMania.結果
 
                 this.現在のフェーズ = フェーズ.表示;
 
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
                 App進行描画.システムサウンド.停止する( システムサウンド種別.ステージクリア );
 
                 this._結果 = null;
@@ -140,7 +135,7 @@ namespace DTXMania.結果
                 this._ランク?.Dispose();
                 this._システム情報?.Dispose();
 
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 
@@ -234,11 +229,11 @@ namespace DTXMania.結果
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
             this._背景.進行描画する( dc );
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
-                dc.FillRectangle( new RectangleF( 0f, 36f, グラフィックデバイス.Instance.設計画面サイズ.Width, グラフィックデバイス.Instance.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
+            DXResources.Instance.D2DBatchDraw( dc, () => {
+                dc.FillRectangle( new RectangleF( 0f, 36f, DXResources.Instance.設計画面サイズ.Width, DXResources.Instance.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
             } );
             this._プレビュー画像を描画する( dc );
             this._曲名パネル.描画する( dc, 660f, 796f );
@@ -265,7 +260,7 @@ namespace DTXMania.結果
 
             // 枠
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
                 const float 枠の太さdpx = 5f;
                 dc.FillRectangle(
                     new RectangleF(
@@ -284,8 +279,8 @@ namespace DTXMania.結果
                     this._プレビュー画像表示サイズdpx.Y / preimage.サイズ.Height,
                     0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
+                    DXResources.Instance.画面左上dpx.X + this._プレビュー画像表示位置dpx.X + this._プレビュー画像表示サイズdpx.X / 2f,
+                    DXResources.Instance.画面左上dpx.Y - this._プレビュー画像表示位置dpx.Y - this._プレビュー画像表示サイズdpx.Y / 2f,
                     0f );
 
             preimage.描画する( 変換行列 );

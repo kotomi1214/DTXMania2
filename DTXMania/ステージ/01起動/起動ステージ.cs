@@ -23,7 +23,7 @@ namespace DTXMania.起動
             キャンセル,
         }
 
-        public フェーズ 現在のフェーズ { get; protected set; }
+        public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
 
@@ -37,12 +37,11 @@ namespace DTXMania.起動
             }
         }
 
-        public override void Dispose()
+        public override void OnDispose()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    this.非活性化する();
+                base.OnDispose();
             }
         }
 
@@ -51,18 +50,13 @@ namespace DTXMania.起動
         // 活性化と非活性化
 
 
-        public override void 活性化する()
+        public override void On活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( this.活性化中 )
-                    return;
-
-                this.活性化中 = true;
-
                 this._コンソールフォント = new 画像フォント( @"$(System)images\コンソールフォント20x32.png", @"$(System)images\コンソールフォント20x32.yaml", 文字幅補正dpx: -6f );
 
-                if( !App.ビュアーモードである )
+                if( !AppForm.ビュアーモードである )
                 {
                     App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_開始音 );     // この２つを先行読み込み。残りはシステムサウンド構築フェーズにて。 
                     App進行描画.システムサウンド.読み込む( システムサウンド種別.認証ステージ_ループBGM );  //
@@ -72,27 +66,21 @@ namespace DTXMania.起動
                 }
 
                 this._コンソール表示内容 = new List<string>() {
-                    $"{App.属性<AssemblyTitleAttribute>().Title} Release {App.リリース番号:000} - Beats with your heart.",
-                    $"{App.属性<AssemblyCopyrightAttribute>().Copyright}",
+                    $"{AppForm.属性<AssemblyTitleAttribute>().Title} Release {AppForm.リリース番号:000} - Beats with your heart.",
+                    $"{AppForm.属性<AssemblyCopyrightAttribute>().Copyright}",
                     $"",
                 };
 
                 this.現在のフェーズ = フェーズ.開始;
 
-
-                base.活性化する();
+                base.On活性化();
             }
         }
 
-        public override void 非活性化する()
+        public override void On非活性化()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                if( !this.活性化中 )
-                    return;
-
-                this.活性化中 = false;
-
                 App進行描画.システムサウンド.停止する( システムサウンド種別.起動ステージ_開始音 );
                 App進行描画.システムサウンド.停止する( システムサウンド種別.起動ステージ_ループBGM );
 
@@ -100,8 +88,7 @@ namespace DTXMania.起動
 
                 this.現在のフェーズ = フェーズ.完了;
 
-
-                base.非活性化する();
+                base.On非活性化();
             }
         }
 
@@ -162,7 +149,7 @@ namespace DTXMania.起動
                 case フェーズ.曲ツリー構築中:
                     #region " 曲検索タスクを起動する。"
                     //----------------
-                    if( App.ビュアーモードである )
+                    if( AppForm.ビュアーモードである )
                     {
                         // ビュアーモードならスキップ。
                     }
@@ -201,8 +188,8 @@ namespace DTXMania.起動
 
         public override void 描画する()
         {
-            var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
-            dc.Transform = グラフィックデバイス.Instance.拡大行列DPXtoPX;
+            var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             // 文字列表示
             for( int i = 0; i < this._コンソール表示内容.Count; i++ )

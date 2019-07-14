@@ -71,7 +71,7 @@ namespace DTXMania.選曲
             if( this._初めての進行描画 )
             {
                 this._スクロール用カウンタ = new 定間隔進行();     // 生成と同時にカウント開始。
-                this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+                this._選択ノードのオフセットアニメをリセットする( DXResources.Instance.アニメーション );
                 this._初めての進行描画 = false;
             }
 
@@ -176,7 +176,7 @@ namespace DTXMania.選曲
 
             #region " 背景 "
             //----------------
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
@@ -186,7 +186,7 @@ namespace DTXMania.選曲
                     //----------------
                     using( var brush = new SolidColorBrush( dc, new Color4( 0xffa3647c ) ) )
                     {
-                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2D1Factory1 ) )
+                        using( var pathGeometry = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
                         {
                             using( var sink = pathGeometry.Open() )
                             {
@@ -195,8 +195,8 @@ namespace DTXMania.選曲
                                 var points = new SharpDX.Mathematics.Interop.RawVector2[] {
                                         new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	// 2
 										new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),	// 3
-										new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	// 4
-										new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),	// 5
+										new Vector2( DXResources.Instance.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	// 4
+										new Vector2( DXResources.Instance.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),	// 5
 										new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	// 6
 										new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	// 1
 									};
@@ -217,7 +217,7 @@ namespace DTXMania.選曲
                     //----------------
                     using( var brush = new SolidColorBrush( dc, Color4.Black ) )
                     {
-                        using( var pathGeometry = new PathGeometry( グラフィックデバイス.Instance.D2D1Factory1 ) )
+                        using( var pathGeometry = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
                         {
                             using( var sink = pathGeometry.Open() )
                             {
@@ -226,8 +226,8 @@ namespace DTXMania.選曲
                                 var points = new SharpDX.Mathematics.Interop.RawVector2[] {
                                         new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	// 2
 										new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),	// 3
-										new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	// 4
-										new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),	// 5
+										new Vector2( DXResources.Instance.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	// 4
+										new Vector2( DXResources.Instance.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),	// 5
 										new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	// 6
 										new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	// 1
 									};
@@ -247,7 +247,7 @@ namespace DTXMania.選曲
                     #region " 既定の背景（半透明の黒）"
                     //----------------
                     using( var brush = new SolidColorBrush( dc, new Color4( 0f, 0f, 0f, 0.25f ) ) )
-                        dc.FillRectangle( new RectangleF( ノード左上dpx.X, ノード左上dpx.Y, グラフィックデバイス.Instance.設計画面サイズ.Width - ノード左上dpx.X, _ノードの高さdpx ), brush );
+                        dc.FillRectangle( new RectangleF( ノード左上dpx.X, ノード左上dpx.Y, DXResources.Instance.設計画面サイズ.Width - ノード左上dpx.X, _ノードの高さdpx ), brush );
                     //----------------
                     #endregion
                 }
@@ -267,8 +267,8 @@ namespace DTXMania.選曲
                     var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
                     var サムネイル表示中央dpx = new Vector3(
-                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        DXResources.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        DXResources.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
                         0f );
 
                     var 変換行列 =
@@ -294,8 +294,8 @@ namespace DTXMania.選曲
                     var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
 
                     var サムネイル表示中央dpx = new Vector3(
-                        グラフィックデバイス.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
-                        グラフィックデバイス.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
+                        DXResources.Instance.画面左上dpx.X + ノード左上dpx.X + ( this._サムネイル表示サイズdpx.X / 2f ) + ノード内サムネイルオフセットdpx.X,
+                        DXResources.Instance.画面左上dpx.Y - ノード左上dpx.Y - ( this._サムネイル表示サイズdpx.Y / 2f ) - ノード内サムネイルオフセットdpx.Y,
                         0f );
 
                     var 変換行列 =
@@ -341,7 +341,7 @@ namespace DTXMania.選曲
                 }
 
                 // 拡大率を計算して描画する。
-                float 最大幅dpx = グラフィックデバイス.Instance.設計画面サイズ.Width - ノード左上dpx.X - 170f;
+                float 最大幅dpx = DXResources.Instance.設計画面サイズ.Width - ノード左上dpx.X - 170f;
                 曲名画像.描画する(
                     dc,
                     ノード左上dpx.X + 170f,
@@ -393,7 +393,7 @@ namespace DTXMania.選曲
                 // 拡大率を計算して描画する。
                 if( null != サブタイトル画像 )
                 {
-                    float 最大幅dpx = グラフィックデバイス.Instance.設計画面サイズ.Width - ノード左上dpx.X - 170f;
+                    float 最大幅dpx = DXResources.Instance.設計画面サイズ.Width - ノード左上dpx.X - 170f;
 
                     サブタイトル画像.描画する(
                         dc,
@@ -417,7 +417,7 @@ namespace DTXMania.選曲
 
             App進行描画.曲ツリー.前のノードをフォーカスする();
 
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+            this._選択ノードのオフセットアニメをリセットする( DXResources.Instance.アニメーション );
         }
 
         public void 次のノードを選択する()
@@ -426,7 +426,7 @@ namespace DTXMania.選曲
 
             App進行描画.曲ツリー.次のノードをフォーカスする();
 
-            this._選択ノードのオフセットアニメをリセットする( グラフィックデバイス.Instance.アニメーション );
+            this._選択ノードのオフセットアニメをリセットする( DXResources.Instance.アニメーション );
         }
 
         public void BOXに入る()
@@ -495,7 +495,7 @@ namespace DTXMania.選曲
         private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
 
 
-        private void _選択ノードのオフセットアニメをリセットする( アニメーション am )
+        private void _選択ノードのオフセットアニメをリセットする( Animation am )
         {
             this._選択ノードの表示オフセットdpx?.Dispose();
             this._選択ノードの表示オフセットdpx = new Variable( am.Manager, initialValue: 0.0 );

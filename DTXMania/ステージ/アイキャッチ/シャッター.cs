@@ -21,7 +21,7 @@ namespace DTXMania
             {
                 this._ロゴ = new 画像( @"$(System)images\タイトルロゴ.png" );
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._明るいブラシ = new SolidColorBrush( dc, new Color4( 83f / 255f, 210f / 255f, 255f / 255f, 1f ) );
                 this._ふつうのブラシ = new SolidColorBrush( dc, new Color4( 46f / 255f, 117f / 255f, 182f / 255f, 1f ) );
@@ -204,6 +204,9 @@ namespace DTXMania
                 this._ロゴ不透明度?.Dispose();
                 this._ロゴ不透明度 = null;
 
+                this._ロゴ?.Dispose();
+                this._ロゴ = null;
+
                 base.Dispose();
             }
         }
@@ -222,7 +225,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
                 var start = animation.Timer.Time;
 
                 for( int i = 0; i < シャッター枚数; i++ )
@@ -261,7 +264,7 @@ namespace DTXMania
             {
                 double 秒( double v ) => ( v / 速度倍率 );
 
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 double 最も遅い時刻sec = 0.0;
                 foreach( var s in this._シャッターアニメーション )
@@ -311,7 +314,7 @@ namespace DTXMania
         {
             bool すべて完了 = true;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 

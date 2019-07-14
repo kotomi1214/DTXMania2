@@ -74,7 +74,7 @@ namespace DTXMania.演奏
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext dc, アニメーション am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext dc, Animation am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             // 進行。
 
@@ -96,7 +96,7 @@ namespace DTXMania.演奏
             var 文字間隔補正 = -10f;
             var 文字の位置 = new Vector2( -( 全体のサイズ.X / 2f ), 0f );
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
@@ -169,7 +169,7 @@ namespace DTXMania.演奏
                 this.Yオフセット?.Dispose();
             }
 
-            public void 跳ね開始( アニメーション am, double 遅延sec )
+            public void 跳ね開始( Animation am, double 遅延sec )
             {
                 this.Dispose();
 

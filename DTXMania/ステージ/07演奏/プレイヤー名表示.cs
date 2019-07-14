@@ -27,9 +27,9 @@ namespace DTXMania.演奏
             {
                 this.名前 = "(no nmae)";
                 this._前回表示した名前 = "";
-                this._TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "メイリオ", FontWeight.Regular, FontStyle.Normal, 22f );
+                this._TextFormat = new TextFormat( DXResources.Instance.DWriteFactory, "メイリオ", FontWeight.Regular, FontStyle.Normal, 22f );
                 this._TextLayout = null;
-                this._文字色 = new SolidColorBrush( グラフィックデバイス.Instance.既定のD2D1DeviceContext, Color4.White );
+                this._文字色 = new SolidColorBrush( DXResources.Instance.既定のD2D1DeviceContext, Color4.White );
                 this._拡大率X = 1.0f;
             }
         }
@@ -56,7 +56,7 @@ namespace DTXMania.演奏
             // 初回または名前が変更された場合に TextLayout を再構築する。
             if( ( null == this._TextLayout ) || ( this._前回表示した名前 != this.名前 ) )
             {
-                this._TextLayout = new TextLayout( グラフィックデバイス.Instance.DWriteFactory, this.名前, this._TextFormat, 1000f, 30f ) { // 最大1000dpxまで
+                this._TextLayout = new TextLayout( DXResources.Instance.DWriteFactory, this.名前, this._TextFormat, 1000f, 30f ) { // 最大1000dpxまで
                     TextAlignment = TextAlignment.Leading,
                     WordWrapping = WordWrapping.NoWrap, // 1000dpxを超えても改行しない（はみ出し分は切り捨て）
                 };
@@ -65,7 +65,7 @@ namespace DTXMania.演奏
                 this._拡大率X = ( 文字列幅dpx <= 描画矩形.Width ) ? 1.0f : ( 描画矩形.Width / 文字列幅dpx );
             }
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;

@@ -16,7 +16,7 @@ namespace FDK
         ///		指定されたファイルの音声をデコードし、<see cref="ISampleSource"/> オブジェクトを返す。
         ///		失敗すれば null 。
         /// </summary>
-        public static ISampleSource Create( サウンドデバイス device, VariablePath ファイルパス, double 再生速度 = 1.0 )
+        public static ISampleSource Create( SoundDevice device, VariablePath ファイルパス, double 再生速度 = 1.0 )
         {
             if( !( File.Exists( ファイルパス.変数なしパス ) ) )
             {

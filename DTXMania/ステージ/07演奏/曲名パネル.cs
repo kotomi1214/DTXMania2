@@ -98,8 +98,8 @@ namespace DTXMania.演奏
                     this._サムネイル画像表示サイズdpx.Y / サムネイル画像.サイズ.Height,
                     0f ) *
                 Matrix.Translation(
-                    グラフィックデバイス.Instance.画面左上dpx.X + this._サムネイル画像表示位置dpx.X + this._サムネイル画像表示サイズdpx.X / 2f,
-                    グラフィックデバイス.Instance.画面左上dpx.Y - this._サムネイル画像表示位置dpx.Y - this._サムネイル画像表示サイズdpx.Y / 2f,
+                    DXResources.Instance.画面左上dpx.X + this._サムネイル画像表示位置dpx.X + this._サムネイル画像表示サイズdpx.X / 2f,
+                    DXResources.Instance.画面左上dpx.Y - this._サムネイル画像表示位置dpx.Y - this._サムネイル画像表示サイズdpx.Y / 2f,
                     0f );
 
             サムネイル画像.描画する( 変換行列 );

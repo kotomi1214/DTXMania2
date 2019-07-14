@@ -32,22 +32,22 @@ namespace DTXMania
                 this._背景画像 = new 画像( 背景画像ファイル名 ?? @"$(System)images\舞台.jpg" );
                 this._背景黒幕付き画像 = new 画像( 背景黒幕付き画像ファイル名 ?? @"$(System)images\舞台黒幕付き.jpg" );
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._ガウスぼかしエフェクト = new GaussianBlur( dc );
                 this._ガウスぼかしエフェクト黒幕付き用 = new GaussianBlur( dc );
 
                 this._拡大エフェクト = new Scale( dc ) {
-                    CenterPoint = new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width / 2.0f, グラフィックデバイス.Instance.設計画面サイズ.Height / 2.0f ),
+                    CenterPoint = new Vector2( DXResources.Instance.設計画面サイズ.Width / 2.0f, DXResources.Instance.設計画面サイズ.Height / 2.0f ),
                 };
                 this._拡大エフェクト黒幕付き用 = new Scale( dc ) {
-                    CenterPoint = new Vector2( グラフィックデバイス.Instance.設計画面サイズ.Width / 2.0f, グラフィックデバイス.Instance.設計画面サイズ.Height / 2.0f ),
+                    CenterPoint = new Vector2( DXResources.Instance.設計画面サイズ.Width / 2.0f, DXResources.Instance.設計画面サイズ.Height / 2.0f ),
                 };
 
                 this._クリッピングエフェクト = new Crop( dc );
                 this._クリッピングエフェクト黒幕付き用 = new Crop( dc );
 
-                this._ぼかしと縮小割合 = new Variable( グラフィックデバイス.Instance.アニメーション.Manager, initialValue: 0.0 );
+                this._ぼかしと縮小割合 = new Variable( DXResources.Instance.アニメーション.Manager, initialValue: 0.0 );
                 this.ぼかしと縮小を適用中 = false;
 
                 this._ストーリーボード = null;
@@ -69,6 +69,8 @@ namespace DTXMania
                 this._拡大エフェクト?.Dispose();
                 this._ガウスぼかしエフェクト黒幕付き用?.Dispose();
                 this._ガウスぼかしエフェクト?.Dispose();
+                this._背景黒幕付き画像?.Dispose();
+                this._背景画像?.Dispose();
             }
         }
 
@@ -81,7 +83,7 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 if( !( this.ぼかしと縮小を適用中 ) )
                 {
@@ -115,7 +117,7 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                var animation = グラフィックデバイス.Instance.アニメーション;
+                var animation = DXResources.Instance.アニメーション;
 
                 if( this.ぼかしと縮小を適用中 )
                 {
@@ -187,7 +189,7 @@ namespace DTXMania
                 this._ガウスぼかしエフェクト黒幕付き用.StandardDeviation = (float) ( 割合 * 10.0 );       // 0～10
                 this._クリッピングエフェクト黒幕付き用.Rectangle = ( null != 表示領域 ) ? ( (Vector4) 表示領域 ) : new Vector4( 0f, 0f, this._背景黒幕付き画像.サイズ.Width, this._背景黒幕付き画像.サイズ.Height );
 
-                グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+                DXResources.Instance.D2DBatchDraw( dc, () => {
 
                     dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
@@ -219,7 +221,7 @@ namespace DTXMania
                 this._ガウスぼかしエフェクト.StandardDeviation = (float) ( 割合 * 10.0 );       // 0～10
                 this._クリッピングエフェクト.Rectangle = ( null != 表示領域 ) ? ( (Vector4) 表示領域 ) : new Vector4( 0f, 0f, this._背景画像.サイズ.Width, this._背景画像.サイズ.Height );
 
-                グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+                DXResources.Instance.D2DBatchDraw( dc, () => {
 
                     dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

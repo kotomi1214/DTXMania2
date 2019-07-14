@@ -68,7 +68,7 @@ namespace DTXMania.演奏
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext dc, アニメーション am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext dc, Animation am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             int Combo値 = Math.Min( Math.Max( 現在の成績.Combo, 0 ), 9999 );  // 表示は9999でカンスト。
 
@@ -111,7 +111,7 @@ namespace DTXMania.演奏
             
             // １桁ずつ描画。
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
@@ -211,7 +211,7 @@ namespace DTXMania.演奏
                 this.不透明度?.Dispose();
             }
 
-            public void 落下開始( アニメーション am )
+            public void 落下開始( Animation am )
             {
                 this.Dispose();
 
@@ -231,7 +231,7 @@ namespace DTXMania.演奏
                 }
                 this.ストーリーボード.Schedule( am.Timer.Time );
             }
-            public void 跳ね開始( アニメーション am, double 遅延sec )
+            public void 跳ね開始( Animation am, double 遅延sec )
             {
                 this.Dispose();
 
@@ -275,7 +275,7 @@ namespace DTXMania.演奏
                 this.振動幅?.Dispose();
             }
 
-            public void 開始( アニメーション am )
+            public void 開始( Animation am )
             {
                 this.ストーリーボード = new Storyboard( am.Manager );
                 this.拡大率 = new Variable( am.Manager, initialValue: 1.0 );

@@ -38,6 +38,8 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this.現在のアイキャッチ = null;
+
                 foreach( var kvp in this._アイキャッチリスト )
                     kvp.Value?.Dispose();
 

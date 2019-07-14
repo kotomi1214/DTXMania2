@@ -23,7 +23,7 @@ namespace FDK
                         // 一時停止中。
                         return ( this._停止位置sec - this._開始位置sec );
                     }
-                    else if( this._DeviceRef.TryGetTarget( out サウンドデバイス device ) )
+                    else if( this._DeviceRef.TryGetTarget( out SoundDevice device ) )
                     {
                         // 稼働中。
                         return ( device.GetDevicePosition() - this._開始位置sec );
@@ -39,11 +39,11 @@ namespace FDK
         // 生成と終了
 
 
-        public SoundTimer( サウンドデバイス device )
+        public SoundTimer( SoundDevice device )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._DeviceRef = new WeakReference<サウンドデバイス>( device );
+                this._DeviceRef = new WeakReference<SoundDevice>( device );
                 this.リセットする();
             }
         }
@@ -68,7 +68,7 @@ namespace FDK
         {
             lock( this._スレッド間同期 )
             {
-                if( this._DeviceRef.TryGetTarget( out サウンドデバイス device ) )
+                if( this._DeviceRef.TryGetTarget( out SoundDevice device ) )
                 {
                     this._開始位置sec = device.GetDevicePosition() - 新しい現在時刻sec;
                     this._停止回数 = 0;
@@ -81,7 +81,7 @@ namespace FDK
         {
             lock( this._スレッド間同期 )
             {
-                if( this._DeviceRef.TryGetTarget( out サウンドデバイス device ) )
+                if( this._DeviceRef.TryGetTarget( out SoundDevice device ) )
                 {
                     if( 0 == this._停止回数 )
                         this._停止位置sec = device.GetDevicePosition();
@@ -107,7 +107,7 @@ namespace FDK
         // private
 
 
-        private WeakReference<サウンドデバイス> _DeviceRef = null;
+        private WeakReference<SoundDevice> _DeviceRef = null;
 
         private int _停止回数 = 0;
 

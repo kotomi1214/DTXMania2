@@ -1,16 +1,16 @@
-﻿namespace FDK
+﻿namespace DTXMania
 {
     partial class AppForm
     {
         /// <summary>
-        /// Required designer variable.
+        /// 必要なデザイナー変数です。
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
         /// <summary>
-        /// Clean up any resources being used.
+        /// 使用中のリソースをすべてクリーンアップします。
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        /// <param name="disposing">マネージド リソースを破棄する場合は true を指定し、その他の場合は false を指定します。</param>
         protected override void Dispose( bool disposing )
         {
             if( disposing && ( components != null ) )
@@ -20,20 +20,21 @@
             base.Dispose( disposing );
         }
 
-        #region Windows Form Designer generated code
+        #region Windows フォーム デザイナーで生成されたコード
 
         /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
+        /// デザイナー サポートに必要なメソッドです。このメソッドの内容を
+        /// コード エディターで変更しないでください。
         /// </summary>
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size( 800, 450 );
-            this.Text = "AppForm";
+            this.Text = "Form1";
         }
 
         #endregion
     }
 }
+

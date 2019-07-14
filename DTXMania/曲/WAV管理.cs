@@ -11,7 +11,7 @@ namespace DTXMania
 {
     /// <summary>
     ///		<see cref="スコア.WAVリスト"/> の各サウンドインスタンスを管理する。
-    ///		サウンドの作成には <see cref="App.WAVキャッシュレンタル"/> を使用する。
+    ///		サウンドの作成には <see cref="AppForm.WAVキャッシュレンタル"/> を使用する。
     /// </summary>
     class WAV管理 : IDisposable
     {
@@ -237,7 +237,7 @@ namespace DTXMania
             /// <summary>
             ///     多重度の数だけ Sound を生成する。ただしソースは共通。
             /// </summary>
-            public void サウンドを生成する( サウンドデバイス device, ISampleSource sampleSource )
+            public void サウンドを生成する( SoundDevice device, ISampleSource sampleSource )
             {
                 for( int i = 0; i < this.Sounds.Length; i++ )
                     this.Sounds[ i ] = new Sound( device, sampleSource );

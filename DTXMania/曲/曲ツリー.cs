@@ -142,15 +142,24 @@ namespace DTXMania
 
         public virtual void Dispose()
         {
-            this.すべてのノードを削除する();
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this.ノードを削除する( this.ルートノード );
+            }
         }
 
-        public void すべてのノードを削除する()
+        public void ノードを削除する( Node node )
         {
             this.フォーカスリスト = null;
 
-            lock( this.ルートノード.子ノードリスト排他 )
-                this.ルートノード.子ノードリスト.Clear();
+            lock( node.子ノードリスト排他 )
+            {
+                foreach( var child in node.子ノードリスト )
+                    ノードを削除する( child );
+
+                node.子ノードリスト.Clear();
+                node.Dispose();
+            }
         }
 
 

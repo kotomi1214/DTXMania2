@@ -49,8 +49,11 @@ namespace FDK
                 {
                     Monitor.Wait( this._Queue排他 );
 
-                    if( this._Canceled )
-                        return;     // ブロックが解除されたときにキャンセル済みだったら何もしない。
+                    if( this._Canceled )    // ブロックが解除されたときにキャンセル済みだった
+                    {
+                        frame.Dispose();
+                        return;
+                    }
                 }
 
                 // キューに格納する。

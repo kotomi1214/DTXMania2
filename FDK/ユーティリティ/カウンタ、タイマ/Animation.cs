@@ -10,7 +10,7 @@ namespace FDK
     /// <summary>
     ///     Windows Animation API の wrapper。
     /// </summary>
-    public class アニメーション : IDisposable
+    public class Animation : IDisposable
     {
         public Manager Manager { get; private set; } = null;
 
@@ -19,7 +19,7 @@ namespace FDK
         public TransitionLibrary TrasitionLibrary { get; private set; } = null;
 
 
-        public アニメーション()
+        public Animation()
         {
             this.Manager = new Manager();
             this.Timer = new Timer();

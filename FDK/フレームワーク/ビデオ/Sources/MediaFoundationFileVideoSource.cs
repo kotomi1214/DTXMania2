@@ -40,7 +40,7 @@ namespace FDK
             using( var ビデオ属性 = new MediaAttributes() )
             {
                 // DXVAに対応しているGPUの場合には、それをデコードに利用するよう指定する。
-                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, グラフィックデバイス.Instance.MFDXGIDeviceManager );
+                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, DXResources.Instance.MFDXGIDeviceManager );
 
                 // 追加のビデオプロセッシングを有効にする。
                 ビデオ属性.Set( SourceReaderAttributeKeys.EnableAdvancedVideoProcessing, true );  // 真偽値が bool だったり
@@ -216,7 +216,7 @@ namespace FDK
                     {
                         // 5. DXGISurface → Bitmap
                         return new Bitmap(
-                            グラフィックデバイス.Instance.既定のD2D1DeviceContext,
+                            DXResources.Instance.既定のD2D1DeviceContext,
                             dxgiSurface,
                             new BitmapProperties( new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Ignore ) ) );
                     }

@@ -95,7 +95,7 @@ namespace FDK
                 try
                 {
                     decoder = new BitmapDecoder(
-                        グラフィックデバイス.Instance.WicImagingFactory2,
+                        DXResources.Instance.WicImagingFactory2,
                         画像ファイルパス.変数なしパス,
                         SharpDX.IO.NativeFileAccess.Read,
                         DecodeOptions.CacheOnLoad );
@@ -127,7 +127,7 @@ namespace FDK
                 try
                 {
                     // WICイメージングファクトリから新しいコンバータを生成。
-                    converter = new FormatConverter( グラフィックデバイス.Instance.WicImagingFactory2 );
+                    converter = new FormatConverter( DXResources.Instance.WicImagingFactory2 );
 
                     // コンバータに変換元フレームや変換後フォーマットなどを設定。
                     converter.Initialize(
@@ -153,7 +153,7 @@ namespace FDK
                     // WIC ビットマップを D2D ビットマップに変換する。
                     this.Bitmap?.Dispose();
                     this.Bitmap = Bitmap1.FromWicBitmap(
-                        グラフィックデバイス.Instance.既定のD2D1DeviceContext,
+                        DXResources.Instance.既定のD2D1DeviceContext,
                         converter,
                         bitmapProperties1 );
                 }
@@ -201,7 +201,7 @@ namespace FDK
             if( null == this.Bitmap )
                 return;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
 
@@ -261,7 +261,7 @@ namespace FDK
             if( null == this.Bitmap )
                 return;
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 var pretrans = dc.Transform;
 

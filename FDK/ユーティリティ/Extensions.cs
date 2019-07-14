@@ -8,6 +8,12 @@ namespace FDK
 {
     public static class Extensions
     {
+        // System.Drawing.Size の拡張メソッド
+
+        public static SharpDX.Size2 ToSharpDXSize2( this System.Drawing.Size size )
+            => new SharpDX.Size2( size.Width, size.Height );
+
+
         // SharpDX.IUnknown の拡張メソッド
 
         /// <summary>
@@ -48,6 +54,7 @@ namespace FDK
 
             return ( resuult.Failure ) ? null : CppObject.FromPointer<T>( comObject );
         }
+
 
         // System.String の拡張メソッド
 
@@ -92,6 +99,21 @@ namespace FDK
         /// </summary>
         public static System.Drawing.Size ToDrawingSize( this SharpDX.Size2 size )
             => new System.Drawing.Size( size.Width, size.Height );
+
+
+        // SharpDX.Point の拡張メソッド
+
+        /// <summary>
+        ///		System.Drawing.Point を SharpDX.Point へ変換する。
+        /// </summary>
+        public static SharpDX.Point ToSharpDXPoint( this System.Drawing.Point point )
+            => new SharpDX.Point( point.X, point.Y );
+
+        /// <summary>
+        ///		SharpDX.Point を System.Drawing.Point へ変換する。
+        /// </summary>
+        public static System.Drawing.Point ToDrawingPoint( this SharpDX.Point point )
+            => new System.Drawing.Point( point.X, point.Y );
 
 
         // SharpDX.Direct2D1.RenderTarget の拡張メソッド

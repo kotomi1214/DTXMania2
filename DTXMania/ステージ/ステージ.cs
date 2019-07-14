@@ -10,24 +10,8 @@ namespace DTXMania
     /// <summary>
     ///     ステージの抽象クラス。
     /// </summary>
-    abstract class ステージ : Activity, IDisposable
+    abstract class ステージ : Activity
     {
-
-        // 生成と終了
-
-
-        public abstract void Dispose();
-
-
-
-        // 活性化と非活性化
-
-
-        public virtual void スワップチェーンに依存するグラフィックリソースを復元する() { }
-
-        public virtual void スワップチェーンに依存するグラフィックリソースを解放する() { }
-
-        
         
         // 進行と描画
 

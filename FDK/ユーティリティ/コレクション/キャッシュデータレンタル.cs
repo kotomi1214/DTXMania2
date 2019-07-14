@@ -61,23 +61,28 @@ namespace FDK
         /// </summary>
         public void 世代を進める()
         {
-            // 今回の世代では貸与されなかった（＝最終貸与世代が現時点の世代ではない）キャッシュデータをすべて破棄する。
-
-            var 削除対象リスト =
-                ( from kvp in this._キャッシュデータリスト
-                  where ( kvp.Value.最終貸与世代 < 現世代 )
-                  select kvp.Key ).ToArray();   // foreach 内で Remove できるようにコピー（配列化）する。
-
-            foreach( var key in 削除対象リスト )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._キャッシュデータリスト[ key ].Dispose();
-                this._キャッシュデータリスト.Remove( key );
+                // 今回の世代では貸与されなかった（＝最終貸与世代が現時点の世代ではない）キャッシュデータをすべて破棄する。
+
+                var 削除対象リスト =
+                    ( from kvp in this._キャッシュデータリスト
+                      where ( kvp.Value.最終貸与世代 < 現世代 )
+                      select kvp.Key ).ToArray();   // foreach 内で Remove できるようにコピー（配列化）する。
+
+                Log.Info( $"{this._キャッシュデータリスト.Count} 個のサウンドのうち、{削除対象リスト.Length} 個を削除しました。" );
+
+                foreach( var key in 削除対象リスト )
+                {
+                    this._キャッシュデータリスト[ key ].Dispose();
+                    this._キャッシュデータリスト.Remove( key );
+                }
+
+
+                // 世代番号を１つ加算する。
+
+                現世代++;
             }
-
-
-            // 世代番号を１つ加算する。
-
-            現世代++;
         }
 
         /// <summary>

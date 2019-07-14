@@ -24,9 +24,9 @@ namespace DTXMania.選曲
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大.png", @"$(System)images\パラメータ文字_大.yaml", 文字幅補正dpx: 0f );
-                this._見出し用TextFormat = new TextFormat( グラフィックデバイス.Instance.DWriteFactory, "Century Gothic", 16f );
+                this._見出し用TextFormat = new TextFormat( DXResources.Instance.DWriteFactory, "Century Gothic", 16f );
 
-                var dc = グラフィックデバイス.Instance.既定のD2D1DeviceContext;
+                var dc = DXResources.Instance.既定のD2D1DeviceContext;
 
                 this._黒ブラシ = new SolidColorBrush( dc, Color4.Black );
                 this._黒透過ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) );
@@ -83,7 +83,7 @@ namespace DTXMania.選曲
             bool 表示可能ノードである = ( node is MusicNode ) || ( node is SetNode );
 
 
-            グラフィックデバイス.Instance.D2DBatchDraw( dc, () => {
+            DXResources.Instance.D2DBatchDraw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 

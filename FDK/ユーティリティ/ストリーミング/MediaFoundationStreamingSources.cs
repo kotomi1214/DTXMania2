@@ -127,7 +127,7 @@ namespace FDK
                 using( var 属性 = new MediaAttributes() )
                 {
                     // DXVAに対応しているGPUの場合には、それをデコードに利用するよう指定する。
-                    属性.Set( SourceReaderAttributeKeys.D3DManager, グラフィックデバイス.Instance.MFDXGIDeviceManager );
+                    属性.Set( SourceReaderAttributeKeys.D3DManager, DXResources.Instance.MFDXGIDeviceManager );
 
                     // 追加のビデオプロセッシングを有効にする。
                     属性.Set( SourceReaderAttributeKeys.EnableAdvancedVideoProcessing, true );  // 真偽値が bool だったり

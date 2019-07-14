@@ -36,7 +36,7 @@ namespace DTXMania.オプション設定
 
                     // 変更後のキーバインディングを、現在の設定値で初期化。
 
-                    this._変更後のキーバインディング = (キーバインディング) App進行描画.システム設定.キー割り当て.Clone();
+                    this._変更後のシステム設定 = App進行描画.システム設定.Clone();
 
 
                     // 最初のパッドを選択し、割り当て済みリストを更新。
@@ -51,8 +51,8 @@ namespace DTXMania.オプション設定
                     this._FootPedal現在値 = 0;
 
                     this.textBoxFootPedal現在値.Text = "0";
-                    this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
-                    this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
+                    this.textBoxFootPedal最小値.Text = this._変更後のシステム設定.FootPedal最小値.ToString();
+                    this.textBoxFootPedal最大値.Text = this._変更後のシステム設定.FootPedal最大値.ToString();
 
                     this._変更あり = false;
 
@@ -95,17 +95,17 @@ namespace DTXMania.オプション設定
                                     this.textBoxFootPedal現在値.Text = this._FootPedal現在値.ToString();
 
                                     // 最大値
-                                    if( this._FootPedal現在値 > this._変更後のキーバインディング.FootPedal最大値 )
+                                    if( this._FootPedal現在値 > this._変更後のシステム設定.FootPedal最大値 )
                                     {
-                                        this._変更後のキーバインディング.FootPedal最大値 = this._FootPedal現在値;
-                                        this.textBoxFootPedal最大値.Text = this._変更後のキーバインディング.FootPedal最大値.ToString();
+                                        this._変更後のシステム設定.FootPedal最大値 = this._FootPedal現在値;
+                                        this.textBoxFootPedal最大値.Text = this._変更後のシステム設定.FootPedal最大値.ToString();
                                     }
 
                                     // 最小値
-                                    if( this._FootPedal現在値 <= this._変更後のキーバインディング.FootPedal最小値 )
+                                    if( this._FootPedal現在値 <= this._変更後のシステム設定.FootPedal最小値 )
                                     {
-                                        this._変更後のキーバインディング.FootPedal最小値 = this._FootPedal現在値;
-                                        this.textBoxFootPedal最小値.Text = this._変更後のキーバインディング.FootPedal最小値.ToString();
+                                        this._変更後のシステム設定.FootPedal最小値 = this._FootPedal現在値;
+                                        this.textBoxFootPedal最小値.Text = this._変更後のシステム設定.FootPedal最小値.ToString();
                                     }
                                 }
                                 //----------------
@@ -118,7 +118,7 @@ namespace DTXMania.オプション設定
                                 var item = new ListViewItem入力リスト用( InputDeviceType.MidiIn, inputEvent );
 
                                 // 既に割り当てられていたらそのドラム種別を表示。
-                                var drumType = this._変更後のキーバインディング.MIDItoドラム
+                                var drumType = this._変更後のシステム設定.MIDItoドラム
                                     .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
                                     .Select( ( kvp ) => kvp.Value );
                                 if( 0 < drumType.Count() )
@@ -146,7 +146,7 @@ namespace DTXMania.オプション設定
 
                             g.FillRectangle( 背景色, 全体矩形 );
 
-                            int 最大値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._変更後のキーバインディング.FootPedal最大値 / 127.0 ) );
+                            int 最大値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._変更後のシステム設定.FootPedal最大値 / 127.0 ) );
                             var 最大値ゲージ矩形 = new System.Drawing.Rectangle(
                                 全体矩形.X,
                                 全体矩形.Y + 最大値用差分,
@@ -189,7 +189,7 @@ namespace DTXMania.オプション設定
                         }
 
                         // 既に割り当てられていたらそのドラム種別を表示。
-                        var drumType = this._変更後のキーバインディング.キーボードtoドラム
+                        var drumType = this._変更後のシステム設定.キーボードtoドラム
                             .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
                             .Select( ( kvp ) => kvp.Value );
 
@@ -222,8 +222,8 @@ namespace DTXMania.オプション設定
                     if( dr == DialogResult.OK )
                     {
                         // 設定値を反映する。
-                        App進行描画.システム設定.キー割り当て = (キーバインディング) this._変更後のキーバインディング.Clone();
-                        App進行描画.入力管理.キーバインディングを保存する();
+                        App進行描画.システム設定 = this._変更後のシステム設定.Clone();
+                        App進行描画.システム設定.保存する();
                     }
                 }
             }
@@ -291,9 +291,9 @@ namespace DTXMania.オプション設定
         {
             public bool 割り当て可能;
             public InputDeviceType deviceType;      // Device種別
-            public キーバインディング.IdKey idKey;  // DeviceID, key
+            public システム設定.IdKey idKey;        // DeviceID, key
 
-            public ListViewItem割り当て済み入力リスト用( InputDeviceType deviceType, キーバインディング.IdKey idKey )
+            public ListViewItem割り当て済み入力リスト用( InputDeviceType deviceType, システム設定.IdKey idKey )
             {
                 this.割り当て可能 = true;
                 this.deviceType = deviceType;
@@ -318,7 +318,7 @@ namespace DTXMania.オプション設定
         /// <summary>
         ///     ダイアログで編集した内容は、このメンバにいったん保存される。
         /// </summary>
-        private キーバインディング _変更後のキーバインディング;
+        private システム設定 _変更後のシステム設定;
 
         private ドラム入力種別 _現在選択されているドラム入力種別 = ドラム入力種別.Unknown;
 
@@ -327,7 +327,7 @@ namespace DTXMania.オプション設定
 
         /// <summary>
         ///     <see cref="_現在選択されているドラム入力種別"/> について、
-        ///     <see cref="_変更後のキーバインディング"/> の内容を割り当て済みリストに反映する。
+        ///     <see cref="_変更後のシステム設定"/> の内容を割り当て済みリストに反映する。
         /// </summary>
         private void _割り当て済みリストを更新する( ListViewItem入力リスト用 選択する項目 = null )
         {
@@ -337,7 +337,7 @@ namespace DTXMania.オプション設定
             // キーボードの反映
 
             var 現在選択されているドラム入力種別に割り当てられているキーボード入力
-                = this._変更後のキーバインディング.キーボードtoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
+                = this._変更後のシステム設定.キーボードtoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
 
             foreach( var key in 現在選択されているドラム入力種別に割り当てられているキーボード入力 )
                 this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.Keyboard, key.Key ) );
@@ -346,7 +346,7 @@ namespace DTXMania.オプション設定
             // MIDI入力の反映
 
             var 現在選択されているドラム入力種別に割り当てられているMIDI入力 = 
-                this._変更後のキーバインディング.MIDItoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
+                this._変更後のシステム設定.MIDItoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
 
             foreach( var note in 現在選択されているドラム入力種別に割り当てられているMIDI入力 )
                 this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.MidiIn, note.Key ) );
@@ -380,13 +380,13 @@ namespace DTXMania.オプション設定
                 if( ( itemobj is ListViewItem入力リスト用 item ) &&   // 選択されているのが ListViewItem入力リスト用 じゃなければ何もしない。
                   ( item.割り当て可能 ) )                             // 割り当て可能のもののみ割り当てる。
                 {
-                    var idKey = new キーバインディング.IdKey( item.inputEvent );
+                    var idKey = new システム設定.IdKey( item.inputEvent );
 
                     switch( item.deviceType )
                     {
                         case InputDeviceType.Keyboard:
 
-                            this._変更後のキーバインディング.キーボードtoドラム[ idKey ] = this._現在選択されているドラム入力種別;   // 追加または更新
+                            this._変更後のシステム設定.キーボードtoドラム[ idKey ] = this._現在選択されているドラム入力種別;   // 追加または更新
 
                             this._割り当て済みリストを更新する( item );
                             this.listView割り当て済み入力リスト.Focus();
@@ -396,7 +396,7 @@ namespace DTXMania.オプション設定
 
                         case InputDeviceType.MidiIn:
 
-                            this._変更後のキーバインディング.MIDItoドラム[ idKey ] = this._現在選択されているドラム入力種別;    // 追加または更新
+                            this._変更後のシステム設定.MIDItoドラム[ idKey ] = this._現在選択されているドラム入力種別;    // 追加または更新
 
                             this._割り当て済みリストを更新する( item );
                             this.listView割り当て済み入力リスト.Focus();
@@ -450,12 +450,12 @@ namespace DTXMania.オプション設定
                 switch( item.deviceType )
                 {
                     case InputDeviceType.Keyboard:
-                        this._変更後のキーバインディング.キーボードtoドラム.Remove( item.idKey );
+                        this._変更後のシステム設定.キーボードtoドラム.Remove( item.idKey );
                         this._変更あり = true;
                         break;
 
                     case InputDeviceType.MidiIn:
-                        this._変更後のキーバインディング.MIDItoドラム.Remove( item.idKey );
+                        this._変更後のシステム設定.MIDItoドラム.Remove( item.idKey );
                         this._変更あり = true;
                         break;
                 }
