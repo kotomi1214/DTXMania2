@@ -10,7 +10,7 @@ namespace FDK
     /// <summary>
     ///     読み込みと書き込みを別々のスレッドから行えるキュー。
     /// </summary>
-    public class QueueMemoryStream : MemoryStream
+    public class QueueMemoryStream : MemoryTributary
     {
         public long 読み出し位置
         {

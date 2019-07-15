@@ -194,6 +194,7 @@
       <DependentUpon>AppFormBase.cs</DependentUpon>
     </Compile>
     <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
+    <Compile Include="ユーティリティ\ストリーミング\MemoryTributary.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\サイズ変更通知.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\例外発生通知.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\終了通知.cs" />

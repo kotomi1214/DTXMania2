@@ -29,6 +29,11 @@ EntityFramework
     Apache Licence, Version 2.0
     https://github.com/aspnet/EntityFramework6/blob/master/License.txt
 
+MemoryTributary
+	Copyright (C) sebastianfriston
+	The Code Project Open License (CPOL)
+	https://www.codeproject.com/Articles/348590/A-replacement-for-MemoryStream
+
 NVorbis
     Copyright (c) 2015 Andrew Ward
     Microsoft Public Licence (Ms-PL)
