@@ -93,8 +93,8 @@ namespace DTXMania
                     }
                     //----------------
                     #endregion
-                    return;
                 }
+                return;
             }
 
             if( 0 == chip.チップサブID && ドラムサウンドを再生する )
