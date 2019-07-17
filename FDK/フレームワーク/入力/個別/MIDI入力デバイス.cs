@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace FDK
 {
-    using MIDIINHANDLE = System.UInt32;
+    using MIDIINHANDLE = System.IntPtr;
 
     public class MIDI入力デバイス : IInputDevice, IDisposable
     {
@@ -80,8 +80,8 @@ namespace FDK
                     Log.Info( $"MidiIn[{id}]: {caps.szPname}" );
 
                     // MIDI入力デバイスを開く。コールバックは全デバイスで共通。
-                    MIDIINHANDLE hMidiIn = 0;
-                    if( ( (uint) CSCore.MmResult.NoError == midiInOpen( ref hMidiIn, id, this._midiInProc, 0, CALLBACK_FUNCTION ) ) && ( 0 != hMidiIn ) )
+                    MIDIINHANDLE hMidiIn = default;
+                    if( ( (uint) CSCore.MmResult.NoError == midiInOpen( ref hMidiIn, id, this._midiInProc, default, CALLBACK_FUNCTION ) ) && ( default != hMidiIn ) )
                     {
                         this._MIDI入力デバイスハンドルリスト.Add( hMidiIn );
                         midiInStart( hMidiIn );
@@ -115,11 +115,12 @@ namespace FDK
         public void ポーリングする()
         {
             // 前回のポーリングから今回までに蓄えたイベントをキャッシュへ参照渡し。
-            this.入力イベントリスト = this._蓄積用入力イベントリスト;
-
             // 蓄積用リストを新しく確保する。
             lock( this._コールバック同期 )
+            {
+                this.入力イベントリスト = this._蓄積用入力イベントリスト;
                 this._蓄積用入力イベントリスト = new List<InputEvent>();
+            }
 
             // FootPedal同時HHのキャンセル処理。
             if( ( 0 < this.FootPedalNotes.Count ) && ( 0 < this.HiHatNotes.Count ) )
@@ -286,7 +287,7 @@ namespace FDK
         private static extern uint midiInGetNumDevs();
 
         [DllImport( "winmm.dll" )]
-        private static extern uint midiInOpen( ref MIDIINHANDLE phMidiIn, uint uDeviceID, MidiInProc dwCallback, int dwInstance, int fdwOpen );
+        private static extern uint midiInOpen( ref MIDIINHANDLE phMidiIn, uint uDeviceID, MidiInProc dwCallback, IntPtr dwInstance, int fdwOpen );
 
         [DllImport( "winmm.dll" )]
         private static extern uint midiInStart( MIDIINHANDLE hMidiIn );

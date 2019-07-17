@@ -367,7 +367,6 @@ namespace DTXMania.演奏
                                         this.チップの発声を行う( chip, ユーザ設定.ドラムの音を発声する );
                                         this._チップの演奏状態[ chip ].発声済みである = true;
                                     }
-
                                 }
                                 //----------------
                                 #endregion
