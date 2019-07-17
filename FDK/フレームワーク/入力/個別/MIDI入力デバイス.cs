@@ -115,11 +115,12 @@ namespace FDK
         public void ポーリングする()
         {
             // 前回のポーリングから今回までに蓄えたイベントをキャッシュへ参照渡し。
-            this.入力イベントリスト = this._蓄積用入力イベントリスト;
-
             // 蓄積用リストを新しく確保する。
             lock( this._コールバック同期 )
+            {
+                this.入力イベントリスト = this._蓄積用入力イベントリスト;
                 this._蓄積用入力イベントリスト = new List<InputEvent>();
+            }
 
             // FootPedal同時HHのキャンセル処理。
             if( ( 0 < this.FootPedalNotes.Count ) && ( 0 < this.HiHatNotes.Count ) )
