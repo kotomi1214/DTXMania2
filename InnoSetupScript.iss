@@ -4,7 +4,7 @@
 ; このスクリプトは Release 版を対象にしているので、
 ; このスクリプトをコンパイルする前に Release 版をビルドしておくこと。
 
-#define MyAppVersion "044"
+#define MyAppVersion "045"
 
 #define MyAppName "DTXMania2"
 #define MyAppFolderName "DTXMania2"
