@@ -456,11 +456,15 @@ namespace DTXMania.演奏
                 this.文字列本体のストーリーボード?.Abandon();
                 this.文字列本体のストーリーボード?.Dispose();
                 this.文字列本体の不透明度?.Dispose();
+                this.文字列本体のY方向拡大率?.Dispose();
+                this.文字列本体のX方向拡大率?.Dispose();
                 this.文字列本体の相対Y位置dpx?.Dispose();
+
                 this.文字列影のストーリーボード?.Abandon();
                 this.文字列影のストーリーボード?.Dispose();
                 this.文字列影の不透明度?.Dispose();
                 this.文字列影の相対Y位置dpx?.Dispose();
+
                 this.光のストーリーボード?.Abandon();
                 this.光のストーリーボード?.Dispose();
                 this.光のY方向拡大率?.Dispose();
