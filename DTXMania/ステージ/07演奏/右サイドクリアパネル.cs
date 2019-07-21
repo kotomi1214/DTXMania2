@@ -30,6 +30,8 @@ namespace DTXMania.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this.クリアパネル?.Dispose();
+                this._背景?.Dispose();
             }
         }
 
