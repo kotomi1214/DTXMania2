@@ -56,7 +56,7 @@ namespace FDK
         public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
         {
             RawInput.RawInputData rawInput;
-            int csSize = Marshal.SizeOf<RawInput>();
+            int csSize = Marshal.SizeOf<RawInput.RawInputData>();
 
             // データ取得。
             if( 0 > RawInput.GetRawInputData( wmInputMsg.LParam, RawInput.DataType.Input, out rawInput, ref csSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
