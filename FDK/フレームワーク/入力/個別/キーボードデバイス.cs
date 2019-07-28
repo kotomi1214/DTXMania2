@@ -53,22 +53,10 @@ namespace FDK
         /// <remarks>
         ///     ウィンドウメッセージループで WM_INPUT を受信した場合は、このコールバックを呼び出すこと。
         /// </remarks>
-        public void WM_INPUTを処理する( in System.Windows.Forms.Message wmInputMsg )
+        public void WM_INPUTを処理する( in RawInput.RawInputData rawInput )
         {
-            RawInput.RawInputData rawInput;
-            int csSize = Marshal.SizeOf<RawInput.RawInputData>();
-
-            // データ取得。
-            if( 0 > RawInput.GetRawInputData( wmInputMsg.LParam, RawInput.DataType.Input, out rawInput, ref csSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
-            {
-                //Debug.WriteLine( "WM_INPUT でのデータ取得に失敗しました。" );
-                return;
-            }
             if( rawInput.Header.Type != RawInput.DeviceType.Keyboard )
-            {
-                //Debug.WriteLine( "未登録の（キーボード以外の）デバイスからのデータが返されました。" );
-                return;
-            }
+                return; // Keyboard 以外は無視。
 
             var keyboard = rawInput.Data.Keyboard;
 

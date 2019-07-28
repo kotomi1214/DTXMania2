@@ -527,10 +527,7 @@ namespace FDK
             ///     Type: BYTE[1]
             ///     Raw Input データ。バイトの配列。
             /// </summary>
-            /// <remarks>
-            ///     現状、未対応。
-            /// </remarks>
-            public IntPtr RawData;
+            public byte RawData;
         }
 
         [StructLayout( LayoutKind.Sequential )]
@@ -689,6 +686,10 @@ namespace FDK
         /// </returns>
         [DllImport( "user32.dll", SetLastError = true )]
         public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, out RawInputData pData, ref int pcbSize, int cbSizeHeader );
+        [DllImport( "user32.dll", SetLastError = true )]
+        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, ref IntPtr pData, ref int pcbSize, int cbSizeHeader );
+        [DllImport( "user32.dll", SetLastError = true )]
+        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, byte[] pData, ref int pcbSize, int cbSizeHeader );
 
         /// <summary>
         ///     システムに接続されている Raw Input デバイスを列挙する。
@@ -722,5 +723,10 @@ namespace FDK
         /// </returns>
         [DllImport( "user32.dll", SetLastError = true, CharSet = CharSet.Auto )]
         public static extern uint GetRawInputDeviceInfo( IntPtr hDevice, DeviceInfoType uiCommand, [In, Out] IntPtr pData, ref int pcbSize );
+
+        [DllImport( "user32.dll", SetLastError = true )]
+        public static extern uint GetRawInputBuffer( [In, Out] RawInputData[] pData, ref uint cbSize, uint csSizeHeader );
+        [DllImport( "user32.dll", SetLastError = true, EntryPoint = "GetRawInputBuffer" )]
+        public static extern uint GetRawInputBufferB( ref IntPtr pData, ref uint cbSize, uint csSizeHeader );
     }
 }

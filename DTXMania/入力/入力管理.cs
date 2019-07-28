@@ -17,6 +17,7 @@ namespace DTXMania
     /// </remarks>
     class 入力管理 : IDisposable
     {
+        // 借り物。
         public キーボードデバイス キーボード { get; protected set; } = null;
 
         public MIDI入力デバイス MIDI入力 { get; protected set; } = null;

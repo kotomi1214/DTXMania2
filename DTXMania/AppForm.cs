@@ -59,8 +59,6 @@ namespace DTXMania
                 //this.Location = new System.Drawing.Point( 20, 20 );
                 this.ClientSize = new Size( 1024, 576 );
             }
-
-            this.キーボード = new キーボードデバイス();
         }
 
         private new App進行描画 App進行描画 => (App進行描画) base.App進行描画;

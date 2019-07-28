@@ -194,7 +194,9 @@
       <DependentUpon>AppFormBase.cs</DependentUpon>
     </Compile>
     <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
+    <Compile Include="フレームワーク\入力\個別\HID.cs" />
     <Compile Include="フレームワーク\入力\個別\RawInput.cs" />
+    <Compile Include="フレームワーク\入力\個別\ゲームコントローラデバイス.cs" />
     <Compile Include="ユーティリティ\ストリーミング\MemoryTributary.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\サイズ変更通知.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\例外発生通知.cs" />
