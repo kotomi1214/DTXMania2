@@ -387,8 +387,6 @@ namespace FDK
                                     // キーの状態を更新。
                                     this._現在のキーの押下状態[ inputEvent.Key ] = inputEvent.押された;
                                 }
-
-                                Debug.WriteLine( inputEvent.ToString() );
                             }
                         }
                     }
