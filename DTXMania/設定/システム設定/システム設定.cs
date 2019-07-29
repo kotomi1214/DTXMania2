@@ -139,6 +139,12 @@ namespace DTXMania
         public Dictionary<IdKey, ドラム入力種別> キーボードtoドラム { get; protected set; }
 
         /// <summary>
+        ///		ゲームコントローラの入力（Extended Usage）からドラム入力へのマッピング用 Dictionary 。
+        /// </summary>
+        [YamlMember( Alias = "KeyboardToDrums" )]
+        public Dictionary<IdKey, ドラム入力種別> ゲームコントローラtoドラム { get; protected set; }
+
+        /// <summary>
         ///		MIDI入力の入力（MIDIノート番号）からドラム入力へのマッピング用 Dictionary 。
         /// </summary>
         [YamlMember( Alias = "MidiInToDrums" )]
@@ -336,6 +342,10 @@ namespace DTXMania
                 { new IdKey( 0, (int) Keys.N ),      ドラム入力種別.Tom3 },
                 { new IdKey( 0, (int) Keys.M ),      ドラム入力種別.RightCrash },
                 { new IdKey( 0, (int) Keys.K ),      ドラム入力種別.Ride },
+            };
+
+            this.ゲームコントローラtoドラム = new Dictionary<IdKey, ドラム入力種別>() {
+                // 特になし
             };
 
             this.MIDItoドラム = new Dictionary<IdKey, ドラム入力種別>() {

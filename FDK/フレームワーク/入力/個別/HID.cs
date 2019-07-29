@@ -766,6 +766,9 @@ namespace FDK
                 $"{usagePage:X4}";
         }
 
+        public static string GetUsageName( uint extendedUsage )
+            => GetUsageName( (ushort) ( ( extendedUsage >> 16 ) & 0xFFFF ), (ushort) ( extendedUsage & 0xFFFF ) );
+
         public static string GetUsageName( ushort usagePage, ushort usageId )
         {
             uint extendedUsage = (uint) ( usagePage << 16 ) | (ushort) usageId;

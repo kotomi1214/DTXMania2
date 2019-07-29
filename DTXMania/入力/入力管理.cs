@@ -17,8 +17,11 @@ namespace DTXMania
     /// </remarks>
     class 入力管理 : IDisposable
     {
-        // 借り物。
+        // 借り物。Disposeしないこと。
         public キーボードデバイス キーボード { get; protected set; } = null;
+
+        // 借り物。Disposeしないこと。
+        public ゲームコントローラデバイス ゲームコントローラ { get; protected set; } = null;
 
         public MIDI入力デバイス MIDI入力 { get; protected set; } = null;
 
@@ -42,13 +45,14 @@ namespace DTXMania
         /// </summary>
         /// <param name="keyboard">キーボードデバイス。キーボードはフォームに依存するため、外部から共有する。</param>
         ///	<param name="最大入力履歴数">１つのシーケンスの最大入力サイズ。</param>
-        public 入力管理( システム設定 systemConfig, キーボードデバイス keyboard, int 最大入力履歴数 = 32 )
+        public 入力管理( システム設定 systemConfig, キーボードデバイス keyboard, ゲームコントローラデバイス gamepad, int 最大入力履歴数 = 32 )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._SystemConfig = systemConfig;
 
                 this.キーボード = keyboard;
+                this.ゲームコントローラ = gamepad;
                 this.MIDI入力 = new MIDI入力デバイス();
 
                 Trace.Assert( 0 < 最大入力履歴数 );
@@ -135,7 +139,8 @@ namespace DTXMania
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this.MIDI入力?.Dispose();
-                //this.キーボード?.Dispose();        --> 借り物なのでDisposeしない。
+                //this.ゲームコントローラ?.Dispose();  --> 借り物なのでDisposeしない。
+                //this.キーボード?.Dispose();          --> 同上
             }
         }
 
@@ -168,6 +173,7 @@ namespace DTXMania
             this.ポーリング結果.Clear();
 
             this._入力デバイスをポーリングする( this.キーボード, this._SystemConfig.キーボードtoドラム, 入力履歴を記録する );
+            this._入力デバイスをポーリングする( this.ゲームコントローラ, this._SystemConfig.ゲームコントローラtoドラム, 入力履歴を記録する );
             this._入力デバイスをポーリングする( this.MIDI入力, this._SystemConfig.MIDItoドラム, 入力履歴を記録する );
 
 

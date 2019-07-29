@@ -95,7 +95,7 @@ namespace DTXMania
                 App進行描画.ドラムサウンド = new ドラムサウンド();
                 App進行描画.システムサウンド = new システムサウンド();
                 //App進行描画.システムサウンド.読み込む();  --> 起動ステージで行う。
-                App進行描画.入力管理 = new 入力管理( App進行描画.システム設定, this.AppForm.キーボード );
+                App進行描画.入力管理 = new 入力管理( App進行描画.システム設定, this.AppForm.キーボード, this.AppForm.ゲームコントローラ );
                 App進行描画.ユーザ管理 = new ユーザ管理();
                 App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
 

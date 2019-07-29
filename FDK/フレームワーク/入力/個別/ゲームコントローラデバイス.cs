@@ -10,7 +10,7 @@ namespace FDK
 {
     public class ゲームコントローラデバイス : IDisposable, IInputDevice
     {
-        public InputDeviceType 入力デバイス種別 => InputDeviceType.Joystick;
+        public InputDeviceType 入力デバイス種別 => InputDeviceType.GameController;
 
         public List<InputEvent> 入力イベントリスト { get; protected set; } = new List<InputEvent>();
 
@@ -55,7 +55,14 @@ namespace FDK
         }
 
 
-        public ゲームコントローラデバイス()
+        /// <summary>
+        ///     ゲームコントローラデバイスをRawInputに登録する。
+        /// </summary>
+        /// <param name="hWindow">
+        ///     対象とするウィンドウのハンドル。
+        ///     /// <see cref="IntPtr.Zero"/>にすると、キーボードフォーカスに追従する。
+        ///     </param>
+        public ゲームコントローラデバイス( IntPtr hWindow )
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -65,13 +72,13 @@ namespace FDK
                         usUsagePage = UsagePage.Generic,
                         usUsage = UsageId.GenericGamepad,
                         Flags = RawInput.DeviceFlags.None,
-                        hwndTarget = IntPtr.Zero,
+                        hwndTarget = hWindow,
                     },
                     new RawInput.RawInputDevice {
                         usUsagePage = UsagePage.Generic,
                         usUsage = UsageId.GenericJoystick,
                         Flags = RawInput.DeviceFlags.None,
-                        hwndTarget = IntPtr.Zero,
+                        hwndTarget = hWindow,
                     }
                 };
 
@@ -281,6 +288,8 @@ namespace FDK
                 this.Devices.Add( rawInputData.Header.hDevice, deviceProperty );
                 //----------------
                 #endregion
+
+                Log.Info( $"新しいゲームコントローラ {deviceProperty.DeviceID} を認識しました。" );
             }
             //----------------
             #endregion
@@ -378,6 +387,8 @@ namespace FDK
                                     // キーの状態を更新。
                                     this._現在のキーの押下状態[ inputEvent.Key ] = inputEvent.押された;
                                 }
+
+                                Debug.WriteLine( inputEvent.ToString() );
                             }
                         }
                     }

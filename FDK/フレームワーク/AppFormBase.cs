@@ -58,7 +58,7 @@ namespace FDK
                 this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
 
                 this.キーボード = new キーボードデバイス();
-                this.ゲームコントローラ = new ゲームコントローラデバイス();
+                this.ゲームコントローラ = new ゲームコントローラデバイス( this.Handle );
 
                 this.On開始();
 
@@ -233,8 +233,7 @@ namespace FDK
                 IntPtr pdata = IntPtr.Zero;
                 RawInput.GetRawInputBufferB( ref pdata, ref pdataSize, (uint) Marshal.SizeOf<RawInput.RawInputHeader>() );
 
-
-
+                // ※ RawInputData は可変長構造体である。
                 int dataSize = Marshal.SizeOf<RawInput.RawInputData>(); // 仮サイズ。
 
                 // 実サイズを取得する。
