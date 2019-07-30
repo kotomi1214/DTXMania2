@@ -141,7 +141,7 @@ namespace DTXMania
         /// <summary>
         ///		ゲームコントローラの入力（Extended Usage）からドラム入力へのマッピング用 Dictionary 。
         /// </summary>
-        [YamlMember( Alias = "KeyboardToDrums" )]
+        [YamlMember( Alias = "GameControllerToDrums" )]
         public Dictionary<IdKey, ドラム入力種別> ゲームコントローラtoドラム { get; protected set; }
 
         /// <summary>
@@ -238,8 +238,11 @@ namespace DTXMania
                     config = new システム設定();
                     config.保存する();
                 }
-                catch
+                catch( YamlException e )
                 {
+                    Log.ERROR( $"{e.Message}" );
+                    if( null != e.InnerException )
+                        Log.ERROR( $"{e.InnerException.Message}" );
                     Log.ERROR( $"ファイルの内容に誤りがあります。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
                     config = new システム設定();
                     config.保存する();
