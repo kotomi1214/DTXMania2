@@ -11,7 +11,7 @@ namespace FDK
     /// <summary>
     ///		指定されたメディアファイル（動画, 音楽）を Vorbis としてデコードして、<see cref="CSCore.ISampleSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
-    ///		参照：<seealso cref="https://cscore.codeplex.com/SourceControl/latest#Samples/NVorbisIntegration/Program.cs"/>
+    ///		参照：<seealso cref="https://github.com/filoe/cscore/blob/master/Samples/NVorbisIntegration/Program.cs"/>
     /// </summary>
     public class NVorbisOnStreamingSampleSource : ISampleSource
     {

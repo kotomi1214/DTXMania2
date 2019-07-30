@@ -183,7 +183,7 @@ namespace FDK
             DeviceInfo = 0x2000000b,
 
             /// <summary>
-            ///     前回解析されたデータ。
+            ///     事前解析されたデータ。
             /// </summary>
             PreparsedData = 0x20000005,
         }
@@ -689,7 +689,7 @@ namespace FDK
         [DllImport( "user32.dll", SetLastError = true )]
         public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, ref IntPtr pData, ref int pcbSize, int cbSizeHeader );
         [DllImport( "user32.dll", SetLastError = true )]
-        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, byte[] pData, ref int pcbSize, int cbSizeHeader );
+        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, [In, Out] byte[] pData, ref int pcbSize, int cbSizeHeader );
 
         /// <summary>
         ///     システムに接続されている Raw Input デバイスを列挙する。

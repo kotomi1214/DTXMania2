@@ -92,7 +92,7 @@ namespace DTXMania
                 // Appインスタンスを生成、初期化。
                 using( var app = new AppForm( options ) )
                 {
-                    if( app.WCFサービスをチェックする( options ) )
+                    if( app.WCFサービスをチェックする( options ) ) // true ならWCFサービスが存在していない。
                     {
                         // アプリを起動。
                         // アプリが終了するまで、このメソッドからは戻ってこない。
@@ -113,13 +113,10 @@ namespace DTXMania
                 #endregion
             }
 
-
-
             // Release 時には、未処理の例外をキャッチしたらダイアログを表示する。
 #if !DEBUG
             catch( Exception e )
             {
-
                 using( var dlg = new 未処理例外検出ダイアログ() )
                 {
                     Trace.WriteLine( "" );
@@ -137,7 +134,8 @@ namespace DTXMania
             }
 #endif
 
-            System.Threading.Tasks.Task.Delay( 1000 ).Wait();
+            Task.Delay( 1000 ).Wait();
+
             Log.WriteLine( "" );
             Log.WriteLine( "遊んでくれてありがとう！" );
         }

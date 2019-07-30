@@ -229,10 +229,6 @@ namespace FDK
             #region " RawInput データを取得する。"
             //----------------
             {
-                uint pdataSize = 0;
-                IntPtr pdata = IntPtr.Zero;
-                RawInput.GetRawInputBufferB( ref pdata, ref pdataSize, (uint) Marshal.SizeOf<RawInput.RawInputHeader>() );
-
                 // ※ RawInputData は可変長構造体である。
                 int dataSize = Marshal.SizeOf<RawInput.RawInputData>(); // 仮サイズ。
 

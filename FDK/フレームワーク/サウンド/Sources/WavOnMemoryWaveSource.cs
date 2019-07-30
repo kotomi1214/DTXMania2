@@ -8,7 +8,7 @@ using CSCore.Codecs.WAV;
 namespace FDK
 {
     /// <summary>
-    ///		指定されたメディアファイルを PCM WAVE としてデコードして、<see cref="CSCore.IWaveAggregator"/> オブジェクトを生成する。
+    ///		指定されたメディアファイルを PCM WAVE としてデコードして、<see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
     /// </summary>
     public class WavOnMemoryWaveSource : IWaveSource
