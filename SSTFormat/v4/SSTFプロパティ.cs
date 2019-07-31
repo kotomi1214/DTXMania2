@@ -42,6 +42,7 @@ namespace SSTFormat.v4
             { チップ種別.LeftCymbal_Mute,    レーン種別.LeftCrash },
             { チップ種別.RightCymbal_Mute,   レーン種別.RightCrash },
             { チップ種別.小節の先頭,         レーン種別.Unknown },
+            { チップ種別.小節メモ,           レーン種別.Unknown },
             { チップ種別.BGM,                レーン種別.BGM },
             { チップ種別.GuitarAuto,         レーン種別.Unknown },    // 以下、出力未対応
             { チップ種別.BassAuto,           レーン種別.Unknown },
