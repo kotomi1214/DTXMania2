@@ -252,7 +252,7 @@
     <Compile Include="フレームワーク\サウンド\SoundDevice.cs" />
     <Compile Include="フレームワーク\サウンド\SoundTimer.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\ResampledOnMemoryWaveSource.cs" />
-    <Compile Include="フレームワーク\サウンド\Sources\WavOnMemoryWaveSource.cs" />
+    <Compile Include="フレームワーク\サウンド\Sources\WavOnStreamingWaveSource.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\XAOnMemoryWaveSource.cs" />
     <Compile Include="ユーティリティ\ストリーミング\HttpRandomAccessStream.cs" />
     <Compile Include="ユーティリティ\ストリーミング\MediaFoundationStreamingSources.cs" />

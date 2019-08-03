@@ -56,7 +56,7 @@ namespace FDK
                 try
                 {
                     // ファイルを読み込んで IWaveSource を生成。
-                    using( var waveSource = new WavOnMemoryWaveSource( ファイルパス, device.WaveFormat ) )
+                    using( var waveSource = new WavOnStreamingWaveSource( ファイルパス, device.WaveFormat ) )
                     {
                         // IWaveSource をリサンプルして ISampleSource を生成。
                         return new ResampledOnMemoryWaveSource( waveSource, device.WaveFormat, 再生速度 ).ToSampleSource();
