@@ -1202,25 +1202,32 @@ namespace DTXMania.演奏
 
                 if( judge != 判定種別.MISS )
                 {
-                    // MISS以外（PERFECT～OK）
+                    // 判定処理(1) チップ光アニメ開始
                     this._チップ光.表示を開始する( 対応表.表示レーン種別 );
 
                     if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
                     {
+                        // 判定処理(2) BASIC用ドラムバッドのヒットアニメ開始
                         this._ドラムパッドBASIC.ヒットする( 対応表.表示レーン種別 );
+
+                        // 判定処理(3-BASIC) BASIC用レーンフラッシュアニメ開始
                         this._レーンフラッシュBASIC.開始する( 対応表.表示レーン種別 );
                     }
+
                     if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
                     {
+                        // 判定処理(3-EXPERT) EXPERT用レーンフラッシュアニメ開始
                         this._レーンフラッシュEXPERT.開始する( 対応表.表示レーン種別 );
                     }
                 }
 
+                // 判定処理(4) 判定文字列アニメ開始
                 this._判定文字列.表示を開始する( 対応表.表示レーン種別, judge );
 
                 var ドラムチッププロパティ = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
                 var AutoPlay = App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
+                // 判定処理(5) 成績更新
                 this.成績.ヒット数を加算する( judge, AutoPlay );
                 //----------------
                 #endregion
@@ -1235,7 +1242,7 @@ namespace DTXMania.演奏
                 }
                 else
                 {
-                    // PERFECT～POOR チップは非表示。
+                    // MISS以外なら、指定通り非表示に。
                     this._チップの演奏状態[ chip ].可視 = false;
                 }
                 //----------------
