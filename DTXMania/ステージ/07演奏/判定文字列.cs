@@ -19,20 +19,41 @@ namespace DTXMania.演奏
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._判定文字列画像 = new テクスチャ( @"$(System)images\演奏\判定文字列.png" );
-
-                var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\判定文字列.yaml" );
-
-                var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
-                var deserializer = new YamlDotNet.Serialization.Deserializer();
-                var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
-
-                this._判定文字列の矩形リスト = new Dictionary<string, RectangleF>();
-                foreach( var kvp in yamlMap.矩形リスト )
+                #region " 判定文字列 "
+                //----------------
                 {
-                    if( 4 == kvp.Value.Length )
-                        this._判定文字列の矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                    this._判定文字列画像 = new テクスチャ( @"$(System)images\演奏\判定文字列.png" );
+                    var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\判定文字列.yaml" );
+                    var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
+                    var deserializer = new YamlDotNet.Serialization.Deserializer();
+                    var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+                    this._判定文字列の矩形リスト = new Dictionary<string, RectangleF>();
+                    foreach( var kvp in yamlMap.矩形リスト )
+                    {
+                        if( 4 == kvp.Value.Length )
+                            this._判定文字列の矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                    }
                 }
+                //----------------
+                #endregion
+
+                #region " FAST/SLOW数字 "
+                //----------------
+                {
+                    this._FastSlow数字画像 = new テクスチャ( @"$(System)images\演奏\判定FastSlow数値.png" );
+                    var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\判定FastSlow数値.yaml" );
+                    var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
+                    var deserializer = new YamlDotNet.Serialization.Deserializer();
+                    var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+                    this._FastSlow数字の矩形リスト = new Dictionary<string, RectangleF>();
+                    foreach( var kvp in yamlMap.矩形リスト )
+                    {
+                        if( 4 == kvp.Value.Length )
+                            this._FastSlow数字の矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                    }
+                }
+                //----------------
+                #endregion
 
                 this._レーンtoステータス = new Dictionary<表示レーン種別, 表示レーンステータス>() {
                     { 表示レーン種別.Unknown,      new 表示レーンステータス( 表示レーン種別.Unknown ) },
@@ -58,6 +79,7 @@ namespace DTXMania.演奏
                 this._レーンtoステータス = null;
 
                 this._判定文字列画像?.Dispose();
+                this._FastSlow数字画像?.Dispose();
             }
         }
 
@@ -66,11 +88,12 @@ namespace DTXMania.演奏
         // 表示開始
 
 
-        public void 表示を開始する( 表示レーン種別 lane, 判定種別 judge )
+        public void 表示を開始する( 表示レーン種別 lane, 判定種別 judge, double fastSlowSec )
         {
             var status = this._レーンtoステータス[ lane ];
 
             status.判定種別 = judge;
+            status.FastSlow値sec = fastSlowSec;
             status.現在の状態 = 表示レーンステータス.状態.表示開始;  // 描画スレッドへ通知。
         }
 
@@ -326,6 +349,49 @@ namespace DTXMania.演奏
                             //----------------
                             #endregion
 
+                            #region " (4) FAST/SLOW値の進行描画 "
+                            //----------------
+                            if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に判定FastSlowを表示する )
+                            {
+                                // FAST/SLOW値：
+                                // ・チップより入力が早いと青文字、チップより入力が遅いと赤文字、
+                                // 　チップと入力の時間差が 10ms 未満なら黄文字で表示する。
+                                // ・MISS 時は表示しない。
+                                // ・ミリ秒単位で表示する。
+
+                                if( status.判定種別 != 判定種別.MISS )
+                                {
+                                    int FastSlow値 = (int) ( status.FastSlow値sec * 1000.0 ); // ミリ秒、小数切り捨て
+                                    int FastSlow値の絶対値 = Math.Abs( FastSlow値 );
+                                    var 接尾詞 =
+                                        ( FastSlow値の絶対値 < 10 ) ? "_yellow" :
+                                        ( 0 < FastSlow値 ) ? "_red" : "_blue";
+                                    var 文字列 = FastSlow値.ToString( "D" );
+                                    int 文字数 = 文字列.Length;
+                                    float 拡大率 = 2f;
+
+                                    var 拡大済み文字列サイズdpx = new Size2F( 0, 0 );
+                                    for( int i = 0; i < 文字数; i++ )
+                                    {
+                                        var 文字矩形 = this._FastSlow数字の矩形リスト[ 文字列[ i ] + 接尾詞 ];
+
+                                        拡大済み文字列サイズdpx.Width += 文字矩形.Width * 拡大率;
+                                        拡大済み文字列サイズdpx.Height = Math.Max( 拡大済み文字列サイズdpx.Height, 文字矩形.Height * 拡大率 );
+                                    }
+
+                                    float x = status.表示中央位置dpx.X - 拡大済み文字列サイズdpx.Width / 2f;
+                                    float y = status.表示中央位置dpx.Y - 拡大済み文字列サイズdpx.Height / 2f + 45f;
+                                    for( int i = 0; i < 文字数; i++ )
+                                    {
+                                        var 文字矩形 = this._FastSlow数字の矩形リスト[ 文字列[ i ] + 接尾詞 ];
+                                        this._FastSlow数字画像.描画する( x, y, X方向拡大率: 拡大率, Y方向拡大率: 拡大率, 転送元矩形: 文字矩形 );
+                                        x += 文字矩形.Width * 拡大率;
+                                    }
+                                }
+                            }
+                            //----------------
+                            #endregion
+
                             // 全部終わったら非表示へ。
                             if( ( ( null == status.文字列影のストーリーボード ) || ( status.文字列影のストーリーボード.Status == StoryboardStatus.Ready ) ) &&
                                 ( ( null == status.文字列本体のストーリーボード ) || ( status.文字列本体のストーリーボード.Status == StoryboardStatus.Ready ) ) &&
@@ -351,7 +417,11 @@ namespace DTXMania.演奏
 
         private テクスチャ _判定文字列画像 = null;
 
+        private テクスチャ _FastSlow数字画像 = null;
+
         private Dictionary<string, RectangleF> _判定文字列の矩形リスト = null;
+
+        private Dictionary<string, RectangleF> _FastSlow数字の矩形リスト = null;
 
         /// <summary>
         ///		以下の画像のアニメ＆表示管理を行うクラス。
@@ -370,6 +440,12 @@ namespace DTXMania.演奏
             public 状態 現在の状態 = 状態.非表示;
 
             public 判定種別 判定種別 = 判定種別.PERFECT;
+
+            /// <summary>
+            ///     チップと入力のズレ時間[秒]。
+            ///     チップより入力が早ければ負数、遅ければ正数。
+            /// </summary>
+            public double FastSlow値sec = 0;
 
             public readonly Vector2 表示中央位置dpx;
             

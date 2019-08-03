@@ -542,6 +542,25 @@ namespace DTXMania.オプション設定
                     ) );
                 //----------------
                 #endregion
+                #region "「判定FAST/SLOW値の表示」ON/OFFトグル "
+                //----------------
+                this._ルートパネルフォルダ.子パネルリスト.Add(
+
+                    new パネル_ONOFFトグル(
+
+                        パネル名:
+                            "判定FAST/SLOWの表示",
+
+                        初期状態はON:
+                            user.演奏中に判定FastSlowを表示する,
+
+                        値の変更処理:
+                            ( panel ) => {
+                                user.演奏中に判定FastSlowを表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            }
+                    ) );
+                //----------------
+                #endregion
 
                 // ツリー構築・システム設定パート（全ユーザ共通）
 

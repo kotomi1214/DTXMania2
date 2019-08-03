@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.User10;
+using User = DTXMania.User11;
 
 namespace DTXMania
 {
@@ -134,6 +134,12 @@ namespace DTXMania
         {
             get => (動画の表示サイズ)this._User.BackgroundMovieSize;
             set => this._User.BackgroundMovieSize = (int)value;
+        }
+
+        public bool 演奏中に判定FastSlowを表示する
+        {
+            get => ( 0 != this._User.ShowFastSlow );
+            set => this._User.ShowFastSlow = value ? 1 : 0;
         }
 
 

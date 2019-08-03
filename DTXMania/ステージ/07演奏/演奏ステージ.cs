@@ -328,7 +328,8 @@ namespace DTXMania.演奏
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
+                                        ヒット判定バーと発声との時間sec,
+                                        ヒット判定バーと描画との時間sec );
                                     return;
                                 }
                                 else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_Miss判定 )
@@ -339,7 +340,8 @@ namespace DTXMania.演奏
                                         ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生,
                                         ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
                                         ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
+                                        ヒット判定バーと発声との時間sec,
+                                        ヒット判定バーと描画との時間sec );
 
                                     this.成績.エキサイトゲージを加算する( 判定種別.MISS ); // 手動演奏なら MISS はエキサイトゲージに反映。
                                     return;
@@ -385,7 +387,8 @@ namespace DTXMania.演奏
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_再生,
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_判定,
                                         ドラムチッププロパティ.AutoPlayON_自動ヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
+                                        ヒット判定バーと発声との時間sec,
+                                        ヒット判定バーと描画との時間sec );
 
                                     //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
 
@@ -401,7 +404,8 @@ namespace DTXMania.演奏
                                         ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生,
                                         ドラムチッププロパティ.AutoPlayOFF_自動ヒット_判定,
                                         ドラムチッププロパティ.AutoPlayOFF_自動ヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
+                                        ヒット判定バーと発声との時間sec,
+                                        ヒット判定バーと描画との時間sec );
 
                                     //this.成績.エキサイトゲージを加算する( 判定種別.PERFECT ); -> エキサイトゲージには反映しない。
 
@@ -475,13 +479,8 @@ namespace DTXMania.演奏
                                             where ( kvp.Value.ドラム入力種別 == 入力.Type )
                                             select kvp.Value.入力グループ種別;
 
-                                        foreach( var 入力の入力グループ種別 in 入力の入力グループ種別リスト )
-                                        {
-                                            if( チップの入力グループ == 入力の入力グループ種別 )
-                                                return true;
-                                        }
+                                        return 入力の入力グループ種別リスト.Any( ( groupType ) => ( groupType == チップの入力グループ ) );
                                     }
-                                    return false;
 
                                 } );
                                 //----------------
@@ -495,14 +494,15 @@ namespace DTXMania.演奏
                                     ヒット処理済み入力.Add( チップにヒットしている入力 );    // この入力はこのチップでヒット処理した。
 
                                     // 入力とチップとの時間差を算出。
-                                    double ヒット判定バーと入力との時間sec = QPCTimer.生カウント相対値を秒へ変換して返す( 現在の演奏時刻qpc - チップにヒットしている入力.InputEvent.TimeStamp );   // 常に正
-                                    double 入力とチップの間隔sec = Math.Abs( ヒット判定バーと入力との時間sec - ヒット判定バーと描画との時間sec );
+                                    double ヒット判定バーと入力との時間sec = QPCTimer.生カウント相対値を秒へ変換して返す( 現在の演奏時刻qpc - チップにヒットしている入力.InputEvent.TimeStamp );   // 常に正（入力遅延）
+                                    double 入力とチップの間隔sec = ヒット判定バーと描画との時間sec - ヒット判定バーと入力との時間sec;
 
                                     // 時間差から判定を算出。
+                                    double 入力とチップの間隔の絶対値sec = Math.Abs( 入力とチップの間隔sec );
                                     var 判定 =
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
-                                        ( 入力とチップの間隔sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD : 判定種別.OK;
+                                        ( 入力とチップの間隔の絶対値sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
+                                        ( 入力とチップの間隔の絶対値sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
+                                        ( 入力とチップの間隔の絶対値sec <= ユーザ設定.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD : 判定種別.OK;
 
                                     // ヒット処理。
                                     this._チップのヒット処理を行う(
@@ -511,7 +511,8 @@ namespace DTXMania.演奏
                                         ( ユーザ設定.ドラムの音を発声する ) ? ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_再生 : false,
                                         ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定,
                                         ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_非表示,
-                                        ヒット判定バーと発声との時間sec );
+                                        ヒット判定バーと発声との時間sec,
+                                        入力とチップの間隔sec );
 
                                     // エキサイトゲージに反映する。
                                     this.成績.エキサイトゲージを加算する( 判定 );
@@ -1176,7 +1177,7 @@ namespace DTXMania.演奏
             return ( 指定時間sec * _1秒あたりのピクセル数 * speed );
         }
 
-        private void _チップのヒット処理を行う( チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec )
+        private void _チップのヒット処理を行う( チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec, double 入力とチップとの間隔sec )
         {
             this._チップの演奏状態[ chip ].ヒット済みである = true;
 
@@ -1222,7 +1223,7 @@ namespace DTXMania.演奏
                 }
 
                 // 判定処理(4) 判定文字列アニメ開始
-                this._判定文字列.表示を開始する( 対応表.表示レーン種別, judge );
+                this._判定文字列.表示を開始する( 対応表.表示レーン種別, judge, 入力とチップとの間隔sec );
 
                 var ドラムチッププロパティ = App進行描画.ユーザ管理.ログオン中のユーザ.ドラムチッププロパティ管理[ chip.チップ種別 ];
                 var AutoPlay = App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
