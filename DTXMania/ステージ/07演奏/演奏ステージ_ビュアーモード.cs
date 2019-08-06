@@ -301,17 +301,14 @@ namespace DTXMania.演奏
                         double 現在の演奏時刻sec = this._演奏開始からの経過時間secを返す();
                         long 現在の演奏時刻qpc = QPCTimer.生カウント;
 
-
-                        // AutoPlay 判定
-
                         #region " 自動ヒット処理。"
                         //----------------
                         this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) => {
 
                             var ユーザ設定 = App進行描画.ユーザ管理.ログオン中のユーザ;
                             var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ chip.チップ種別 ];
-                            var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
+                            bool AutoPlayである = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
                             bool チップはヒット済みである = this._チップの演奏状態[ chip ].ヒット済みである;
                             bool チップはまだヒットされていない = !( チップはヒット済みである );
                             bool チップはMISSエリアに達している = ( ヒット判定バーと描画との時間sec > ユーザ設定.最大ヒット距離sec[ 判定種別.OK ] );
@@ -322,7 +319,7 @@ namespace DTXMania.演奏
                             {
                                 #region " MISS判定。"
                                 //----------------
-                                if( AutoPlay && ドラムチッププロパティ.AutoPlayON_Miss判定 )
+                                if( AutoPlayである && ドラムチッププロパティ.AutoPlayON_Miss判定 )
                                 {
                                     this._チップのヒット処理を行う(
                                         chip,
@@ -334,7 +331,7 @@ namespace DTXMania.演奏
                                         ヒット判定バーと描画との時間sec );
                                     return;
                                 }
-                                else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_Miss判定 )
+                                else if( !AutoPlayである && ドラムチッププロパティ.AutoPlayOFF_Miss判定 )
                                 {
                                     this._チップのヒット処理を行う(
                                         chip,
@@ -359,10 +356,10 @@ namespace DTXMania.演奏
                             // ヒット処理(1) 発声時刻
                             if( チップは発声についてヒット判定バーを通過した )    // ヒット済みかどうかには関係ない
                             {
-                                #region " 自動ヒット判定。"
+                                #region " 自動ヒット判定（再生）"
                                 //----------------
-                                if( ( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット_再生 ) ||
-                                    ( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生 ) )
+                                if( ( AutoPlayである && ドラムチッププロパティ.AutoPlayON_自動ヒット_再生 ) ||
+                                    ( !AutoPlayである && ドラムチッププロパティ.AutoPlayOFF_自動ヒット_再生 ) )
                                 {
                                     // チップの発声がまだなら発声を行う。
 
@@ -371,7 +368,6 @@ namespace DTXMania.演奏
                                         this.チップの発声を行う( chip, ( ユーザ設定.ドラムの音を発声する && this._ビュアーモード時にドラムサウンドを発声する ) );
                                         this._チップの演奏状態[ chip ].発声済みである = true;
                                     }
-
                                 }
                                 //----------------
                                 #endregion
@@ -380,9 +376,9 @@ namespace DTXMania.演奏
                             // ヒット処理(2) 描画時刻
                             if( チップはまだヒットされていない && チップは描画についてヒット判定バーを通過した )
                             {
-                                #region " 自動ヒット判定。"
+                                #region " 自動ヒット判定（判定）"
                                 //----------------
-                                if( AutoPlay && ドラムチッププロパティ.AutoPlayON_自動ヒット )
+                                if( AutoPlayである && ドラムチッププロパティ.AutoPlayON_自動ヒット )
                                 {
                                     this._チップのヒット処理を行う(
                                         chip,
@@ -399,7 +395,7 @@ namespace DTXMania.演奏
 
                                     return;
                                 }
-                                else if( !AutoPlay && ドラムチッププロパティ.AutoPlayOFF_自動ヒット )
+                                else if( !AutoPlayである && ドラムチッププロパティ.AutoPlayOFF_自動ヒット )
                                 {
                                     this._チップのヒット処理を行う(
                                         chip,
@@ -428,18 +424,16 @@ namespace DTXMania.演奏
                         //----------------
                         #endregion
 
-
-                        // 入力(1) 手動演奏
-
                         App進行描画.入力管理.すべての入力デバイスをポーリングする( 入力履歴を記録する: false );
 
-                        #region " ユーザヒット処理 --> ビュアーモードでは無効 "
+                        #region " 手動ヒット処理（ビュアーモードでは無効）"
                         //----------------
                         //----------------
                         #endregion
 
-
-                        // 入力(2) 演奏以外の操作（※演奏中なのでドラム入力は無視。）
+                        #region " その他の手動入力の処理。"
+                        //----------------
+                        // ※演奏中なのでドラム入力は無視。
 
                         if( App進行描画.入力管理.キーボード.キーが押された( 0, Keys.Escape ) )
                         {
@@ -501,6 +495,8 @@ namespace DTXMania.演奏
                             //----------------
                             #endregion
                         }
+                        //----------------
+                        #endregion
 
                         break;
 
@@ -899,22 +895,13 @@ namespace DTXMania.演奏
 
             for( int i = this._描画開始チップ番号; ( 0 <= i ) && ( i < スコア.チップリスト.Count ); i++ )
             {
-                var ユーザ設定 = App進行描画.ユーザ管理.ログオン中のユーザ;
                 var チップ = スコア.チップリスト[ i ];
-                var ドラムチッププロパティ = ユーザ設定.ドラムチッププロパティ管理[ チップ.チップ種別 ];
-                var AutoPlay = ユーザ設定.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
 
                 // ヒット判定バーとチップの間の、時間 と 距離 を算出。→ いずれも、負数ならバー未達、0でバー直上、正数でバー通過。
 
                 double ヒット判定バーと描画との時間sec = 現在の演奏時刻sec - チップ.描画時刻sec;
                 double ヒット判定バーと発声との時間sec = 現在の演奏時刻sec - チップ.発声時刻sec;
-                if( !AutoPlay )
-                {
-                    // ユーザ入力については、判定位置調整を適用する。（自動ヒットについては適用しない。）
-                    ヒット判定バーと描画との時間sec += ( App進行描画.システム設定.判定位置調整ms / 1000.0 );
-                    ヒット判定バーと発声との時間sec += ( App進行描画.システム設定.判定位置調整ms / 1000.0 );
-                }
                 double 倍率 = this._譜面スクロール速度.補間付き速度;
                 double ヒット判定バーとの距離dpx = this._指定された時間secに対応する符号付きピクセル数を返す( 倍率, ヒット判定バーと描画との時間sec );
 
