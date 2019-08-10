@@ -9,7 +9,7 @@ using FDK;
 namespace DTXMania
 {
     using User02 = データベース.ユーザ.old.User02;
-    using User = User10;        // 最新バージョンを指定（１／３）
+    using User = User11;        // 最新バージョンを指定（１／３）
     using Record = Record06;    // 最新バージョンを指定（２／３）
 
     /// <summary>
@@ -17,7 +17,7 @@ namespace DTXMania
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 10;  // 最新バージョンを指定（３／３）
+        public const long VERSION = 11;  // 最新バージョンを指定（３／３）
 
         public static readonly VariablePath ユーザDBファイルパス = @"$(AppData)UserDB.sqlite3";
 
@@ -353,6 +353,37 @@ namespace DTXMania
                             // データベースにカラムを追加する。
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowScoreWall INTEGER NOT NULL DEFAULT 1" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN BackgroundMovieSize INTEGER NOT NULL DEFAULT 1" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            this.DataContext.ExecuteCommand( "VACUUM" );    // Vacuum はトランザクションの外で。
+                            this.DataContext.SubmitChanges();
+                            Log.Info( $"Users テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 10:
+                    #region " 10 → 11 "
+                    //----------------
+                    // 変更点:
+                    // ・Users テーブルに ShowFastSlow を追加。
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // データベースにカラムを追加する。
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN ShowFastSlow INTEGER NOT NULL DEFAULT 0" );
                             this.DataContext.SubmitChanges();
 
                             // 成功。

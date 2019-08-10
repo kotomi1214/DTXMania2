@@ -63,7 +63,7 @@ namespace FDK
         /// <returns></returns>
         public override string ToString()
         {
-            return $"InputEvent[Key={Key},押された={押された},TimeStamp={TimeStamp},Velocity={Velocity}]";
+            return $"InputEvent[Key={Key}(0x{Key:X8}),押された={押された},TimeStamp={TimeStamp},Velocity={Velocity}]";
         }
     }
 }

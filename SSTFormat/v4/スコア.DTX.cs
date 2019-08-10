@@ -1097,7 +1097,7 @@ namespace SSTFormat.v4
                 [ 0x19 ] = ( チップ種別.Ride,       true,   true  ),  // チップ配置（ドラム）・ライドシンバル
                 [ 0x1A ] = ( チップ種別.LeftCrash,  true,   true  ),  // チップ配置（ドラム）・左シンバル
                 [ 0x1B ] = ( チップ種別.HiHat_Foot, true,   true  ),  // チップ配置（ドラム）・左ペダル
-                [ 0x1C ] = ( チップ種別.LeftBass,   true,   true  ),  // チップ配置（ドラム）・左バス
+                [ 0x1C ] = ( チップ種別.Bass,       true,   true  ),  // チップ配置（ドラム）・左バス      --> SSTF では LeftBass は Bass に統合される
                 [ 0x20 ] = ( チップ種別.GuitarAuto, false,  true  ),  // チップ配置（ギター）・OPEN
                 [ 0x21 ] = ( チップ種別.GuitarAuto, false,  true  ),  // チップ配置（ギター）・xxB
                 [ 0x22 ] = ( チップ種別.GuitarAuto, false,  true  ),  // チップ配置（ギター）・xGx

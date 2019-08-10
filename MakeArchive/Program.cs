@@ -47,7 +47,7 @@ namespace MakeArchive
                     => !( 出力対象ファイルリスト.Any( ( existingPair ) => ( existingPair.dst == item.dst ) ) );    // 同じ dst は除外する
 
                 // 必要あれば変更する
-                出力対象ファイルリスト.AddRange( GetPair( dtxmaniaBinDir, @"ja\*.*" ).Where( ( pair ) => 重複がない( pair ) ) );
+                //出力対象ファイルリスト.AddRange( GetPair( dtxmaniaBinDir, @"ja\*.*" ).Where( ( pair ) => 重複がない( pair ) ) );
                 出力対象ファイルリスト.AddRange( GetPair( dtxmaniaBinDir, @"System\*.*" ).Where( ( pair ) => 重複がない( pair ) ) );
                 出力対象ファイルリスト.AddRange( GetPair( dtxmaniaBinDir, @"x64\*.*" ).Where( ( pair ) => 重複がない( pair ) ) );
                 出力対象ファイルリスト.AddRange( GetPair( dtxmaniaBinDir, @"x86\*.*" ).Where( ( pair ) => 重複がない( pair ) ) );

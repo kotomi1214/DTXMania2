@@ -230,6 +230,7 @@ namespace DTXMania.結果
             this._システム情報.VPSをカウントする();
 
             var dc = DXResources.Instance.既定のD2D1DeviceContext;
+            dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
             this._背景.進行描画する( dc );
             DXResources.Instance.D2DBatchDraw( dc, () => {

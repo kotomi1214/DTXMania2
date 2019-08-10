@@ -26,10 +26,8 @@ namespace FDK
         /// </summary>
         public long Position
         {
-            get
-                => this._Position;
-            set
-                => this._Position = FDKUtilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
+            get => this._Position;
+            set => this._Position = FDKUtilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
         }
 
         /// <summary>
@@ -61,23 +59,31 @@ namespace FDK
             // リサンプルを行う。
             using( var resampler = new DmoResampler( waveSource, waveFormtForResampling ) )
             {
-                var サイズbyte = resampler.Length;
-                this._DecodedWaveData = new byte[ サイズbyte ];
+                long サイズbyte = resampler.Length;
+                this._DecodedWaveData = new MemoryTributary( (int) サイズbyte );
 
                 //resampler.Read( this._DecodedWaveData, 0, (int) サイズbyte );
                 //　→ 一気にReadすると、内部の Marshal.AllocCoTaskMem() に OutOfMemory例外を出されることがある。
                 // 　　よって、２秒ずつ分解しながら受け取る。
                 int sizeOf2秒 = FDKUtilities.位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
-                long 変換済byte = 0;
-                long 変換残byte = サイズbyte;
-                while( 0 < 変換残byte )
+                long 変換残サイズbyte = サイズbyte;
+                while( 0 < 変換残サイズbyte )
                 {
-                    int 今回の変換byte = (int)FDKUtilities.位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残byte ), resampler.WaveFormat.BlockAlign );
-                    int 今回の変換済byte = resampler.Read( this._DecodedWaveData, (int)変換済byte, 今回の変換byte );
-                    変換済byte += 今回の変換byte;
-                    変換残byte -= 今回の変換byte;
+                    int 今回の変換サイズbyte = (int)FDKUtilities.位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残サイズbyte ), resampler.WaveFormat.BlockAlign );
+
+                    var 中間バッファ = new byte[ 今回の変換サイズbyte ];
+                    int 変換できたサイズbyte = resampler.Read( 中間バッファ, 0, 今回の変換サイズbyte );
+
+                    if( 0 == 変換できたサイズbyte )
+                        break;  // 強制脱出
+
+                    this._DecodedWaveData.Write( 中間バッファ, 0, 変換できたサイズbyte );
+
+                    変換残サイズbyte -= 変換できたサイズbyte;
                 }
             }
+
+            this._DecodedWaveData.Position = 0;
         }
 
         /// <summary>
@@ -85,6 +91,7 @@ namespace FDK
         /// </summary>
         public void Dispose()
         {
+            this._DecodedWaveData?.Dispose();
             this._DecodedWaveData = null;
         }
 
@@ -108,12 +115,8 @@ namespace FDK
 
             if( 0 < count )
             {
-                Buffer.BlockCopy(
-                    src: this._DecodedWaveData,
-                    srcOffset: (int) this._Position,
-                    dst: buffer,
-                    dstOffset: offset,
-                    count: count );
+                this._DecodedWaveData.Position = this._Position;
+                this._DecodedWaveData.Read( buffer, offset, count );
 
                 this._Position += count;
             }
@@ -124,6 +127,6 @@ namespace FDK
 
         private long _Position = 0;
 
-        private byte[] _DecodedWaveData = null;
+        private MemoryTributary _DecodedWaveData = null;
     }
 }

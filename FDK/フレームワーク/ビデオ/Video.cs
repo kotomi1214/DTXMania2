@@ -171,6 +171,7 @@ namespace FDK
 
             VideoFrame 次のフレーム;
 
+            // フレームドロップ判定
             while( true )
             {
                 // 次のフレームを取得：

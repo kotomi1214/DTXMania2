@@ -39,7 +39,12 @@ namespace SSTFEditor
                 this.dicレーン別チップ種別対応表[ editLaneType ] = new List<チップ種別>();
 
             foreach( var kvp in this.Form.譜面.dicチップ編集レーン対応表 )
+            {
+                if( kvp.Key == チップ種別.LeftBass )
+                    continue;   // SSTFEditorではLeftBassを扱わない
+
                 this.dicレーン別チップ種別対応表[ kvp.Value ].Add( kvp.Key );
+            }
         }
 
 

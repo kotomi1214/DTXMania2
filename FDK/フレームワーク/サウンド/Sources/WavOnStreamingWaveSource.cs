@@ -8,10 +8,10 @@ using CSCore.Codecs.WAV;
 namespace FDK
 {
     /// <summary>
-    ///		指定されたメディアファイルを PCM WAVE としてデコードして、<see cref="CSCore.IWaveAggregator"/> オブジェクトを生成する。
+    ///		指定されたメディアファイルを PCM WAVE としてデコードして、<see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
     /// </summary>
-    public class WavOnMemoryWaveSource : IWaveSource
+    public class WavOnStreamingWaveSource : IWaveSource
     {
         public bool CanSeek => this._WaveFileReader.CanSeek;
 
@@ -32,7 +32,7 @@ namespace FDK
         public long Length => this._WaveFileReader.Length;
 
 
-        public WavOnMemoryWaveSource( VariablePath ファイルパス, WaveFormat deviceFormat )
+        public WavOnStreamingWaveSource( VariablePath ファイルパス, WaveFormat deviceFormat )
         {
             this._WaveFileReader = new WaveFileReader( ファイルパス.変数なしパス );
         }

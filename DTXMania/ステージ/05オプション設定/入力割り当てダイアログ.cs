@@ -70,9 +70,38 @@ namespace DTXMania.オプション設定
                     //----------------
                     #endregion
 
-                    // タイマーイベントを使って、定期的に、入力値の表示とフットペダル開度ゲージの描画を行う。
+                    // タイマーイベントを使って、定期的に、ゲームコントローラ/MIDI入力値の表示と、MIDIフットペダル開度ゲージの描画を行う。
                     timer.Interval = 100;
                     timer.Tick += ( sender, arg ) => {
+
+                        #region " ゲームコントローラをポーリングし、入力値を入力リストへ出力。"
+                        //----------------
+                        App進行描画.入力管理.ゲームコントローラ.ポーリングする();
+
+                        for( int i = 0; i < App進行描画.入力管理.ゲームコントローラ.入力イベントリスト.Count; i++ )
+                        {
+                            var inputEvent = App進行描画.入力管理.ゲームコントローラ.入力イベントリスト[ i ];
+
+                            if( inputEvent.押された )
+                            {
+                                // 入力リストに表示。
+                                var item = new ListViewItem入力リスト用( InputDeviceType.GameController, inputEvent );
+
+                                // 既に割り当てられていたらそのドラム種別を表示。
+                                var drumType = this._変更後のシステム設定.ゲームコントローラtoドラム
+                                    .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
+                                    .Select( ( kvp ) => kvp.Value );
+                                if( 0 < drumType.Count() )
+                                    item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+
+                                this._一定時間が経っていれば空行を挿入する();
+
+                                this.listView入力リスト.Items.Add( item );
+                                this.listView入力リスト.EnsureVisible( this.listView入力リスト.Items.Count - 1 );
+                            }
+                        }
+                        //----------------
+                        #endregion
 
                         #region " MIDI入力をポーリングし、入力値を入力リストへ出力。"
                         //----------------
@@ -252,6 +281,10 @@ namespace DTXMania.オプション設定
                         this.Text = $"Keyboard, {inputEvent.Key}, '{( (Keys) inputEvent.Key ).ToString()}'";
                         break;
 
+                    case InputDeviceType.GameController:
+                        this.Text = $"GamePad, 0x{inputEvent.Key:X8}, '{HID.GetUsageName( (uint) inputEvent.Key )}'";
+                        break;
+
                     case InputDeviceType.MidiIn:
                         if( inputEvent.押された )
                         {
@@ -305,6 +338,10 @@ namespace DTXMania.オプション設定
                         this.Text = $"Keyboard, {idKey.key}, '{( (Keys) idKey.key ).ToString()}'";
                         break;
 
+                    case InputDeviceType.GameController:
+                        this.Text = $"GamePad, 0x{idKey.key:X8}, '{HID.GetUsageName( (uint) idKey.key )}'";
+                        break;
+
                     case InputDeviceType.MidiIn:
                         this.Text = $"MidiIn[{idKey.deviceId}], Note:{idKey.key}";
                         break;
@@ -341,7 +378,16 @@ namespace DTXMania.オプション設定
 
             foreach( var key in 現在選択されているドラム入力種別に割り当てられているキーボード入力 )
                 this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.Keyboard, key.Key ) );
-            
+
+
+            // ゲームコントローラの反映
+
+            var 現在選択されているドラム入力種別に割り当てられているゲームコントローラ入力
+                = this._変更後のシステム設定.ゲームコントローラtoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
+
+            foreach( var key in 現在選択されているドラム入力種別に割り当てられているゲームコントローラ入力 )
+                this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.GameController, key.Key ) );
+
 
             // MIDI入力の反映
 
@@ -385,22 +431,23 @@ namespace DTXMania.オプション設定
                     switch( item.deviceType )
                     {
                         case InputDeviceType.Keyboard:
-
                             this._変更後のシステム設定.キーボードtoドラム[ idKey ] = this._現在選択されているドラム入力種別;   // 追加または更新
-
                             this._割り当て済みリストを更新する( item );
                             this.listView割り当て済み入力リスト.Focus();
+                            this._変更あり = true;
+                            break;
 
+                        case InputDeviceType.GameController:
+                            this._変更後のシステム設定.ゲームコントローラtoドラム[ idKey ] = this._現在選択されているドラム入力種別;   // 追加または更新
+                            this._割り当て済みリストを更新する( item );
+                            this.listView割り当て済み入力リスト.Focus();
                             this._変更あり = true;
                             break;
 
                         case InputDeviceType.MidiIn:
-
                             this._変更後のシステム設定.MIDItoドラム[ idKey ] = this._現在選択されているドラム入力種別;    // 追加または更新
-
                             this._割り当て済みリストを更新する( item );
                             this.listView割り当て済み入力リスト.Focus();
-
                             this._変更あり = true;
                             break;
                     }
@@ -451,6 +498,11 @@ namespace DTXMania.オプション設定
                 {
                     case InputDeviceType.Keyboard:
                         this._変更後のシステム設定.キーボードtoドラム.Remove( item.idKey );
+                        this._変更あり = true;
+                        break;
+
+                    case InputDeviceType.GameController:
+                        this._変更後のシステム設定.ゲームコントローラtoドラム.Remove( item.idKey );
                         this._変更あり = true;
                         break;
 

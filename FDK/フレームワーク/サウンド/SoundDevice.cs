@@ -87,13 +87,12 @@ namespace FDK
                     try
                     {
                         long 期間100ns = ( this._共有モード == AudioClientShareMode.Shared ) ?
-                            this._AudioClient.DefaultDevicePeriod :                         // 共有モードの場合、遅延を既定値に設定する。
+                            0 :                                                             // 共有モードの場合、0 を指定。
                             FDKUtilities.変換_sec単位から100ns単位へ( this.再生遅延sec );   // 排他モードの場合、コンストラクタで指定された値。
 
                         // イベント駆動で初期化。
 
                         this._AudioClient.Initialize( this._共有モード, AudioClientStreamFlags.StreamFlagsEventCallback, 期間100ns, 期間100ns, this.WaveFormat, Guid.Empty );
-
                     }
                     catch( CoreAudioAPIException e )
                     {

@@ -11,7 +11,7 @@ namespace DTXMania
     ///		ユーザテーブルのエンティティクラス。
     /// </summary>
     [Table( Name = "Users" )]   // テーブル名は複数形
-    class User10 : ICloneable
+    class User11 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別する文字列。主キー。
@@ -230,13 +230,19 @@ namespace DTXMania
         [Column( DbType = "INT", CanBeNull = false )]
         public int BackgroundMovieSize { get; set; }
 
+        /// <summary>
+        ///		判定FAST/SLOWの表示
+        ///		0: OFF, その他: ON
+        /// </summary>
+        [Column( DbType = "INT", CanBeNull = false )]
+        public int ShowFastSlow { get; set; }
 
         ///////////////////////////
 
         /// <summary>
         ///		既定値で初期化。
         /// </summary>
-        public User10()
+        public User11()
         {
             this.Id = "Anonymous";
             this.Name = "Anonymous";
@@ -267,12 +273,13 @@ namespace DTXMania
             this.PlaySpeed = 1.0;
             this.ShowPartLine = 1;
             this.ShowPartNumber = 1;
+            this.ShowFastSlow = 0;
         }
 
         // ICloneable 実装
-        public User10 Clone()
+        public User11 Clone()
         {
-            return (User10) this.MemberwiseClone();
+            return (User11) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
@@ -320,6 +327,7 @@ namespace DTXMania
             @", ShowPartNumber INTEGER NOT NULL" +
             @", ShowScoreWall INTEGER NOT NULL" +
             @", BackgroundMovieSize INTEGER NOT NULL" +
+            @", ShowFastSlow INTEGER NOT NULL" +
             @")";
     }
 }

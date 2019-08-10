@@ -1609,10 +1609,10 @@ namespace SSTFEditor
                 this.textBox説明.Text = 譜面.SSTFormatScore.説明文;
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
-                this.textBoxBGV.Text = Path.GetFileName( 譜面.SSTFormatScore.BGVファイル名 );
+                this.textBoxBGV.Text = 譜面.SSTFormatScore.BGVファイル名;
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
-                this.textBoxBGM.Text = Path.GetFileName( 譜面.SSTFormatScore.BGMファイル名 );
+                this.textBoxBGM.Text = 譜面.SSTFormatScore.BGMファイル名;
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
                 this.textBoxメモ.Text = ( this.譜面.SSTFormatScore.小節メモリスト.ContainsKey( 0 ) ) ? this.譜面.SSTFormatScore.AVIリスト[ 0 ] : "";

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -56,6 +57,9 @@ namespace FDK
                 PowerManagement.システムの自動スリープと画面の自動非表示を抑制する();
                 this.Activate();    // ウィンドウが後ろに隠れることがあるので、最前面での表示を保証する。
 
+                this.キーボード = new キーボードデバイス();
+                this.ゲームコントローラ = new ゲームコントローラデバイス( this.Handle );
+
                 this.On開始();
 
                 this.App進行描画.開始する( this, this.ClientSize, new Size( 1920, 1080 ), this.Handle );
@@ -70,6 +74,9 @@ namespace FDK
                 this.On終了();
 
                 this.App進行描画.終了を通知する().WaitOne();  // 終了するまで待つ
+
+                this.ゲームコントローラ?.Dispose();
+                this.キーボード?.Dispose();
 
                 PowerManagement.システムの自動スリープと画面の自動非表示の抑制を解除する();
                 TimeGetTime.timeEndPeriod( 1 );
@@ -209,13 +216,48 @@ namespace FDK
 
         public キーボードデバイス キーボード { get; protected set; }
 
+        public ゲームコントローラデバイス ゲームコントローラ { get; protected set; }
+
         /// <summary>
         ///     WM_INPUT ハンドラ。GUIスレッドで実行される。 
         /// </summary>
         /// <param name="msg">WM_INPUT のメッセージ。</param>
         protected virtual void OnInput( in Message msg )
         {
-            this.キーボード.WM_INPUTを処理する( msg );
+            RawInput.RawInputData rawInputData;
+
+            #region " RawInput データを取得する。"
+            //----------------
+            {
+                // ※ RawInputData は可変長構造体である。
+                int dataSize = Marshal.SizeOf<RawInput.RawInputData>(); // 仮サイズ。
+
+                // 実サイズを取得する。
+                IntPtr dataPtr = IntPtr.Zero;
+                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, ref dataPtr, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                {
+                    Debug.WriteLine( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
+                    return;
+                }
+
+                // 実データを取得する。
+                var dataBytes = new byte[ dataSize ];
+                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, dataBytes, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                {
+                    Debug.WriteLine( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
+                    return;
+                }
+
+                // 実データ byte[] を RawInputData 構造体に変換する。
+                var gch = GCHandle.Alloc( dataBytes, GCHandleType.Pinned );
+                rawInputData = Marshal.PtrToStructure<RawInput.RawInputData>( gch.AddrOfPinnedObject() );
+                gch.Free();
+            }
+            //----------------
+            #endregion
+
+            this.キーボード?.WM_INPUTを処理する( rawInputData );
+            this.ゲームコントローラ?.WM_INPUTを処理する( rawInputData );
         }
 
         

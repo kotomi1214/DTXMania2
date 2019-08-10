@@ -49,7 +49,7 @@ namespace DTXMania
         public Size2 ビュアーモード時のウィンドウサイズ { get; set; }
 
         /// <summary>
-        ///     チップヒットの判定位置を、判定バーからさらに上下に調整する。
+        ///     チップヒットの判定位置を、判定バーからさらに上（負数）または下（正数）に調整する。
         ///     -99～+99[ms] 。
         /// </summary>
         /// <remarks>
@@ -137,6 +137,12 @@ namespace DTXMania
         /// </summary>
         [YamlMember( Alias = "KeyboardToDrums" )]
         public Dictionary<IdKey, ドラム入力種別> キーボードtoドラム { get; protected set; }
+
+        /// <summary>
+        ///		ゲームコントローラの入力（Extended Usage）からドラム入力へのマッピング用 Dictionary 。
+        /// </summary>
+        [YamlMember( Alias = "GameControllerToDrums" )]
+        public Dictionary<IdKey, ドラム入力種別> ゲームコントローラtoドラム { get; protected set; }
 
         /// <summary>
         ///		MIDI入力の入力（MIDIノート番号）からドラム入力へのマッピング用 Dictionary 。
@@ -232,8 +238,11 @@ namespace DTXMania
                     config = new システム設定();
                     config.保存する();
                 }
-                catch
+                catch( YamlException e )
                 {
+                    Log.ERROR( $"{e.Message}" );
+                    if( null != e.InnerException )
+                        Log.ERROR( $"{e.InnerException.Message}" );
                     Log.ERROR( $"ファイルの内容に誤りがあります。新規に作成して保存します。[{システム設定ファイルパス.変数付きパス}]" );
                     config = new システム設定();
                     config.保存する();
@@ -336,6 +345,10 @@ namespace DTXMania
                 { new IdKey( 0, (int) Keys.N ),      ドラム入力種別.Tom3 },
                 { new IdKey( 0, (int) Keys.M ),      ドラム入力種別.RightCrash },
                 { new IdKey( 0, (int) Keys.K ),      ドラム入力種別.Ride },
+            };
+
+            this.ゲームコントローラtoドラム = new Dictionary<IdKey, ドラム入力種別>() {
+                // 特になし
             };
 
             this.MIDItoドラム = new Dictionary<IdKey, ドラム入力種別>() {

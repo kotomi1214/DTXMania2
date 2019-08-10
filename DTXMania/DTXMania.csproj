@@ -170,7 +170,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.6.1.1\lib\net45\YamlDotNet.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.6.1.2\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -275,7 +275,8 @@
     <Compile Include="データベース\ユーザ\old\User08.cs" />
     <Compile Include="データベース\ユーザ\old\User09.cs" />
     <Compile Include="データベース\ユーザ\Record06.cs" />
-    <Compile Include="データベース\ユーザ\User10.cs" />
+    <Compile Include="データベース\ユーザ\User11.cs" />
+    <Compile Include="データベース\ユーザ\old\User10.cs" />
     <Compile Include="データベース\ユーザ\UserDB.cs" />
     <Compile Include="データベース\曲\old\Song01.cs" />
     <Compile Include="データベース\曲\old\Song02.cs" />
@@ -429,6 +430,9 @@
     <None Include="System\Images\演奏\レーン配置\TypeD.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="System\Images\演奏\判定FastSlow数値.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="System\Images\演奏\判定文字列.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -497,7 +501,11 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="System\Images\演奏\判定FastSlow数値.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <None Include="System\Images\演奏\エキサイトゲージDANGER.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

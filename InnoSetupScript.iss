@@ -4,7 +4,7 @@
 ; このスクリプトは Release 版を対象にしているので、
 ; このスクリプトをコンパイルする前に Release 版をビルドしておくこと。
 
-#define MyAppVersion "045"
+#define MyAppVersion "046"
 
 #define MyAppName "DTXMania2"
 #define MyAppFolderName "DTXMania2"
@@ -72,7 +72,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 ; {app} → exe のおかれるフォルダ。（例："C:\Program Files (x86)\<アプリ名>"）
-Source: "{#MyAppBin}\ja\*"; DestDir: "{app}\ja"; Flags: ignoreversion recursesubdirs
+;Source: "{#MyAppBin}\ja\*"; DestDir: "{app}\ja"; Flags: ignoreversion recursesubdirs
 Source: "{#MyAppBin}\System\*"; DestDir: "{app}\System"; Flags: ignoreversion recursesubdirs
 Source: "{#MyAppBin}\x64\*"; DestDir: "{app}\x64"; Flags: ignoreversion recursesubdirs
 Source: "{#MyAppBin}\x86\*"; DestDir: "{app}\x86"; Flags: ignoreversion recursesubdirs

@@ -6,7 +6,7 @@ namespace FDK
     {
         Keyboard,
         Mouse,
-        Joystick,
+        GameController,
         MidiIn,
         Unknown
     }

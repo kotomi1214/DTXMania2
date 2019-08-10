@@ -182,7 +182,7 @@
       <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.16299.0\Windows.winmd</HintPath>
     </Reference>
     <Reference Include="YamlDotNet, Version=6.0.0.0, Culture=neutral, PublicKeyToken=ec19458f3c15af5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\YamlDotNet.6.1.1\lib\net45\YamlDotNet.dll</HintPath>
+      <HintPath>..\packages\YamlDotNet.6.1.2\lib\net45\YamlDotNet.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -194,6 +194,9 @@
       <DependentUpon>AppFormBase.cs</DependentUpon>
     </Compile>
     <None Include="フレームワーク\★現在の利用バージョンと対応するクラス.md" />
+    <Compile Include="フレームワーク\入力\個別\HID.cs" />
+    <Compile Include="フレームワーク\入力\個別\RawInput.cs" />
+    <Compile Include="フレームワーク\入力\個別\ゲームコントローラデバイス.cs" />
     <Compile Include="ユーティリティ\ストリーミング\MemoryTributary.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\サイズ変更通知.cs" />
     <Compile Include="ユーティリティ\スレッド間通知\例外発生通知.cs" />
@@ -249,7 +252,7 @@
     <Compile Include="フレームワーク\サウンド\SoundDevice.cs" />
     <Compile Include="フレームワーク\サウンド\SoundTimer.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\ResampledOnMemoryWaveSource.cs" />
-    <Compile Include="フレームワーク\サウンド\Sources\WavOnMemoryWaveSource.cs" />
+    <Compile Include="フレームワーク\サウンド\Sources\WavOnStreamingWaveSource.cs" />
     <Compile Include="フレームワーク\サウンド\Sources\XAOnMemoryWaveSource.cs" />
     <Compile Include="ユーティリティ\ストリーミング\HttpRandomAccessStream.cs" />
     <Compile Include="ユーティリティ\ストリーミング\MediaFoundationStreamingSources.cs" />

@@ -301,10 +301,12 @@ namespace FDK
             var d3dDevice = DXResources.Instance.D3D11Device1;
 
             var シェーダコンパイルのオプション =
-                ShaderFlags.Debug |
-                ShaderFlags.SkipOptimization |
-                ShaderFlags.EnableStrictness |
-                ShaderFlags.PackMatrixColumnMajor;
+#if DEBUG
+                ShaderFlags.Debug |                 // デバッグ情報をコードに挿入する。
+                ShaderFlags.SkipOptimization |      // 最適化を行わない。
+#endif
+                ShaderFlags.EnableStrictness |      // 厳密にコンパイルする；古い非推奨の構文はエラーとする。
+                ShaderFlags.PackMatrixColumnMajor;  // 行列は列優先とする。(HLSLの既定値）
 
             #region " 頂点シェーダを生成する。"
             //----------------
