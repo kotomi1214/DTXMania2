@@ -195,6 +195,7 @@ namespace DTXMania.演奏
             foreach( var chip in App進行描画.演奏スコア.チップリスト )
                 this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
 
+            this._スコア指定の背景画像?.Dispose();
             this._スコア指定の背景画像 = (App進行描画.演奏スコア.背景画像ファイル名.Nullまたは空である() ) ? null : 
                 new 画像( Path.Combine( App進行描画.演奏スコア.PATH_WAV, App進行描画.演奏スコア.背景画像ファイル名 ) );
 

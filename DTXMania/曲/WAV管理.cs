@@ -39,7 +39,7 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._一時停止中の音声のリスト = null;
+                this._一時停止中の音声のリスト = null;  // Disposeしない
 
                 if( null != this._WAV情報リスト )
                 {

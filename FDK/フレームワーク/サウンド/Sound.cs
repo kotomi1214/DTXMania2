@@ -81,7 +81,7 @@ namespace FDK
         {
             this.Stop();
 
-            //this._BaseSampleSource?.Dispose();	Dispose は外部で。（SampleSource は複数の Sound で共有されている可能性があるため。）
+            //this._BaseSampleSource?.Dispose();	Dispose は行わない。（SampleSource は複数の Sound で共有されている可能性があるため。）
             this._BaseSampleSource = null;
 
             this._DeviceRef = null;
