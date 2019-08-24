@@ -33,7 +33,7 @@ namespace DTXMania
         // 生成と終了
 
 
-        public MusicNode( VariablePath 曲ファイルの絶対パス, Node 親ノード )
+        public MusicNode( VariablePath 曲ファイルの絶対パス, Node 親ノード = null )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;

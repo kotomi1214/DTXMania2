@@ -11,15 +11,9 @@ namespace DTXMania
     /// </summary>
     class BackNode : Node
     {
-        public BackNode()
+        public BackNode( Node 親ノード = null )
         {
             this.タイトル = "<< 戻る";
-            this.親ノード = null;
-        }
-
-        public BackNode( Node 親ノード )
-            : this()
-        {
             this.親ノード = 親ノード;
         }
     }

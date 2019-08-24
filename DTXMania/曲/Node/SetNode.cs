@@ -120,7 +120,7 @@ namespace DTXMania
         /// <summary>
         ///     指定された <see cref="SetDef.Block"/> をもとに、初期化する。
         /// </summary>
-        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, Node 親ノード )
+        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, Node 親ノード = null )
         {
             this.タイトル = block.Title;
             this.親ノード = 親ノード;
