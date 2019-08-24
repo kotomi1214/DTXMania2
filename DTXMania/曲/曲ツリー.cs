@@ -152,14 +152,11 @@ namespace DTXMania
         {
             this.フォーカスリスト = null;
 
-            lock( node.子ノードリスト排他 )
-            {
-                foreach( var child in node.子ノードリスト )
-                    ノードを削除する( child );
+            foreach( var child in node.子ノードリスト )
+                ノードを削除する( child );
 
-                node.子ノードリスト.Clear();
-                node.Dispose();
-            }
+            node.子ノードリスト.Clear();
+            node.Dispose();
         }
 
 
@@ -208,41 +205,38 @@ namespace DTXMania
                 var 旧フォーカスリスト = this.フォーカスリスト;    // 初回は null 。
                 this.フォーカスリスト = 親ノード.子ノードリスト;   // 常に非 null。（先のAssertで保証されている。）
 
-                lock( 親ノード.子ノードリスト排他 )
+                if( 旧フォーカスリスト == this.フォーカスリスト )
                 {
-                    if( 旧フォーカスリスト == this.フォーカスリスト )
-                    {
-                        // (A) フォーカスリストが変わらない場合 → 必要あればフォーカスノードを変更する。
+                    // (A) フォーカスリストが変わらない場合 → 必要あればフォーカスノードを変更する。
 
-                        if( null != ノード )
-                        {
-                            // (A-a) ノードの指定がある（非null）なら、それを選択する。
-                            this.フォーカスリスト.SelectItem( ノード );
-                        }
-                        else
-                        {
-                            // (A-b) ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
-                        }
+                    if( null != ノード )
+                    {
+                        // (A-a) ノードの指定がある（非null）なら、それを選択する。
+                        this.フォーカスリスト.SelectItem( ノード );
                     }
                     else
                     {
-                        // (B) フォーカスリストが変更される場合
-
-                        Log.Info( "フォーカスリストが変更されました。" );
-
-                        if( null != 旧フォーカスリスト ) // 初回は null 。
-                        {
-                            旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
-                        }
-
-                        if( null != ノード )
-                            this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
-
-                        this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
-
-                        // 手動でイベントを発火。
-                        this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
+                        // (A-b) ノードの指定がない（null）なら、フォーカスノードは現状のまま維持する。
                     }
+                }
+                else
+                {
+                    // (B) フォーカスリストが変更される場合
+
+                    Log.Info( "フォーカスリストが変更されました。" );
+
+                    if( null != 旧フォーカスリスト ) // 初回は null 。
+                    {
+                        旧フォーカスリスト.SelectionChanged -= this.フォーカスリスト_SelectionChanged;   // ハンドラ削除
+                    }
+
+                    if( null != ノード )
+                        this.フォーカスリスト.SelectItem( ノード );    // イベントハンドラ登録前
+
+                    this.フォーカスリスト.SelectionChanged += this.フォーカスリスト_SelectionChanged;   // ハンドラ登録
+
+                    // 手動でイベントを発火。
+                    this.フォーカスノードが変更された?.Invoke( this.フォーカスリスト, (this.フォーカスリスト?.SelectedItem, 旧フォーカスリスト?.SelectedItem) );
                 }
             }
         }
@@ -377,11 +371,8 @@ namespace DTXMania
                     一時ノードリスト.Add( boxNode );
 
                     // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
-                    lock( boxNode.子ノードリスト排他 )
-                    {
-                        boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
-                        boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
-                    }
+                    boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
+                    boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
 
                     // box.defを無効にして、このフォルダを対象として、再度構築する。
                     // 構築結果のノードリストは、BOXノードの子として付与される。
@@ -457,13 +448,10 @@ namespace DTXMania
 
             #region " (D) 作成したノードリストを親ノードの子として追加する。"
             //----------------
-            lock( 親ノード.子ノードリスト排他 )  // lock は、ノードリスト単位で行う（ノード単位ではない）。
+            foreach( var item in 一時ノードリスト )
             {
-                foreach( var item in 一時ノードリスト )
-                {
-                    item.親ノード = 親ノード;
-                    親ノード.子ノードリスト.Add( item );
-                }
+                item.親ノード = 親ノード;
+                親ノード.子ノードリスト.Add( item );
             }
             //----------------
             #endregion
@@ -479,15 +467,11 @@ namespace DTXMania
                         //----------------
                         // BOXノードを作成し、ツリーに登録。
                         var boxNode = new BoxNode( dir.Name.Substring( 9 ), 親ノード );
-                        lock( 親ノード.子ノードリスト排他 )
-                            親ノード.子ノードリスト.Add( boxNode );
+                        親ノード.子ノードリスト.Add( boxNode );
 
                         // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
-                        lock( boxNode.子ノードリスト排他 )
-                        {
-                            boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
-                            boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
-                        }
+                        boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
+                        boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
 
                         // BOXノードを親として、検索予約をキューに投入。
                         this._検索フォルダキュー.Enqueue( (boxNode, dir.FullName) );

@@ -66,11 +66,6 @@ namespace DTXMania
         public SelectableList<Node> 子ノードリスト { get; } = new SelectableList<Node>();
 
         /// <summary>
-        ///     <see cref="子ノードリスト"/> にアクセスするときはこれをlockすること。
-        /// </summary>
-        public readonly object 子ノードリスト排他 = new object();
-
-        /// <summary>
         ///		このノードの１つ前に位置する兄弟ノードを示す。
         /// </summary>
         /// <remarks>
@@ -80,18 +75,15 @@ namespace DTXMania
         {
             get
             {
-                lock( this.親ノード.子ノードリスト排他 )
-                {
-                    var index = this.親ノード.子ノードリスト.IndexOf( this );
-                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+                var index = this.親ノード.子ノードリスト.IndexOf( this );
+                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
 
-                    index = index - 1;
+                index--;
 
-                    if( 0 > index )
-                        index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
+                if( 0 > index )
+                    index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
 
-                    return this.親ノード.子ノードリスト[ index ];
-                }
+                return this.親ノード.子ノードリスト[ index ];
             }
         }
 
@@ -105,18 +97,15 @@ namespace DTXMania
         {
             get
             {
-                lock( this.親ノード.子ノードリスト排他 )
-                {
-                    var index = this.親ノード.子ノードリスト.IndexOf( this );
-                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+                var index = this.親ノード.子ノードリスト.IndexOf( this );
+                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
 
-                    index = index + 1;
+                index++;
 
-                    if( this.親ノード.子ノードリスト.Count <= index )
-                        index = 0;      // 末尾なら、先頭へ。
+                if( this.親ノード.子ノードリスト.Count <= index )
+                    index = 0;      // 末尾なら、先頭へ。
 
-                    return this.親ノード.子ノードリスト[ index ];
-                }
+                return this.親ノード.子ノードリスト[ index ];
             }
         }
 
