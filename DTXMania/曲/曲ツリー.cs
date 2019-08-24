@@ -115,56 +115,7 @@ namespace DTXMania
         /// </summary>
         public int ユーザ希望難易度 { get; protected set; } = 3;
 
-
-
-        // イベント
-
-
-        /// <summary>
-        ///     フォーカスノードが変更された場合に発生するイベント。
-        /// </summary>
-        /// <remarks>
-        ///     選択されたノードと、選択が解除されたノードは、必ずしも同じNodeリストに存在するとは限らない。
-        ///     例えば、BOXを移動する場合、選択されるNodeは移動後のNodeリストに、選択が解除されたNodeは移動前のNodeリストに、それぞれ存在する。
-        ///     この場合、後者はすでに非活性化されているので注意すること。
-        /// </remarks>
-        public event EventHandler<(Node 選択されたNode, Node 選択が解除されたNode)> フォーカスノードが変更された;
-
-
-
-        // 生成と終了
-
-
-        public 曲ツリー()
-        {
-            //this.ユーザ希望難易度 = 3;	-> 初期化せず、前回の値を継承する。
-        }
-
-        public virtual void Dispose()
-        {
-            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
-            {
-                this.ノードを削除する( this.ルートノード );
-            }
-        }
-
-        public void ノードを削除する( Node node )
-        {
-            this.フォーカスリスト = null;
-
-            foreach( var child in node.子ノードリスト )
-                ノードを削除する( child );
-
-            node.子ノードリスト.Clear();
-            node.Dispose();
-        }
-
-
-
-        // 難易度
-
-
-        public void 難易度アンカをひとつ増やす()
+        public void ユーザ希望難易度をひとつ増やす()
         {
             for( int i = 0; i < 5; i++ )   // 最大でも5回まで
             {
@@ -180,7 +131,7 @@ namespace DTXMania
             }
         }
 
-        
+
 
         // フォーカス
 
@@ -271,6 +222,15 @@ namespace DTXMania
             this.フォーカスリスト.SelectItem( index );
         }
 
+        /// <summary>
+        ///     フォーカスノードが変更された場合に発生するイベント。
+        /// </summary>
+        /// <remarks>
+        ///     選択されたノードと、選択が解除されたノードは、必ずしも同じNodeリストに存在するとは限らない。
+        ///     例えば、BOXを移動する場合、選択されるNodeは移動後のNodeリストに、選択が解除されたNodeは移動前のNodeリストに、それぞれ存在する。
+        ///     この場合、後者はすでに非活性化されているので注意すること。
+        /// </remarks>
+        public event EventHandler<(Node 選択されたNode, Node 選択が解除されたNode)> フォーカスノードが変更された;
 
         private void フォーカスリスト_SelectionChanged( object sender, (Node 選択されたItem, Node 選択が解除されたItem) e )
         {
@@ -282,14 +242,43 @@ namespace DTXMania
 
 
 
-        // 曲検索・構築タスク
+        // 生成と終了
 
 
-        public void ランダムセレクトノードを追加する( Node 親ノード )
+        public 曲ツリー()
         {
-            親ノード.子ノードリスト.Add( new RandomSelectNode( 親ノード ) );
+            //this.ユーザ希望難易度 = 3;	-> 初期化せず、前回の値を継承する。
+
+            this._ランダムセレクトノードを追加する( this.ルートノード );   // 先頭はRandomSelect
         }
 
+        public virtual void Dispose()
+        {
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
+            {
+                this._ノードを削除する( this.ルートノード );
+            }
+        }
+
+        private void _ノードを削除する( Node node )
+        {
+            this.フォーカスリスト = null;
+
+            foreach( var child in node.子ノードリスト )
+                this._ノードを削除する( child );
+
+            node.子ノードリスト.Clear();
+            node.Dispose();
+        }
+
+
+
+        // 曲ツリー構築
+
+
+        /// <summary>
+        ///     指定されたフォルダに対して、曲の検索を開始する。
+        /// </summary>
         public void 曲の検索を開始する( VariablePath フォルダパス )
         {
             // 指定されたフォルダパスをルートノードとして追加
@@ -500,6 +489,14 @@ namespace DTXMania
                     }
                 }
             }
+        }
+
+        /// <summary>
+        ///     指定された親ノードの末尾に、RandomSelct ノードを追加する。
+        /// </summary>
+        private void _ランダムセレクトノードを追加する( Node 親ノード )
+        {
+            親ノード.子ノードリスト.Add( new RandomSelectNode( 親ノード ) );
         }
 
 
