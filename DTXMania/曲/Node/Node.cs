@@ -176,7 +176,7 @@ namespace DTXMania
             this._プレビュー音声.停止する();
         }
 
-        private PreviewSound _プレビュー音声;  // null なら未使用
+        private Node.PreviewSound _プレビュー音声;  // null なら未使用
 
 
 
@@ -185,7 +185,7 @@ namespace DTXMania
 
         public Node()
         {
-            this._曲名テクスチャ = new 曲名();
+            this._曲名テクスチャ = new TitleTexture();
             this._プレビュー音声 = new PreviewSound();
         }
 
@@ -233,7 +233,7 @@ namespace DTXMania
         // private
 
 
-        protected 曲名 _曲名テクスチャ = null;
+        protected Node.TitleTexture _曲名テクスチャ = null;
 
 
         private float _難易度 = 0.0f;

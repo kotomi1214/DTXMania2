@@ -318,7 +318,7 @@
     <Compile Include="設定\システム設定\old\システム設定02.cs" />
     <Compile Include="設定\成績.cs" />
     <Compile Include="曲\曲DB.cs" />
-    <Compile Include="曲\曲名.cs" />
+    <Compile Include="曲\Node\Node.TitleTexture.cs" />
     <Compile Include="設定\ドラムサウンド.cs" />
     <Compile Include="設定\ユーザ管理.cs" />
     <Compile Include="設定\ユーザ設定.cs" />
