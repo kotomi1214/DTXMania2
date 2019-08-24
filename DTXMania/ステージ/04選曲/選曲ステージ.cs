@@ -69,6 +69,7 @@ namespace DTXMania.選曲
                         "Song not found...\n" +
                         "Hit BDx2 (in default SPACEx2) to select song folders."
                 };
+                this._UpdatingSoglistパネル = new UpdatingSoglistパネル();
 
                 // 外部接続。
                 this._難易度と成績.青い線を取得する = () => this._青い線;
@@ -112,6 +113,7 @@ namespace DTXMania.選曲
                 this._左に伸びる導線の長さdpx?.Dispose();
                 this._上に伸びる導線の長さdpx?.Dispose();
 
+                this._UpdatingSoglistパネル?.Dispose();
                 this._SongNotFound?.Dispose();
                 this._表示方法選択パネル?.Dispose();
                 this._曲別SKILL?.Dispose();
@@ -300,6 +302,7 @@ namespace DTXMania.選曲
                 this._選択曲枠ランナー.進行描画する( dc );
                 this._導線を描画する( dc );
                 this._ステージタイマー.描画する( 1689f, 37f );
+                this._UpdatingSoglistパネル.進行描画する( 40f, 740f );
             }
             else
             {
@@ -361,6 +364,8 @@ namespace DTXMania.選曲
         private 文字列画像 _SongNotFound = null;
 
         private テクスチャ _ステージタイマー = null;
+
+        private UpdatingSoglistパネル _UpdatingSoglistパネル = null;
 
         private SolidColorBrush _白 = null;
 

@@ -184,6 +184,7 @@
     <Compile Include="ステージ\03認証\ユーザリスト.cs" />
     <Compile Include="ステージ\03認証\認証ステージ.cs" />
     <Compile Include="ステージ\04選曲\BPMパネル.cs" />
+    <Compile Include="ステージ\04選曲\UpdatingSoglistパネル.cs" />
     <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
     <Compile Include="ステージ\04選曲\曲リスト.cs" />
     <Compile Include="ステージ\04選曲\曲別SKILL.cs" />
@@ -923,6 +924,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="System\Images\現行化待ちのプレビュー画像.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\選曲\Updating songlist.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
