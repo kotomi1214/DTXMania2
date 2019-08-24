@@ -115,6 +115,16 @@ namespace DTXMania
 
 
         /// <summary>
+        ///		ノードを表す画像。
+        /// </summary>
+        /// <remarks>
+        ///		派生クラスで、適切な画像を割り当てること。（このクラスでは、生成も Dispose もしない。）
+        ///		<see cref="SetNode"/> の場合のみ、扱いが異なる。
+        ///		詳細は<see cref="SetNode.ノード画像"/>を参照のこと。
+        /// </remarks>
+        public virtual テクスチャ ノード画像 { get; set; }
+
+        /// <summary>
         ///		ノードの全体サイズ（設計単位）。
         ///		すべてのノードで同一、固定値。
         /// </summary>
@@ -126,27 +136,7 @@ namespace DTXMania
         /// <remarks>
         ///		初回アクセス時に生成される。
         /// </remarks>
-        public static テクスチャ 既定のノード画像
-        {
-            get
-            {
-                if( null == _既定のノード画像 )
-                    _既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
-
-                return _既定のノード画像;
-            }
-        }
-
-        /// <summary>
-        ///		ノードを表す画像。
-        ///		null にすると、既定のノード画像が使用される。
-        /// </summary>
-        /// <remarks>
-        ///		派生クラスで、適切な画像を割り当てること。（このクラスでは、生成も Dispose もしない。）
-        ///		<see cref="SetNode"/> の場合のみ、扱いが異なる。
-        ///		詳細は<see cref="SetNode.ノード画像"/>を参照のこと。
-        /// </remarks>
-        public virtual テクスチャ ノード画像 { get; set; }
+        public static テクスチャ 既定のノード画像 { get; private set; }
 
 
 
@@ -176,14 +166,20 @@ namespace DTXMania
         {
             this._曲名テクスチャ = new TitleTexture();
             this._プレビュー音声 = new PreviewSound();
+
+            if( 0 == _インスタンス数++ )
+                既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
         }
 
         public virtual void Dispose()
         {
-            //Node._既定のノード画像?.Dispose();     --> めんどくさいので破棄はしない。
             //this.ノード画像?.Dispose();            --> 生成も解放も派生クラスに任せる。
+
             this._曲名テクスチャ?.Dispose();
             this._プレビュー音声?.Dispose();
+
+            if( 0 == --_インスタンス数 )
+                既定のノード画像?.Dispose();
         }
 
 
@@ -224,14 +220,8 @@ namespace DTXMania
 
         protected Node.TitleTexture _曲名テクスチャ = null;
 
-
         private float _難易度 = 0.0f;
 
-
-
-        // private (static) 
-
-
-        private static テクスチャ _既定のノード画像 = null;
+        private static int _インスタンス数 = 0;
     }
 }
