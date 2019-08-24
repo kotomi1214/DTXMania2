@@ -459,6 +459,12 @@ namespace DTXMania
 
         public CancellationTokenSource 現行化タスクキャンセル通知 { get; protected set; } = new CancellationTokenSource();
 
+        /// <summary>
+        ///     ON の間は現行化タスクを一時停止する。
+        ///     OFF にすると再開する。
+        /// </summary>
+        public TriStateEvent 現行化タスクの一時停止 { get; protected set; } = new TriStateEvent( TriStateEvent.状態種別.OFF );
+
         public async void 曲ツリーを現行化するAsync()
         {
             this.現行化タスク = Task.Run( () => {
@@ -472,11 +478,15 @@ namespace DTXMania
                     if( node is MusicNode music && music.現行化未実施 )
                         music.現行化する();
 
+                    // キャンセル？
                     if( this.現行化タスクキャンセル通知.IsCancellationRequested )
                     {
                         Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
                         break;
                     }
+
+                    // 一時停止？
+                    this.現行化タスクの一時停止.OFFになるまでブロックする();
                 }
 
                 Log.Info( "曲ツリーの現行化を終了します。" );
