@@ -109,6 +109,37 @@ namespace DTXMania
             }
         }
 
+        /// <summary>
+        ///     自分と子孫を直列に列挙する。
+        /// </summary>
+        public IEnumerable<Node> Traverse()
+        {
+            yield return this;
+
+            // (A) 深さ優先
+            //foreach( var child in this.子ノードリスト )
+            //{
+            //    foreach( var n in child.Traverse() )
+            //    {
+            //        yield return n;
+            //    }
+            //}
+
+            // (B) 幅優先
+            foreach( var child in this.子ノードリスト )
+            {
+                yield return child;
+            }
+            foreach( var child in this.子ノードリスト )
+            {
+                foreach( var n in child.Traverse() )
+                {
+                    if( n != child )
+                        yield return n;
+                }
+            }
+        }
+
 
 
         // ノード画像関連
@@ -133,11 +164,12 @@ namespace DTXMania
         /// <summary>
         ///		ノードを表す画像の既定画像。
         /// </summary>
-        /// <remarks>
-        ///		初回アクセス時に生成される。
-        /// </remarks>
         public static テクスチャ 既定のノード画像 { get; private set; }
 
+        /// <summary>
+        ///		現行化前のノードを表す画像の既定画像。
+        /// </summary>
+        public static テクスチャ 現行化前のノード画像 { get; private set; }
 
 
         // プレビュー音声関連
@@ -168,7 +200,10 @@ namespace DTXMania
             this._プレビュー音声 = new PreviewSound();
 
             if( 0 == _インスタンス数++ )
+            {
                 既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
+                現行化前のノード画像 = new テクスチャ( @"$(System)images\現行化待ちのプレビュー画像.png" );
+            }
         }
 
         public virtual void Dispose()
@@ -179,7 +214,13 @@ namespace DTXMania
             this._プレビュー音声?.Dispose();
 
             if( 0 == --_インスタンス数 )
+            {
                 既定のノード画像?.Dispose();
+                現行化前のノード画像?.Dispose();
+            }
+
+            foreach( var child in this.子ノードリスト )
+                child.Dispose();
         }
 
 

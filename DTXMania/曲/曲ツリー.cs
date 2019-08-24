@@ -273,67 +273,27 @@ namespace DTXMania
 
 
 
-        // 曲ツリー構築
+        // 曲ツリーの構築
 
 
         /// <summary>
-        ///     指定されたフォルダに対して、曲の検索を開始する。
+        ///     曲検索フォルダパスをもとにファイルとフォルダを列挙し、ノード（Root, Music, Set, Box, Back, RandomSelect）から成る曲ツリーを確定する。
+        ///     また、ファイルの情報が SongDB に存在している場合は、DBから情報を反映する。
         /// </summary>
-        public void 曲の検索を開始する( VariablePath フォルダパス )
+        /// <param name="曲検索フォルダパスリスト">曲検索対象のルートフォルダのパスのリスト。</param>
+        public void 曲ツリーを構築する( IEnumerable<VariablePath> 曲検索フォルダパスリスト )
         {
-            // 指定されたフォルダパスをルートノードとして追加
-            this._検索フォルダを追加する( フォルダパス, this.ルートノード );
-        }
-
-        /// <summary>
-        ///     <see cref="_検索フォルダキュー"/> にフォルダを投入する。
-        ///     また、構築タスクが起動していなければ、起動する。
-        /// </summary>
-        /// <param name="フォルダパス">検索対象のフォルダのパス。</param>
-        /// <param name="追加先親ノード">検索結果を追加する先の親ノード</param>
-        private void _検索フォルダを追加する( VariablePath フォルダパス, Node 追加先親ノード )
-        {
-            this._検索フォルダキュー.Enqueue( (追加先親ノード, フォルダパス) );
-            this._検索フォルダキュー投入通知.Set();
-
-
-            // 構築タスクを開始していなければ開始する。
-
-            if( null == this._構築タスク )
+            using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._構築タスク = Task.Run( () => {
-
-                    #region " 曲検索・構築タスク "
-                    //----------------
-                    Log.現在のスレッドに名前をつける( "曲検索" );
-                    Log.Info( $"曲ツリーの構築タスクを開始します。" );
-
-                    // キューに項目が投入されるまで待つ。
-                    // → タイムアウトしたら、これ以上の投入はないものと見なして、ループを抜ける。
-                    while( this._検索フォルダキュー投入通知.WaitOne( 5000 ) )
-                    {
-                        // キュー内のすべての項目について……
-                        while( this._検索フォルダキュー.TryDequeue( out var item ) )
-                        {
-                            // フォルダを検索し、ツリーを構築する。
-                            Log.Info( $"検索中: {item.path.変数付きパス}" );
-                            this._構築する( item.parent, item.path );
-                        }
-                    }
-
-                    Log.Info( $"曲ツリーの構築タスクを終了しました。" );
-                    //----------------
-                    #endregion
-
-                } );
+                using( var songdb = new SongDB() )
+                {
+                    foreach( var path in 曲検索フォルダパスリスト )
+                        this._曲ツリーを構築する( path, this.ルートノード, songdb );
+                }
             }
         }
 
-        /// <summary>
-        ///     <see cref="_検索フォルダキュー"/> からフォルダと追加先親ノードを取り出し、
-        ///     ノードリストを構築して、親ノードの子ノードリストに追加する。
-        /// </summary>
-        private void _構築する( Node 親ノード, VariablePath 基点フォルダパス, bool boxDefファイル有効 = true )
+        private void _曲ツリーを構築する( VariablePath 基点フォルダパス, Node 親ノード, SongDB songdb, bool BoxDefが有効 = true )
         {
             if( !( Directory.Exists( 基点フォルダパス.変数なしパス ) ) )
             {
@@ -341,31 +301,29 @@ namespace DTXMania
                 return;
             }
 
-            // 以下(A)～(C)で生成したノードはいったんこのノードリストに格納し、あとでまとめて曲ツリーに登録する(D)。
-            List<Node> 一時ノードリスト = new List<Node>();
+            // 作成したノードはいったんこのノードリストに格納し、あとでまとめて曲ツリーに登録する。
+            var 追加ノードリスト = new List<Node>();
 
             var dirInfo = new DirectoryInfo( 基点フォルダパス.変数なしパス );
             var boxDefPath = new VariablePath( Path.Combine( 基点フォルダパス.変数なしパス, @"box.def" ) );
             var setDefPath = new VariablePath( Path.Combine( 基点フォルダパス.変数なしパス, @"set.def" ) );
             bool サブフォルダを検索する = true;
 
-            if( boxDefファイル有効 && File.Exists( boxDefPath.変数なしパス ) )
+            if( BoxDefが有効 && File.Exists( boxDefPath.変数なしパス ) )
             {
                 #region " (A) このフォルダに box.def がある → BOXノードを作成し、子ノードリストを作成する。"
                 //----------------
                 try
                 {
-                    // BOXノードを作成。
-                    var boxNode = new BoxNode( boxDefPath, null );
-                    一時ノードリスト.Add( boxNode );
-
-                    // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
-                    boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
-                    boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
+                    // box.defを読み込んでBOXノードを作成する。
+                    var boxNode = new BoxNode( boxDefPath );
+                    boxNode.子ノードリスト.Add( new BackNode( boxNode ) );         // 戻る
+                    boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) ); // RandomSelect
+                    追加ノードリスト.Add( boxNode );
 
                     // box.defを無効にして、このフォルダを対象として、再度構築する。
                     // 構築結果のノードリストは、BOXノードの子として付与される。
-                    this._構築する( boxNode, 基点フォルダパス, boxDefファイル有効: false );
+                    this._曲ツリーを構築する( 基点フォルダパス, boxNode, songdb, BoxDefが有効: false );
 
                     // box.def があった場合、サブフォルダは検索しない。
                     サブフォルダを検索する = false;
@@ -386,13 +344,16 @@ namespace DTXMania
                     // set.def を読み込む。
                     var setDef = SetDef.復元する( setDefPath );
 
-                    // set.def 内のすべてのブロックについて……
+                    // set.def 内のすべてのブロックについて、SetNodeを作成する。
                     foreach( var block in setDef.Blocks )
                     {
-                        // Setノードを作成し、追加。
-                        var setNode = new SetNode( block, 基点フォルダパス, null );
+                        // １つのブロックにつき１つの SetNode を作成する。
+                        var setNode = new SetNode( block, 基点フォルダパス, songdb );
+
                         if( 0 < setNode.子ノードリスト.Count ) // L1～L5のいずれかが有効であるときのみ登録する。
-                            一時ノードリスト.Add( setNode );
+                            追加ノードリスト.Add( setNode );
+                        else
+                            setNode?.Dispose();
                     }
 
                     // set.def があった場合、サブフォルダは検索しない。
@@ -419,9 +380,9 @@ namespace DTXMania
                     var vpath = new VariablePath( fileInfo.FullName );
                     try
                     {
-                        // Musicノードを作成し、追加。
-                        var music = new MusicNode( vpath, null );
-                        一時ノードリスト.Add( music );
+                        // MusicNodeを作成し、追加する。
+                        var music = new MusicNode( vpath, songdb );
+                        追加ノードリスト.Add( music );
                     }
                     catch
                     {
@@ -437,7 +398,7 @@ namespace DTXMania
 
             #region " (D) 作成したノードリストを親ノードの子として追加する。"
             //----------------
-            foreach( var item in 一時ノードリスト )
+            foreach( var item in 追加ノードリスト )
             {
                 item.親ノード = 親ノード;
                 親ノード.子ノードリスト.Add( item );
@@ -447,47 +408,36 @@ namespace DTXMania
 
             if( サブフォルダを検索する )
             {
-                // (E) このフォルダ内のサブフォルダについて……
+                #region " (E) サブフォルダを検索する。"
+                //----------------
                 foreach( var dir in dirInfo.GetDirectories() )
                 {
                     if( dir.Name.StartsWith( "DTXFiles.", StringComparison.OrdinalIgnoreCase ) )
                     {
-                        #region " (E-a) サブフォルダがBOXである(1) → BOXノードを追加し、検索キューに検索予約を投入する。"
+                        #region " (E-a) サブフォルダがBOXである → BOXノードを追加し、サブフォルダを再帰検索する。"
                         //----------------
-                        // BOXノードを作成し、ツリーに登録。
+                        // BOXノードを作成し、ツリーに登録する。
                         var boxNode = new BoxNode( dir.Name.Substring( 9 ), 親ノード );
+                        boxNode.子ノードリスト.Add( new BackNode( boxNode ) );         // 戻る
+                        boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) ); // RandomSelect
                         親ノード.子ノードリスト.Add( boxNode );
 
-                        // BOXノード内に "戻る", "RANDOM SELECT" ノードを追加。
-                        boxNode.子ノードリスト.Add( new BackNode( boxNode ) );
-                        boxNode.子ノードリスト.Add( new RandomSelectNode( boxNode ) );
-
-                        // BOXノードを親として、検索予約をキューに投入。
-                        this._検索フォルダキュー.Enqueue( (boxNode, dir.FullName) );
-                        this._検索フォルダキュー投入通知.Set();
-                        //----------------
-                        #endregion
-                    }
-                    else if( File.Exists( Path.Combine( dir.FullName, @"box.def" ) ) )
-                    {
-                        #region " (E-b) サブフォルダがBOXである(2) → 検索キューに検索予約を投入する。"
-                        //----------------
-                        // 同じノードを親として、検索予約をキューに投入。
-                        this._検索フォルダキュー.Enqueue( (親ノード, dir.FullName) );
-                        this._検索フォルダキュー投入通知.Set();
+                        // BOXノードを親として、サブフォルダを検索する。
+                        this._曲ツリーを構築する( dir.FullName, boxNode, songdb );
                         //----------------
                         #endregion
                     }
                     else
                     {
-                        #region " (E-c) サブフォルダの内容をこのノードリストに追加する。"
+                        #region " (E-c) それ以外 → サブフォルダの内容を同じ親ノードに追加する。"
                         //----------------
-                        // 同じノードを親として構築を続行。
-                        this._構築する( 親ノード, dir.FullName );
+                        this._曲ツリーを構築する( dir.FullName, 親ノード, songdb );
                         //----------------
                         #endregion
                     }
                 }
+                //----------------
+                #endregion
             }
         }
 
@@ -499,13 +449,56 @@ namespace DTXMania
             親ノード.子ノードリスト.Add( new RandomSelectNode( 親ノード ) );
         }
 
-
-        private ConcurrentQueue<(Node parent, VariablePath path)> _検索フォルダキュー = new ConcurrentQueue<(Node parent, VariablePath path)>();
-
-        private AutoResetEvent _検索フォルダキュー投入通知 = new AutoResetEvent( false );    // キューに格納した際には必ず Set すること。
-
-        private Task _構築タスク = null;
-
         private string[] _対応する拡張子 = { ".sstf", ".dtx", ".gda", ".g2d", "bms", "bme" };
+
+
+        // 曲ツリーの現行化
+
+
+        public Task 現行化タスク { get; protected set; } = null;
+
+        public CancellationTokenSource 現行化タスクキャンセル通知 { get; protected set; } = new CancellationTokenSource();
+
+        public async void 曲ツリーを現行化するAsync()
+        {
+            this.現行化タスク = Task.Run( () => {
+
+                Log.現在のスレッドに名前をつける( "現行化" );
+                Log.Info( "曲ツリーの現行化を開始します。" );
+
+                // すべてのMusicNodeを現行化する。
+                foreach( var node in this.ルートノード.Traverse() )
+                {
+                    if( node is MusicNode music && music.現行化未実施 )
+                        music.現行化する();
+
+                    if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                    {
+                        Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
+                        break;
+                    }
+                }
+
+                Log.Info( "曲ツリーの現行化を終了します。" );
+
+            }, this.現行化タスクキャンセル通知.Token );
+
+            await this.現行化タスク;
+        }
+
+        public void 曲ツリーの現行化をキャンセルする()
+        {
+            if( null != this.現行化タスク && !this.現行化タスク.IsCompleted )
+            {
+                Log.Info( "曲ツリーの現行化タスクをキャンセルします。" );
+
+                this.現行化タスクキャンセル通知.Cancel();
+
+                if( !this.現行化タスク.Wait( 5000 ) )
+                    Log.ERROR( "曲ツリーの現行化タスクのキャンセルがタイムアウトしました。" );
+                else
+                    Log.Info( "曲ツリーの現行化タスクをキャンセルしました。" );
+            }
+        }
     }
 }
