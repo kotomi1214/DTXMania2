@@ -38,7 +38,7 @@ namespace FDK
                     break;
 
                 default:
-                    Log.WARNING( "未定義のメッセージが指定されました。" );
+                    //Log.WARNING( "未定義のメッセージが指定されました。" );
                     break;
             }
         }

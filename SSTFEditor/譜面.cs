@@ -51,6 +51,7 @@ namespace SSTFEditor
             { チップ種別.小節線,             編集レーン種別.Unknown },
             { チップ種別.拍線,               編集レーン種別.Unknown },
             { チップ種別.小節の先頭,         編集レーン種別.Unknown },
+            { チップ種別.小節メモ,           編集レーン種別.Unknown },
             { チップ種別.SE1,                編集レーン種別.Unknown },
             { チップ種別.SE2,                編集レーン種別.Unknown },
             { チップ種別.SE3,                編集レーン種別.Unknown },

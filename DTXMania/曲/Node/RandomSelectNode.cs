@@ -17,15 +17,9 @@ namespace DTXMania
         public Node 選択曲 { get; protected set; }
 
 
-        public RandomSelectNode()
+        public RandomSelectNode( Node 親ノード = null )
         {
             this.タイトル = "< RANDOM SELECT >";
-            this.親ノード = null;
-        }
-
-        public RandomSelectNode( Node 親ノード )
-            : this()
-        {
             this.親ノード = 親ノード;
         }
 

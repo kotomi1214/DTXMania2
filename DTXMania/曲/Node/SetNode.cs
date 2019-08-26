@@ -101,10 +101,6 @@ namespace DTXMania
                 // (3) 現在のフォーカス難易度に一番近い MusicNode のノード画像が有効ならそれを返す。
                 return this.MusicNodes[ this.ユーザ希望難易度に最も近い難易度レベルを返す( App進行描画.曲ツリー.ユーザ希望難易度 ) ].ノード画像;
             }
-            set
-            {
-                this._SetNode自身のノード画像 = value;
-            }
         }
 
         public override string プレビュー音声ファイルの絶対パス
@@ -120,56 +116,55 @@ namespace DTXMania
         /// <summary>
         ///     指定された <see cref="SetDef.Block"/> をもとに、初期化する。
         /// </summary>
-        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, Node 親ノード )
+        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, SongDB songdb, Node 親ノード = null )
         {
             this.タイトル = block.Title;
             this.親ノード = 親ノード;
 
-            using( var songdb = new SongDB() )
+            for( int i = 0; i < this.MusicNodes.Length; i++ )
             {
-                for( int i = 0; i < 5; i++ )
+                this.MusicNodes[ i ] = null;
+
+                if( block.File[ i ].Nullでも空でもない() )
                 {
-                    this.MusicNodes[ i ] = null;
+                    var 曲ファイルパス = new VariablePath( Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] ) );
 
-                    if( block.File[ i ].Nullでも空でもない() )
+                    if( File.Exists( 曲ファイルパス.変数なしパス ) )
                     {
-                        VariablePath 曲のパス = Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] );
-
-                        if( File.Exists( 曲のパス.変数なしパス ) )
+                        try
                         {
-                            try
-                            {
-                                this.MusicNodes[ i ] = new MusicNode( Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] ), this );
-                                this.MusicNodes[ i ].難易度ラベル = block.Label[ i ];
-                                this.子ノードリスト.Add( this.MusicNodes[ i ] );
-
-                                var song = songdb.Songs.Where( ( r ) => ( r.Path == this.MusicNodes[ i ].曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
-                                this.MusicNodes[ i ].難易度 = ( null != song ) ? (float) song.Level : 0.00f;
-                            }
-                            catch
-                            {
-                                Log.ERROR( "SetNode 内での MusicNode の生成に失敗しました。" );
-                            }
+                            this.MusicNodes[ i ] = new MusicNode( Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] ), songdb, this );
+                            this.MusicNodes[ i ].難易度ラベル = block.Label[ i ];
+                            this.MusicNodes[ i ].難易度 = 0.00f;   // 仮置き
+                            this.子ノードリスト.Add( this.MusicNodes[ i ] );
                         }
-                        else
+                        catch
                         {
-                            Log.ERROR( $"set.def 内に指定されたファイルが存在しません。無視します。[{曲のパス.変数付きパス}] " );
+                            Log.ERROR( "SetNode 内での MusicNode の生成に失敗しました。" );
                         }
+                    }
+                    else
+                    {
+                        Log.ERROR( $"set.def 内に指定されたファイルが存在しません。無視します。[{曲ファイルパス.変数付きパス}] " );
                     }
                 }
             }
 
+            #region " set.def自身のノード画像は廃止 "
+            //----------------
             // 基点フォルダパス（set.def ファイルと同じ場所）に画像ファイルがあるなら、それをノード画像として採用する。
-            var サムネイル画像ファイルパス =
-                ( from ファイル名 in Directory.GetFiles( 基点フォルダパス.変数なしパス )
-                  where _対応するサムネイル画像名.Any( thumbファイル名 => ( Path.GetFileName( ファイル名 ).ToLower() == thumbファイル名 ) )
-                  select ファイル名 ).FirstOrDefault();
-
-            this._SetNode自身のノード画像 = ( null != サムネイル画像ファイルパス ) ? new テクスチャ( サムネイル画像ファイルパス ) : null;  // ないなら null
+            //var サムネイル画像ファイルパス =
+            //    ( from ファイル名 in Directory.GetFiles( 基点フォルダパス.変数なしパス )
+            //      where _対応するサムネイル画像名.Any( thumbファイル名 => ( Path.GetFileName( ファイル名 ).ToLower() == thumbファイル名 ) )
+            //      select ファイル名 ).FirstOrDefault();
+            //this._SetNode自身のノード画像 = ( null != サムネイル画像ファイルパス ) ? new テクスチャ( サムネイル画像ファイルパス ) : null;  // ないなら null
+            //----------------
+            #endregion
         }
 
         public override void Dispose()
         {
+            // MusicNodes[] は 子ノードリスト に登録してあるので、以下で一緒に解放される。
             base.Dispose();
         }
 

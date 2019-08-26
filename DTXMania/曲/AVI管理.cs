@@ -32,7 +32,7 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._一時停止中の動画のリスト = null;
+                this._一時停止中の動画のリスト = null;  // Disposeしない
 
                 foreach( var kvp in this._動画リスト )
                     kvp.Value.Dispose();
