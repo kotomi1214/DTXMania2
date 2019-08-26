@@ -66,11 +66,6 @@ namespace DTXMania
         public SelectableList<Node> 子ノードリスト { get; } = new SelectableList<Node>();
 
         /// <summary>
-        ///     <see cref="子ノードリスト"/> にアクセスするときはこれをlockすること。
-        /// </summary>
-        public readonly object 子ノードリスト排他 = new object();
-
-        /// <summary>
         ///		このノードの１つ前に位置する兄弟ノードを示す。
         /// </summary>
         /// <remarks>
@@ -80,18 +75,15 @@ namespace DTXMania
         {
             get
             {
-                lock( this.親ノード.子ノードリスト排他 )
-                {
-                    var index = this.親ノード.子ノードリスト.IndexOf( this );
-                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+                var index = this.親ノード.子ノードリスト.IndexOf( this );
+                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
 
-                    index = index - 1;
+                index--;
 
-                    if( 0 > index )
-                        index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
+                if( 0 > index )
+                    index = this.親ノード.子ノードリスト.Count - 1;    // 先頭なら、末尾へ。
 
-                    return this.親ノード.子ノードリスト[ index ];
-                }
+                return this.親ノード.子ノードリスト[ index ];
             }
         }
 
@@ -105,17 +97,45 @@ namespace DTXMania
         {
             get
             {
-                lock( this.親ノード.子ノードリスト排他 )
+                var index = this.親ノード.子ノードリスト.IndexOf( this );
+                Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
+
+                index++;
+
+                if( this.親ノード.子ノードリスト.Count <= index )
+                    index = 0;      // 末尾なら、先頭へ。
+
+                return this.親ノード.子ノードリスト[ index ];
+            }
+        }
+
+        /// <summary>
+        ///     自分と子孫を直列に列挙する。
+        /// </summary>
+        public IEnumerable<Node> Traverse()
+        {
+            yield return this;
+
+            // (A) 深さ優先
+            //foreach( var child in this.子ノードリスト )
+            //{
+            //    foreach( var n in child.Traverse() )
+            //    {
+            //        yield return n;
+            //    }
+            //}
+
+            // (B) 幅優先
+            foreach( var child in this.子ノードリスト )
+            {
+                yield return child;
+            }
+            foreach( var child in this.子ノードリスト )
+            {
+                foreach( var n in child.Traverse() )
                 {
-                    var index = this.親ノード.子ノードリスト.IndexOf( this );
-                    Trace.Assert( ( 0 <= index ), "[バグあり] 自分が、自分の親の子ノードリストに存在していません。" );
-
-                    index = index + 1;
-
-                    if( this.親ノード.子ノードリスト.Count <= index )
-                        index = 0;      // 末尾なら、先頭へ。
-
-                    return this.親ノード.子ノードリスト[ index ];
+                    if( n != child )
+                        yield return n;
                 }
             }
         }
@@ -126,31 +146,7 @@ namespace DTXMania
 
 
         /// <summary>
-        ///		ノードの全体サイズ（設計単位）。
-        ///		すべてのノードで同一、固定値。
-        /// </summary>
-        public static Size2F 全体サイズ => new Size2F( 314f, 220f );
-
-        /// <summary>
-        ///		ノードを表す画像の既定画像。
-        /// </summary>
-        /// <remarks>
-        ///		初回アクセス時に生成される。
-        /// </remarks>
-        public static テクスチャ 既定のノード画像
-        {
-            get
-            {
-                if( null == _既定のノード画像 )
-                    _既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
-
-                return _既定のノード画像;
-            }
-        }
-
-        /// <summary>
         ///		ノードを表す画像。
-        ///		null にすると、既定のノード画像が使用される。
         /// </summary>
         /// <remarks>
         ///		派生クラスで、適切な画像を割り当てること。（このクラスでは、生成も Dispose もしない。）
@@ -159,6 +155,21 @@ namespace DTXMania
         /// </remarks>
         public virtual テクスチャ ノード画像 { get; set; }
 
+        /// <summary>
+        ///		ノードの全体サイズ（設計単位）。
+        ///		すべてのノードで同一、固定値。
+        /// </summary>
+        public static Size2F 全体サイズ => new Size2F( 314f, 220f );
+
+        /// <summary>
+        ///		ノードを表す画像の既定画像。
+        /// </summary>
+        public static テクスチャ 既定のノード画像 { get; private set; }
+
+        /// <summary>
+        ///		現行化前のノードを表す画像の既定画像。
+        /// </summary>
+        public static テクスチャ 現行化前のノード画像 { get; private set; }
 
 
         // プレビュー音声関連
@@ -176,7 +187,7 @@ namespace DTXMania
             this._プレビュー音声.停止する();
         }
 
-        private PreviewSound _プレビュー音声;  // null なら未使用
+        private Node.PreviewSound _プレビュー音声;  // null なら未使用
 
 
 
@@ -185,16 +196,31 @@ namespace DTXMania
 
         public Node()
         {
-            this._曲名テクスチャ = new 曲名();
+            this._曲名テクスチャ = new TitleTexture();
             this._プレビュー音声 = new PreviewSound();
+
+            if( 0 == _インスタンス数++ )
+            {
+                既定のノード画像 = new テクスチャ( @"$(System)images\既定のプレビュー画像.png" );
+                現行化前のノード画像 = new テクスチャ( @"$(System)images\現行化待ちのプレビュー画像.png" );
+            }
         }
 
         public virtual void Dispose()
         {
-            //Node._既定のノード画像?.Dispose();     --> めんどくさいので破棄はしない。
             //this.ノード画像?.Dispose();            --> 生成も解放も派生クラスに任せる。
+
             this._曲名テクスチャ?.Dispose();
             this._プレビュー音声?.Dispose();
+
+            if( 0 == --_インスタンス数 )
+            {
+                既定のノード画像?.Dispose();
+                現行化前のノード画像?.Dispose();
+            }
+
+            foreach( var child in this.子ノードリスト )
+                child.Dispose();
         }
 
 
@@ -233,16 +259,10 @@ namespace DTXMania
         // private
 
 
-        protected 曲名 _曲名テクスチャ = null;
-
+        protected Node.TitleTexture _曲名テクスチャ = null;
 
         private float _難易度 = 0.0f;
 
-
-
-        // private (static) 
-
-
-        private static テクスチャ _既定のノード画像 = null;
+        private static int _インスタンス数 = 0;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
@@ -138,18 +139,15 @@ namespace DTXMania.選曲
             if( null == 描画するノード )
                 return;
 
-            lock( 描画するノード.子ノードリスト排他 )   // リスト描画中は lock
-            {
-                // 表示する最上行のノードまで戻る。
-                for( int i = 0; i < this._カーソル位置; i++ )
-                    描画するノード = 描画するノード.前のノード;
+            // 表示する最上行のノードまで戻る。
+            for( int i = 0; i < this._カーソル位置; i++ )
+                描画するノード = 描画するノード.前のノード;
 
-                // 10行描画。
-                for( int i = 0; i < 10; i++ )
-                {
-                    this._ノードを描画する( dc, i, 描画するノード );
-                    描画するノード = 描画するノード.次のノード;
-                }
+            // 10行描画。
+            for( int i = 0; i < 10; i++ )
+            {
+                this._ノードを描画する( dc, i, 描画するノード );
+                描画するノード = 描画するノード.次のノード;
             }
         }
 
@@ -163,6 +161,15 @@ namespace DTXMania.選曲
             Debug.Assert( 0 <= 行番号 && 9 >= 行番号 );
             Debug.Assert( null != ノード );
             Debug.Assert( ( ノード as RootNode ) is null );
+
+            // MusicNode については、現行化中であれば終了するまで待つ。
+            if( ノード is MusicNode music )
+            {
+                lock( music.現行化処理の排他 )
+                {
+                    // 取得できたらOK
+                }
+            }
 
             var ノード画像 = ノード.ノード画像 ?? Node.既定のノード画像;
             bool 選択ノードである = ( 4 == 行番号 );
@@ -449,7 +456,7 @@ namespace DTXMania.選曲
 
         public void 難易度アンカをひとつ増やす()
         {
-            App進行描画.曲ツリー.難易度アンカをひとつ増やす();
+            App進行描画.曲ツリー.ユーザ希望難易度をひとつ増やす();
         }
 
 

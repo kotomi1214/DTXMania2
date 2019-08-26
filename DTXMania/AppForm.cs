@@ -72,12 +72,17 @@ namespace DTXMania
 
         protected override void OnClosing( CancelEventArgs e )
         {
+            App進行描画.曲ツリー?.曲ツリーの現行化をキャンセルする();
+
             if( AppForm.ビュアーモードである )
             {
                 // 今回の位置とサイズを保存する。
-                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location.ToSharpDXPoint();
-                DTXMania.App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize.ToSharpDXSize2();
-                DTXMania.App進行描画.システム設定.保存する();
+                if( null != App進行描画.システム設定 )
+                {
+                    App進行描画.システム設定.ビュアーモード時のウィンドウ表示位置 = this.Location.ToSharpDXPoint();
+                    App進行描画.システム設定.ビュアーモード時のウィンドウサイズ = this.ClientSize.ToSharpDXSize2();
+                    App進行描画.システム設定.保存する();
+                }
             }
 
             base.OnClosing( e );

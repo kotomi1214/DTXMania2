@@ -19,7 +19,7 @@ namespace DTXMania
         /// <summary>
         ///		box.def ファイルからBOXノードを生成する。
         /// </summary>
-        public BoxNode( VariablePath BOX定義ファイルパス, Node 親ノード )
+        public BoxNode( VariablePath BOX定義ファイルパス, Node 親ノード = null )
             : this()
         {
             var box = BoxDef.復元する( BOX定義ファイルパス );
@@ -34,7 +34,7 @@ namespace DTXMania
         /// <remarks>
         ///		「DTXFiles.」で始まるBOXフォルダの場合はこちらで初期化。
         /// </remarks>
-        public BoxNode( string BOX名, Node 親ノード )
+        public BoxNode( string BOX名, Node 親ノード = null )
             : this()
         {
             this.タイトル = BOX名;

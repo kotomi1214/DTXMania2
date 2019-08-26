@@ -184,6 +184,7 @@
     <Compile Include="ステージ\03認証\ユーザリスト.cs" />
     <Compile Include="ステージ\03認証\認証ステージ.cs" />
     <Compile Include="ステージ\04選曲\BPMパネル.cs" />
+    <Compile Include="ステージ\04選曲\UpdatingSoglistパネル.cs" />
     <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
     <Compile Include="ステージ\04選曲\曲リスト.cs" />
     <Compile Include="ステージ\04選曲\曲別SKILL.cs" />
@@ -318,7 +319,7 @@
     <Compile Include="設定\システム設定\old\システム設定02.cs" />
     <Compile Include="設定\成績.cs" />
     <Compile Include="曲\曲DB.cs" />
-    <Compile Include="曲\曲名.cs" />
+    <Compile Include="曲\Node\Node.TitleTexture.cs" />
     <Compile Include="設定\ドラムサウンド.cs" />
     <Compile Include="設定\ユーザ管理.cs" />
     <Compile Include="設定\ユーザ設定.cs" />
@@ -918,6 +919,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="System\Sounds\Drums\Tom3Rim.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\現行化待ちのプレビュー画像.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\選曲\Updating songlist.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
