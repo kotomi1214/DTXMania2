@@ -48,6 +48,23 @@ namespace DTXMania
         }
 
         /// <summary>
+        ///     現在選択されているノードのインデックス番号（0～）を返す。
+        /// </summary>
+        public int フォーカスノードのインデックス
+        {
+            get
+            {
+                if( null == this.フォーカスリスト )
+                    return 0;    // 未設定。
+
+                if( 0 > this.フォーカスリスト.SelectedIndex )
+                    return 0;    // リストが空。
+
+                return this.フォーカスリスト.SelectedIndex;
+            }
+        }
+
+        /// <summary>
         ///	    <see cref="フォーカスノード"/> が存在するノードリスト。
         ///	    変更するには、変更先のリスト内の任意のノードを選択すること。
         /// </summary>
