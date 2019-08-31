@@ -251,18 +251,9 @@ namespace DTXMania.演奏
 
                 // 表示中央位置は、レーンごとに固定。
 
-                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.BASIC )
-                {
-                    this.表示中央位置dpx = new Vector2(
-                        BASIC.レーンフレーム.領域.Left + BASIC.レーンフレーム.現在のレーン配置.表示レーンの左端位置dpx[ lane ] + BASIC.レーンフレーム.現在のレーン配置.表示レーンの幅dpx[ lane ] / 2f,
-                        演奏ステージ.ヒット判定位置Ydpx );
-                }
-                if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏モード == PlayMode.EXPERT )
-                {
-                    this.表示中央位置dpx = new Vector2(
-                        EXPERT.レーンフレーム.レーン中央位置X[ lane ],
-                        演奏ステージ.ヒット判定位置Ydpx );
-                }
+                this.表示中央位置dpx = new Vector2(
+                    レーンフレーム.レーン中央位置X[ lane ],
+                    演奏ステージ.ヒット判定位置Ydpx );
             }
             public void Dispose()
             {

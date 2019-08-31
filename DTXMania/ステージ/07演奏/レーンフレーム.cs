@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania.演奏.EXPERT
+namespace DTXMania.演奏
 {
     /// <summary>
     ///		チップの背景であり、レーン全体を示すフレーム画像。

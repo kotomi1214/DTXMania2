@@ -8,7 +8,7 @@ using SSTFormat.v4;
 using FDK;
 using DTXMania.演奏;
 
-namespace DTXMania.演奏.EXPERT
+namespace DTXMania.演奏
 {
     class ドラムチップ : IDisposable
     {
@@ -20,9 +20,9 @@ namespace DTXMania.演奏.EXPERT
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._ドラムチップ画像 = new テクスチャ( @"$(System)images\演奏\ドラムチップEXPERT.png" );
+                this._ドラムチップ画像 = new テクスチャ( @"$(System)images\演奏\ドラムチップ.png" );
 
-                var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\ドラムチップEXPERT.yaml" );
+                var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\ドラムチップ.yaml" );
 
                 var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
                 var deserializer = new YamlDotNet.Serialization.Deserializer();

@@ -142,6 +142,7 @@ namespace DTXMania
         /// <summary>
         ///		演奏モード。
         ///		0: Basic, 1: Expert
+        ///     Release 048 より Basic 廃止のため 1 で固定化。
         /// </summary>
         [Column( DbType = "INT", CanBeNull = false )]
         public int PlayMode { get; set; }
@@ -262,7 +263,7 @@ namespace DTXMania
             this.MaxRange_Good = 0.084;
             this.MaxRange_Ok = 0.117;
             this.CymbalFree = 1;
-            this.PlayMode = 0;
+            this.PlayMode = 1;
             this.RideLeft = 0;
             this.ChinaLeft = 0;
             this.SplashLeft = 1;
