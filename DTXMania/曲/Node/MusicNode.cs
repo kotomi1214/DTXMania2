@@ -116,7 +116,7 @@ namespace DTXMania
             base.Dispose();
         }
 
-        public void 現行化する()
+        public void 現行化する( SongDB songdb )
         {
             if( this.現行化済み || AppForm.ビュアーモードである )
                 return;
@@ -125,34 +125,31 @@ namespace DTXMania
             {
                 this.現行化済み = true;  // 先に設定
 
-                using( var songdb = new SongDB() )
+                // SongDB へ反映（新規追加 or 更新）する。
+                _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
+
+                // そのSongDBレコードを取得。
+                var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+
+                if( null != song )
                 {
-                    // SongDB へ反映（新規追加 or 更新）する。
-                    _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
+                    // 情報を更新する。
+                    this.タイトル = song.Title;
+                    this.サブタイトル = song.Artist;
+                    this.難易度 = (float) song.Level;
+                    this.BGMAdjust = song.BGMAdjust;
 
-                    // そのSongDBレコードを取得。
-                    var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+                    // ノード画像（プレビュー画像）を生成する。
+                    this.ノード画像 = ( song.PreImage.Nullでも空でもない() ) ?
+                        new テクスチャ( Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage ) ) : null;
 
-                    if( null != song )
-                    {
-                        // 情報を更新する。
-                        this.タイトル = song.Title;
-                        this.サブタイトル = song.Artist;
-                        this.難易度 = (float) song.Level;
-                        this.BGMAdjust = song.BGMAdjust;
-
-                        // ノード画像（プレビュー画像）を生成する。
-                        this.ノード画像 = ( song.PreImage.Nullでも空でもない() ) ?
-                            new テクスチャ( Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage ) ) : null;
-
-                        // プレビューサウンドはパスだけ取得しておく。（生成は再生直前に行う。）
-                        if( song.PreSound.Nullでも空でもない() )
-                            this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
-                    }
-                    else
-                    {
-                        Log.ERROR( $"SongDBに曲レコードが存在していません。" );
-                    }
+                    // プレビューサウンドはパスだけ取得しておく。（生成は再生直前に行う。）
+                    if( song.PreSound.Nullでも空でもない() )
+                        this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+                }
+                else
+                {
+                    Log.ERROR( $"SongDBに曲レコードが存在していません。" );
                 }
             }
         }

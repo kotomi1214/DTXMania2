@@ -490,21 +490,24 @@ namespace DTXMania
                 Log.現在のスレッドに名前をつける( "現行化" );
                 Log.Info( "曲ツリーの現行化を開始します。" );
 
-                // すべてのMusicNodeを現行化する。
-                foreach( var node in this.ルートノード.Traverse() )
+                using( var songdb = new SongDB() )
                 {
-                    if( node is MusicNode music && music.現行化未実施 )
-                        music.現行化する();
-
-                    // キャンセル？
-                    if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                    // すべてのMusicNodeを現行化する。
+                    foreach( var node in this.ルートノード.Traverse() )
                     {
-                        Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
-                        break;
-                    }
+                        if( node is MusicNode music && music.現行化未実施 )
+                            music.現行化する( songdb );
 
-                    // 一時停止？
-                    this.現行化タスクの一時停止.OFFになるまでブロックする();
+                        // キャンセル？
+                        if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                        {
+                            Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
+                            break;
+                        }
+
+                        // 一時停止？
+                        this.現行化タスクの一時停止.OFFになるまでブロックする();
+                    }
                 }
 
                 Log.Info( "曲ツリーの現行化を終了します。" );
