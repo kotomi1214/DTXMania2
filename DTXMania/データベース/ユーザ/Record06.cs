@@ -38,20 +38,20 @@ namespace DTXMania
 
         /// <summary>
         ///		カウントマップラインのデータ。
-        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.ステージ.演奏.カウントマップライン.カウントマップの最大要素数"/> 個の文字が並ぶ。
+        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.演奏.カウントマップライン.カウントマップの最大要素数"/> 個の文字が並ぶ。
         ///		もし不足分があれば、'0' とみなされる。
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false )]
         public string CountMap { get; set; }
 
         /// <summary>
-        ///		曲別SKILL。
+        ///		曲別SKILL。0～199.80。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
         public double Skill { get; set; }
 
         /// <summary>
-        ///		達成率。
+        ///		達成率[%]。0～100。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
         public double Achievement { get; set; }
