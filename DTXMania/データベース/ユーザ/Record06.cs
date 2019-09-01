@@ -38,7 +38,7 @@ namespace DTXMania
 
         /// <summary>
         ///		カウントマップラインのデータ。
-        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.演奏.カウントマップライン.カウントマップの最大要素数"/> 個の文字が並ぶ。
+        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.演奏.クリアメーター.カウントマップの最大要素数"/> 個の文字が並ぶ。
         ///		もし不足分があれば、'0' とみなされる。
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false )]

@@ -8,7 +8,12 @@ using FDK;
 
 namespace DTXMania.演奏
 {
-    class カウントマップライン : IDisposable
+    /// <summary>
+    ///     1曲を曲の長さによらず64等分し、それぞれの区間での成績を大雑把に示すメーター。
+    ///     区間内で Ok, Miss 判定を出さなかったら黄色、出したら青色で示される。
+    ///     この64等分された配列データをカウントマップと称する。
+    /// </summary>
+    class クリアメーター : IDisposable
     {
         /// <summary>
         ///		カウント値の配列。
@@ -33,7 +38,7 @@ namespace DTXMania.演奏
         // 生成と終了
 
 
-        public カウントマップライン()
+        public クリアメーター()
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
@@ -41,10 +46,10 @@ namespace DTXMania.演奏
                 for( int i = 0; i < this.カウントマップ.Length; i++ )
                     this.カウントマップ[ i ] = 0;
 
-                this._最後にカウント値を設定した位置 = 0f;
-                this._最後にカウント値を設定したときの成績 = new Dictionary<判定種別, int>();
+                this._前回の設定位置 = 0f;
+                this._前回設定したときの成績 = new Dictionary<判定種別, int>();
                 foreach( 判定種別 judge in Enum.GetValues( typeof( 判定種別 ) ) )
-                    this._最後にカウント値を設定したときの成績.Add( judge, 0 );
+                    this._前回設定したときの成績.Add( judge, 0 );
             }
         }
 
@@ -63,12 +68,12 @@ namespace DTXMania.演奏
         /// <summary>
         ///		初期化。
         /// </summary>
-        public void 過去最大のカウントマップを登録する( int[] カウントマップ )
+        public void 最高成績のカウントマップを登録する( int[] カウントマップ )
         {
             Debug.Assert( カウントマップの最大要素数 == カウントマップ.Length, "カウントマップの要素数が不正です。" );
 
-            this._過去最大のカウントマップ = new int[ カウントマップ.Length ];
-            カウントマップ.CopyTo( this._過去最大のカウントマップ, 0 );    // コピー
+            this._最高成績のカウントマップ = new int[ カウントマップ.Length ];
+            カウントマップ.CopyTo( this._最高成績のカウントマップ, 0 );    // コピー
         }
         
         /// <summary>
@@ -78,27 +83,40 @@ namespace DTXMania.演奏
         /// <param name="判定toヒット数">現在の位置における成績。</param>
         public void カウント値を設定する( float 現在位置, IReadOnlyDictionary<判定種別, int> 判定toヒット数 )
         {
-            // 成績の増加分を得る。
+            // 判定種別ごとに、前回からの成績の増加分を得る。
+
             var 増加値 = new Dictionary<判定種別, int>();
+
             foreach( 判定種別 judge in Enum.GetValues( typeof( 判定種別 ) ) )
-                増加値.Add( judge, 判定toヒット数[ judge ] - this._最後にカウント値を設定したときの成績[ judge ] );
+                増加値.Add( judge, 判定toヒット数[ judge ] - this._前回設定したときの成績[ judge ] );
 
-            // HACK: カウント値を算出する。
-            int カウント値 = ( 増加値[ 判定種別.MISS ] > 0 ) ? 1 : 12;      // 暫定式。
 
-            // 最後にカウント値を設定した位置 から 現在位置 までの期間に対応するすべてのカウント値に反映する。
-            int 開始 = (int) ( this._最後にカウント値を設定した位置 * カウントマップの最大要素数 );
-            int 終了 = (int) ( 現在位置 * カウントマップの最大要素数 );
+            // カウント値を算出する。
+
+            int カウント値 = ( 0 < 増加値[ 判定種別.OK ] || 0 < 増加値[ 判定種別.MISS ] ) ? 1 : 12;
+
+
+            // 前回の設定位置 から 現在位置 までの期間に対応するすべてのカウント値に反映する。
+
+            int 前回の位置 = (int) ( this._前回の設定位置 * カウントマップの最大要素数 );
+            int 今回の位置 = (int) ( 現在位置 * カウントマップの最大要素数 );
+
             if( 1.0f > 現在位置 )
             {
-                for( int i = 開始; i <= 終了; i++ )
-                    this.カウントマップ[ i ] = カウント値;
+                for( int i = 前回の位置; i <= 今回の位置; i++ )
+                {
+                    // 同一区間では、成績の悪いほう（カウント値の小さいほう）を優先する。
+                    this.カウントマップ[ i ] = ( 0 < this.カウントマップ[ i ] ) ? Math.Min( カウント値, this.カウントマップ[ i ] ) : カウント値;
+                }
             }
 
+
             // 位置と成績を保存。
-            this._最後にカウント値を設定した位置 = 現在位置;
+
+            this._前回の設定位置 = 現在位置;
+
             foreach( 判定種別 judge in Enum.GetValues( typeof( 判定種別 ) ) )
-                this._最後にカウント値を設定したときの成績[ judge ] = 判定toヒット数[ judge ];
+                this._前回設定したときの成績[ judge ] = 判定toヒット数[ judge ];
         }
 
 
@@ -120,7 +138,7 @@ namespace DTXMania.演奏
                     var 過去最高のライン全体の矩形 = new RectangleF( 1371f, 108f, 6f, 768f );
 
 
-                    // (1) 今回のカウントマップラインを描画する。
+                    // (1) 今回のクリアメータ―を描画する。
 
                     for( int i = 0; i < this.カウントマップ.Length; i++ )
                     {
@@ -133,18 +151,18 @@ namespace DTXMania.演奏
                     }
 
 
-                    // (2) 過去の最高カウントマップラインを描画する。
+                    // (2) 過去の最高成績のクリアメータ―を描画する。
 
-                    if( null != this._過去最大のカウントマップ )
+                    if( null != this._最高成績のカウントマップ )
                     {
-                        for( int i = 0; i < this._過去最大のカウントマップ.Length; i++ )
+                        for( int i = 0; i < this._最高成績のカウントマップ.Length; i++ )
                         {
-                            if( 0 == this._過去最大のカウントマップ[ i ] )
+                            if( 0 == this._最高成績のカウントマップ[ i ] )
                                 continue;
 
                             dc.FillRectangle(
                                 new RectangleF( 過去最高のライン全体の矩形.Left, 過去最高のライン全体の矩形.Bottom - 単位幅 * ( i + 1 ), 過去最高のライン全体の矩形.Width, 単位幅 ),
-                                ( 2 <= this._過去最大のカウントマップ[ i ] ) ? 黄色ブラシ : 水色ブラシ );
+                                ( 2 <= this._最高成績のカウントマップ[ i ] ) ? 黄色ブラシ : 水色ブラシ );
                         }
                     }
                 }
@@ -157,10 +175,10 @@ namespace DTXMania.演奏
         // private
 
 
-        private int[] _過去最大のカウントマップ = null;
+        private int[] _最高成績のカウントマップ = null;
 
-        private float _最後にカウント値を設定した位置 = 0f;
+        private float _前回の設定位置 = 0f;
 
-        private Dictionary<判定種別, int> _最後にカウント値を設定したときの成績 = null;
+        private Dictionary<判定種別, int> _前回設定したときの成績 = null;
     }
 }

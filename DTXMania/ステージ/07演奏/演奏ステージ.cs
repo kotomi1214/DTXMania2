@@ -82,7 +82,7 @@ namespace DTXMania.演奏
                 this._判定パラメータ表示 = new 判定パラメータ表示();
                 this._フェーズパネル = new フェーズパネル();
                 this._コンボ表示 = new コンボ表示();
-                this._カウントマップライン = new カウントマップライン();
+                this._クリアメーター = new クリアメーター();
                 this._スコア表示 = new スコア表示();
                 this._プレイヤー名表示 = new プレイヤー名表示();
                 this._譜面スクロール速度 = new 譜面スクロール速度( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
@@ -151,7 +151,7 @@ namespace DTXMania.演奏
                 this._判定パラメータ表示?.Dispose();
                 this._フェーズパネル?.Dispose();
                 this._コンボ表示?.Dispose();
-                this._カウントマップライン?.Dispose();
+                this._クリアメーター?.Dispose();
                 this._スコア表示?.Dispose();
                 this._プレイヤー名表示?.Dispose();
                 this._譜面スクロール速度?.Dispose();
@@ -175,8 +175,8 @@ namespace DTXMania.演奏
             this.成績 = new 成績();
             this.成績.スコアと設定を反映する( App進行描画.演奏スコア, App進行描画.ユーザ管理.ログオン中のユーザ );
 
-            this._カウントマップライン?.Dispose();
-            this._カウントマップライン = new カウントマップライン();
+            this._クリアメーター?.Dispose();
+            this._クリアメーター = new クリアメーター();
 
             this._描画開始チップ番号 = -1;
 
@@ -757,7 +757,7 @@ namespace DTXMania.演奏
                         this._背景画像.描画する( dc, 0f, 0f );
                         this._譜面スクロール速度.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
                         this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
-                        this._カウントマップライン.進行描画する( dc );
+                        this._クリアメーター.進行描画する( dc );
                         this._フェーズパネル.進行描画する( dc );
                         this._曲名パネル.描画する( dc );
 
@@ -864,8 +864,8 @@ namespace DTXMania.演奏
                         double 曲の長さsec = App進行描画.演奏スコア.チップリスト[ App進行描画.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
                         float 現在位置 = (float) ( 1.0 - ( 曲の長さsec - 演奏時刻sec ) / 曲の長さsec );
 
-                        this._カウントマップライン.カウント値を設定する( 現在位置, this.成績.判定toヒット数 );
-                        this._カウントマップライン.進行描画する( dc );
+                        this._クリアメーター.カウント値を設定する( 現在位置, this.成績.判定toヒット数 );
+                        this._クリアメーター.進行描画する( dc );
 
                         this._フェーズパネル.現在位置 = 現在位置;
                         this._フェーズパネル.進行描画する( dc );
@@ -939,7 +939,7 @@ namespace DTXMania.演奏
 
         private フェーズパネル _フェーズパネル = null;
 
-        private カウントマップライン _カウントマップライン = null;
+        private クリアメーター _クリアメーター = null;
 
         private 左サイドクリアパネル _左サイドクリアパネル = null;
 

@@ -221,7 +221,7 @@
     <Compile Include="ステージ\07演奏\レーンフラッシュ.cs" />
     <Compile Include="ステージ\07演奏\レーンフレーム.cs" />
     <Compile Include="ステージ\07演奏\エキサイトゲージ.cs" />
-    <Compile Include="ステージ\07演奏\カウントマップライン.cs" />
+    <Compile Include="ステージ\07演奏\クリアメータ―.cs" />
     <Compile Include="ステージ\07演奏\コンボ表示.cs" />
     <Compile Include="ステージ\07演奏\スコア表示.cs" />
     <Compile Include="ステージ\07演奏\チップの演奏状態.cs" />
