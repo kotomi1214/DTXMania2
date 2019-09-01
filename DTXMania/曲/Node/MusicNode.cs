@@ -39,6 +39,16 @@ namespace DTXMania
         /// </summary>
         public int BGMAdjust { get; set; } = 0;
 
+        /// <summary>
+        ///     これまでの最高達成率。0～100。
+        /// </summary>
+        public float 達成率 { get; set; } = 0f;
+
+        /// <summary>
+        ///     これまでの最高ランク。
+        /// </summary>
+        public ランク種別 ランク => 成績.ランクを算出する( this.達成率 );
+
 
 
         // 現行化ステータス
@@ -59,14 +69,14 @@ namespace DTXMania
         // 生成と終了
 
 
-        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb, Node 親ノード = null )
+        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, Node 親ノード = null )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
             this.ノード画像 = Node.現行化前のノード画像;
 
             // SongDB にレコードがある？
-            var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+            var song = songdb?.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
             if( null != song )
             {
                 // (A) あれば、情報を転写する。
@@ -76,6 +86,8 @@ namespace DTXMania
                 this.難易度ラベル = "FREE";   // 既定値。set.def 内の MusicNode であれば、指定ラベルに上書きすること。
                 this.曲ファイルハッシュ = song.HashId;
                 this.BGMAdjust = song.BGMAdjust;
+
+                // UserDB.Records にレコードがある？
             }
             else
             {
