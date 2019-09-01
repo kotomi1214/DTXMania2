@@ -41,6 +41,7 @@ namespace DTXMania.選曲
         {
             var 描画領域 = new RectangleF( 10f, 340f, 275f, 98f );
 
+            // スキル値は UserDB から取得する。
 
             if( App進行描画.曲ツリー.フォーカス曲ノード != this._現在表示しているノード )
             {
@@ -63,7 +64,6 @@ namespace DTXMania.選曲
                 //----------------
                 #endregion
             }
-
 
             if( this._スキル値文字列.Nullまたは空である() )
                 return;

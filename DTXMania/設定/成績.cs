@@ -220,32 +220,26 @@ namespace DTXMania
             //----------------
             #endregion
 
-            double 達成率0to100 = 0.0;
-
             #region " 達成率を更新する。"
             //----------------
-            {
-                達成率0to100 = 達成率を算出する(
-                    this.総ノーツ数,                          // Auto含む
-                    this._判定toヒット数[ 判定種別.PERFECT ], // Auto含む
-                    this._判定toヒット数[ 判定種別.GREAT ],   // Auto含む
-                    this.MaxCombo,                            // Auto含む
-                    オプション補正0to1 );
-
-                this.Achievement = (float) 達成率0to100;
-            }
+            this.Achievement = 達成率を算出する(
+                this.総ノーツ数,                          // Auto含む
+                this._判定toヒット数[ 判定種別.PERFECT ], // Auto含む
+                this._判定toヒット数[ 判定種別.GREAT ],   // Auto含む
+                this.MaxCombo,                            // Auto含む
+                オプション補正0to1 );
             //----------------
             #endregion
 
             #region " スキル値を更新する。"
             //----------------
-            this.Skill = (float) スキルを算出する( this._譜面レベル, 達成率0to100 );
+            this.Skill = スキルを算出する( this._譜面レベル, this.Achievement );
             //----------------
             #endregion
 
             #region " ランクを更新する。"
             //----------------
-            this.ランク = ランクを算出する( 達成率0to100 );
+            this.ランク = ランクを算出する( this.Achievement );
             //----------------
             #endregion
         }

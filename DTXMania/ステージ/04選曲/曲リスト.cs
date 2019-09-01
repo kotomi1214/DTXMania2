@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using SharpDX;
@@ -38,6 +39,19 @@ namespace DTXMania.選曲
 
                 this._ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
 
+                this._成績アイコン = new テクスチャ( @"$(System)images\選曲\成績アイコン_曲リスト用.png" );
+
+                var 設定ファイルパス = new VariablePath( @"$(System)images\選曲\成績アイコン_曲リスト用.yaml" );
+                var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
+                var deserializer = new YamlDotNet.Serialization.Deserializer();
+                var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+                this._成績アイコンの矩形リスト = new Dictionary<string, RectangleF>();
+                foreach( var kvp in yamlMap.矩形リスト )
+                {
+                    if( 4 == kvp.Value.Length )
+                        this._成績アイコンの矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                }
+
                 this._初めての進行描画 = true;
             }
         }
@@ -57,6 +71,8 @@ namespace DTXMania.選曲
                 this._選択ノードの表示オフセットのストーリーボード?.Abandon();
                 this._選択ノードの表示オフセットdpx?.Dispose();
                 this._選択ノードの表示オフセットのストーリーボード?.Dispose();
+
+                this._成績アイコン?.Dispose();
             }
         }
 
@@ -162,19 +178,23 @@ namespace DTXMania.選曲
             Debug.Assert( null != ノード );
             Debug.Assert( ( ノード as RootNode ) is null );
 
-            // MusicNode については、現行化中であれば終了するまで待つ。
+            #region " MusicNode については、現行化中であれば終了するまで待つ。"
+            //----------------
             if( ノード is MusicNode music )
             {
                 lock( music.現行化処理の排他 )
                 {
-                    // 取得できたらOK
+                    // 取得できたらOK。
+                    // 現行化は１度しか行われないので、ここで以下の処理のためにlockを維持する必要はない。
                 }
             }
+            //----------------
+            #endregion
 
             var ノード画像 = ノード.ノード画像 ?? Node.既定のノード画像;
             bool 選択ノードである = ( 4 == 行番号 );
-
             var 実数行番号 = 行番号 + ( this._曲リスト全体のY軸移動オフセット / 100f );
+
             var ノード左上dpx = new Vector3(
                 // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
                 this._曲リストの基準左上隅座標dpx.X + ( ( 選択ノードである ) ? (float) this._選択ノードの表示オフセットdpx.Value : 0f ),
@@ -316,6 +336,16 @@ namespace DTXMania.選曲
                     //----------------
                     #endregion
                 }
+            }
+            //----------------
+            #endregion
+
+            #region " 成績アイコン "
+            //----------------
+            if( ノード is MusicNode mnode )    // MusicNode 時のみ表示。
+            {
+                if( mnode.ランク.HasValue )
+                    this._成績アイコン.描画する( ノード左上dpx.X + 6f, ノード左上dpx.Y + 57f, 転送元矩形: this._成績アイコンの矩形リスト[ mnode.ランク.Value.ToString() ] );
             }
             //----------------
             #endregion
@@ -501,6 +531,10 @@ namespace DTXMania.選曲
 
         private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
 
+        private テクスチャ _成績アイコン = null;
+
+        private Dictionary<string, RectangleF> _成績アイコンの矩形リスト = null;
+
 
         private void _選択ノードのオフセットアニメをリセットする( Animation am )
         {
@@ -531,6 +565,11 @@ namespace DTXMania.選曲
             // (2) 選択曲のプレビュー音声を生成し、再生を始める。
 
             e.選択されたNode?.プレビュー音声を再生する();
+        }
+
+        private class YAMLマップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
     }
 }

@@ -302,15 +302,16 @@ namespace DTXMania
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                using( var userdb = new UserDB() )
                 using( var songdb = new SongDB() )
                 {
                     foreach( var path in 曲検索フォルダパスリスト )
-                        this._曲ツリーを構築する( path, this.ルートノード, songdb );
+                        this._曲ツリーを構築する( path, this.ルートノード, songdb, userdb );
                 }
             }
         }
 
-        private void _曲ツリーを構築する( VariablePath 基点フォルダパス, Node 親ノード, SongDB songdb, bool BoxDefが有効 = true )
+        private void _曲ツリーを構築する( VariablePath 基点フォルダパス, Node 親ノード, SongDB songdb, UserDB userdb, bool BoxDefが有効 = true )
         {
             if( !( Directory.Exists( 基点フォルダパス.変数なしパス ) ) )
             {
@@ -340,7 +341,7 @@ namespace DTXMania
 
                     // box.defを無効にして、このフォルダを対象として、再度構築する。
                     // 構築結果のノードリストは、BOXノードの子として付与される。
-                    this._曲ツリーを構築する( 基点フォルダパス, boxNode, songdb, BoxDefが有効: false );
+                    this._曲ツリーを構築する( 基点フォルダパス, boxNode, songdb, userdb, BoxDefが有効: false );
 
                     // box.def があった場合、サブフォルダは検索しない。
                     サブフォルダを検索する = false;
@@ -365,7 +366,7 @@ namespace DTXMania
                     foreach( var block in setDef.Blocks )
                     {
                         // １つのブロックにつき１つの SetNode を作成する。
-                        var setNode = new SetNode( block, 基点フォルダパス, songdb );
+                        var setNode = new SetNode( block, 基点フォルダパス, songdb, userdb );
 
                         if( 0 < setNode.子ノードリスト.Count ) // L1～L5のいずれかが有効であるときのみ登録する。
                             追加ノードリスト.Add( setNode );
@@ -398,7 +399,7 @@ namespace DTXMania
                     try
                     {
                         // MusicNodeを作成し、追加する。
-                        var music = new MusicNode( vpath, songdb );
+                        var music = new MusicNode( vpath, songdb, userdb );
                         追加ノードリスト.Add( music );
                     }
                     catch
@@ -440,7 +441,7 @@ namespace DTXMania
                         親ノード.子ノードリスト.Add( boxNode );
 
                         // BOXノードを親として、サブフォルダを検索する。
-                        this._曲ツリーを構築する( dir.FullName, boxNode, songdb );
+                        this._曲ツリーを構築する( dir.FullName, boxNode, songdb, userdb );
                         //----------------
                         #endregion
                     }
@@ -448,7 +449,7 @@ namespace DTXMania
                     {
                         #region " (E-c) それ以外 → サブフォルダの内容を同じ親ノードに追加する。"
                         //----------------
-                        this._曲ツリーを構築する( dir.FullName, 親ノード, songdb );
+                        this._曲ツリーを構築する( dir.FullName, 親ノード, songdb, userdb );
                         //----------------
                         #endregion
                     }

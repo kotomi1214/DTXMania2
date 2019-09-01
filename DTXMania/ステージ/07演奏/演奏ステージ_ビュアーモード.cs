@@ -657,7 +657,7 @@ namespace DTXMania.演奏
             this._演奏状態を終了する();
 
             App進行描画.ビュアー用曲ノード?.Dispose();
-            App進行描画.ビュアー用曲ノード = new MusicNode( msg.path, null );
+            App進行描画.ビュアー用曲ノード = new MusicNode( msg.path );
             App進行描画.演奏スコア = this._スコアを読み込む();
 
             if( null == App進行描画.演奏スコア )

@@ -39,15 +39,22 @@ namespace DTXMania
         /// </summary>
         public int BGMAdjust { get; set; } = 0;
 
+
+
+        // プロパティ（最高成績）
+
+
         /// <summary>
         ///     これまでの最高達成率。0～100。
+        ///     未設定なら null。
         /// </summary>
-        public float 達成率 { get; set; } = 0f;
+        public double? 達成率 { get; set; } = null;
 
         /// <summary>
         ///     これまでの最高ランク。
+        ///     未設定なら null。
         /// </summary>
-        public ランク種別 ランク => 成績.ランクを算出する( this.達成率 );
+        public ランク種別? ランク => ( this.達成率.HasValue ) ? 成績.ランクを算出する( this.達成率.Value ) : (ランク種別?) null;
 
 
 
@@ -69,7 +76,7 @@ namespace DTXMania
         // 生成と終了
 
 
-        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, Node 親ノード = null )
+        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, UserDB userdb = null, Node 親ノード = null )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
@@ -88,6 +95,12 @@ namespace DTXMania
                 this.BGMAdjust = song.BGMAdjust;
 
                 // UserDB.Records にレコードがある？
+                var record = userdb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
+                if( null != record )
+                {
+                    // あれば、成績を転写する。
+                    this.達成率 = record.Achievement;
+                }
             }
             else
             {
