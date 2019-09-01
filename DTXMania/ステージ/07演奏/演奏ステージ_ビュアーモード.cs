@@ -332,7 +332,7 @@ namespace DTXMania.演奏
                                         ヒット判定バーと発声との時間sec,
                                         ヒット判定バーと描画との時間sec );
 
-                                    this.成績.エキサイトゲージを加算する( 判定種別.MISS ); // 手動演奏なら MISS はエキサイトゲージに反映。
+                                    this.成績.エキサイトゲージを更新する( 判定種別.MISS ); // 手動演奏なら MISS はエキサイトゲージに反映。
                                     return;
                                 }
                                 else
@@ -919,7 +919,7 @@ namespace DTXMania.演奏
                 var AutoPlay = App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
 
                 // 判定処理(5) 成績更新
-                this.成績.ヒット数を加算する( judge, AutoPlay );
+                this.成績.成績を更新する( judge, AutoPlay );
                 //----------------
                 #endregion
             }
