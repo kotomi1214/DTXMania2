@@ -52,6 +52,9 @@ namespace DTXMania.選曲
                         this._成績アイコンの矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
                 }
 
+                this._スキルアイコン = new テクスチャ( @"$(System)images\選曲\曲別SKILLアイコン3.png" );
+                this._スキル数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大太斜.png", @"$(System)images\パラメータ文字_大太斜.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
+
                 this._初めての進行描画 = true;
             }
         }
@@ -60,6 +63,9 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._スキル数字画像?.Dispose();
+                this._スキルアイコン?.Dispose();
+
                 foreach( var kvp in this._ノードto曲名画像 )
                     kvp.Value?.Dispose();
                 this._ノードto曲名画像.Clear();
@@ -167,6 +173,9 @@ namespace DTXMania.選曲
             }
         }
 
+        /// <summary>
+        ///     ノードを一行描画する。
+        /// </summary>
         /// <param name="行番号">
         ///		一番上:0 ～ 9:一番下。
         ///		「静止時の」可視範囲は 1～8。
@@ -340,15 +349,88 @@ namespace DTXMania.選曲
             //----------------
             #endregion
 
-            #region " 成績アイコン "
-            //----------------
-            if( ノード is MusicNode mnode )    // MusicNode 時のみ表示。
+            var musicNode = ノード as MusicNode;
+
+            if( null == musicNode && ノード is SetNode setNode )
+                musicNode = setNode.MusicNodes[ setNode.ユーザ希望難易度に最も近い難易度レベルを返す( App進行描画.曲ツリー.ユーザ希望難易度 ) ];
+
+            if( null != musicNode )
             {
-                if( mnode.ランク.HasValue )
-                    this._成績アイコン.描画する( ノード左上dpx.X + 6f, ノード左上dpx.Y + 57f, 転送元矩形: this._成績アイコンの矩形リスト[ mnode.ランク.Value.ToString() ] );
+                #region " 成績アイコン "
+                //----------------
+                if( musicNode.ランク.HasValue )
+                    this._成績アイコン.描画する( ノード左上dpx.X + 6f, ノード左上dpx.Y + 57f, 転送元矩形: this._成績アイコンの矩形リスト[ musicNode.ランク.Value.ToString() ] );
+                //----------------
+                #endregion
+
+                #region " スキルゲージ "
+                //----------------
+                if( musicNode.達成率.HasValue )
+                {
+                    const double スキル値の最大値 = 199.80;
+
+                    this._スキルアイコン.描画する( ノード左上dpx.X + 170f, ノード左上dpx.Y + 1f );
+
+                    double スキル値 = 成績.スキルを算出する( musicNode.難易度, musicNode.達成率.Value );
+                    this._スキル数字画像.描画する( dc, ノード左上dpx.X + 210f, ノード左上dpx.Y + 4, スキル値.ToString( "0.00" ).PadLeft( 6 ), 拡大率: new Size2F( 0.3f, 0.3f ) );
+
+                    DXResources.Instance.D2DBatchDraw( dc, () => {
+
+                        using( var ゲージ色 = new SolidColorBrush( dc, new Color( 124, 100, 163, 255 ) ) )
+                        using( var ゲージ枠色 = new SolidColorBrush( dc, Color.White ) )
+                        using( var ゲージ背景色 = new SolidColorBrush( dc, new Color( 0.25f, 0.25f, 0.25f, 1f ) ) )
+                        using( var ゲージ枠ジオメトリ = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
+                        using( var ゲージジオメトリ = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
+                        {
+                            var ゲージサイズdpx = new Size2F( 448f, 17f );
+                            var ゲージ位置 = new Vector2( ノード左上dpx.X + 310f, ノード左上dpx.Y + 10f );
+
+                            using( var sink = ゲージジオメトリ.Open() )
+                            {
+                                var 割合0to1 = (float) ( スキル値 / スキル値の最大値 );
+                                var p = new Vector2[] {
+                                    new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                                    // 左上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1, ゲージ位置.Y ),                                 // 右上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1 - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),   // 右下
+                                    new Vector2( ゲージ位置.X - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),                                      // 左下
+                                };
+                                sink.SetFillMode( FillMode.Winding );
+                                sink.BeginFigure( p[ 0 ], FigureBegin.Filled );
+                                sink.AddLine( p[ 1 ] );
+                                sink.AddLine( p[ 2 ] );
+                                sink.AddLine( p[ 3 ] );
+                                sink.EndFigure( FigureEnd.Closed );
+                                sink.Close();
+                            }
+
+                            using( var sink = ゲージ枠ジオメトリ.Open() )
+                            {
+                                var p = new Vector2[] {
+                                    new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                         // 左上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width, ゲージ位置.Y ),                                 // 右上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),   // 右下
+                                    new Vector2( ゲージ位置.X - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),                           // 左下
+                                };
+                                sink.SetFillMode( FillMode.Winding );
+                                sink.BeginFigure( p[ 0 ], FigureBegin.Filled );
+                                sink.AddLine( p[ 1 ] );
+                                sink.AddLine( p[ 2 ] );
+                                sink.AddLine( p[ 3 ] );
+                                sink.EndFigure( FigureEnd.Closed );
+                                sink.Close();
+                            }
+
+                            dc.FillGeometry( ゲージ枠ジオメトリ, ゲージ背景色 );
+                            dc.FillGeometry( ゲージジオメトリ, ゲージ色 );
+                            dc.DrawGeometry( ゲージジオメトリ, ゲージ枠色, 1f );
+                            dc.DrawGeometry( ゲージ枠ジオメトリ, ゲージ枠色, 2f );
+                        }
+
+                    } );
+                }
+                //----------------
+                #endregion
             }
-            //----------------
-            #endregion
 
             #region " タイトル文字列 "
             //----------------
@@ -382,7 +464,7 @@ namespace DTXMania.選曲
                 曲名画像.描画する(
                     dc,
                     ノード左上dpx.X + 170f,
-                    ノード左上dpx.Y + 30f,
+                    ノード左上dpx.Y + 20f,
                     X方向拡大率: ( 曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / 曲名画像.画像サイズdpx.Width );
             }
             //----------------
@@ -435,7 +517,7 @@ namespace DTXMania.選曲
                     サブタイトル画像.描画する(
                         dc,
                         ノード左上dpx.X + 190f,
-                        ノード左上dpx.Y + 80f,
+                        ノード左上dpx.Y + 70f,
                         X方向拡大率: ( サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / サブタイトル画像.画像サイズdpx.Width );
                 }
             }
@@ -534,6 +616,10 @@ namespace DTXMania.選曲
         private テクスチャ _成績アイコン = null;
 
         private Dictionary<string, RectangleF> _成績アイコンの矩形リスト = null;
+
+        private テクスチャ _スキルアイコン = null;
+
+        private 画像フォント _スキル数字画像 = null;
 
 
         private void _選択ノードのオフセットアニメをリセットする( Animation am )

@@ -80,7 +80,7 @@ namespace DTXMania
         }
 
         /// <summary>
-        ///     スキル値（0～199.78）を算出して返す。
+        ///     スキル値（0～199.80）を算出して返す。
         /// </summary>
         public static double スキルを算出する( double 譜面レベル, double 達成率0to100 )
         {
