@@ -39,16 +39,15 @@ namespace DTXMania
                 {
                     // (B) レコードがすでに存在するので、更新する。（記録更新したレコードのみ）
 
-                    if( record.Score < 今回の成績.Score )
+                    if( record.Achievement < 今回の成績.Achievement ||
+                        record.Skill < 今回の成績.Skill )
+                    {
                         record.Score = 今回の成績.Score;
-
-                    // TODO: CountMap を成績クラスに保存する。
-
-                    if( record.Skill < 今回の成績.Skill )
                         record.Skill = 今回の成績.Skill;
-
-                    if( record.Achievement < 今回の成績.Achievement )
                         record.Achievement = 今回の成績.Achievement;
+
+                        // TODO: CountMap を成績クラスに保存する。
+                    }
                 }
 
                 userdb.DataContext.SubmitChanges();
