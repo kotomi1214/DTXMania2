@@ -210,7 +210,7 @@ namespace DTXMania
                     // (B) 一部だけ ON → AutoPlay が ON になっている個所に応じて補正する。
                     foreach( var kvp in this._ユーザ設定.AutoPlay )
                     {
-                        if( this._Auto時の補正.ContainsKey( kvp.Key ) )
+                        if( kvp.Value && this._Auto時の補正.ContainsKey( kvp.Key ) )
                         {
                             オプション補正0to1 *= this._Auto時の補正[ kvp.Key ];   // 補正値は累積
                         }
