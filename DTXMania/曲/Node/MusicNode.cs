@@ -76,7 +76,7 @@ namespace DTXMania
         // 生成と終了
 
 
-        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, UserDB userdb = null, Node 親ノード = null )
+        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, Node 親ノード = null )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
@@ -93,14 +93,6 @@ namespace DTXMania
                 this.難易度ラベル = "FREE";   // 既定値。set.def 内の MusicNode であれば、指定ラベルに上書きすること。
                 this.曲ファイルハッシュ = song.HashId;
                 this.BGMAdjust = song.BGMAdjust;
-
-                // UserDB.Records にレコードがある？
-                var record = userdb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
-                if( null != record )
-                {
-                    // あれば、成績を転写する。
-                    this.達成率 = record.Achievement;
-                }
             }
             else
             {
@@ -116,7 +108,7 @@ namespace DTXMania
             base.Dispose();
         }
 
-        public void 現行化する( SongDB songdb )
+        public void 現行化する( SongDB songdb, UserDB userdb )
         {
             if( this.現行化済み || AppForm.ビュアーモードである )
                 return;
@@ -146,6 +138,19 @@ namespace DTXMania
                     // プレビューサウンドはパスだけ取得しておく。（生成は再生直前に行う。）
                     if( song.PreSound.Nullでも空でもない() )
                         this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+
+                    // UserDB.Records にレコードがある？
+                    var record = userdb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
+                    if( null != record )
+                    {
+                        // あれば、成績を転写する。
+                        this.達成率 = record.Achievement;
+                    }
+                    else
+                    {
+                        // なければ、リセット。
+                        this.達成率 = null;
+                    }
                 }
                 else
                 {

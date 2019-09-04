@@ -116,7 +116,7 @@ namespace DTXMania
         /// <summary>
         ///     指定された <see cref="SetDef.Block"/> をもとに、初期化する。
         /// </summary>
-        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, SongDB songdb, UserDB userdb, Node 親ノード = null )
+        public SetNode( SetDef.Block block, VariablePath 基点フォルダパス, SongDB songdb, Node 親ノード = null )
         {
             this.タイトル = block.Title;
             this.親ノード = 親ノード;
@@ -133,7 +133,7 @@ namespace DTXMania
                     {
                         try
                         {
-                            this.MusicNodes[ i ] = new MusicNode( Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] ), songdb, userdb, this );
+                            this.MusicNodes[ i ] = new MusicNode( Path.Combine( 基点フォルダパス.変数なしパス, block.File[ i ] ), songdb, this );
                             this.MusicNodes[ i ].難易度ラベル = block.Label[ i ];
                             this.MusicNodes[ i ].難易度 = 0.00f;   // 仮置き
                             this.子ノードリスト.Add( this.MusicNodes[ i ] );
