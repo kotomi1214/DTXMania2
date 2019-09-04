@@ -5,7 +5,7 @@ using System.Data.SQLite;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania.データベース.ユーザ.old
+namespace DTXMania.データベース.成績.old
 {
     /// <summary>
     ///		成績テーブルのエンティティクラス。

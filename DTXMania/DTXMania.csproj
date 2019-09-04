@@ -256,6 +256,7 @@
     <Compile Include="ステージ\舞台画像.cs" />
     <Compile Include="ステージ\青い線.cs" />
     <Compile Include="データベース\SQLiteDBBase.cs" />
+    <Compile Include="データベース\ユーザ\old\User11.cs" />
     <Compile Include="データベース\成績\old\Record01.cs" />
     <Compile Include="データベース\成績\old\Record02.cs" />
     <Compile Include="データベース\成績\old\Record03.cs" />
@@ -270,8 +271,9 @@
     <Compile Include="データベース\ユーザ\old\User07.cs" />
     <Compile Include="データベース\ユーザ\old\User08.cs" />
     <Compile Include="データベース\ユーザ\old\User09.cs" />
-    <Compile Include="データベース\成績\Record06.cs" />
-    <Compile Include="データベース\ユーザ\User11.cs" />
+    <Compile Include="データベース\成績\old\Record06.cs" />
+    <Compile Include="データベース\成績\Record07.cs" />
+    <Compile Include="データベース\ユーザ\User12.cs" />
     <Compile Include="データベース\ユーザ\old\User10.cs" />
     <Compile Include="データベース\ユーザ\UserDB.cs" />
     <Compile Include="データベース\成績\RecordDB.cs" />

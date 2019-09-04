@@ -9,14 +9,14 @@ namespace DTXMania
 {
     /// <summary>
     ///		成績テーブルのエンティティクラス。
-    ///		バージョン 6。
+    ///		バージョン 7。
     /// </summary>
     /// <remarks>
     ///		変更点：
     ///		なし
     /// </remarks>
     [Table( Name = "Records" )]   // テーブル名は複数形
-    class Record06 : ICloneable
+    class Record07 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別するID。[key1/2]
@@ -61,7 +61,7 @@ namespace DTXMania
         /// <summary>
         ///		規定値で初期化。
         /// </summary>
-        public Record06()
+        public Record07()
         {
             this.UserId = "Anonymous";
             this.SongHashId = "";
@@ -72,9 +72,9 @@ namespace DTXMania
         }
 
         // ICloneable 実装
-        public Record06 Clone()
+        public Record07 Clone()
         {
-            return (Record06) this.MemberwiseClone();
+            return (Record07) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {

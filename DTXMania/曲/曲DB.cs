@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
-using Record = DTXMania.Record06;
+using Record = DTXMania.Record07;
 
 namespace DTXMania
 {

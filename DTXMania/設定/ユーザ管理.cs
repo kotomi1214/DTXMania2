@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.User11;
+using User = DTXMania.User12;
 
 namespace DTXMania
 {

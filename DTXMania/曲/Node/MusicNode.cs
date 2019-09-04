@@ -10,7 +10,7 @@ using FDK;
 using SSTFormat.v4;
 
 using Song = DTXMania.Song05;
-using Record = DTXMania.Record06;
+using Record = DTXMania.Record07;
 
 namespace DTXMania
 {

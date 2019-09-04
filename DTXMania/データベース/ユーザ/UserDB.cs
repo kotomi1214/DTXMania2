@@ -8,20 +8,20 @@ using FDK;
 
 namespace DTXMania
 {
+    using User = User12;        // 最新バージョンを指定（１／２）
+    using Record06 = データベース.成績.old.Record06;
     using User02 = データベース.ユーザ.old.User02;
-    using User = User11;        // 最新バージョンを指定（１／２）
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 11;  // 最新バージョンを指定（２／２）
+        public const long VERSION = 12;  // 最新バージョンを指定（２／２）
 
         public static readonly VariablePath DBファイルパス = @"$(AppData)UserDB.sqlite3";
 
         public Table<User> Users => base.DataContext.GetTable<User>();
-
 
         public UserDB()
         {
@@ -395,6 +395,73 @@ namespace DTXMania
                             throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                     }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 11:
+                    #region " 11 →12 "
+                    //----------------
+                    // 変更点：
+                    // ・UserDB.Records テーブルを廃止し、新規に作成する RecordDB.Records テーブルに移行。
+                    this.DataContext.SubmitChanges();
+
+                    #region " RecordDB を新設し、UserDB11.Records の内容をコピーする。"
+                    //----------------
+                    using( var recorddb = new RecordDB() )
+                    using( var transaction = recorddb.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            foreach( var src in this.DataContext.GetTable<Record06>().ToArray() )
+                            {
+                                recorddb.Records.InsertOnSubmit(
+                                    new Record07() {
+                                        UserId = src.UserId,
+                                        SongHashId = src.SongHashId,
+                                        Score = src.Score,
+                                        CountMap = src.CountMap,
+                                        Skill = src.Skill,
+                                        Achievement = src.Achievement,
+                                    } );
+                            }
+
+                            // 成功。
+                            transaction.Commit();
+                            recorddb.DataContext.SubmitChanges();
+                            Log.Info( "RecordDB を新設し、データを移行しました。" );
+                        }
+                        catch( Exception e )
+                        {
+                            // 失敗
+                            transaction.Rollback();
+                            throw new Exception( "RecordDB の新設とデータ移行に失敗しました。", e );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
+                    #region " UserDB.Records テーブルを削除する。"
+                    //----------------
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            this.DataContext.ExecuteCommand( "DROP TABLE Records" );
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( "UserDB.Records テーブルの削除に成功しました。" );
+                        }
+                        catch( Exception e )
+                        {
+                            transaction.Rollback();
+                            throw new Exception( "UserDB.Records テーブルの削除に失敗しました。", e );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
                     //----------------
                     #endregion
                     break;

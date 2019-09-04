@@ -8,14 +8,14 @@ using FDK;
 
 namespace DTXMania
 {
-    using Record = Record06;    // 最新バージョンを指定（１／２）
+    using Record = Record07;    // 最新バージョンを指定（１／２）
 
     /// <summary>
-    ///		ユーザデータベースに対応するエンティティクラス。
+    ///		成績データベースに対応するエンティティクラス。
     /// </summary>
     class RecordDB : SQLiteDBBase
     {
-        public const long VERSION = 6;  // 最新バージョンを指定（３／３）
+        public const long VERSION = 7;  // 最新バージョンを指定（２／２）
 
         public static readonly VariablePath DBファイルパス = @"$(AppData)RecordDB.sqlite3";
 
@@ -85,6 +85,7 @@ namespace DTXMania
                 case 3:
                 case 4:
                 case 5:
+                case 6:
                     // 変更なし
                     break;
 

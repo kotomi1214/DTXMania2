@@ -11,7 +11,7 @@ namespace DTXMania
     ///		ユーザテーブルのエンティティクラス。
     /// </summary>
     [Table( Name = "Users" )]   // テーブル名は複数形
-    class User11 : ICloneable
+    class User12 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別する文字列。主キー。
@@ -243,7 +243,7 @@ namespace DTXMania
         /// <summary>
         ///		既定値で初期化。
         /// </summary>
-        public User11()
+        public User12()
         {
             this.Id = "Anonymous";
             this.Name = "Anonymous";
@@ -278,9 +278,9 @@ namespace DTXMania
         }
 
         // ICloneable 実装
-        public User11 Clone()
+        public User12 Clone()
         {
-            return (User11) this.MemberwiseClone();
+            return (User12) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
