@@ -140,14 +140,6 @@ namespace DTXMania
         public int CymbalFree { get; set; }
 
         /// <summary>
-        ///		演奏モード。
-        ///		0: Basic, 1: Expert
-        ///     Release 048 より Basic 廃止のため 1 で固定化。
-        /// </summary>
-        [Column( DbType = "INT", CanBeNull = false )]
-        public int PlayMode { get; set; }
-
-        /// <summary>
         ///		Ride の表示位置。
         ///		0: 右, 1: 左
         /// </summary>
@@ -263,7 +255,6 @@ namespace DTXMania
             this.MaxRange_Good = 0.084;
             this.MaxRange_Ok = 0.117;
             this.CymbalFree = 1;
-            this.PlayMode = 1;
             this.RideLeft = 0;
             this.ChinaLeft = 0;
             this.SplashLeft = 1;
@@ -296,7 +287,7 @@ namespace DTXMania
         /// <summary>
         ///		テーブルのカラム部分を列挙したSQL。
         /// </summary>
-        public static readonly string ColumnsList =
+        public static readonly string ColumnList =
             @"( Id NVARCHAR NOT NULL PRIMARY KEY" +
             @", Name NVARCHAR NOT NULL" +
             @", ScrollSpeed REAL NOT NULL" +
@@ -315,7 +306,6 @@ namespace DTXMania
             @", MaxRange_Good REAL NOT NULL" +
             @", MaxRange_Ok REAL NOT NULL" +
             @", CymbalFree INTEGER NOT NULL" +
-            @", PlayMode INTEGER NOT NULL" +
             @", RideLeft INTEGER NOT NULL" +
             @", ChinaLeft INTEGER NOT NULL" +
             @", SplashLeft INTEGER NOT NULL" +

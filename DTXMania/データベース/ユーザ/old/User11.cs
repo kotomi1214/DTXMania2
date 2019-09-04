@@ -296,7 +296,7 @@ namespace DTXMania.データベース.ユーザ.old
         /// <summary>
         ///		テーブルのカラム部分を列挙したSQL。
         /// </summary>
-        public static readonly string ColumnsList =
+        public static readonly string ColumnList =
             @"( Id NVARCHAR NOT NULL PRIMARY KEY" +
             @", Name NVARCHAR NOT NULL" +
             @", ScrollSpeed REAL NOT NULL" +

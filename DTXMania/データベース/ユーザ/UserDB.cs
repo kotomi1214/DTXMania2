@@ -9,8 +9,9 @@ using FDK;
 namespace DTXMania
 {
     using User = User12;        // 最新バージョンを指定（１／２）
-    using Record06 = データベース.成績.old.Record06;
-    using User02 = データベース.ユーザ.old.User02;
+    using rRecord06 = データベース.成績.old.Record06;
+    using rUser02 = データベース.ユーザ.old.User02;
+    using rUser12 = User12;
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
@@ -62,7 +63,7 @@ namespace DTXMania
                     try
                     {
                         // 最新のバージョンのテーブルを作成する。
-                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Users {User.ColumnsList};" );
+                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Users {User.ColumnList};" );
                         this.DataContext.SubmitChanges();
 
                         // 成功。
@@ -93,7 +94,7 @@ namespace DTXMania
                         try
                         {
                             // テータベースをアップデートしてデータを移行する。
-                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {User02.ColumnsList}" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser02.ColumnsList}" );
                             this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree FROM Users" );
                             this.DataContext.ExecuteCommand( "DROP TABLE Users" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
@@ -404,6 +405,7 @@ namespace DTXMania
                     //----------------
                     // 変更点：
                     // ・UserDB.Records テーブルを廃止し、新規に作成する RecordDB.Records テーブルに移行。
+                    // ・PlayMode カラムを削除。
                     this.DataContext.SubmitChanges();
 
                     #region " RecordDB を新設し、UserDB11.Records の内容をコピーする。"
@@ -413,7 +415,7 @@ namespace DTXMania
                     {
                         try
                         {
-                            foreach( var src in this.DataContext.GetTable<Record06>().ToArray() )
+                            foreach( var src in this.DataContext.GetTable<rRecord06>().ToArray() )
                             {
                                 recorddb.Records.InsertOnSubmit(
                                     new Record07() {
@@ -457,6 +459,36 @@ namespace DTXMania
                         {
                             transaction.Rollback();
                             throw new Exception( "UserDB.Records テーブルの削除に失敗しました。", e );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
+                    #region " PlayMode カラムを削除する。"
+                    //----------------
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テータベースをアップデートしてデータを移行する。
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser12.ColumnList}" );
+                            this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneType,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow FROM Users" );
+                            this.DataContext.ExecuteCommand( "DROP TABLE Users" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( "Users テーブルをアップデートしました。[1→2]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( "Users テーブルのアップデートに失敗しました。[1→2]" );
                         }
                     }
                     //----------------
