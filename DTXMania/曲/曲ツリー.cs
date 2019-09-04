@@ -500,13 +500,13 @@ namespace DTXMania
                 }
 
                 // すべてのMusicNodeを現行化する。
-                using( var userdb = new UserDB() )
+                using( var recorddb = new RecordDB() )
                 using( var songdb = new SongDB() )
                 {
                     foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                     {
                         if( node is MusicNode music )
-                            music.現行化する( songdb, userdb );
+                            music.現行化する( songdb, recorddb );
 
                         // キャンセル？
                         if( this.現行化タスクキャンセル通知.IsCancellationRequested )

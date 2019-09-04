@@ -9,28 +9,25 @@ using FDK;
 namespace DTXMania
 {
     using User02 = データベース.ユーザ.old.User02;
-    using User = User11;        // 最新バージョンを指定（１／３）
-    using Record = Record06;    // 最新バージョンを指定（２／３）
+    using User = User11;        // 最新バージョンを指定（１／２）
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 11;  // 最新バージョンを指定（３／３）
+        public const long VERSION = 11;  // 最新バージョンを指定（２／２）
 
-        public static readonly VariablePath ユーザDBファイルパス = @"$(AppData)UserDB.sqlite3";
+        public static readonly VariablePath DBファイルパス = @"$(AppData)UserDB.sqlite3";
 
-        public Table<User> Users
-            => base.DataContext.GetTable<User>();
-        public Table<Record> Records
-            => base.DataContext.GetTable<Record>();
+        public Table<User> Users => base.DataContext.GetTable<User>();
+
 
         public UserDB()
         {
             try
             {
-                this.Open( ユーザDBファイルパス, VERSION );
+                this.Open( DBファイルパス, VERSION );
             }
             catch( Exception e )
             {
@@ -40,18 +37,18 @@ namespace DTXMania
                 //----------------
                 try
                 {
-                    File.Delete( ユーザDBファイルパス.変数なしパス );  // ファイルがない場合には例外は出ない
+                    File.Delete( DBファイルパス.変数なしパス );  // ファイルがない場合には例外は出ない
                 }
                 catch( Exception e2 )
                 {
-                    var msg = $"ユーザデータベースファイルの削除に失敗しました。[{ユーザDBファイルパス.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
+                    var msg = $"ユーザデータベースファイルの削除に失敗しました。[{DBファイルパス.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
                     Log.ERROR( msg );
                     throw new Exception( msg, e2 );  // どうしようもないので例外発出
                 }
                 //----------------
                 #endregion
 
-                this.Open( ユーザDBファイルパス, VERSION );
+                this.Open( DBファイルパス, VERSION );
             }
         }
 
@@ -66,7 +63,6 @@ namespace DTXMania
                     {
                         // 最新のバージョンのテーブルを作成する。
                         this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Users {User.ColumnsList};" );
-                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Records {Record.ColumnList};" );
                         this.DataContext.SubmitChanges();
 
                         // 成功。
@@ -89,7 +85,7 @@ namespace DTXMania
                     #region " 1 → 2 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルから SongFolders カラムを削除。
+                    // ・SongFolders カラムを削除。
                     this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
@@ -123,7 +119,7 @@ namespace DTXMania
                     #region " 2 → 3 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに PlayMode カラムを追加。
+                    // ・PlayMode カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -154,7 +150,7 @@ namespace DTXMania
                     #region " 3 → 4 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに RideLeft, ChinaLeft, SplashLeft カラムを追加。
+                    // ・RideLeft, ChinaLeft, SplashLeft カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -187,7 +183,7 @@ namespace DTXMania
                     #region " 4 → 5 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに DrumSound カラムを追加。
+                    // ・DrumSound カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -218,7 +214,7 @@ namespace DTXMania
                     #region " 5 → 6 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに LaneType カラムを追加。
+                    // ・LaneType カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -249,7 +245,7 @@ namespace DTXMania
                     #region " 6 → 7 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに LaneTrans カラムを追加。
+                    // ・LaneTrans カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -280,7 +276,7 @@ namespace DTXMania
                     #region " 7 → 8 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに BackgroundMovie カラムを追加。
+                    // ・BackgroundMovie カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -311,7 +307,7 @@ namespace DTXMania
                     #region " 8 → 9 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに PlaySpeed, ShowPartLine, ShorPartNumber を追加。
+                    // ・PlaySpeed, ShowPartLine, ShorPartNumber を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -344,7 +340,7 @@ namespace DTXMania
                     #region " 9 → 10 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに ShorScoreWall, BackgroundMovieSize を追加。
+                    // ・ShorScoreWall, BackgroundMovieSize を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -376,7 +372,7 @@ namespace DTXMania
                     #region " 10 → 11 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに ShowFastSlow を追加。
+                    // ・ShowFastSlow を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {

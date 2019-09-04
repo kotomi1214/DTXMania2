@@ -108,7 +108,7 @@ namespace DTXMania
             base.Dispose();
         }
 
-        public void 現行化する( SongDB songdb, UserDB userdb )
+        public void 現行化する( SongDB songdb, RecordDB recorddb )
         {
             if( this.現行化済み || AppForm.ビュアーモードである )
                 return;
@@ -140,7 +140,7 @@ namespace DTXMania
                         this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
 
                     // UserDB.Records にレコードがある？
-                    var record = userdb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
+                    var record = recorddb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
                     if( null != record )
                     {
                         // あれば、成績を転写する。

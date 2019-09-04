@@ -19,13 +19,13 @@ namespace DTXMania
         /// </summary>
         public static void 成績を追加または更新する( 成績 今回の成績, string ユーザID, string 曲ファイルハッシュ )
         {
-            using( var userdb = new UserDB() )
+            using( var recorddb = new RecordDB() )
             {
-                var record = userdb.Records.Where( ( r ) => ( r.UserId == ユーザID && r.SongHashId == 曲ファイルハッシュ ) ).SingleOrDefault();
+                var record = recorddb.Records.Where( ( r ) => ( r.UserId == ユーザID && r.SongHashId == 曲ファイルハッシュ ) ).SingleOrDefault();
                 if( null == record )
                 {
                     // (A) レコードが存在しないので、追加する。
-                    userdb.Records.InsertOnSubmit( new Record() {
+                    recorddb.Records.InsertOnSubmit( new Record() {
                         UserId = ユーザID,
                         SongHashId = 曲ファイルハッシュ,
                         Score = 今回の成績.Score,
@@ -50,7 +50,7 @@ namespace DTXMania
                     }
                 }
 
-                userdb.DataContext.SubmitChanges();
+                recorddb.DataContext.SubmitChanges();
             }
         }
     }

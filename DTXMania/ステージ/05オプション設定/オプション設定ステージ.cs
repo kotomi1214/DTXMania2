@@ -1015,7 +1015,7 @@ namespace DTXMania.オプション設定
 
             // ファイルを削除する。
 
-            var vpath = UserDB.ユーザDBファイルパス;
+            var vpath = UserDB.DBファイルパス;
             try
             {
                 File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
