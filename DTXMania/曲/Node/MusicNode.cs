@@ -139,7 +139,7 @@ namespace DTXMania
                     if( song.PreSound.Nullでも空でもない() )
                         this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
 
-                    // UserDB.Records にレコードがある？
+                    // 成績レコードがある？
                     var record = recorddb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
                     if( null != record )
                     {

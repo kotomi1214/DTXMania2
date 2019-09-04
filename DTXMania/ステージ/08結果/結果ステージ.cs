@@ -7,6 +7,8 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
+using Record = DTXMania.Record07;
+
 namespace DTXMania.結果
 {
     class 結果ステージ : ステージ
@@ -147,10 +149,45 @@ namespace DTXMania.結果
         {
             var 選択曲 = App進行描画.曲ツリー.フォーカス曲ノード;
 
-            // UserDB へ反映する。
-            曲DB.成績を追加または更新する( this._結果, App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID, 選択曲.曲ファイルハッシュ );
 
-            // 曲ツリーへ反映する。
+            // 成績を、RecordDB へ追加または反映する。
+
+            var ユーザID = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID;
+            using( var recorddb = new RecordDB() )
+            {
+                var record = recorddb.Records.Where( ( r ) => ( r.UserId == ユーザID && r.SongHashId == 選択曲.曲ファイルハッシュ ) ).SingleOrDefault();
+
+                if( null == record )
+                {
+                    // (A) レコードが存在しない → 新規追加する。
+
+                    recorddb.Records.InsertOnSubmit( new Record() {
+                        UserId = ユーザID,
+                        SongHashId = 選択曲.曲ファイルハッシュ,
+                        Score = this._結果.Score,
+                        CountMap = "",  // TODO: CountMap を成績DBに保存する。
+                        Achievement = this._結果.Achievement,
+                    } );
+                }
+                else
+                {
+                    // (B) レコードがすでに存在する → 記録を更新していれば、更新する。
+
+                    if( record.Achievement < this._結果.Achievement )
+                    {
+                        record.Score = this._結果.Score;
+                        record.Achievement = this._結果.Achievement;
+                        // TODO: CountMap を成績DBに保存する。
+                        //record.CountMap = ...
+                    }
+                }
+
+                recorddb.DataContext.SubmitChanges();
+            }
+
+
+            // 成績を、曲ツリーへ反映する。
+
             選択曲.達成率 = this._結果.Achievement;
         }
 
