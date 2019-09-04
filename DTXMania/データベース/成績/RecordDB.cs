@@ -80,13 +80,23 @@ namespace DTXMania
         {
             switch( 移行元DBバージョン )
             {
-                case 1:
-                case 2:
-                case 3:
-                case 4:
-                case 5:
+                case 1: // 1 → 2
+                case 2: // 2 → 3
+                case 3: // 3 → 4
+                case 4: // 4 → 5
+                case 5: // 5 → 6
+                    break;  // 変更なし
+
                 case 6:
-                    // 変更なし
+                    #region " 6 → 7 "
+                    //----------------
+                    // 変更点：
+                    // ・Skill カラムを削除。
+
+                    // UserDB 側で RecordDB を作成する際に Record07 で生成されるので、ここでは何もしない。
+                    
+                    //----------------
+                    #endregion
                     break;
 
                 default:

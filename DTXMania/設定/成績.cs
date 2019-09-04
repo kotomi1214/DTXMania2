@@ -56,6 +56,11 @@ namespace DTXMania
         /// </summary>
         public ランク種別 ランク { get; protected set; } = ランク種別.E;
 
+        /// <summary>
+        ///     現在のスキル値。
+        /// </summary>
+        public double スキル => 成績.スキルを算出する( this._譜面レベル, this.Achievement );
+
 
 
         // static
@@ -228,12 +233,6 @@ namespace DTXMania
                 this._判定toヒット数[ 判定種別.GREAT ],   // Auto含む
                 this.MaxCombo,                            // Auto含む
                 オプション補正0to1 );
-            //----------------
-            #endregion
-
-            #region " スキル値を更新する。"
-            //----------------
-            this.Skill = スキルを算出する( this._譜面レベル, this.Achievement );
             //----------------
             #endregion
 

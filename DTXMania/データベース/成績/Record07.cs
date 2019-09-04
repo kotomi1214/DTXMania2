@@ -11,10 +11,6 @@ namespace DTXMania
     ///		成績テーブルのエンティティクラス。
     ///		バージョン 7。
     /// </summary>
-    /// <remarks>
-    ///		変更点：
-    ///		なし
-    /// </remarks>
     [Table( Name = "Records" )]   // テーブル名は複数形
     class Record07 : ICloneable
     {
@@ -45,12 +41,6 @@ namespace DTXMania
         public string CountMap { get; set; }
 
         /// <summary>
-        ///		曲別SKILL。0～199.80。
-        /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
-        public double Skill { get; set; }
-
-        /// <summary>
         ///		達成率[%]。0～100。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
@@ -67,7 +57,6 @@ namespace DTXMania
             this.SongHashId = "";
             this.Score = 0;
             this.CountMap = "";
-            this.Skill = 0.0;
             this.Achievement = 0.0;
         }
 
@@ -91,7 +80,6 @@ namespace DTXMania
             @", SongHashId NVARCHAR NOT NULL" +
             @", Score INTEGER NOT NULL" +
             @", CountMap NVARCHAR NOT NULL" +
-            @", Skill REAL NOT NULL" +
             @", Achievement REAL NOT NULL" +
             @", PRIMARY KEY(`UserId`,`SongHashId`)" +
             @")";

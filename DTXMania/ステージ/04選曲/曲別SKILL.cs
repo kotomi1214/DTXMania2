@@ -58,7 +58,10 @@ namespace DTXMania.選曲
                         var record = recorddb.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == this._現在表示しているノード.曲ファイルハッシュ ) ).SingleOrDefault();
 
                         if( null != record )
-                            this._スキル値文字列 = record.Skill.ToString( "0.00" ).PadLeft( 6 );  // 右詰め、余白は' '。
+                        {
+                            double skill = 成績.スキルを算出する( this._現在表示しているノード.難易度, record.Achievement );
+                            this._スキル値文字列 = skill.ToString( "0.00" ).PadLeft( 6 );  // 右詰め、余白は' '。
+                        }
                     }
                 }
                 //----------------

@@ -577,7 +577,7 @@ namespace DTXMania.演奏
                             this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
-                            this._曲別SKILL.進行描画する( dcp, this.成績.Skill );
+                            this._曲別SKILL.進行描画する( dcp, this.成績.スキル );
                         } );
                         this._左サイドクリアパネル.描画する();
 

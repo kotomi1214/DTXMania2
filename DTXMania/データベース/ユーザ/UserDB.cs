@@ -423,7 +423,7 @@ namespace DTXMania
                                         SongHashId = src.SongHashId,
                                         Score = src.Score,
                                         CountMap = src.CountMap,
-                                        Skill = src.Skill,
+                                        //Skill = src.Skill,        Record07 で Skill カラムは廃止
                                         Achievement = src.Achievement,
                                     } );
                             }

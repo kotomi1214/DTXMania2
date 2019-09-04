@@ -29,9 +29,7 @@ namespace DTXMania
                         UserId = ユーザID,
                         SongHashId = 曲ファイルハッシュ,
                         Score = 今回の成績.Score,
-                        // TODO: CountMap を成績クラスに保存する。
-                        CountMap = "",
-                        Skill = 今回の成績.Skill,
+                        CountMap = "",  // TODO: CountMap を成績DBに保存する。
                         Achievement = 今回の成績.Achievement,
                     } );
                 }
@@ -39,14 +37,12 @@ namespace DTXMania
                 {
                     // (B) レコードがすでに存在するので、更新する。（記録更新したレコードのみ）
 
-                    if( record.Achievement < 今回の成績.Achievement ||
-                        record.Skill < 今回の成績.Skill )
+                    if( record.Achievement < 今回の成績.Achievement )
                     {
                         record.Score = 今回の成績.Score;
-                        record.Skill = 今回の成績.Skill;
                         record.Achievement = 今回の成績.Achievement;
-
-                        // TODO: CountMap を成績クラスに保存する。
+                        // TODO: CountMap を成績DBに保存する。
+                        //record.CountMap = ...
                     }
                 }
 
