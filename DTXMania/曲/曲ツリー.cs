@@ -493,7 +493,7 @@ namespace DTXMania
                 using( var songdb = new SongDB() )
                 {
                     // すべてのMusicNodeを現行化する。
-                    foreach( var node in this.ルートノード.Traverse() )
+                    foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                     {
                         if( node is MusicNode music && music.現行化未実施 )
                             music.現行化する( songdb );
