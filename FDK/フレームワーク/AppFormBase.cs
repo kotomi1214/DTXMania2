@@ -233,8 +233,7 @@ namespace FDK
                 int dataSize = Marshal.SizeOf<RawInput.RawInputData>(); // 仮サイズ。
 
                 // 実サイズを取得する。
-                IntPtr dataPtr = IntPtr.Zero;
-                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, ref dataPtr, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, null, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
                 {
                     Debug.WriteLine( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
                     return;
