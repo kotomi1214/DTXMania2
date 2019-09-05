@@ -881,7 +881,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\選曲\曲別SKILLアイコン3.png">
+    <None Include="System\Images\選曲\達成率ゲージアイコン.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

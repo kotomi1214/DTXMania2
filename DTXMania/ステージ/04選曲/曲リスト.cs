@@ -52,8 +52,8 @@ namespace DTXMania.選曲
                         this._成績アイコンの矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
                 }
 
-                this._スキルアイコン = new テクスチャ( @"$(System)images\選曲\曲別SKILLアイコン3.png" );
-                this._スキル数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大太斜.png", @"$(System)images\パラメータ文字_大太斜.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
+                this._達成率ゲージアイコン = new テクスチャ( @"$(System)images\選曲\達成率ゲージアイコン.png" );
+                this._達成率数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大太斜.png", @"$(System)images\パラメータ文字_大太斜.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
 
                 this._初めての進行描画 = true;
             }
@@ -63,8 +63,8 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._スキル数字画像?.Dispose();
-                this._スキルアイコン?.Dispose();
+                this._達成率数字画像?.Dispose();
+                this._達成率ゲージアイコン?.Dispose();
 
                 foreach( var kvp in this._ノードto曲名画像 )
                     kvp.Value?.Dispose();
@@ -363,20 +363,17 @@ namespace DTXMania.選曲
                 //----------------
                 #endregion
 
-                #region " スキルゲージ "
+                #region " 達成率ゲージ "
                 //----------------
                 if( musicNode.達成率.HasValue )
                 {
-                    const double スキル値の最大値 = 199.80;
+                    this._達成率ゲージアイコン.描画する( ノード左上dpx.X + 160f, ノード左上dpx.Y - 25f, X方向拡大率: 0.4f, Y方向拡大率: 0.4f );
 
-                    this._スキルアイコン.描画する( ノード左上dpx.X + 170f, ノード左上dpx.Y + 1f );
-
-                    double スキル値 = 成績.スキルを算出する( musicNode.難易度, musicNode.達成率.Value );
-                    this._スキル数字画像.描画する( dc, ノード左上dpx.X + 210f, ノード左上dpx.Y + 4, スキル値.ToString( "0.00" ).PadLeft( 6 ), 拡大率: new Size2F( 0.3f, 0.3f ) );
+                    this._達成率数字画像.描画する( dc, ノード左上dpx.X + 204f, ノード左上dpx.Y + 4, musicNode.達成率.Value.ToString( "0.00" ).PadLeft( 6 ) + '%', 拡大率: new Size2F( 0.3f, 0.3f ) );
 
                     DXResources.Instance.D2DBatchDraw( dc, () => {
 
-                        using( var ゲージ色 = new SolidColorBrush( dc, new Color( 124, 100, 163, 255 ) ) )
+                        using( var ゲージ色 = new SolidColorBrush( dc, new Color( 184, 156, 231, 255 ) ) )
                         using( var ゲージ枠色 = new SolidColorBrush( dc, Color.White ) )
                         using( var ゲージ背景色 = new SolidColorBrush( dc, new Color( 0.25f, 0.25f, 0.25f, 1f ) ) )
                         using( var ゲージ枠ジオメトリ = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
@@ -387,7 +384,7 @@ namespace DTXMania.選曲
 
                             using( var sink = ゲージジオメトリ.Open() )
                             {
-                                var 割合0to1 = (float) ( スキル値 / スキル値の最大値 );
+                                var 割合0to1 = (float) ( musicNode.達成率.Value / 100.0 );
                                 var p = new Vector2[] {
                                     new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                                    // 左上
                                     new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1, ゲージ位置.Y ),                                 // 右上
@@ -617,9 +614,9 @@ namespace DTXMania.選曲
 
         private Dictionary<string, RectangleF> _成績アイコンの矩形リスト = null;
 
-        private テクスチャ _スキルアイコン = null;
+        private テクスチャ _達成率ゲージアイコン = null;
 
-        private 画像フォント _スキル数字画像 = null;
+        private 画像フォント _達成率数字画像 = null;
 
 
         private void _選択ノードのオフセットアニメをリセットする( Animation am )
