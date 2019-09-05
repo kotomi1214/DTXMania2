@@ -62,7 +62,7 @@ namespace DTXMania.選曲
                 this._青い線 = new 青い線();
                 this._選択曲枠ランナー = new 選択曲枠ランナー();
                 this._BPMパネル = new BPMパネル();
-                this._曲別SKILL = new 曲別SKILL();
+                this._曲別スキルと達成率 = new 曲別スキルと達成率();
                 this._表示方法選択パネル = new 表示方法選択パネル();
                 this._SongNotFound = new 文字列画像() {
                     表示文字列 =
@@ -121,7 +121,7 @@ namespace DTXMania.選曲
                 this._UpdatingSoglistパネル?.Dispose();
                 this._SongNotFound?.Dispose();
                 this._表示方法選択パネル?.Dispose();
-                this._曲別SKILL?.Dispose();
+                this._曲別スキルと達成率?.Dispose();
                 this._BPMパネル?.Dispose();
                 this._選択曲枠ランナー?.Dispose();
                 this._青い線?.Dispose();
@@ -302,7 +302,7 @@ namespace DTXMania.選曲
                 this._曲ステータスパネル.描画する( dc );
                 this._プレビュー画像を描画する( dc, App進行描画.曲ツリー.フォーカスノード );
                 this._BPMパネル.描画する( dc );
-                this._曲別SKILL.進行描画する( dc );
+                this._曲別スキルと達成率.進行描画する( dc );
                 this._選択曲を囲む枠を描画する( dc );
                 this._選択曲枠ランナー.進行描画する( dc );
                 this._導線を描画する( dc );
@@ -363,7 +363,7 @@ namespace DTXMania.選曲
 
         private BPMパネル _BPMパネル = null;
 
-        private 曲別SKILL _曲別SKILL = null;
+        private 曲別スキルと達成率 _曲別スキルと達成率 = null;
 
         private 表示方法選択パネル _表示方法選択パネル = null;
 

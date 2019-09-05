@@ -52,7 +52,7 @@ namespace DTXMania.選曲
                         this._成績アイコンの矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
                 }
 
-                this._達成率ゲージアイコン = new テクスチャ( @"$(System)images\選曲\達成率ゲージアイコン.png" );
+                this._達成率ゲージアイコン = new テクスチャ( @"$(System)images\達成率アイコン.png" );
                 this._達成率数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大太斜.png", @"$(System)images\パラメータ文字_大太斜.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
 
                 this._初めての進行描画 = true;

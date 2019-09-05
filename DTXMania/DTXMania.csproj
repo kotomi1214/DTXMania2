@@ -187,7 +187,7 @@
     <Compile Include="ステージ\04選曲\UpdatingSoglistパネル.cs" />
     <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
     <Compile Include="ステージ\04選曲\曲リスト.cs" />
-    <Compile Include="ステージ\04選曲\曲別SKILL.cs" />
+    <Compile Include="ステージ\04選曲\曲別スキルと達成率.cs" />
     <Compile Include="ステージ\04選曲\表示方法選択パネル.cs" />
     <Compile Include="ステージ\04選曲\選択曲枠ランナー.cs" />
     <Compile Include="ステージ\04選曲\選曲ステージ.cs" />
@@ -881,7 +881,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\選曲\達成率ゲージアイコン.png">
+    <None Include="System\Images\達成率アイコン.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
