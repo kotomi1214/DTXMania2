@@ -132,6 +132,7 @@ namespace DTXMania
                     this.BGMAdjust = song.BGMAdjust;
 
                     // ノード画像（プレビュー画像）を生成する。
+                    this.ノード画像?.Dispose();
                     this.ノード画像 = ( song.PreImage.Nullでも空でもない() ) ?
                         new テクスチャ( Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage ) ) : null;
 
