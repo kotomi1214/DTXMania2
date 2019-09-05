@@ -367,7 +367,7 @@ namespace DTXMania.選曲
                 //----------------
                 if( musicNode.達成率.HasValue )
                 {
-                    this._達成率ゲージアイコン.描画する( ノード左上dpx.X + 160f, ノード左上dpx.Y - 25f, X方向拡大率: 0.4f, Y方向拡大率: 0.4f );
+                    this._達成率ゲージアイコン.描画する( ノード左上dpx.X + 160f, ノード左上dpx.Y - 27f, X方向拡大率: 0.4f, Y方向拡大率: 0.4f );
 
                     this._達成率数字画像.描画する( dc, ノード左上dpx.X + 204f, ノード左上dpx.Y + 4, musicNode.達成率.Value.ToString( "0.00" ).PadLeft( 6 ) + '%', 拡大率: new Size2F( 0.3f, 0.3f ) );
 
