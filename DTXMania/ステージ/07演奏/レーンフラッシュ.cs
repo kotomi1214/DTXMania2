@@ -6,7 +6,7 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania.演奏.EXPERT
+namespace DTXMania.演奏
 {
     class レーンフラッシュ : IDisposable
     {
@@ -19,10 +19,10 @@ namespace DTXMania.演奏.EXPERT
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュEXPERT.png" ) { 加算合成する = true };
+                this._レーンフラッシュ画像 = new テクスチャ( @"$(System)images\演奏\レーンフラッシュ.png" ) { 加算合成する = true };
 
                 {
-                    var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\レーンフラッシュEXPERT.yaml" );
+                    var 設定ファイルパス = new VariablePath( @"$(System)images\演奏\レーンフラッシュ.yaml" );
 
                     var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
                     var deserializer = new YamlDotNet.Serialization.Deserializer();

@@ -9,23 +9,19 @@ namespace DTXMania
 {
     /// <summary>
     ///		成績テーブルのエンティティクラス。
-    ///		バージョン 6。
+    ///		バージョン 7。
     /// </summary>
-    /// <remarks>
-    ///		変更点：
-    ///		なし
-    /// </remarks>
     [Table( Name = "Records" )]   // テーブル名は複数形
-    class Record06 : ICloneable
+    class Record07 : ICloneable
     {
         /// <summary>
-        ///		ユーザを一意に識別するID。
+        ///		ユーザを一意に識別するID。[key1/2]
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false, IsPrimaryKey = true )]
         public string UserId { get; set; }
 
         /// <summary>
-        ///		曲譜面ファイルのハッシュ値。
+        ///		曲譜面ファイルのハッシュ値。[key2/2]
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false, IsPrimaryKey = true )]
         public string SongHashId { get; set; }
@@ -38,20 +34,14 @@ namespace DTXMania
 
         /// <summary>
         ///		カウントマップラインのデータ。
-        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.ステージ.演奏.カウントマップライン.カウントマップの最大要素数"/> 個の文字が並ぶ。
+        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.演奏.クリアメーター.カウントマップの最大要素数"/> 個の文字が並ぶ。
         ///		もし不足分があれば、'0' とみなされる。
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false )]
         public string CountMap { get; set; }
 
         /// <summary>
-        ///		曲別SKILL。
-        /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
-        public double Skill { get; set; }
-
-        /// <summary>
-        ///		達成率。
+        ///		達成率[%]。0～100。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
         public double Achievement { get; set; }
@@ -61,20 +51,19 @@ namespace DTXMania
         /// <summary>
         ///		規定値で初期化。
         /// </summary>
-        public Record06()
+        public Record07()
         {
             this.UserId = "Anonymous";
             this.SongHashId = "";
             this.Score = 0;
             this.CountMap = "";
-            this.Skill = 0.0;
             this.Achievement = 0.0;
         }
 
         // ICloneable 実装
-        public Record06 Clone()
+        public Record07 Clone()
         {
-            return (Record06) this.MemberwiseClone();
+            return (Record07) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
@@ -91,7 +80,6 @@ namespace DTXMania
             @", SongHashId NVARCHAR NOT NULL" +
             @", Score INTEGER NOT NULL" +
             @", CountMap NVARCHAR NOT NULL" +
-            @", Skill REAL NOT NULL" +
             @", Achievement REAL NOT NULL" +
             @", PRIMARY KEY(`UserId`,`SongHashId`)" +
             @")";

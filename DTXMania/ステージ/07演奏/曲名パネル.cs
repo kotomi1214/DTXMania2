@@ -142,7 +142,7 @@ namespace DTXMania.演奏
 
         private readonly Vector3 _サムネイル画像表示サイズdpx = new Vector3( 91f, 91f, 0f );
 
-        private readonly Vector2 _曲名表示位置dpx = new Vector2( 1576f + 4f, 43f + 10f );
+        private readonly Vector2 _曲名表示位置dpx = new Vector2( 1576f + 4f, 43f + 0f );
 
         private readonly Vector2 _曲名表示サイズdpx = new Vector2( 331f - 8f - 4f, 70f - 10f );
     }

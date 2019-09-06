@@ -46,7 +46,7 @@ namespace FDK
             {
                 Log._一定時間が経過していたら区切り線を表示する();
 
-                Trace.WriteLine( $"{tagWARNING} {Log._日時とスレッドID} {出力}" );
+                Trace.WriteLine( $"{tagWARNING} {Log._日時とスレッドID} {Log._インデックスを返す( Log._深さ )}{出力}" );
             }
         }
 
@@ -56,7 +56,7 @@ namespace FDK
             {
                 Log._一定時間が経過していたら区切り線を表示する();
 
-                Trace.WriteLine( $"{tagERROR} {Log._日時とスレッドID} {出力}" );
+                Trace.WriteLine( $"{tagERROR} {Log._日時とスレッドID} {Log._インデックスを返す( Log._深さ )}{出力}" );
             }
         }
 

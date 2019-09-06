@@ -6,7 +6,7 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania.演奏.EXPERT
+namespace DTXMania.演奏
 {
     class ドラムキットとヒットバー : IDisposable
     {

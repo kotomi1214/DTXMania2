@@ -187,7 +187,7 @@
     <Compile Include="ステージ\04選曲\UpdatingSoglistパネル.cs" />
     <Compile Include="ステージ\04選曲\曲ステータスパネル.cs" />
     <Compile Include="ステージ\04選曲\曲リスト.cs" />
-    <Compile Include="ステージ\04選曲\曲別SKILL.cs" />
+    <Compile Include="ステージ\04選曲\曲別スキルと達成率.cs" />
     <Compile Include="ステージ\04選曲\表示方法選択パネル.cs" />
     <Compile Include="ステージ\04選曲\選択曲枠ランナー.cs" />
     <Compile Include="ステージ\04選曲\選曲ステージ.cs" />
@@ -216,17 +216,12 @@
     <Compile Include="ステージ\06曲読み込み\曲読み込みステージ.cs" />
     <Compile Include="ステージ\06曲読み込み\プレビュー画像.cs" />
     <Compile Include="ステージ\06曲読み込み\難易度.cs" />
-    <Compile Include="ステージ\07演奏\BASIC\ドラムチップ.cs" />
-    <Compile Include="ステージ\07演奏\BASIC\ドラムパッド.cs" />
-    <Compile Include="ステージ\07演奏\BASIC\ヒットバー.cs" />
-    <Compile Include="ステージ\07演奏\BASIC\レーンフラッシュ.cs" />
-    <Compile Include="ステージ\07演奏\BASIC\レーンフレーム.cs" />
-    <Compile Include="ステージ\07演奏\EXPERT\ドラムキットとヒットバー.cs" />
-    <Compile Include="ステージ\07演奏\EXPERT\ドラムチップ.cs" />
-    <Compile Include="ステージ\07演奏\EXPERT\レーンフラッシュ.cs" />
-    <Compile Include="ステージ\07演奏\EXPERT\レーンフレーム.cs" />
+    <Compile Include="ステージ\07演奏\ドラムキットとヒットバー.cs" />
+    <Compile Include="ステージ\07演奏\ドラムチップ.cs" />
+    <Compile Include="ステージ\07演奏\レーンフラッシュ.cs" />
+    <Compile Include="ステージ\07演奏\レーンフレーム.cs" />
     <Compile Include="ステージ\07演奏\エキサイトゲージ.cs" />
-    <Compile Include="ステージ\07演奏\カウントマップライン.cs" />
+    <Compile Include="ステージ\07演奏\クリアメータ―.cs" />
     <Compile Include="ステージ\07演奏\コンボ表示.cs" />
     <Compile Include="ステージ\07演奏\スコア表示.cs" />
     <Compile Include="ステージ\07演奏\チップの演奏状態.cs" />
@@ -261,11 +256,12 @@
     <Compile Include="ステージ\舞台画像.cs" />
     <Compile Include="ステージ\青い線.cs" />
     <Compile Include="データベース\SQLiteDBBase.cs" />
-    <Compile Include="データベース\ユーザ\old\Record01.cs" />
-    <Compile Include="データベース\ユーザ\old\Record02.cs" />
-    <Compile Include="データベース\ユーザ\old\Record03.cs" />
-    <Compile Include="データベース\ユーザ\old\Record04.cs" />
-    <Compile Include="データベース\ユーザ\old\Record05.cs" />
+    <Compile Include="データベース\ユーザ\old\User11.cs" />
+    <Compile Include="データベース\成績\old\Record01.cs" />
+    <Compile Include="データベース\成績\old\Record02.cs" />
+    <Compile Include="データベース\成績\old\Record03.cs" />
+    <Compile Include="データベース\成績\old\Record04.cs" />
+    <Compile Include="データベース\成績\old\Record05.cs" />
     <Compile Include="データベース\ユーザ\old\User01.cs" />
     <Compile Include="データベース\ユーザ\old\User02.cs" />
     <Compile Include="データベース\ユーザ\old\User03.cs" />
@@ -275,10 +271,12 @@
     <Compile Include="データベース\ユーザ\old\User07.cs" />
     <Compile Include="データベース\ユーザ\old\User08.cs" />
     <Compile Include="データベース\ユーザ\old\User09.cs" />
-    <Compile Include="データベース\ユーザ\Record06.cs" />
-    <Compile Include="データベース\ユーザ\User11.cs" />
+    <Compile Include="データベース\成績\old\Record06.cs" />
+    <Compile Include="データベース\成績\Record07.cs" />
+    <Compile Include="データベース\ユーザ\User12.cs" />
     <Compile Include="データベース\ユーザ\old\User10.cs" />
     <Compile Include="データベース\ユーザ\UserDB.cs" />
+    <Compile Include="データベース\成績\RecordDB.cs" />
     <Compile Include="データベース\曲\old\Song01.cs" />
     <Compile Include="データベース\曲\old\Song02.cs" />
     <Compile Include="データベース\曲\old\Song03.cs" />
@@ -318,13 +316,11 @@
     <Compile Include="設定\システム設定\old\キーバインディング02.cs" />
     <Compile Include="設定\システム設定\old\システム設定02.cs" />
     <Compile Include="設定\成績.cs" />
-    <Compile Include="曲\曲DB.cs" />
     <Compile Include="曲\Node\Node.TitleTexture.cs" />
     <Compile Include="設定\ドラムサウンド.cs" />
     <Compile Include="設定\ユーザ管理.cs" />
     <Compile Include="設定\ユーザ設定.cs" />
     <Compile Include="設定\種別\AutoPlay種別.cs" />
-    <Compile Include="設定\種別\PlayMode.cs" />
     <Compile Include="設定\システムサウンド.cs" />
     <Compile Include="設定\種別\システムサウンド種別.cs" />
     <Compile Include="設定\システム設定\システム設定.cs" />
@@ -398,37 +394,16 @@
     <None Include="System\Images\演奏\ドラムキットとヒットバー.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Images\演奏\ドラムチップBASIC.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\ドラムチップEXPERT.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\ドラムパッド.yaml">
+    <None Include="System\Images\演奏\ドラムチップ.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="System\Images\演奏\パラメータ用判定種別文字.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="System\Images\演奏\レーンフラッシュBASIC.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\レーンフラッシュEXPERT.yaml">
+    <None Include="System\Images\演奏\レーンフラッシュ.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="System\Images\演奏\レーン配置\Expert.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\レーン配置\TypeA.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\レーン配置\TypeB.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\レーン配置\TypeC.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="System\Images\演奏\レーン配置\TypeD.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="System\Images\演奏\判定FastSlow数値.yaml">
@@ -438,6 +413,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="System\Images\演奏\演奏位置カーソル.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="System\Images\選曲\成績アイコン_曲リスト用.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="System\Sounds\Presets\Default\カーソル移動音.ogg">
@@ -543,17 +521,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\演奏\ドラムチップBASIC.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\演奏\ドラムチップEXPERT.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\演奏\ドラムパッド.png">
+    <None Include="System\Images\演奏\ドラムチップ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -563,17 +531,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\演奏\ヒットバー.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\演奏\レーンフラッシュBASIC.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\演奏\レーンフラッシュEXPERT.png">
+    <None Include="System\Images\演奏\レーンフラッシュ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -693,22 +651,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\認証\パネル_0.png">
+    <None Include="System\Images\認証\パネル.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\認証\パネル_0_光彩あり.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\認証\パネル_1.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\認証\パネル_1_光彩あり.png">
+    <None Include="System\Images\認証\パネル光彩あり.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -718,12 +666,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="System\Images\認証\肩書きパネル_0.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="System\Images\認証\肩書きパネル_1.png">
+    <None Include="System\Images\認証\肩書きパネル.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -929,6 +872,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="System\Images\選曲\Updating songlist.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\選曲\成績アイコン_曲リスト用.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\達成率アイコン.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

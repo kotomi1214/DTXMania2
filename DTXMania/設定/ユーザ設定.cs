@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.User11;
+using User = DTXMania.User12;
 
 namespace DTXMania
 {
@@ -57,12 +57,6 @@ namespace DTXMania
         public HookedDictionary<判定種別, double> 最大ヒット距離sec { get; set; } = null;
 
         public ドラムチッププロパティ管理 ドラムチッププロパティ管理 { get; protected set; } = null;
-
-        public PlayMode 演奏モード
-        {
-            get => (PlayMode) this._User.PlayMode;
-            set => this._User.PlayMode = (int) value;
-        }
 
         public 表示レーンの左右 表示レーンの左右
         {
@@ -156,7 +150,6 @@ namespace DTXMania
                 };
 
                 this.ドラムチッププロパティ管理 = new ドラムチッププロパティ管理(
-                    (PlayMode) this._User.PlayMode,
                     new 表示レーンの左右() { Chinaは左 = false, Rideは左 = false, Splashは左 = true },
                     入力グループプリセット種別.基本形 );
 
@@ -359,7 +352,6 @@ namespace DTXMania
             #endregion
             #region " ドラムチッププロパティ "
             //----------------
-            this.ドラムチッププロパティ管理.反映する( this.演奏モード );
             this.ドラムチッププロパティ管理.反映する( this.表示レーンの左右 );
             this.ドラムチッププロパティ管理.反映する( ( this.シンバルフリーモードである ) ? 入力グループプリセット種別.シンバルフリー : 入力グループプリセット種別.基本形 );
             //----------------

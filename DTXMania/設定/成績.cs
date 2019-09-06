@@ -5,7 +5,7 @@ using System.Linq;
 using SSTFormatCurrent = SSTFormat.v4;
 using FDK;
 
-using Record = DTXMania.Record06;
+using Record = DTXMania.Record07;
 
 namespace DTXMania
 {
@@ -17,32 +17,37 @@ namespace DTXMania
     {
         /// <summary>
         ///     現在のコンボ数。
+        ///     AutoPlayチップを含む。
         /// </summary>
         public int Combo { get; protected set; } = 0;
 
         /// <summary>
         ///     現在までの最大コンボ数。
+        ///     AutoPlayチップを含む。
         /// </summary>
         public int MaxCombo { get; protected set; } = 0;
         
         /// <summary>
-        ///		0.0で0%、1.0で100%。
+        ///		エキサイトゲージの割合。空:0～1:最大
         /// </summary>
         public float エキサイトゲージ量 { get; protected set; }
-        
+
         /// <summary>
         ///		現在の設定において、ヒット対象になるノーツの数を返す。
+        ///     AutoPlayチップを含む。
         /// </summary>
         public int 総ノーツ数 { get; protected set; } = 0;
-        
+
         /// <summary>
         ///		判定種別ごとのヒット数。
+        ///     AutoPlayチップを含む。
         /// </summary>
         public IReadOnlyDictionary<判定種別, int> 判定toヒット数 => this._判定toヒット数;
-        
+
         /// <summary>
         ///		現在の <see cref="判定toヒット数"/> から、判定種別ごとのヒット割合を算出して返す。
         ///		判定種別のヒット割合は、すべて合計すればちょうど 100 になる。
+        ///     ヒット数にはAutoPlayチップを含む。
         /// </summary>
         public IReadOnlyDictionary<判定種別, int> 判定toヒット割合 => this._ヒット割合を算出して返す();
 
@@ -50,6 +55,57 @@ namespace DTXMania
         ///     最終的に判定されたランク。
         /// </summary>
         public ランク種別 ランク { get; protected set; } = ランク種別.E;
+
+        /// <summary>
+        ///     現在のスキル値。
+        /// </summary>
+        public double スキル => 成績.スキルを算出する( this._譜面レベル, this.Achievement );
+
+
+
+        // static
+
+
+        /// <summary>
+        ///     達成率（0～99.99）を算出して返す。
+        /// </summary>
+        /// <param name="総ノーツ数"></param>
+        /// <param name="Perfect数"></param>
+        /// <param name="Great数"></param>
+        /// <param name="最大コンボ数"></param>
+        /// <param name="オプション補正">0～1。</param>
+        public static double 達成率を算出する( int 総ノーツ数, int Perfect数, int Great数, int 最大コンボ数, double オプション補正 )
+        {
+            double 判定値 = _小数第3位以下切り捨て( ( Perfect数 * 85.0 + Great数 * 35.0 ) / 総ノーツ数 );
+            double COMBO値 = _小数第3位以下切り捨て( 最大コンボ数 * 15.0 / 総ノーツ数 );
+
+            // 判定値とCOMBO値にはAutoチップも含まれるので、すべてAutoPlayONであっても、達成率はゼロにはならない。
+            // その代わり、オプション補正でガシガシ削る。
+            return _小数第3位以下切り捨て( ( 判定値 + COMBO値 ) * オプション補正 );
+        }
+
+        /// <summary>
+        ///     スキル値（0～199.80）を算出して返す。
+        /// </summary>
+        public static double スキルを算出する( double 譜面レベル, double 達成率0to100 )
+        {
+            return _小数第3位以下切り捨て( ( 達成率0to100 * 譜面レベル * 20.0 ) / 100.0 );
+        }
+
+        /// <summary>
+        ///     達成率(0～99.99)からランクを算出して返す。
+        /// </summary>
+        public static ランク種別 ランクを算出する( double 達成率0to100 )
+        {
+            return                                          // 範囲
+                ( 95 <= 達成率0to100 ) ? ランク種別.SS :    //  5 %
+                ( 88 <= 達成率0to100 ) ? ランク種別.S :     //  7 %
+                ( 80 <= 達成率0to100 ) ? ランク種別.A :     //  8 %
+                ( 70 <= 達成率0to100 ) ? ランク種別.B :     // 10 %
+                ( 60 <= 達成率0to100 ) ? ランク種別.C :     // 10 %
+                ( 40 <= 達成率0to100 ) ? ランク種別.D :     // 20 %
+                ランク種別.E;                               // 40 %
+        }
 
 
 
@@ -66,20 +122,14 @@ namespace DTXMania
                 this.Achievement = 0.0f;
                 this.総ノーツ数 = 0;
 
+                this._譜面レベル = 0.5;
                 this._判定toヒット数 = new Dictionary<判定種別, int>();
-                this._判定toヒット数Auto含まない = new Dictionary<判定種別, int>();
                 this._最後にスコアを更新したときの判定toヒット数 = new Dictionary<判定種別, int>();
                 foreach( 判定種別 judge in Enum.GetValues( typeof( 判定種別 ) ) )
                 {
                     this._判定toヒット数.Add( judge, 0 );
-                    this._判定toヒット数Auto含まない.Add( judge, 0 );
                     this._最後にスコアを更新したときの判定toヒット数.Add( judge, 0 );
                 }
-
-                // TODO: AutoPlay の状態から、達成率用のオプション補正を算出。
-                this._オプション補正 = 1.0;
-
-                this._譜面レベル = 0.5;
             }
         }
 
@@ -88,28 +138,34 @@ namespace DTXMania
         // 操作
 
 
+        /// <summary>
+        ///     譜面情報とユーザ設定情報を設定する。
+        ///     以降の成績の計算には、これらの設定値が使用される。
+        /// </summary>
         public void スコアと設定を反映する( SSTFormatCurrent.スコア 譜面, ユーザ設定 設定 )
         {
+            this._ユーザ設定 = 設定;
+
             this.総ノーツ数 = ( null != 譜面 && null != 設定 ) ? this._総ノーツ数を算出して返す( 譜面, 設定 ) : 0;
+
             this._譜面レベル = 譜面?.難易度 ?? 0.5;
         }
 
         /// <summary>
-        ///		ヒット数を加算し、各プロパティを更新する。
+        ///		判定に応じて成績（エキサイトゲージを除く）を更新する。
         /// </summary>
-        public void ヒット数を加算する( 判定種別 judge, bool auto, int 加算値 = 1 )
+        public void 成績を更新する( 判定種別 判定, bool autoPlay )
         {
-            // (1) ヒット数を加算する。
-            {
-                this._判定toヒット数[ judge ] += 加算値;
+            #region " ヒット数を加算する。"
+            //----------------
+            this._判定toヒット数[ 判定 ]++;
+            //----------------
+            #endregion
 
-                if( !auto )
-                    this._判定toヒット数Auto含まない[ judge ] += 加算値;
-            }
-
-            // (2) コンボを加算する。
+            #region " コンボを加算する。"
+            //----------------
             {
-                bool コンボ切れ = ( judge == 判定種別.OK || judge == 判定種別.MISS );
+                bool コンボ切れ = ( 判定 == 判定種別.OK || 判定 == 判定種別.MISS );
 
                 if( コンボ切れ )
                 {
@@ -121,8 +177,11 @@ namespace DTXMania
                     this.MaxCombo = Math.Max( this.Combo, this.MaxCombo );
                 }
             }
+            //----------------
+            #endregion
 
-            // (3) スコアを加算する。
+            #region " スコアを加算する。"
+            //----------------
             {
                 if( this.総ノーツ数 == this._判定toヒット数[ 判定種別.PERFECT ] )
                 {
@@ -132,59 +191,62 @@ namespace DTXMania
                 else
                 {
                     // それ以外は通常の加点。
-                    double 基礎点 = 1000000.0 / ( 1275.0 + 50.0 * ( this.総ノーツ数 - 50 ) );
+                    double 基礎点 = 100_0000.0 / ( 1275.0 + 50.0 * ( this.総ノーツ数 - 50 ) );
                     int コンボ数 = Math.Min( this.Combo, 50 );
 
-                    this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ judge ] );
+                    this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ 判定 ] );
                 }
             }
+            //----------------
+            #endregion
 
-            // (4) 達成率を更新する。
+            double オプション補正0to1 = 1.0;
+
+            #region " オプション補正を算出する。"
+            //----------------
             {
-                double 判定値 = Math.Floor( 100.0 * ( ( this._判定toヒット数[ 判定種別.PERFECT ] * 85.0 + this._判定toヒット数[ 判定種別.GREAT ] * 35.0 ) / this.総ノーツ数 ) ) / 100.0;    // 小数第3位以下切り捨て
-                double フレーズコンボ成功率 = 0.0;    // 未対応
-                double COMBO値 = Math.Floor( 100.0 * ( ( this.MaxCombo * 5.0 / this.総ノーツ数 ) + ( フレーズコンボ成功率 * 10.0 ) ) ) / 100.0; // 小数第3位以下切り捨て
-
-                this.Achievement = (float) ( Math.Floor( 100.0 * ( ( 判定値 + COMBO値 ) * this._オプション補正 ) ) / 100.0 );    // 小数第3位以下切り捨て
-            }
-
-            // (5) SKILL値を更新する。
-            this.Skill = (float) ( Math.Floor( 100.0 * ( ( this.Achievement * this._譜面レベル * 20.0 ) / 100.0 ) ) / 100.0 );       // 小数第3位以下切り捨て
-
-            // (6) エキサイトゲージ → ここからは呼び出さない。（AutoPlayと区別がつかないため）
-
-            // (7) ランクを更新する。
-            {
-                int Perfect = this._判定toヒット数Auto含まない[ 判定種別.PERFECT ];
-                int Great = this._判定toヒット数Auto含まない[ 判定種別.GREAT ];
-                int Good = this._判定toヒット数Auto含まない[ 判定種別.GOOD ];
-                int Ok = this._判定toヒット数Auto含まない[ 判定種別.OK ];
-                int Miss = this._判定toヒット数Auto含まない[ 判定種別.MISS ];
-                int Total = Perfect + Great + Good + Ok + Miss;
-
-                if( 0 == Total )
+                if( this._ユーザ設定.AutoPlayがすべてONである )
                 {
-                    this.ランク = ランク種別.SS;    // 全AUTOならSS
+                    // (A) すべて ON → 補正なし(x1.0), ただしDBには保存されない。
+                    オプション補正0to1 = 1.0;
                 }
                 else
                 {
-                    var rate = ( (double) ( Perfect + Great ) ) / ( (double) Total );
-
-                    this.ランク =
-                        ( 1.00 == rate ) ? ランク種別.SS :
-                        ( 0.95 <= rate ) ? ランク種別.S :
-                        ( 0.90 <= rate ) ? ランク種別.A :
-                        ( 0.85 <= rate ) ? ランク種別.B :
-                        ( 0.80 <= rate ) ? ランク種別.C :
-                        ( 0.70 <= rate ) ? ランク種別.D : ランク種別.E;
+                    // (B) 一部だけ ON → AutoPlay が ON になっている個所に応じて補正する。
+                    foreach( var kvp in this._ユーザ設定.AutoPlay )
+                    {
+                        if( kvp.Value && this._Auto時の補正.ContainsKey( kvp.Key ) )
+                        {
+                            オプション補正0to1 *= this._Auto時の補正[ kvp.Key ];   // 補正値は累積
+                        }
+                    }
                 }
             }
+            //----------------
+            #endregion
+
+            #region " 達成率を更新する。"
+            //----------------
+            this.Achievement = 達成率を算出する(
+                this.総ノーツ数,                          // Auto含む
+                this._判定toヒット数[ 判定種別.PERFECT ], // Auto含む
+                this._判定toヒット数[ 判定種別.GREAT ],   // Auto含む
+                this.MaxCombo,                            // Auto含む
+                オプション補正0to1 );
+            //----------------
+            #endregion
+
+            #region " ランクを更新する。"
+            //----------------
+            this.ランク = ランクを算出する( this.Achievement );
+            //----------------
+            #endregion
         }
 
         /// <summary>
         ///		判定に応じてエキサイトゲージを加減する。
         /// </summary>
-        public void エキサイトゲージを加算する( 判定種別 judge )
+        public void エキサイトゲージを更新する( 判定種別 judge )
         {
             switch( judge )
             {
@@ -205,8 +267,6 @@ namespace DTXMania
 
         private Dictionary<判定種別, int> _判定toヒット数 = null;
 
-        private Dictionary<判定種別, int> _判定toヒット数Auto含まない = null;
-
         private Dictionary<判定種別, int> _最後にスコアを更新したときの判定toヒット数 = null;
 
         private readonly Dictionary<判定種別, double> _判定値表 = new Dictionary<判定種別, double>() {
@@ -217,9 +277,25 @@ namespace DTXMania
             { 判定種別.MISS,    0.0 },
         };
 
-        private double _オプション補正 = 1.0;
+        /// <summary>
+        ///     Autoを使用した場合のオプション補正。
+        ///     達成率に乗じる数値なので、Autoにすると演奏が簡単になる（と思われる）ものほど補正値は小さくなる。
+        /// </summary>
+        private readonly Dictionary<AutoPlay種別, double> _Auto時の補正 = new Dictionary<AutoPlay種別, double>() {
+            { AutoPlay種別.LeftCrash, 0.9 },
+            { AutoPlay種別.HiHat, 0.5 },
+            { AutoPlay種別.Foot, 1.0 },       // Foot は判定に使われない。
+            { AutoPlay種別.Snare, 0.5 },
+            { AutoPlay種別.Bass, 0.5 },
+            { AutoPlay種別.Tom1, 0.7 },
+            { AutoPlay種別.Tom2, 0.7 },
+            { AutoPlay種別.Tom3, 0.8 },
+            { AutoPlay種別.RightCrash, 0.9 },
+        };
 
         private double _譜面レベル = 5.0;
+
+        private ユーザ設定 _ユーザ設定 = null;
 
 
         private IReadOnlyDictionary<判定種別, int> _ヒット割合を算出して返す()
@@ -322,6 +398,9 @@ namespace DTXMania
             return ヒット割合_整数;
         }
 
+        /// <summary>
+        ///     スコアのチップリストのうち、判定対象のチップの数を返す。
+        /// </summary>
         private int _総ノーツ数を算出して返す( SSTFormatCurrent.スコア score, ユーザ設定 options )
         {
             int 総ノーツ数 = 0;
@@ -329,45 +408,21 @@ namespace DTXMania
             foreach( var chip in score.チップリスト )
             {
                 var ドラムチッププロパティ = options.ドラムチッププロパティ管理[ chip.チップ種別 ];
-
-                // AutoPlay ON のチップは、すべての AutoPlay が ON である場合を除いて、カウントしない。
-                //if( options.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ] &&
-                //    !( options.AutoPlayがすべてONである ) )
-                //        continue;
-                // AutoPlay OFF 時でもユーザヒットの対象にならないチップはカウントしない。
-                //if( !( ドラムチッププロパティ.AutoPlayOFF_ユーザヒット ) )
-                //    continue;
-
-                bool 判定対象である = true;
-
-
-                bool チップのAutoPlayはONである =
-                    options.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
-
-                if( チップのAutoPlayはONである )
-                {
-                    if( options.AutoPlayがすべてONである )
-                    {
-                        判定対象である = ドラムチッププロパティ.AutoPlayON_自動ヒット_判定;
-                    }
-                    else
-                    {
-                        判定対象である = false;
-                    }
-                }
-                else
-                {
-                    判定対象である = ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定;
-                }
-
+                bool AutoPlayである = options.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ];
+                bool 判定対象である = ( AutoPlayである ) ?
+                    ドラムチッププロパティ.AutoPlayON_自動ヒット_判定 :
+                    ドラムチッププロパティ.AutoPlayOFF_ユーザヒット_判定;
 
                 if( 判定対象である )
-                {
                     総ノーツ数++;
-                }
             }
 
             return 総ノーツ数;
+        }
+
+        private static double _小数第3位以下切り捨て( double v )
+        {
+            return Math.Floor( 100.0 * v ) / 100.0;
         }
     }
 }

@@ -114,22 +114,28 @@ namespace DTXMania
         /// </summary>
         public IEnumerable<Node> Traverse()
         {
+            // 幅優先探索。
+
+            // (1) 自分。
             yield return this;
 
-            // (A) 深さ優先
-            //foreach( var child in this.子ノードリスト )
-            //{
-            //    foreach( var n in child.Traverse() )
-            //    {
-            //        yield return n;
-            //    }
-            //}
+            // (2) SetNode内MusicNode。
+            if( this is SetNode setnode )
+            {
+                foreach( var music in setnode.MusicNodes )
+                {
+                    if( null != music )
+                        yield return music;
+                }
+            }
 
-            // (B) 幅優先
+            // (3) 子ノードリスト。
             foreach( var child in this.子ノードリスト )
             {
                 yield return child;
             }
+
+            // (4) 子ノードのその他。
             foreach( var child in this.子ノードリスト )
             {
                 foreach( var n in child.Traverse() )

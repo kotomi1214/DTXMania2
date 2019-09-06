@@ -37,31 +37,34 @@ namespace DTXMania.演奏
         // 進行と描画
 
 
-        public void 描画する( DeviceContext dc, float 達成率 )
+        public void 描画する( DeviceContext dc, float 達成率0to100 )
         {
-            var 描画領域 = new RectangleF( 220f, 650f, 165f, 80f );
-            達成率 = Math.Max( Math.Min( 達成率, 99.99f ), 0f );  // 0～99.99にクリッピング
+            var 描画領域 = new RectangleF( 200f, 650f, 165f, 80f );
 
-            string 達成率文字列 = ( 達成率.ToString( "0.00" ) + '%' ).PadLeft( 6 ).Replace( ' ', 'o' );  // 右詰め、余白は'o'。例:"99.00%", "o8.12%", "o0.00%"
+            string 達成率文字列;
+            if( MathUtil.NearEqual( 100f, 達成率0to100 ) )
+                達成率文字列 = "100.00%";
+            else
+                達成率文字列 = ' ' + ( 達成率0to100.ToString( "0.00" ) + '%' ).PadLeft( 6 ).Replace( ' ', 'o' );  // 右詰め、余白は'o'。例:"99.00%", "o8.12%", "o0.00%"
 
 
             // 達成率ロゴを描画する
 
             var 変換行列2D =
                 Matrix3x2.Scaling( 0.4f, 0.5f ) *
-                Matrix3x2.Translation( 描画領域.X - 30f, 描画領域.Y - 60f );
+                Matrix3x2.Translation( 描画領域.X - 46f, 描画領域.Y - 60f );
 
             this._達成率ロゴ画像.描画する( dc, 変換行列2D );
 
 
             // 小数部を描画する（'%'含む）
 
-            this._数字画像.描画する( dc, 描画領域.X + 65f, 描画領域.Y + ( 描画領域.Height * 0.2f ), 達成率文字列.Substring( 3 ), new Size2F( 0.5f, 0.8f ) );
+            this._数字画像.描画する( dc, 描画領域.X + 86f, 描画領域.Y + ( 描画領域.Height * 0.2f ), 達成率文字列.Substring( 4 ), new Size2F( 0.5f, 0.8f ) );
 
 
             // 整数部を描画する（'.'含む）
 
-            this._数字画像.描画する( dc, 描画領域.X, 描画領域.Y, 達成率文字列.Substring( 0, 3 ), new Size2F( 0.5f, 1.0f ) );
+            this._数字画像.描画する( dc, 描画領域.X, 描画領域.Y, 達成率文字列.Substring( 0, 4 ), new Size2F( 0.5f, 1.0f ) );
         }
 
 

@@ -9,14 +9,14 @@ namespace DTXMania.データベース.ユーザ.old
 {
     /// <summary>
     ///		成績テーブルのエンティティクラス。
-    ///		バージョン 2。
+    ///		バージョン 6。
     /// </summary>
     /// <remarks>
     ///		変更点：
     ///		なし
     /// </remarks>
     [Table( Name = "Records" )]   // テーブル名は複数形
-    class Record02 : ICloneable
+    class Record06 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別するID。
@@ -38,20 +38,20 @@ namespace DTXMania.データベース.ユーザ.old
 
         /// <summary>
         ///		カウントマップラインのデータ。
-        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.ステージ.演奏.カウントマップライン.カウントマップの最大要素数"/> 個の文字が並ぶ。
+        ///		１ブロックを１文字（'0':0～'C':12）で表し、<see cref="DTXMania.演奏.クリアメーター.カウントマップの最大要素数"/> 個の文字が並ぶ。
         ///		もし不足分があれば、'0' とみなされる。
         /// </summary>
         [Column( DbType = "NVARCHAR", CanBeNull = false )]
         public string CountMap { get; set; }
 
         /// <summary>
-        ///		曲別SKILL。
+        ///		曲別SKILL。0～199.80。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
         public double Skill { get; set; }
 
         /// <summary>
-        ///		達成率。
+        ///		達成率[%]。0～100。
         /// </summary>
         [Column( DbType = "REAL", CanBeNull = false )]
         public double Achievement { get; set; }
@@ -61,7 +61,7 @@ namespace DTXMania.データベース.ユーザ.old
         /// <summary>
         ///		規定値で初期化。
         /// </summary>
-        public Record02()
+        public Record06()
         {
             this.UserId = "Anonymous";
             this.SongHashId = "";
@@ -72,9 +72,9 @@ namespace DTXMania.データベース.ユーザ.old
         }
 
         // ICloneable 実装
-        public Record02 Clone()
+        public Record06 Clone()
         {
-            return (Record02) this.MemberwiseClone();
+            return (Record06) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {

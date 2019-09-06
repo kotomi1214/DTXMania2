@@ -62,7 +62,7 @@ namespace DTXMania.選曲
                 this._青い線 = new 青い線();
                 this._選択曲枠ランナー = new 選択曲枠ランナー();
                 this._BPMパネル = new BPMパネル();
-                this._曲別SKILL = new 曲別SKILL();
+                this._曲別スキルと達成率 = new 曲別スキルと達成率();
                 this._表示方法選択パネル = new 表示方法選択パネル();
                 this._SongNotFound = new 文字列画像() {
                     表示文字列 =
@@ -81,7 +81,9 @@ namespace DTXMania.選曲
                 this._黒 = new SolidColorBrush( dc, Color4.Black );
                 this._黒透過 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) );
                 this._灰透過 = new SolidColorBrush( dc, new Color4( 0x80535353 ) );
-
+                this._スクロールバー背景色 = new SolidColorBrush( dc, new Color4( 0.2f, 0.2f, 0.2f, 1.0f ) );
+                this._スクロールバー枠色 = new SolidColorBrush( dc, Color4.Black );
+                this._スクロールバーつまみ色 = new SolidColorBrush( dc, Color4.White );
                 this._上に伸びる導線の長さdpx = null;
                 this._左に伸びる導線の長さdpx = null;
                 this._プレビュー枠の長さdpx = null;
@@ -104,6 +106,9 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._スクロールバーつまみ色?.Dispose();
+                this._スクロールバー枠色?.Dispose();
+                this._スクロールバー背景色?.Dispose();
                 this._灰透過?.Dispose();
                 this._黒透過?.Dispose();
                 this._黒?.Dispose();
@@ -116,7 +121,7 @@ namespace DTXMania.選曲
                 this._UpdatingSoglistパネル?.Dispose();
                 this._SongNotFound?.Dispose();
                 this._表示方法選択パネル?.Dispose();
-                this._曲別SKILL?.Dispose();
+                this._曲別スキルと達成率?.Dispose();
                 this._BPMパネル?.Dispose();
                 this._選択曲枠ランナー?.Dispose();
                 this._青い線?.Dispose();
@@ -297,11 +302,12 @@ namespace DTXMania.選曲
                 this._曲ステータスパネル.描画する( dc );
                 this._プレビュー画像を描画する( dc, App進行描画.曲ツリー.フォーカスノード );
                 this._BPMパネル.描画する( dc );
-                this._曲別SKILL.進行描画する( dc );
+                this._曲別スキルと達成率.進行描画する( dc );
                 this._選択曲を囲む枠を描画する( dc );
                 this._選択曲枠ランナー.進行描画する( dc );
                 this._導線を描画する( dc );
                 this._ステージタイマー.描画する( 1689f, 37f );
+                this._スクロールバーを描画する( dc );
                 this._UpdatingSoglistパネル.進行描画する( 40f, 740f );
             }
             else
@@ -357,7 +363,7 @@ namespace DTXMania.選曲
 
         private BPMパネル _BPMパネル = null;
 
-        private 曲別SKILL _曲別SKILL = null;
+        private 曲別スキルと達成率 _曲別スキルと達成率 = null;
 
         private 表示方法選択パネル _表示方法選択パネル = null;
 
@@ -374,6 +380,12 @@ namespace DTXMania.選曲
         private SolidColorBrush _黒透過 = null;
 
         private SolidColorBrush _灰透過 = null;
+
+        private SolidColorBrush _スクロールバー背景色 = null;
+
+        private SolidColorBrush _スクロールバー枠色 = null;
+
+        private SolidColorBrush _スクロールバーつまみ色 = null;
 
         private readonly Vector3 _プレビュー画像表示位置dpx = new Vector3( 471f, 61f, 0f );
 
@@ -435,6 +447,33 @@ namespace DTXMania.選曲
             this._青い線.描画する( dc, new Vector2( 矩形.Left - this._青枠のマージンdpx, 矩形.Top ), 幅dpx: 矩形.Width + this._青枠のマージンdpx * 2f );
             this._青い線.描画する( dc, new Vector2( 矩形.Left - this._青枠のマージンdpx, 矩形.Bottom ), 幅dpx: 矩形.Width + this._青枠のマージンdpx * 2f );
             this._青い線.描画する( dc, new Vector2( 矩形.Left, 矩形.Top - this._青枠のマージンdpx ), 高さdpx: 矩形.Height + this._青枠のマージンdpx * 2f );
+        }
+
+        private void _スクロールバーを描画する( DeviceContext dc )
+        {
+            var 全矩形 = new RectangleF( 1901f, 231f, 9f, 732f );  // 枠線含まず
+
+            DXResources.Instance.D2DBatchDraw( dc, () => {
+
+                dc.DrawRectangle( 全矩形, this._スクロールバー枠色, 4f );
+                dc.FillRectangle( 全矩形, this._スクロールバー背景色 );
+
+                int 曲数 = App進行描画.曲ツリー.フォーカスリスト.Count;
+
+                if( 1 < 曲数 )
+                {
+                    float 曲の高さ = 全矩形.Height / 曲数;
+
+                    var つまみ矩形 = new RectangleF(
+                        全矩形.Left,
+                        全矩形.Top + 曲の高さ * App進行描画.曲ツリー.フォーカスノードのインデックス,
+                        全矩形.Width,
+                        Math.Max( 2f, 曲の高さ ) );      // つまみは最小 2dpx 厚
+
+                    dc.FillRectangle( つまみ矩形, this._スクロールバーつまみ色 );
+                }
+
+            } );
         }
 
 

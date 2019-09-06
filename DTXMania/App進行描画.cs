@@ -137,9 +137,6 @@ namespace DTXMania
                     結果を取得する = () => 演奏ステージ.成績,
                 };
                 this.終了ステージ = new 終了.終了ステージ();
-
-                // static なメンバの初期化。
-                演奏.BASIC.レーンフレーム.初期化する();
             }
         }
 
@@ -148,11 +145,6 @@ namespace DTXMania
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this.現在のステージ = null;
-
-
-                // static なメンバの終了。
-
-                演奏.BASIC.レーンフレーム.終了する();
 
 
                 // ステージを解放。

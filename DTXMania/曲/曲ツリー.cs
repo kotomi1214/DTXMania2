@@ -48,6 +48,23 @@ namespace DTXMania
         }
 
         /// <summary>
+        ///     現在選択されているノードのインデックス番号（0～）を返す。
+        /// </summary>
+        public int フォーカスノードのインデックス
+        {
+            get
+            {
+                if( null == this.フォーカスリスト )
+                    return 0;    // 未設定。
+
+                if( 0 > this.フォーカスリスト.SelectedIndex )
+                    return 0;    // リストが空。
+
+                return this.フォーカスリスト.SelectedIndex;
+            }
+        }
+
+        /// <summary>
         ///	    <see cref="フォーカスノード"/> が存在するノードリスト。
         ///	    変更するには、変更先のリスト内の任意のノードを選択すること。
         /// </summary>
@@ -472,21 +489,35 @@ namespace DTXMania
                 Log.現在のスレッドに名前をつける( "現行化" );
                 Log.Info( "曲ツリーの現行化を開始します。" );
 
-                // すべてのMusicNodeを現行化する。
-                foreach( var node in this.ルートノード.Traverse() )
+                // すべての MusicNode の現行化フラグと成績をリセットする。
+                foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                 {
-                    if( node is MusicNode music && music.現行化未実施 )
-                        music.現行化する();
-
-                    // キャンセル？
-                    if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                    if( node is MusicNode mnode )
                     {
-                        Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
-                        break;
+                        mnode.現行化未実施 = true;
+                        mnode.達成率 = null;
                     }
+                }
 
-                    // 一時停止？
-                    this.現行化タスクの一時停止.OFFになるまでブロックする();
+                // すべてのMusicNodeを現行化する。
+                using( var recorddb = new RecordDB() )
+                using( var songdb = new SongDB() )
+                {
+                    foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
+                    {
+                        if( node is MusicNode music )
+                            music.現行化する( songdb, recorddb );
+
+                        // キャンセル？
+                        if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                        {
+                            Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
+                            break;
+                        }
+
+                        // 一時停止？
+                        this.現行化タスクの一時停止.OFFになるまでブロックする();
+                    }
                 }
 
                 Log.Info( "曲ツリーの現行化を終了します。" );

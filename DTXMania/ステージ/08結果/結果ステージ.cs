@@ -7,6 +7,8 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
+using Record = DTXMania.Record07;
+
 namespace DTXMania.結果
 {
     class 結果ステージ : ステージ
@@ -91,9 +93,13 @@ namespace DTXMania.結果
 
                 App進行描画.システムサウンド.再生する( システムサウンド種別.ステージクリア );
 
-                // 成績をDBに記録。
-                if( !( App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlayがすべてONである ) )    // ただし全AUTOなら記録しない。
-                    曲DB.成績を追加または更新する( this._結果, App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID, 選択曲.曲ファイルハッシュ );
+
+                // 成績の反映。ただし、全AUTOなら行わない。
+
+                if( !( App進行描画.ユーザ管理.ログオン中のユーザ.AutoPlayがすべてONである ) )
+                {
+                    this._成績を反映する();
+                }
 
                 this._曲名画像.表示文字列 = 選択曲.タイトル;
                 this._サブタイトル画像.表示文字列 = 選択曲.サブタイトル;
@@ -137,6 +143,52 @@ namespace DTXMania.結果
 
                 base.On非活性化();
             }
+        }
+
+        private void _成績を反映する()
+        {
+            var 選択曲 = App進行描画.曲ツリー.フォーカス曲ノード;
+
+
+            // 成績を、RecordDB へ追加または反映する。
+
+            var ユーザID = App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID;
+            using( var recorddb = new RecordDB() )
+            {
+                var record = recorddb.Records.Where( ( r ) => ( r.UserId == ユーザID && r.SongHashId == 選択曲.曲ファイルハッシュ ) ).SingleOrDefault();
+
+                if( null == record )
+                {
+                    // (A) レコードが存在しない → 新規追加する。
+
+                    recorddb.Records.InsertOnSubmit( new Record() {
+                        UserId = ユーザID,
+                        SongHashId = 選択曲.曲ファイルハッシュ,
+                        Score = this._結果.Score,
+                        CountMap = "",  // TODO: CountMap を成績DBに保存する。
+                        Achievement = this._結果.Achievement,
+                    } );
+                }
+                else
+                {
+                    // (B) レコードがすでに存在する → 記録を更新していれば、更新する。
+
+                    if( record.Achievement < this._結果.Achievement )
+                    {
+                        record.Score = this._結果.Score;
+                        record.Achievement = this._結果.Achievement;
+                        // TODO: CountMap を成績DBに保存する。
+                        //record.CountMap = ...
+                    }
+                }
+
+                recorddb.DataContext.SubmitChanges();
+            }
+
+
+            // 成績を、曲ツリーへ反映する。
+
+            選択曲.達成率 = this._結果.Achievement;
         }
 
 

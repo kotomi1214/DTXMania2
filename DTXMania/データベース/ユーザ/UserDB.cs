@@ -8,29 +8,27 @@ using FDK;
 
 namespace DTXMania
 {
-    using User02 = データベース.ユーザ.old.User02;
-    using User = User11;        // 最新バージョンを指定（１／３）
-    using Record = Record06;    // 最新バージョンを指定（２／３）
+    using User = User12;        // 最新バージョンを指定（１／２）
+    using rRecord06 = データベース.成績.old.Record06;
+    using rUser02 = データベース.ユーザ.old.User02;
+    using rUser12 = User12;
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 11;  // 最新バージョンを指定（３／３）
+        public const long VERSION = 12;  // 最新バージョンを指定（２／２）
 
-        public static readonly VariablePath ユーザDBファイルパス = @"$(AppData)UserDB.sqlite3";
+        public static readonly VariablePath DBファイルパス = @"$(AppData)UserDB.sqlite3";
 
-        public Table<User> Users
-            => base.DataContext.GetTable<User>();
-        public Table<Record> Records
-            => base.DataContext.GetTable<Record>();
+        public Table<User> Users => base.DataContext.GetTable<User>();
 
         public UserDB()
         {
             try
             {
-                this.Open( ユーザDBファイルパス, VERSION );
+                this.Open( DBファイルパス, VERSION );
             }
             catch( Exception e )
             {
@@ -40,18 +38,18 @@ namespace DTXMania
                 //----------------
                 try
                 {
-                    File.Delete( ユーザDBファイルパス.変数なしパス );  // ファイルがない場合には例外は出ない
+                    File.Delete( DBファイルパス.変数なしパス );  // ファイルがない場合には例外は出ない
                 }
                 catch( Exception e2 )
                 {
-                    var msg = $"ユーザデータベースファイルの削除に失敗しました。[{ユーザDBファイルパス.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
+                    var msg = $"ユーザデータベースファイルの削除に失敗しました。[{DBファイルパス.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
                     Log.ERROR( msg );
                     throw new Exception( msg, e2 );  // どうしようもないので例外発出
                 }
                 //----------------
                 #endregion
 
-                this.Open( ユーザDBファイルパス, VERSION );
+                this.Open( DBファイルパス, VERSION );
             }
         }
 
@@ -65,8 +63,7 @@ namespace DTXMania
                     try
                     {
                         // 最新のバージョンのテーブルを作成する。
-                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Users {User.ColumnsList};" );
-                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Records {Record.ColumnList};" );
+                        this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Users {User.ColumnList};" );
                         this.DataContext.SubmitChanges();
 
                         // 成功。
@@ -89,7 +86,7 @@ namespace DTXMania
                     #region " 1 → 2 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルから SongFolders カラムを削除。
+                    // ・SongFolders カラムを削除。
                     this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
@@ -97,7 +94,7 @@ namespace DTXMania
                         try
                         {
                             // テータベースをアップデートしてデータを移行する。
-                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {User02.ColumnsList}" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser02.ColumnsList}" );
                             this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree FROM Users" );
                             this.DataContext.ExecuteCommand( "DROP TABLE Users" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
@@ -123,7 +120,7 @@ namespace DTXMania
                     #region " 2 → 3 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに PlayMode カラムを追加。
+                    // ・PlayMode カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -154,7 +151,7 @@ namespace DTXMania
                     #region " 3 → 4 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに RideLeft, ChinaLeft, SplashLeft カラムを追加。
+                    // ・RideLeft, ChinaLeft, SplashLeft カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -187,7 +184,7 @@ namespace DTXMania
                     #region " 4 → 5 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに DrumSound カラムを追加。
+                    // ・DrumSound カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -218,7 +215,7 @@ namespace DTXMania
                     #region " 5 → 6 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに LaneType カラムを追加。
+                    // ・LaneType カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -249,7 +246,7 @@ namespace DTXMania
                     #region " 6 → 7 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに LaneTrans カラムを追加。
+                    // ・LaneTrans カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -280,7 +277,7 @@ namespace DTXMania
                     #region " 7 → 8 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに BackgroundMovie カラムを追加。
+                    // ・BackgroundMovie カラムを追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -311,7 +308,7 @@ namespace DTXMania
                     #region " 8 → 9 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに PlaySpeed, ShowPartLine, ShorPartNumber を追加。
+                    // ・PlaySpeed, ShowPartLine, ShorPartNumber を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -344,7 +341,7 @@ namespace DTXMania
                     #region " 9 → 10 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに ShorScoreWall, BackgroundMovieSize を追加。
+                    // ・ShorScoreWall, BackgroundMovieSize を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -376,7 +373,7 @@ namespace DTXMania
                     #region " 10 → 11 "
                     //----------------
                     // 変更点:
-                    // ・Users テーブルに ShowFastSlow を追加。
+                    // ・ShowFastSlow を追加。
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
                     {
@@ -399,6 +396,104 @@ namespace DTXMania
                             throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                     }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 11:
+                    #region " 11 →12 "
+                    //----------------
+                    // 変更点：
+                    // ・UserDB.Records テーブルを廃止し、新規に作成する RecordDB.Records テーブルに移行。
+                    // ・PlayMode カラムを削除。
+                    this.DataContext.SubmitChanges();
+
+                    #region " RecordDB を新設し、UserDB11.Records の内容をコピーする。"
+                    //----------------
+                    using( var recorddb = new RecordDB() )
+                    using( var transaction = recorddb.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            foreach( var src in this.DataContext.GetTable<rRecord06>().ToArray() )
+                            {
+                                recorddb.Records.InsertOnSubmit(
+                                    new Record07() {
+                                        UserId = src.UserId,
+                                        SongHashId = src.SongHashId,
+                                        Score = src.Score,
+                                        CountMap = src.CountMap,
+                                        //Skill = src.Skill,        Record07 で Skill カラムは廃止
+                                        Achievement = src.Achievement,
+                                    } );
+                            }
+
+                            // 成功。
+                            transaction.Commit();
+                            recorddb.DataContext.SubmitChanges();
+                            Log.Info( "RecordDB を新設し、データを移行しました。" );
+                        }
+                        catch( Exception e )
+                        {
+                            // 失敗
+                            transaction.Rollback();
+                            throw new Exception( "RecordDB の新設とデータ移行に失敗しました。", e );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
+                    #region " UserDB.Records テーブルを削除する。"
+                    //----------------
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            this.DataContext.ExecuteCommand( "DROP TABLE Records" );
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( "UserDB.Records テーブルの削除に成功しました。" );
+                        }
+                        catch( Exception e )
+                        {
+                            transaction.Rollback();
+                            throw new Exception( "UserDB.Records テーブルの削除に失敗しました。", e );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
+                    #region " PlayMode カラムを削除する。"
+                    //----------------
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テータベースをアップデートしてデータを移行する。
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser12.ColumnList}" );
+                            this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneType,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow FROM Users" );
+                            this.DataContext.ExecuteCommand( "DROP TABLE Users" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( "Users テーブルをアップデートしました。[1→2]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( "Users テーブルのアップデートに失敗しました。[1→2]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+
                     //----------------
                     #endregion
                     break;

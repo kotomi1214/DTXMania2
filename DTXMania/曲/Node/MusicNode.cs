@@ -10,7 +10,7 @@ using FDK;
 using SSTFormat.v4;
 
 using Song = DTXMania.Song05;
-using Record = DTXMania.Record06;
+using Record = DTXMania.Record07;
 
 namespace DTXMania
 {
@@ -41,6 +41,23 @@ namespace DTXMania
 
 
 
+        // プロパティ（最高成績）
+
+
+        /// <summary>
+        ///     これまでの最高達成率。0～100。
+        ///     未設定なら null。
+        /// </summary>
+        public double? 達成率 { get; set; } = null;
+
+        /// <summary>
+        ///     これまでの最高ランク。
+        ///     未設定なら null。
+        /// </summary>
+        public ランク種別? ランク => ( this.達成率.HasValue ) ? 成績.ランクを算出する( this.達成率.Value ) : (ランク種別?) null;
+
+
+
         // 現行化ステータス
 
 
@@ -59,14 +76,14 @@ namespace DTXMania
         // 生成と終了
 
 
-        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb, Node 親ノード = null )
+        public MusicNode( VariablePath 曲ファイルの絶対パス, SongDB songdb = null, Node 親ノード = null )
         {
             this.親ノード = 親ノード;
             this.曲ファイルの絶対パス = 曲ファイルの絶対パス;
             this.ノード画像 = Node.現行化前のノード画像;
 
             // SongDB にレコードがある？
-            var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+            var song = songdb?.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
             if( null != song )
             {
                 // (A) あれば、情報を転写する。
@@ -91,7 +108,7 @@ namespace DTXMania
             base.Dispose();
         }
 
-        public void 現行化する()
+        public void 現行化する( SongDB songdb, RecordDB recorddb )
         {
             if( this.現行化済み || AppForm.ビュアーモードである )
                 return;
@@ -100,34 +117,46 @@ namespace DTXMania
             {
                 this.現行化済み = true;  // 先に設定
 
-                using( var songdb = new SongDB() )
+                // SongDB へ反映（新規追加 or 更新）する。
+                _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
+
+                // そのSongDBレコードを取得。
+                var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+
+                if( null != song )
                 {
-                    // SongDB へ反映（新規追加 or 更新）する。
-                    _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
+                    // 情報を更新する。
+                    this.タイトル = song.Title;
+                    this.サブタイトル = song.Artist;
+                    this.難易度 = (float) song.Level;
+                    this.BGMAdjust = song.BGMAdjust;
 
-                    // そのSongDBレコードを取得。
-                    var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+                    // ノード画像（プレビュー画像）を生成する。
+                    if( this.ノード画像 != Node.既定のノード画像 && this.ノード画像 != Node.現行化前のノード画像 )
+                        this.ノード画像?.Dispose();
+                    this.ノード画像 = ( song.PreImage.Nullでも空でもない() ) ?
+                        new テクスチャ( Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage ) ) : null;
 
-                    if( null != song )
+                    // プレビューサウンドはパスだけ取得しておく。（生成は再生直前に行う。）
+                    if( song.PreSound.Nullでも空でもない() )
+                        this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+
+                    // 成績レコードがある？
+                    var record = recorddb?.Records.Where( ( r ) => ( r.UserId == App進行描画.ユーザ管理.ログオン中のユーザ.ユーザID && r.SongHashId == song.HashId ) ).SingleOrDefault();
+                    if( null != record )
                     {
-                        // 情報を更新する。
-                        this.タイトル = song.Title;
-                        this.サブタイトル = song.Artist;
-                        this.難易度 = (float) song.Level;
-                        this.BGMAdjust = song.BGMAdjust;
-
-                        // ノード画像（プレビュー画像）を生成する。
-                        this.ノード画像 = ( song.PreImage.Nullでも空でもない() ) ?
-                            new テクスチャ( Path.Combine( Path.GetDirectoryName( song.Path ), song.PreImage ) ) : null;
-
-                        // プレビューサウンドはパスだけ取得しておく。（生成は再生直前に行う。）
-                        if( song.PreSound.Nullでも空でもない() )
-                            this.プレビュー音声ファイルの絶対パス = Path.Combine( Path.GetDirectoryName( song.Path ), song.PreSound );
+                        // あれば、成績を転写する。
+                        this.達成率 = record.Achievement;
                     }
                     else
                     {
-                        Log.ERROR( $"SongDBに曲レコードが存在していません。" );
+                        // なければ、リセット。
+                        this.達成率 = null;
                     }
+                }
+                else
+                {
+                    Log.ERROR( $"SongDBに曲レコードが存在していません。" );
                 }
             }
         }

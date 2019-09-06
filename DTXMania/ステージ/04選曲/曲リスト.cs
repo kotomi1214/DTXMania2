@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using SharpDX;
@@ -38,6 +39,22 @@ namespace DTXMania.選曲
 
                 this._ノードto曲名画像 = new Dictionary<Node, 文字列画像>();
 
+                this._成績アイコン = new テクスチャ( @"$(System)images\選曲\成績アイコン_曲リスト用.png" );
+
+                var 設定ファイルパス = new VariablePath( @"$(System)images\選曲\成績アイコン_曲リスト用.yaml" );
+                var yaml = File.ReadAllText( 設定ファイルパス.変数なしパス );
+                var deserializer = new YamlDotNet.Serialization.Deserializer();
+                var yamlMap = deserializer.Deserialize<YAMLマップ>( yaml );
+                this._成績アイコンの矩形リスト = new Dictionary<string, RectangleF>();
+                foreach( var kvp in yamlMap.矩形リスト )
+                {
+                    if( 4 == kvp.Value.Length )
+                        this._成績アイコンの矩形リスト[ kvp.Key ] = new RectangleF( kvp.Value[ 0 ], kvp.Value[ 1 ], kvp.Value[ 2 ], kvp.Value[ 3 ] );
+                }
+
+                this._達成率ゲージアイコン = new テクスチャ( @"$(System)images\達成率アイコン.png" );
+                this._達成率数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大太斜.png", @"$(System)images\パラメータ文字_大太斜.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
+
                 this._初めての進行描画 = true;
             }
         }
@@ -46,6 +63,9 @@ namespace DTXMania.選曲
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
+                this._達成率数字画像?.Dispose();
+                this._達成率ゲージアイコン?.Dispose();
+
                 foreach( var kvp in this._ノードto曲名画像 )
                     kvp.Value?.Dispose();
                 this._ノードto曲名画像.Clear();
@@ -57,6 +77,8 @@ namespace DTXMania.選曲
                 this._選択ノードの表示オフセットのストーリーボード?.Abandon();
                 this._選択ノードの表示オフセットdpx?.Dispose();
                 this._選択ノードの表示オフセットのストーリーボード?.Dispose();
+
+                this._成績アイコン?.Dispose();
             }
         }
 
@@ -151,6 +173,9 @@ namespace DTXMania.選曲
             }
         }
 
+        /// <summary>
+        ///     ノードを一行描画する。
+        /// </summary>
         /// <param name="行番号">
         ///		一番上:0 ～ 9:一番下。
         ///		「静止時の」可視範囲は 1～8。
@@ -162,19 +187,23 @@ namespace DTXMania.選曲
             Debug.Assert( null != ノード );
             Debug.Assert( ( ノード as RootNode ) is null );
 
-            // MusicNode については、現行化中であれば終了するまで待つ。
+            #region " MusicNode については、現行化中であれば終了するまで待つ。"
+            //----------------
             if( ノード is MusicNode music )
             {
                 lock( music.現行化処理の排他 )
                 {
-                    // 取得できたらOK
+                    // 取得できたらOK。
+                    // 現行化は１度しか行われないので、ここで以下の処理のためにlockを維持する必要はない。
                 }
             }
+            //----------------
+            #endregion
 
             var ノード画像 = ノード.ノード画像 ?? Node.既定のノード画像;
             bool 選択ノードである = ( 4 == 行番号 );
-
             var 実数行番号 = 行番号 + ( this._曲リスト全体のY軸移動オフセット / 100f );
+
             var ノード左上dpx = new Vector3(
                 // テクスチャは画面中央が (0,0,0) で、Xは右がプラス方向, Yは上がプラス方向, Zは奥がプラス方向+。
                 this._曲リストの基準左上隅座標dpx.X + ( ( 選択ノードである ) ? (float) this._選択ノードの表示オフセットdpx.Value : 0f ),
@@ -320,6 +349,86 @@ namespace DTXMania.選曲
             //----------------
             #endregion
 
+            var musicNode = ノード as MusicNode;
+
+            if( null == musicNode && ノード is SetNode setNode )
+                musicNode = setNode.MusicNodes[ setNode.ユーザ希望難易度に最も近い難易度レベルを返す( App進行描画.曲ツリー.ユーザ希望難易度 ) ];
+
+            if( null != musicNode )
+            {
+                #region " 成績アイコン "
+                //----------------
+                if( musicNode.ランク.HasValue )
+                    this._成績アイコン.描画する( ノード左上dpx.X + 6f, ノード左上dpx.Y + 57f, 転送元矩形: this._成績アイコンの矩形リスト[ musicNode.ランク.Value.ToString() ] );
+                //----------------
+                #endregion
+
+                #region " 達成率ゲージ "
+                //----------------
+                if( musicNode.達成率.HasValue )
+                {
+                    this._達成率ゲージアイコン.描画する( ノード左上dpx.X + 160f, ノード左上dpx.Y - 27f, X方向拡大率: 0.4f, Y方向拡大率: 0.4f );
+
+                    this._達成率数字画像.描画する( dc, ノード左上dpx.X + 204f, ノード左上dpx.Y + 4, musicNode.達成率.Value.ToString( "0.00" ).PadLeft( 6 ) + '%', 拡大率: new Size2F( 0.3f, 0.3f ) );
+
+                    DXResources.Instance.D2DBatchDraw( dc, () => {
+
+                        using( var ゲージ色 = new SolidColorBrush( dc, new Color( 184, 156, 231, 255 ) ) )
+                        using( var ゲージ枠色 = new SolidColorBrush( dc, Color.White ) )
+                        using( var ゲージ背景色 = new SolidColorBrush( dc, new Color( 0.25f, 0.25f, 0.25f, 1f ) ) )
+                        using( var ゲージ枠ジオメトリ = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
+                        using( var ゲージジオメトリ = new PathGeometry( DXResources.Instance.D2D1Factory1 ) )
+                        {
+                            var ゲージサイズdpx = new Size2F( 448f, 17f );
+                            var ゲージ位置 = new Vector2( ノード左上dpx.X + 310f, ノード左上dpx.Y + 10f );
+
+                            using( var sink = ゲージジオメトリ.Open() )
+                            {
+                                var 割合0to1 = (float) ( musicNode.達成率.Value / 100.0 );
+                                var p = new Vector2[] {
+                                    new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                                    // 左上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1, ゲージ位置.Y ),                                 // 右上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1 - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),   // 右下
+                                    new Vector2( ゲージ位置.X - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),                                      // 左下
+                                };
+                                sink.SetFillMode( FillMode.Winding );
+                                sink.BeginFigure( p[ 0 ], FigureBegin.Filled );
+                                sink.AddLine( p[ 1 ] );
+                                sink.AddLine( p[ 2 ] );
+                                sink.AddLine( p[ 3 ] );
+                                sink.EndFigure( FigureEnd.Closed );
+                                sink.Close();
+                            }
+
+                            using( var sink = ゲージ枠ジオメトリ.Open() )
+                            {
+                                var p = new Vector2[] {
+                                    new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                         // 左上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width, ゲージ位置.Y ),                                 // 右上
+                                    new Vector2( ゲージ位置.X + ゲージサイズdpx.Width - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),   // 右下
+                                    new Vector2( ゲージ位置.X - 3f, ゲージ位置.Y + ゲージサイズdpx.Height ),                           // 左下
+                                };
+                                sink.SetFillMode( FillMode.Winding );
+                                sink.BeginFigure( p[ 0 ], FigureBegin.Filled );
+                                sink.AddLine( p[ 1 ] );
+                                sink.AddLine( p[ 2 ] );
+                                sink.AddLine( p[ 3 ] );
+                                sink.EndFigure( FigureEnd.Closed );
+                                sink.Close();
+                            }
+
+                            dc.FillGeometry( ゲージ枠ジオメトリ, ゲージ背景色 );
+                            dc.FillGeometry( ゲージジオメトリ, ゲージ色 );
+                            dc.DrawGeometry( ゲージジオメトリ, ゲージ枠色, 1f );
+                            dc.DrawGeometry( ゲージ枠ジオメトリ, ゲージ枠色, 2f );
+                        }
+
+                    } );
+                }
+                //----------------
+                #endregion
+            }
+
             #region " タイトル文字列 "
             //----------------
             {
@@ -352,7 +461,7 @@ namespace DTXMania.選曲
                 曲名画像.描画する(
                     dc,
                     ノード左上dpx.X + 170f,
-                    ノード左上dpx.Y + 30f,
+                    ノード左上dpx.Y + 20f,
                     X方向拡大率: ( 曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / 曲名画像.画像サイズdpx.Width );
             }
             //----------------
@@ -405,7 +514,7 @@ namespace DTXMania.選曲
                     サブタイトル画像.描画する(
                         dc,
                         ノード左上dpx.X + 190f,
-                        ノード左上dpx.Y + 80f,
+                        ノード左上dpx.Y + 70f,
                         X方向拡大率: ( サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / サブタイトル画像.画像サイズdpx.Width );
                 }
             }
@@ -501,6 +610,14 @@ namespace DTXMania.選曲
 
         private Storyboard _選択ノードの表示オフセットのストーリーボード = null;
 
+        private テクスチャ _成績アイコン = null;
+
+        private Dictionary<string, RectangleF> _成績アイコンの矩形リスト = null;
+
+        private テクスチャ _達成率ゲージアイコン = null;
+
+        private 画像フォント _達成率数字画像 = null;
+
 
         private void _選択ノードのオフセットアニメをリセットする( Animation am )
         {
@@ -531,6 +648,11 @@ namespace DTXMania.選曲
             // (2) 選択曲のプレビュー音声を生成し、再生を始める。
 
             e.選択されたNode?.プレビュー音声を再生する();
+        }
+
+        private class YAMLマップ
+        {
+            public Dictionary<string, float[]> 矩形リスト { get; set; }
         }
     }
 }
