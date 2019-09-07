@@ -161,6 +161,7 @@ namespace DTXMania
             this.PreImage = "";
             this.Artist = "";
             this.PreSound = "";
+            this.BGMAdjust = 0;
         }
 
         // ICloneable 実装

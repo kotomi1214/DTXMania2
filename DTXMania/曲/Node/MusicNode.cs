@@ -196,7 +196,7 @@ namespace DTXMania
 
                         songdb.Songs.InsertOnSubmit(
                             new Song() {
-                                HashId = _ファイルのハッシュを算出して返す( 曲ファイルの絶対パス ),
+                                HashId = 調べる曲のハッシュ,
                                 Title = score.曲名,
                                 Path = 曲ファイルの絶対パス.変数なしパス,
                                 LastWriteTime = File.GetLastWriteTime( 曲ファイルの絶対パス.変数なしパス ).ToString( "G" ),
