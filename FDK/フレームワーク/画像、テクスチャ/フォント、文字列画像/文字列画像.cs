@@ -251,11 +251,6 @@ namespace FDK
 
             if( this.レイアウトサイズdpx == Size2F.Zero )
                 this.レイアウトサイズdpx = DXResources.Instance.設計画面サイズ; // 初期サイズとして設計画面サイズを設定。
-
-            // 画像を生成する。
-
-            if( this.表示文字列.Nullでも空でもない() )
-                this.ビットマップを生成または更新する( DXResources.Instance.既定のD2D1DeviceContext );
         }
 
         public virtual void Dispose()
