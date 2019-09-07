@@ -328,6 +328,7 @@
     <Compile Include="App進行描画.cs" />
     <Compile Include="設定\ドラムチッププロパティ.cs" />
     <Compile Include="設定\ドラムチッププロパティ管理.cs" />
+    <Compile Include="設定\種別\ダーク種別.cs" />
     <Compile Include="設定\種別\ランク種別.cs" />
     <Compile Include="設定\種別\入力グループプリセット種別.cs" />
     <Compile Include="設定\種別\入力グループ種別.cs" />

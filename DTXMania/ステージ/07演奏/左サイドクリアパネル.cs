@@ -40,9 +40,16 @@ namespace DTXMania.演奏
         // クリア
 
 
+        /// <summary>
+        ///		クリアパネルにそれまで描かれていた内容を消去する。
+        /// </summary>
         public void クリアする()
         {
             this.クリアパネル.テクスチャへ描画する( ( dcp ) => {
+
+                dcp.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
+                dcp.PrimitiveBlend = PrimitiveBlend.Copy;
+
                 dcp.Clear( new Color4( Color3.Black, 0f ) );
                 dcp.DrawBitmap( this._背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
             } );

@@ -136,6 +136,12 @@ namespace DTXMania
             set => this._User.NoteSizeByVolume = value ? 1 : 0;
         }
 
+        public ダーク種別 ダーク
+        {
+            get => (ダーク種別) this._User.Dark;
+            set => this._User.Dark = (int) value;
+        }
+
 
 
         // 生成と終了

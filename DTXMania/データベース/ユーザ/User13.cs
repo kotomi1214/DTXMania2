@@ -230,6 +230,14 @@ namespace DTXMania
         [Column( DbType = "INT", CanBeNull = false )]
         public int NoteSizeByVolume { get; set; }
 
+        /// <summary>
+        ///     ダークモード。
+        ///     0: OFF, 1:HALF, 2:FULL
+        /// </summary>
+        [Column( DbType = "INT", CanBeNull = false )]
+        public int Dark { get; set; }
+
+
         ///////////////////////////
 
         /// <summary>
@@ -319,6 +327,7 @@ namespace DTXMania
             @", BackgroundMovieSize INTEGER NOT NULL" +
             @", ShowFastSlow INTEGER NOT NULL" +
             @", NoteSizeByVolume INTEGER NOT NULL" +
+            @", Dark INTEGER NOT NULL" +
             @")";
     }
 }

@@ -504,7 +504,7 @@ namespace DTXMania
                     //----------------
                     // 変更点:
                     // ・LaneType カラムを削除。
-                    // ・NoteSizeByVolume カラムを追加。
+                    // ・NoteSizeByVolume, Dark カラムを追加。
                     this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
                     this.DataContext.SubmitChanges();
                     using( var transaction = this.Connection.BeginTransaction() )
@@ -513,6 +513,7 @@ namespace DTXMania
                         {
                             // データベースにカラムを追加する。
                             this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN NoteSizeByVolume INTEGER NOT NULL DEFAULT 1" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN Dark INTEGER NOT NULL DEFAULT 0" );
                             this.DataContext.SubmitChanges();
 
                             // 成功。
@@ -531,7 +532,7 @@ namespace DTXMania
                         {
                             // テータベースをアップデートしてデータを移行する。
                             this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser13.ColumnList}" );
-                            this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow,NoteSizeByVolume FROM Users" );
+                            this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow,NoteSizeByVolume,Dark FROM Users" );
                             this.DataContext.ExecuteCommand( "DROP TABLE Users" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
                             this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );

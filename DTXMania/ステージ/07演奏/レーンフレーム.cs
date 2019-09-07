@@ -21,7 +21,8 @@ namespace DTXMania.演奏
         /// <summary>
         ///		画面全体に対する、レーンフレームの表示位置と範囲。
         /// </summary>
-        public static RectangleF 領域 => new RectangleF( 445f, 0f, 778f, 938f );
+        //public static RectangleF 領域 => new RectangleF( 445f, 0f, 778f, 938f );
+        public static RectangleF 領域 => new RectangleF( 445f, 0f, 778f, 1080f );
 
         internal static Dictionary<表示レーン種別, float> レーン中央位置X;
 
@@ -64,7 +65,7 @@ namespace DTXMania.演奏
         // 進行と描画
 
 
-        public void 描画する( DeviceContext dc, int BGAの透明度 )
+        public void 描画する( DeviceContext dc, int BGAの透明度, bool レーンラインを描画する = true )
         {
             DXResources.Instance.D2DBatchDraw( dc, () => {
 
@@ -82,18 +83,21 @@ namespace DTXMania.演奏
 
                 // レーンラインを描画する。
 
-                foreach( 表示レーン種別 displayLaneType in Enum.GetValues( typeof( 表示レーン種別 ) ) )
+                if( レーンラインを描画する )
                 {
-                    if( displayLaneType == 表示レーン種別.Unknown )
-                        continue;
-
-                    var レーンライン色 = レーン色[ displayLaneType ];
-                    レーンライン色.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
-
-                    using( var laneLineBrush = new SolidColorBrush( dc, レーンライン色 ) )
+                    foreach( 表示レーン種別 displayLaneType in Enum.GetValues( typeof( 表示レーン種別 ) ) )
                     {
-                        var rc = new RectangleF( レーン中央位置X[ displayLaneType ] - 1, 0f, 3f, 領域.Height );
-                        dc.FillRectangle( rc, laneLineBrush );
+                        if( displayLaneType == 表示レーン種別.Unknown )
+                            continue;
+
+                        var レーンライン色 = レーン色[ displayLaneType ];
+                        レーンライン色.Alpha *= ( 100 - BGAの透明度 ) / 100.0f;   // BGAの透明度0→100 のとき Alpha×1→×0
+
+                        using( var laneLineBrush = new SolidColorBrush( dc, レーンライン色 ) )
+                        {
+                            var rc = new RectangleF( レーン中央位置X[ displayLaneType ] - 1, 0f, 3f, 領域.Height );
+                            dc.FillRectangle( rc, laneLineBrush );
+                        }
                     }
                 }
 

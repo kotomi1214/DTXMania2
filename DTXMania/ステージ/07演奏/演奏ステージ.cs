@@ -727,12 +727,14 @@ namespace DTXMania.演奏
             var dc = DXResources.Instance.既定のD2D1DeviceContext;
             dc.Transform = DXResources.Instance.拡大行列DPXtoPX;
 
+            var user = App進行描画.ユーザ管理.ログオン中のユーザ;
+
             switch( this.現在のフェーズ )
             {
                 case フェーズ.フェードイン:
                 case フェーズ.キャンセル完了:
                     {
-                        if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
+                        if( user.スコア指定の背景画像を表示する )
                         {
                             this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
                                 X方向拡大率: DXResources.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
@@ -742,7 +744,8 @@ namespace DTXMania.演奏
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
+                            if( user.ダーク == ダーク種別.OFF )
+                                this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
                             this._曲別SKILL.進行描画する( dcp, 0f );
@@ -752,17 +755,32 @@ namespace DTXMania.演奏
                         this._右サイドクリアパネル.クリアする();
                         this._右サイドクリアパネル.描画する();
 
-                        this._レーンフレーム.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
+                        this._レーンフレーム.描画する( dc, user.レーンの透明度, レーンラインを描画する: ( user.ダーク == ダーク種別.OFF ) ? true : false );
 
-                        this._背景画像.描画する( dc, 0f, 0f );
-                        this._譜面スクロール速度.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
-                        this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
-                        this._クリアメーター.進行描画する( dc );
-                        this._フェーズパネル.進行描画する( dc );
-                        this._曲名パネル.描画する( dc );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._背景画像.描画する( dc, 0f, 0f );
 
-                        this._ドラムキットとヒットバー.ヒットバーを進行描画する();
-                        this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._譜面スクロール速度.描画する( dc, user.譜面スクロール速度 );
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._クリアメーター.進行描画する( dc );
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._フェーズパネル.進行描画する( dc );
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._曲名パネル.描画する( dc );
+
+                        if( user.ダーク != ダーク種別.FULL )
+                            this._ドラムキットとヒットバー.ヒットバーを進行描画する();
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+
 
                         this._キャプチャ画面を描画する( dc, ( 1.0f - this._フェードインカウンタ.現在値の割合 ) );
                     }
@@ -777,15 +795,15 @@ namespace DTXMania.演奏
                     {
                         double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + DXResources.Instance.次のDComp表示までの残り時間sec;
 
-                        this._譜面スクロール速度.進行する( App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
+                        this._譜面スクロール速度.進行する( user.譜面スクロール速度 );  // チップの表示より前に進行だけ行う
 
-                        if( App進行描画.ユーザ管理.ログオン中のユーザ.スコア指定の背景画像を表示する )
+                        if( user.スコア指定の背景画像を表示する )
                         {
                             this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
                                 X方向拡大率: DXResources.Instance.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
                                 Y方向拡大率: DXResources.Instance.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
                         }
-                        if( App進行描画.ユーザ管理.ログオン中のユーザ.演奏中に動画を表示する )
+                        if( user.演奏中に動画を表示する )
                         {
                             #region " AVI（動画）の進行描画を行う。"
                             //----------------
@@ -796,7 +814,7 @@ namespace DTXMania.演奏
 
                                 if( video.再生中 )
                                 {
-                                    switch( App進行描画.ユーザ管理.ログオン中のユーザ.動画の表示サイズ )
+                                    switch( user.動画の表示サイズ )
                                     {
                                         case 動画の表示サイズ.全画面:
                                             {
@@ -836,7 +854,8 @@ namespace DTXMania.演奏
                         this._左サイドクリアパネル.クリアする();
                         this._左サイドクリアパネル.クリアパネル.テクスチャへ描画する( ( dcp ) => {
                             this._プレイヤー名表示.進行描画する( dcp );
-                            this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
+                            if( user.ダーク == ダーク種別.OFF )
+                                this._スコア表示.進行描画する( dcp, DXResources.Instance.アニメーション, new Vector2( +280f, +120f ), this.成績 );
                             this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
                             this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
                             this._曲別SKILL.進行描画する( dcp, this.成績.スキル );
@@ -849,31 +868,41 @@ namespace DTXMania.演奏
                         } );
                         this._右サイドクリアパネル.描画する();
 
-                        this._レーンフレーム.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.レーンの透明度 );
+                        this._レーンフレーム.描画する( dc, user.レーンの透明度, レーンラインを描画する: ( user.ダーク == ダーク種別.OFF ) ? true : false );
 
                         this._レーンフラッシュ.進行描画する();
 
-                        this._小節線拍線を描画する( dc, 演奏時刻sec );
+                        if( user.ダーク != ダーク種別.FULL )
+                            this._小節線拍線を描画する( dc, 演奏時刻sec );
 
-                        this._背景画像.描画する( dc, 0f, 0f );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._背景画像.描画する( dc, 0f, 0f );
 
-                        this._譜面スクロール速度.描画する( dc, App進行描画.ユーザ管理.ログオン中のユーザ.譜面スクロール速度 );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._譜面スクロール速度.描画する( dc, user.譜面スクロール速度 );
 
-                        this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
 
                         double 曲の長さsec = App進行描画.演奏スコア.チップリスト[ App進行描画.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
                         float 現在位置 = (float) ( 1.0 - ( 曲の長さsec - 演奏時刻sec ) / 曲の長さsec );
 
                         this._クリアメーター.カウント値を設定する( 現在位置, this.成績.判定toヒット数 );
-                        this._クリアメーター.進行描画する( dc );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._クリアメーター.進行描画する( dc );
 
                         this._フェーズパネル.現在位置 = 現在位置;
-                        this._フェーズパネル.進行描画する( dc );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._フェーズパネル.進行描画する( dc );
 
-                        this._曲名パネル.描画する( dc );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._曲名パネル.描画する( dc );
 
-                        this._ドラムキットとヒットバー.ヒットバーを進行描画する();
-                        this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+                        if( user.ダーク != ダーク種別.FULL )
+                            this._ドラムキットとヒットバー.ヒットバーを進行描画する();
+
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._ドラムキットとヒットバー.ドラムキットを進行描画する();
 
                         this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
 
@@ -893,7 +922,8 @@ namespace DTXMania.演奏
                         this._判定文字列.進行描画する();
 
                         this._システム情報.VPSをカウントする();
-                        this._システム情報.描画する( dc, $"BGMAdjust: {App進行描画.演奏曲ノード.BGMAdjust}" );
+                        if( user.ダーク == ダーク種別.OFF )
+                            this._システム情報.描画する( dc, $"BGMAdjust: {App進行描画.演奏曲ノード.BGMAdjust}" );
 
                         if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
                         {

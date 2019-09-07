@@ -41,7 +41,7 @@ namespace DTXMania.演奏
 
 
         /// <summary>
-        ///		クリアパネルに初期背景を上書きすることで、それまで描かれていた内容を消去する。
+        ///		クリアパネルにそれまで描かれていた内容を消去する。
         /// </summary>
         public void クリアする()
         {
@@ -50,6 +50,7 @@ namespace DTXMania.演奏
                 dcp.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
                 dcp.PrimitiveBlend = PrimitiveBlend.Copy;
 
+                dcp.Clear( new Color4( Color3.Black, 0f ) );
                 dcp.DrawBitmap( this._背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
 
             } );
