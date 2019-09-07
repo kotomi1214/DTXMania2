@@ -675,6 +675,23 @@ namespace DTXMania.オプション設定
                         ) );
                     //----------------
                     #endregion
+                    #region "「成績DBを初期化」パネル "
+                    //----------------
+                    初期化フォルダ.子パネルリスト.Add(
+
+                        new パネル(
+
+                            パネル名:
+                                "成績DBを初期化",
+
+                            値の変更処理:
+                                new Action<パネル>( ( panel ) => {
+                                    this._成績データベースを初期化する();
+                                    this.現在のフェーズ = フェーズ.再起動;
+                                } )
+                        ) );
+                    //----------------
+                    #endregion
 
                     初期化フォルダ.子パネルリスト.SelectFirst();
                 }
@@ -1030,6 +1047,21 @@ namespace DTXMania.オプション設定
 
             App進行描画.ユーザ管理を再構築する();
             App進行描画.ユーザ管理.ユーザリスト.SelectItem( ( user ) => ( user.ユーザID == "AutoPlayer" ) );  // ひとまずAutoPlayerを選択。
+        }
+
+        private void _成績データベースを初期化する()
+        {
+            // ファイルを削除する。
+
+            var vpath = RecordDB.DBファイルパス;
+            try
+            {
+                File.Delete( vpath.変数なしパス );  // ファイルがない場合には例外は出ない
+            }
+            catch( Exception e )
+            {
+                Log.ERROR( $"成績データベースファイルの削除に失敗しました。[{vpath.変数付きパス}][{VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]" );
+            }
         }
     }
 }
