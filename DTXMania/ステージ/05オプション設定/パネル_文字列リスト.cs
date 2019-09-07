@@ -30,10 +30,7 @@ namespace DTXMania.オプション設定
 
             // 初期値があるなら設定する。
             if( null != 選択肢初期値リスト )
-            {
-                foreach( var item in 選択肢初期値リスト )
-                    this.選択肢リスト.Add( item );
-            }
+                this.選択肢リスト.AddRange( 選択肢初期値リスト );
 
             this._選択肢文字列画像リスト = new Dictionary<string, 文字列画像>();
 

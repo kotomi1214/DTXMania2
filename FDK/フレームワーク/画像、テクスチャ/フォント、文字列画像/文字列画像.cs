@@ -255,7 +255,7 @@ namespace FDK
             // 画像を生成する。
 
             if( this.表示文字列.Nullでも空でもない() )
-                this.ビットマップを生成または更新する();
+                this.ビットマップを生成または更新する( DXResources.Instance.既定のD2D1DeviceContext );
         }
 
         public virtual void Dispose()
@@ -268,7 +268,7 @@ namespace FDK
 
         protected SharpDX.Direct2D1.BitmapRenderTarget _Bitmap;
 
-        public void ビットマップを生成または更新する()
+        public void ビットマップを生成または更新する( DeviceContext dc )
         {
             if( this._TextFormatを更新せよ )
             {
@@ -289,7 +289,7 @@ namespace FDK
                 };
 
                 // 行間は、プロパティではなくメソッドで設定する。
-                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( DXResources.Instance.既定のD2D1DeviceContext.DotsPerInch.Width, this.フォントサイズpt );
+                this.LineSpacing = FDKUtilities.変換_pt単位からpx単位へ( dc.DotsPerInch.Width, this.フォントサイズpt );
 
                 // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.Baseline = this.LineSpacing * 0.8f;
@@ -312,7 +312,7 @@ namespace FDK
                     this.レイアウトサイズdpx.Width,
                     this.レイアウトサイズdpx.Height );
 
-                // レイアウトが変わったのでサイズも更新すｒ。
+                // レイアウトが変わったのでサイズも更新する。
 
                 this._表示文字列のサイズdpx = new Size2F(
                     this.TextLayout.Metrics.WidthIncludingTrailingWhitespace,
@@ -328,8 +328,8 @@ namespace FDK
                 #region " 古いビットマップレンダーターゲットを解放し、新しく生成する。"
                 //----------------
                 // D2DContext1.Target が設定済みでない場合、例外も出さずに落ちてしまうので、明示的に弾く。
-                using( var target = DXResources.Instance.既定のD2D1DeviceContext.Target )    // Target を get すると COM参照カウンタが増えるので注意。
-                    Debug.Assert( null != target );
+                //using( var target = dc.Target )    // Target を get すると COM参照カウンタが増えるので注意。
+                //    Debug.Assert( null != target );
 
                 if( this.ParagraphAlignment != ParagraphAlignment.Near ||
                     this.TextAlignment != TextAlignment.Leading )
@@ -355,7 +355,7 @@ namespace FDK
 
                 this._Bitmap?.Dispose();
                 this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget(
-                    DXResources.Instance.既定のD2D1DeviceContext, 
+                    dc,
                     CompatibleRenderTargetOptions.None,
                     this.画像サイズdpx );
                 //----------------
@@ -367,8 +367,8 @@ namespace FDK
 
                 DXResources.Instance.D2DBatchDraw( rt, () => {
 
-                    using( var 前景色ブラシ = new SolidColorBrush( this._Bitmap, this.前景色 ) )
-                    using( var 背景色ブラシ = new SolidColorBrush( this._Bitmap, this.背景色 ) )
+                    using( var 前景色ブラシ = new SolidColorBrush( rt, this.前景色 ) )
+                    using( var 背景色ブラシ = new SolidColorBrush( rt, this.背景色 ) )
                     {
                         rt.Clear( Color.Transparent );
 
@@ -440,7 +440,7 @@ namespace FDK
                 this._TextFormatを更新せよ ||
                 this._TextLayoutを更新せよ )
             {
-                this.ビットマップを生成または更新する();
+                this.ビットマップを生成または更新する( dc );
 
                 this._ビットマップを更新せよ = false;
                 this._TextFormatを更新せよ = false;
@@ -452,9 +452,7 @@ namespace FDK
 
             DXResources.Instance.D2DBatchDraw( dc, () => {
 
-                var pretrans = dc.Transform;
-
-                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * pretrans;
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * dc.Transform;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
 
                 using( var bmp = this._Bitmap.Bitmap )
@@ -468,7 +466,6 @@ namespace FDK
                         erspectiveTransformRef: 変換行列3D );
                 }
 
-                dc.Transform = pretrans;
             } );
         }
 
