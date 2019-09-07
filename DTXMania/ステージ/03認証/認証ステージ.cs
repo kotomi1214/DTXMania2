@@ -238,7 +238,7 @@ namespace DTXMania.認証
                         Log.Info( $"ユーザ「{App進行描画.ユーザ管理.ログオン中のユーザ.ユーザ名}」でログインしました。" );
 
                         // 曲ツリーの現行化を開始する。
-                        App進行描画.曲ツリー.曲ツリーを現行化するAsync(); // 非同期
+                        App進行描画.曲ツリー.曲ツリーを現行化するAsync( new Action<Exception>( ( e ) => App進行描画.Instance.AppForm.例外を通知する( e ) ) ); // 非同期
 
                         this.現在のフェーズ = フェーズ.完了;
                     }

@@ -482,45 +482,52 @@ namespace DTXMania
         /// </summary>
         public TriStateEvent 現行化タスクの一時停止 { get; protected set; } = new TriStateEvent( TriStateEvent.状態種別.OFF );
 
-        public async void 曲ツリーを現行化するAsync()
+        public async void 曲ツリーを現行化するAsync( Action<Exception> 例外通知 )
         {
             this.現行化タスク = Task.Run( () => {
 
-                Log.現在のスレッドに名前をつける( "現行化" );
-                Log.Info( "曲ツリーの現行化を開始します。" );
-
-                // すべての MusicNode の現行化フラグと成績をリセットする。
-                foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
+                try
                 {
-                    if( node is MusicNode mnode )
-                    {
-                        mnode.現行化未実施 = true;
-                        mnode.達成率 = null;
-                    }
-                }
+                    Log.現在のスレッドに名前をつける( "現行化" );
+                    Log.Info( "曲ツリーの現行化を開始します。" );
 
-                // すべてのMusicNodeを現行化する。
-                using( var recorddb = new RecordDB() )
-                using( var songdb = new SongDB() )
-                {
+                    // すべての MusicNode の現行化フラグと成績をリセットする。
                     foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                     {
-                        if( node is MusicNode music )
-                            music.現行化する( songdb, recorddb );
-
-                        // キャンセル？
-                        if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                        if( node is MusicNode mnode )
                         {
-                            Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
-                            break;
+                            mnode.現行化未実施 = true;
+                            mnode.達成率 = null;
                         }
-
-                        // 一時停止？
-                        this.現行化タスクの一時停止.OFFになるまでブロックする();
                     }
-                }
 
-                Log.Info( "曲ツリーの現行化を終了します。" );
+                    // すべてのMusicNodeを現行化する。
+                    using( var recorddb = new RecordDB() )
+                    using( var songdb = new SongDB() )
+                    {
+                        foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
+                        {
+                            if( node is MusicNode music )
+                                music.現行化する( songdb, recorddb );
+
+                            // キャンセル？
+                            if( this.現行化タスクキャンセル通知.IsCancellationRequested )
+                            {
+                                Log.Info( "曲ツリーの現行化タスクのキャンセルが要請されました。" );
+                                break;
+                            }
+
+                            // 一時停止？
+                            this.現行化タスクの一時停止.OFFになるまでブロックする();
+                        }
+                    }
+
+                    Log.Info( "曲ツリーの現行化を終了します。" );
+                }
+                catch( Exception e )
+                {
+                    例外通知( e );
+                }
 
             }, this.現行化タスクキャンセル通知.Token );
 
