@@ -8,17 +8,18 @@ using FDK;
 
 namespace DTXMania
 {
-    using User = User12;        // 最新バージョンを指定（１／２）
+    using User = User13;        // 最新バージョンを指定（１／２）
     using rRecord06 = データベース.成績.old.Record06;
     using rUser02 = データベース.ユーザ.old.User02;
-    using rUser12 = User12;
+    using rUser12 = データベース.ユーザ.old.User12;
+    using rUser13 = User13;
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 12;  // 最新バージョンを指定（２／２）
+        public const long VERSION = 13;  // 最新バージョンを指定（２／２）
 
         public static readonly VariablePath DBファイルパス = @"$(AppData)UserDB.sqlite3";
 
@@ -401,7 +402,7 @@ namespace DTXMania
                     break;
 
                 case 11:
-                    #region " 11 →12 "
+                    #region " 11 → 12 "
                     //----------------
                     // 変更点：
                     // ・UserDB.Records テーブルを廃止し、新規に作成する RecordDB.Records テーブルに移行。
@@ -482,18 +483,71 @@ namespace DTXMania
 
                             // 成功。
                             transaction.Commit();
-                            Log.Info( "Users テーブルをアップデートしました。[1→2]" );
+                            Log.Info( $"Users テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                         catch
                         {
                             // 失敗。
                             transaction.Rollback();
-                            throw new Exception( "Users テーブルのアップデートに失敗しました。[1→2]" );
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                     }
                     //----------------
                     #endregion
 
+                    //----------------
+                    #endregion
+                    break;
+
+                case 12:
+                    #region " 12 → 13 "
+                    //----------------
+                    // 変更点:
+                    // ・LaneType カラムを削除。
+                    // ・NoteSizeByVolume カラムを追加。
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // データベースにカラムを追加する。
+                            this.DataContext.ExecuteCommand( "ALTER TABLE Users ADD COLUMN NoteSizeByVolume INTEGER NOT NULL DEFAULT 1" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テータベースをアップデートしてデータを移行する。
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser13.ColumnList}" );
+                            this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow,NoteSizeByVolume FROM Users" );
+                            this.DataContext.ExecuteCommand( "DROP TABLE Users" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( $"Users テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
                     //----------------
                     #endregion
                     break;

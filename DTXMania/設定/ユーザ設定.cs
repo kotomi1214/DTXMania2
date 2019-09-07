@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-using User = DTXMania.User12;
+using User = DTXMania.User13;
 
 namespace DTXMania
 {
@@ -82,12 +82,6 @@ namespace DTXMania
             set => this._User.DrumSound = value ? 1 : 0;
         }
 
-        public string レーン配置
-        {
-            get => this._User.LaneType;
-            set => this._User.LaneType = value;
-        }
-
         public int レーンの透明度
         {
             get => this._User.LaneTrans;
@@ -134,6 +128,12 @@ namespace DTXMania
         {
             get => ( 0 != this._User.ShowFastSlow );
             set => this._User.ShowFastSlow = value ? 1 : 0;
+        }
+
+        public bool 音量に応じてチップサイズを変更する
+        {
+            get => ( 0 != this._User.NoteSizeByVolume );
+            set => this._User.NoteSizeByVolume = value ? 1 : 0;
         }
 
 
