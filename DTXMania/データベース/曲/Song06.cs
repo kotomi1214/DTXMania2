@@ -10,7 +10,7 @@ namespace DTXMania
     ///		曲テーブルのエンティティクラス。
     /// </summary>
     [Table( Name = "Songs" )]   // テーブル名は複数形
-    class Song05 : ICloneable
+    class Song06 : ICloneable
     {
         /// <summary>
         ///		曲譜面ファイルのハッシュ値。
@@ -43,19 +43,19 @@ namespace DTXMania
         /// <summary>
         ///		曲の難易度。0.00～9.99。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double Level { get; set; }
 
         /// <summary>
         ///		最小BPM。null なら未取得。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = true )]
+        [Column( DbType = "NUMERIC", CanBeNull = true )]
         public double? MinBPM { get; set; }
 
         /// <summary>
         ///		最大BPM。null なら未取得。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = true )]
+        [Column( DbType = "NUMERIC", CanBeNull = true )]
         public double? MaxBPM { get; set; }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace DTXMania
 
         ///////////////////////
 
-        public Song05()
+        public Song06()
         {
             this.HashId = "";
             this.Title = "(no title)";
@@ -165,9 +165,9 @@ namespace DTXMania
         }
 
         // ICloneable 実装
-        public Song05 Clone()
+        public Song06 Clone()
         {
-            return (Song05) this.MemberwiseClone();
+            return (Song06) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
@@ -177,14 +177,14 @@ namespace DTXMania
         /// <summary>
         ///		テーブルのカラム部分を列挙したSQL。
         /// </summary>
-        public static readonly string ColumnsList =
+        public static readonly string ColumnList =
             @"( HashId NVARCHAR NOT NULL PRIMARY KEY" +
             @", Title NVARCHAR NOT NULL" +
             @", Path NVARCHAR NOT NULL UNIQUE" +
             @", LastWriteTime NVARCHAR NOT NULL" +
-            @", Level REAL NOT NULL CHECK(0.0 <= Level AND Level < 10.0)" +
-            @", MinBPM REAL" +
-            @", MaxBPM REAL" +
+            @", Level NUMERIC NOT NULL" +
+            @", MinBPM NUMERIC" +
+            @", MaxBPM NUMERIC" +
             @", TotalNotes_LeftCymbal INTEGER NOT NULL" +
             @", TotalNotes_HiHat INTEGER NOT NULL" +
             @", TotalNotes_LeftPedal INTEGER NOT NULL" +

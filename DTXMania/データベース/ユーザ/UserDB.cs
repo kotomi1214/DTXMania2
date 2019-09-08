@@ -8,18 +8,19 @@ using FDK;
 
 namespace DTXMania
 {
-    using User = User13;        // 最新バージョンを指定（１／２）
+    using User = User14;        // 最新バージョンを指定（１／２）
     using rRecord06 = データベース.成績.old.Record06;
     using rUser02 = データベース.ユーザ.old.User02;
     using rUser12 = データベース.ユーザ.old.User12;
-    using rUser13 = User13;
+    using rUser13 = データベース.ユーザ.old.User13;
+    using rUser14 = User14;
 
     /// <summary>
     ///		ユーザデータベースに対応するエンティティクラス。
     /// </summary>
     class UserDB : SQLiteDBBase
     {
-        public const long VERSION = 13;  // 最新バージョンを指定（２／２）
+        public const long VERSION = 14;  // 最新バージョンを指定（２／２）
 
         public static readonly VariablePath DBファイルパス = @"$(AppData)UserDB.sqlite3";
 
@@ -419,7 +420,7 @@ namespace DTXMania
                             foreach( var src in this.DataContext.GetTable<rRecord06>().ToArray() )
                             {
                                 recorddb.Records.InsertOnSubmit(
-                                    new Record07() {
+                                    new Record08() {
                                         UserId = src.UserId,
                                         SongHashId = src.SongHashId,
                                         Score = src.Score,
@@ -533,6 +534,51 @@ namespace DTXMania
                             // テータベースをアップデートしてデータを移行する。
                             this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser13.ColumnList}" );
                             this.DataContext.ExecuteCommand( "INSERT INTO new_Users SELECT Id,Name,ScrollSpeed,Fullscreen,AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal,MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok,CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneTrans,BackgroundMovie,PlaySpeed,ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow,NoteSizeByVolume,Dark FROM Users" );
+                            this.DataContext.ExecuteCommand( "DROP TABLE Users" );
+                            this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( $"Users テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Users テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 13:
+                    #region " 13 → 14 "
+                    //----------------
+                    // 変更点：
+                    // ・REAL 型を NUMERIC 型に変更。
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テータベースを削除して新規生成する。
+                            // → 既に誤差の生じている旧 REAL 型のカラム（以下）のみリセットする。
+                            //    ScrollSpeed, MaxRange_*, PlaySpeed
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Users {rUser14.ColumnList}" );
+                            this.DataContext.ExecuteCommand(
+                                "INSERT INTO new_Users SELECT " +
+                                "Id,Name," +
+                                "1.0," + // ScrollSpeed
+                                "Fullscreen," +
+                                "AutoPlay_LeftCymbal,AutoPlay_HiHat,AutoPlay_LeftPedal,AutoPlay_Snare,AutoPlay_Bass,AutoPlay_HighTom,AutoPlay_LowTom,AutoPlay_FloorTom,AutoPlay_RightCymbal," +
+                                "0.034,0.067,0.084,0.117," + // MaxRange_Perfect,MaxRange_Great,MaxRange_Good,MaxRange_Ok
+                                "CymbalFree,RideLeft,ChinaLeft,SplashLeft,DrumSound,LaneTrans,BackgroundMovie," +
+                                "1.0," + // PlaySpeed
+                                "ShowPartLine,ShowPartNumber,ShowScoreWall,BackgroundMovieSize,ShowFastSlow,NoteSizeByVolume,Dark FROM Users" );
                             this.DataContext.ExecuteCommand( "DROP TABLE Users" );
                             this.DataContext.ExecuteCommand( "ALTER TABLE new_Users RENAME TO Users" );
                             this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );

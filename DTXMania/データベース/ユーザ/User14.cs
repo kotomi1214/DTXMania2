@@ -11,7 +11,7 @@ namespace DTXMania
     ///		ユーザテーブルのエンティティクラス。
     /// </summary>
     [Table( Name = "Users" )]   // テーブル名は複数形
-    class User13 : ICloneable
+    class User14 : ICloneable
     {
         /// <summary>
         ///		ユーザを一意に識別する文字列。主キー。
@@ -30,7 +30,7 @@ namespace DTXMania
         /// <summary>
         ///		譜面スクロール速度の倍率。1.0で等倍。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double ScrollSpeed { get; set; }
 
         /// <summary>
@@ -110,25 +110,25 @@ namespace DTXMania
         /// <summary>
         ///		Perfect の最大ヒット距離[秒]。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double MaxRange_Perfect { get; set; }
 
         /// <summary>
         ///		Great の最大ヒット距離[秒]。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double MaxRange_Great { get; set; }
 
         /// <summary>
         ///		Good の最大ヒット距離[秒]。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double MaxRange_Good { get; set; }
 
         /// <summary>
         ///		Ok の最大ヒット距離[秒]。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double MaxRange_Ok { get; set; }
 
 
@@ -185,7 +185,7 @@ namespace DTXMania
         ///     演奏速度。
         ///     1.0 で通常速度。
         /// </summary>
-        [Column( DbType = "REAL", CanBeNull = false )]
+        [Column( DbType = "NUMERIC", CanBeNull = false )]
         public double PlaySpeed { get; set; }
 
         /// <summary>
@@ -243,7 +243,7 @@ namespace DTXMania
         /// <summary>
         ///		既定値で初期化。
         /// </summary>
-        public User13()
+        public User14()
         {
             this.Id = "Anonymous";
             this.Name = "Anonymous";
@@ -277,9 +277,9 @@ namespace DTXMania
         }
 
         // ICloneable 実装
-        public User13 Clone()
+        public User14 Clone()
         {
-            return (User13) this.MemberwiseClone();
+            return (User14) this.MemberwiseClone();
         }
         object ICloneable.Clone()
         {
@@ -298,7 +298,7 @@ namespace DTXMania
         public static readonly string ColumnList =
             @"( Id NVARCHAR NOT NULL PRIMARY KEY" +
             @", Name NVARCHAR NOT NULL" +
-            @", ScrollSpeed REAL NOT NULL" +
+            @", ScrollSpeed NUMERIC NOT NULL" +
             @", Fullscreen INTEGER NOT NULL" +
             @", AutoPlay_LeftCymbal INTEGER NOT NULL" +
             @", AutoPlay_HiHat INTEGER NOT NULL" +
@@ -309,10 +309,10 @@ namespace DTXMania
             @", AutoPlay_LowTom INTEGER NOT NULL" +
             @", AutoPlay_FloorTom INTEGER NOT NULL" +
             @", AutoPlay_RightCymbal INTEGER NOT NULL" +
-            @", MaxRange_Perfect REAL NOT NULL" +
-            @", MaxRange_Great REAL NOT NULL" +
-            @", MaxRange_Good REAL NOT NULL" +
-            @", MaxRange_Ok REAL NOT NULL" +
+            @", MaxRange_Perfect NUMERIC NOT NULL" +
+            @", MaxRange_Great NUMERIC NOT NULL" +
+            @", MaxRange_Good NUMERIC NOT NULL" +
+            @", MaxRange_Ok NUMERIC NOT NULL" +
             @", CymbalFree INTEGER NOT NULL" +
             @", RideLeft INTEGER NOT NULL" +
             @", ChinaLeft INTEGER NOT NULL" +
@@ -320,7 +320,7 @@ namespace DTXMania
             @", DrumSound INTEGER NOT NULL" +
             @", LaneTrans INTEGER NOT NULL" +
             @", BackgroundMovie INTEGER NOT NULL" +
-            @", PlaySpeed REAL NOT NULL" +
+            @", PlaySpeed NUMERIC NOT NULL" +
             @", ShowPartLine INTEGER NOT NULL" +
             @", ShowPartNumber INTEGER NOT NULL" +
             @", ShowScoreWall INTEGER NOT NULL" +

@@ -9,18 +9,18 @@ using SSTFormatCurrent = SSTFormat.v4;
 
 namespace DTXMania
 {
-    using Song01 = データベース.曲.old.Song01;
-    using Song02 = データベース.曲.old.Song02;
-    using Song03 = データベース.曲.old.Song03;
-    using Song04 = データベース.曲.old.Song04;
-    using Song = Song05;    // 最新バージョンを指定(1/2)。
+    using Song = Song06;    // 最新バージョンを指定(1/2)。
+    using rSong02 = データベース.曲.old.Song02;
+    using rSong03 = データベース.曲.old.Song03;
+    using rSong04 = データベース.曲.old.Song04;
+    using rSong06 = Song06;
 
     /// <summary>
     ///		曲データベースに対応するエンティティクラス。
     /// </summary>
     class SongDB : SQLiteDBBase
     {
-        public const long VERSION = 5;  // 最新バージョンを指定(2/2)。
+        public const long VERSION = 6;  // 最新バージョンを指定(2/2)。
 
         public static readonly VariablePath 曲DBファイルパス = @"$(AppData)SongDB.sqlite3";
 
@@ -64,7 +64,7 @@ namespace DTXMania
                 try
                 {
                     // 最新のバージョンのテーブルを作成する。
-                    this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Songs {Song.ColumnsList};" );
+                    this.DataContext.ExecuteCommand( $"CREATE TABLE IF NOT EXISTS Songs {Song.ColumnList};" );
                     this.DataContext.SubmitChanges();
 
                     // 成功。
@@ -92,7 +92,7 @@ namespace DTXMania
                         try
                         {
                             // テータベースをアップデートしてデータを移行する。
-                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Songs {Song02.ColumnsList}" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Songs {rSong02.ColumnsList}" );
                             this.DataContext.ExecuteCommand( $"INSERT INTO new_Songs SELECT *,null FROM Songs" );   // 追加されたカラムは null
                             this.DataContext.ExecuteCommand( $"DROP TABLE Songs" );
                             this.DataContext.ExecuteCommand( $"ALTER TABLE new_Songs RENAME TO Songs" );
@@ -100,7 +100,7 @@ namespace DTXMania
                             this.DataContext.SubmitChanges();
 
                             // すべてのレコードについて、追加されたカラムを更新する。
-                            var song02s = base.DataContext.GetTable<Song02>();
+                            var song02s = base.DataContext.GetTable<rSong02>();
                             foreach( var song02 in song02s )
                             {
                                 var score = (SSTFormatCurrent.スコア) null;
@@ -150,7 +150,7 @@ namespace DTXMania
                         try
                         {
                             // テータベースをアップデートしてデータを移行する。
-                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Songs {Song03.ColumnsList}" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE new_Songs {rSong03.ColumnsList}" );
                             this.DataContext.ExecuteCommand( $"INSERT INTO new_Songs SELECT *,null FROM Songs" );   // 追加されたカラムは null
                             this.DataContext.ExecuteCommand( $"DROP TABLE Songs" );
                             this.DataContext.ExecuteCommand( $"ALTER TABLE new_Songs RENAME TO Songs" );
@@ -158,7 +158,7 @@ namespace DTXMania
                             this.DataContext.SubmitChanges();
 
                             // すべてのレコードについて、追加されたカラムを更新する。
-                            var song03s = base.DataContext.GetTable<Song03>();
+                            var song03s = base.DataContext.GetTable<rSong03>();
                             foreach( var song03 in song03s )
                             {
                                 var score = (SSTFormatCurrent.スコア) null;
@@ -210,7 +210,7 @@ namespace DTXMania
                             this.DataContext.SubmitChanges();
 
                             // (2) すべてのレコードについて、変更のあったカラムを更新する。
-                            var songs = this.DataContext.GetTable<Song04>();
+                            var songs = this.DataContext.GetTable<rSong04>();
                             foreach( var song in songs )
                             {
                                 // スコアを読み込む 
@@ -268,6 +268,38 @@ namespace DTXMania
                             // 失敗。
                             transaction.Rollback();
                             Log.ERROR( $"Songs テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
+                    //----------------
+                    #endregion
+                    break;
+
+                case 5:
+                    #region " 5 → 6 "
+                    //----------------
+                    // 変更点：
+                    // ・REAL 型を NUMERIC 型に変更。
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テーブルを削除して、空のテーブルで作り直す。
+                            this.DataContext.ExecuteCommand( "DROP TABLE Songs" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE Songs {rSong06.ColumnList}" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( $"Songs テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Songs テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
                         }
                     }
                     //----------------

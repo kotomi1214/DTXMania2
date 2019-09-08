@@ -9,8 +9,8 @@ using System.Threading;
 using FDK;
 using SSTFormat.v4;
 
-using Song = DTXMania.Song05;
-using Record = DTXMania.Record07;
+using Song = DTXMania.Song06;
+using Record = DTXMania.Record08;
 
 namespace DTXMania
 {

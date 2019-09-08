@@ -5,7 +5,7 @@ using System.Linq;
 using SSTFormatCurrent = SSTFormat.v4;
 using FDK;
 
-using Record = DTXMania.Record07;
+using Record = DTXMania.Record08;
 
 namespace DTXMania
 {

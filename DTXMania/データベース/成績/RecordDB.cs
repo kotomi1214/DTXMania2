@@ -8,14 +8,15 @@ using FDK;
 
 namespace DTXMania
 {
-    using Record = Record07;    // 最新バージョンを指定（１／２）
+    using Record = Record08;    // 最新バージョンを指定（１／２）
+    using rRecord08 = Record08;
 
     /// <summary>
     ///		成績データベースに対応するエンティティクラス。
     /// </summary>
     class RecordDB : SQLiteDBBase
     {
-        public const long VERSION = 7;  // 最新バージョンを指定（２／２）
+        public const long VERSION = 8;  // 最新バージョンを指定（２／２）
 
         public static readonly VariablePath DBファイルパス = @"$(AppData)RecordDB.sqlite3";
 
@@ -95,6 +96,38 @@ namespace DTXMania
 
                     // UserDB 側で RecordDB を作成する際に Record07 で生成されるので、ここでは何もしない。
                     
+                    //----------------
+                    #endregion
+                    break;
+
+                case 7:
+                    #region " 7 → 8 "
+                    //----------------
+                    // 変更点：
+                    // ・REAL 型を NUMERIC 型に変更。
+                    this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = OFF" );
+                    this.DataContext.SubmitChanges();
+                    using( var transaction = this.Connection.BeginTransaction() )
+                    {
+                        try
+                        {
+                            // テーブルを削除して、空のテーブルで作り直す。
+                            this.DataContext.ExecuteCommand( "DROP TABLE Records" );
+                            this.DataContext.ExecuteCommand( $"CREATE TABLE Records {rRecord08.ColumnList}" );
+                            this.DataContext.ExecuteCommand( "PRAGMA foreign_keys = ON" );
+                            this.DataContext.SubmitChanges();
+
+                            // 成功。
+                            transaction.Commit();
+                            Log.Info( $"Records テーブルをアップデートしました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                        catch
+                        {
+                            // 失敗。
+                            transaction.Rollback();
+                            throw new Exception( $"Records テーブルのアップデートに失敗しました。[{移行元DBバージョン}→{移行元DBバージョン + 1}]" );
+                        }
+                    }
                     //----------------
                     #endregion
                     break;

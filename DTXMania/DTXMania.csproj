@@ -192,6 +192,7 @@
     <Compile Include="データベース\SQLiteDBBase.cs" />
     <Compile Include="データベース\ユーザ\old\User11.cs" />
     <Compile Include="データベース\ユーザ\old\User12.cs" />
+    <Compile Include="データベース\ユーザ\old\User13.cs" />
     <Compile Include="データベース\成績\old\Record01.cs" />
     <Compile Include="データベース\成績\old\Record02.cs" />
     <Compile Include="データベース\成績\old\Record03.cs" />
@@ -207,8 +208,9 @@
     <Compile Include="データベース\ユーザ\old\User08.cs" />
     <Compile Include="データベース\ユーザ\old\User09.cs" />
     <Compile Include="データベース\成績\old\Record06.cs" />
-    <Compile Include="データベース\成績\Record07.cs" />
-    <Compile Include="データベース\ユーザ\User13.cs" />
+    <Compile Include="データベース\成績\old\Record07.cs" />
+    <Compile Include="データベース\成績\Record08.cs" />
+    <Compile Include="データベース\ユーザ\User14.cs" />
     <Compile Include="データベース\ユーザ\old\User10.cs" />
     <Compile Include="データベース\ユーザ\UserDB.cs" />
     <Compile Include="データベース\成績\RecordDB.cs" />
@@ -216,7 +218,8 @@
     <Compile Include="データベース\曲\old\Song02.cs" />
     <Compile Include="データベース\曲\old\Song03.cs" />
     <Compile Include="データベース\曲\old\Song04.cs" />
-    <Compile Include="データベース\曲\Song05.cs" />
+    <Compile Include="データベース\曲\old\Song05.cs" />
+    <Compile Include="データベース\曲\Song06.cs" />
     <Compile Include="データベース\曲\SongDB.cs" />
     <Compile Include="ユーティリティ\CommandLineOptions.cs" />
     <Compile Include="Program.cs" />
