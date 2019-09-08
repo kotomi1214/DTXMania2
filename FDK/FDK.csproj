@@ -107,21 +107,12 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'Debug'">
+    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\cscore\DebugDll\CSCore.dll</HintPath>
-    </Reference>
-    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'Release'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\cscore\ReleaseDll\CSCore.dll</HintPath>
-    </Reference>
-    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'RemoteDebug'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\cscore\DebugDll\CSCore.dll</HintPath>
-    </Reference>
-    <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL" Condition="'$(Configuration)' == 'RemoteRelease'">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Debug'">..\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Release'">..\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteDebug'">..\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteRelease'">..\cscore\ReleaseDll\CSCore.dll</HintPath>
     </Reference>
     <Reference Include="libbjxa">
       <HintPath>.\libbjxa.dll</HintPath>
