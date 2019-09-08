@@ -58,8 +58,11 @@ namespace FDK
                     // ファイルを読み込んで IWaveSource を生成。
                     using( var waveSource = new WavOnStreamingWaveSource( ファイルパス, device.WaveFormat ) )
                     {
-                        // IWaveSource をリサンプルして ISampleSource を生成。
-                        return new ResampledOnMemoryWaveSource( waveSource, device.WaveFormat, 再生速度 ).ToSampleSource();
+                        if( waveSource.WaveFormat.WaveFormatTag == AudioEncoding.Pcm )  // ここでは PCM WAV のみサポート
+                        {
+                            // IWaveSource をリサンプルして ISampleSource を生成。
+                            return new ResampledOnMemoryWaveSource( waveSource, device.WaveFormat, 再生速度 ).ToSampleSource();
+                        }
                     }
                 }
                 catch
