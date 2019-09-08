@@ -671,6 +671,11 @@
             Stereo.
             </summary>
         </member>
+        <member name="F:CSCore.ChannelMasks.QuadraphonicMask">
+            <summary>
+            Quadraphonic
+            </summary>
+        </member>
         <member name="F:CSCore.ChannelMasks.FiveDotOneWithRearMask">
             <summary>
             5.1 surround with rear speakers.
@@ -10862,6 +10867,16 @@
         <member name="F:CSCore.DSP.ChannelMatrix.SevenDotOneSurroundToFiveDotOneSurroundWithSide">
             <summary>
             Defines a 7.1 surround to 5.1 surround (with side) channel conversion matrix
+            </summary>
+        </member>
+        <member name="F:CSCore.DSP.ChannelMatrix.QuadraphonicToStereo">
+            <summary>
+            Defines a quadraphonic to stereo channel conversion matrix.
+            </summary>
+        </member>
+        <member name="F:CSCore.DSP.ChannelMatrix.StereoToQuadraphonic">
+            <summary>
+            Defines a stereo to quadraphonic channel conversion matrix.
             </summary>
         </member>
         <member name="M:CSCore.DSP.ChannelMatrix.GetMatrix(CSCore.ChannelMask,CSCore.ChannelMask)">
