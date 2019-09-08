@@ -105,10 +105,10 @@
   <ItemGroup>
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath Condition="'$(Configuration)' == 'Debug'">..\cscore\DebugDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'Release'">..\cscore\ReleaseDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'RemoteDebug'">..\cscore\DebugDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'RemoteRelease'">..\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Debug'">..\packages-selfbuild\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Release'">..\packages-selfbuild\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteDebug'">..\packages-selfbuild\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteRelease'">..\packages-selfbuild\cscore\ReleaseDll\CSCore.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.6.3.0-preview9-19423-04\lib\net45\EntityFramework.dll</HintPath>
