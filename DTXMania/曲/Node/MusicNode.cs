@@ -118,10 +118,7 @@ namespace DTXMania
                 this.現行化済み = true;  // 先に設定
 
                 // SongDB へ反映（新規追加 or 更新）する。
-                _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
-
-                // そのSongDBレコードを取得。
-                var song = songdb.Songs.Where( ( r ) => ( r.Path == this.曲ファイルの絶対パス.変数なしパス ) ).SingleOrDefault();
+                var song = _SongDBに曲を追加または更新する( songdb, this.曲ファイルの絶対パス, App進行描画.ユーザ管理.ログオン中のユーザ );
 
                 if( null != song )
                 {
@@ -158,7 +155,7 @@ namespace DTXMania
                 }
                 else
                 {
-                    Log.ERROR( $"SongDBに曲レコードが存在していません。" );
+                    //Log.ERROR( $"SongDBに曲レコードが存在していません。" );
                 }
             }
         }
@@ -171,8 +168,9 @@ namespace DTXMania
         /// <summary>
         ///		指定された曲ファイルに対応するレコードがデータベースになければレコードを追加し、
         ///		あればそのレコードを更新する。
+        ///		戻り値として、該当レコードを返す。
         /// </summary>
-        private static void _SongDBに曲を追加または更新する( SongDB songdb, VariablePath 曲ファイルの絶対パス, ユーザ設定 ユーザ設定 )
+        private static Song _SongDBに曲を追加または更新する( SongDB songdb, VariablePath 曲ファイルの絶対パス, ユーザ設定 ユーザ設定 )
         {
             try
             {
@@ -196,33 +194,33 @@ namespace DTXMania
                         var ノーツ数 = _ノーツ数を算出して返す( score, ユーザ設定 );
                         var BPMs = _最小最大BPMを調べて返す( score );
 
-                        songdb.Songs.InsertOnSubmit(
-                            new Song() {
-                                HashId = 調べる曲のハッシュ,
-                                Title = score.曲名,
-                                Path = 曲ファイルの絶対パス.変数なしパス,
-                                LastWriteTime = File.GetLastWriteTime( 曲ファイルの絶対パス.変数なしパス ).ToString( "G" ),
-                                Level = score.難易度,
-                                MinBPM = BPMs.最小BPM,
-                                MaxBPM = BPMs.最大BPM,
-                                TotalNotes_LeftCymbal = ノーツ数[ 表示レーン種別.LeftCymbal ],
-                                TotalNotes_HiHat = ノーツ数[ 表示レーン種別.HiHat ],
-                                TotalNotes_LeftPedal = ノーツ数[ 表示レーン種別.Foot ],
-                                TotalNotes_Snare = ノーツ数[ 表示レーン種別.Snare ],
-                                TotalNotes_Bass = ノーツ数[ 表示レーン種別.Bass ],
-                                TotalNotes_HighTom = ノーツ数[ 表示レーン種別.Tom1 ],
-                                TotalNotes_LowTom = ノーツ数[ 表示レーン種別.Tom2 ],
-                                TotalNotes_FloorTom = ノーツ数[ 表示レーン種別.Tom3 ],
-                                TotalNotes_RightCymbal = ノーツ数[ 表示レーン種別.RightCymbal ],
-                                PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "",
-                                Artist = score.アーティスト名,
-                                PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "",
-                                BGMAdjust = 0,
-                            } );
-
-                        songdb.DataContext.SubmitChanges();
+                        var song = new Song() {
+                            HashId = 調べる曲のハッシュ,
+                            Title = score.曲名,
+                            Path = 曲ファイルの絶対パス.変数なしパス,
+                            LastWriteTime = File.GetLastWriteTime( 曲ファイルの絶対パス.変数なしパス ).ToString( "G" ),
+                            Level = score.難易度,
+                            MinBPM = BPMs.最小BPM,
+                            MaxBPM = BPMs.最大BPM,
+                            TotalNotes_LeftCymbal = ノーツ数[ 表示レーン種別.LeftCymbal ],
+                            TotalNotes_HiHat = ノーツ数[ 表示レーン種別.HiHat ],
+                            TotalNotes_LeftPedal = ノーツ数[ 表示レーン種別.Foot ],
+                            TotalNotes_Snare = ノーツ数[ 表示レーン種別.Snare ],
+                            TotalNotes_Bass = ノーツ数[ 表示レーン種別.Bass ],
+                            TotalNotes_HighTom = ノーツ数[ 表示レーン種別.Tom1 ],
+                            TotalNotes_LowTom = ノーツ数[ 表示レーン種別.Tom2 ],
+                            TotalNotes_FloorTom = ノーツ数[ 表示レーン種別.Tom3 ],
+                            TotalNotes_RightCymbal = ノーツ数[ 表示レーン種別.RightCymbal ],
+                            PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "",
+                            Artist = score.アーティスト名,
+                            PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "",
+                            BGMAdjust = 0,
+                        };
+                        songdb.Songs.InsertOnSubmit( song );
+                        //songdb.DataContext.SubmitChanges();
 
                         Log.Info( $"DBに曲を追加しました。{曲ファイルの絶対パス.変数付きパス}" );
+                        return song;
                         //----------------
                         #endregion
                     }
@@ -262,6 +260,7 @@ namespace DTXMania
                         songdb.DataContext.SubmitChanges();
 
                         Log.Info( $"パスが異なりハッシュが同一であるレコードが検出されたため、曲の情報を更新しました。{曲ファイルの絶対パス.変数付きパス}" );
+                        return song;
                         //----------------
                         #endregion
                     }
@@ -270,9 +269,9 @@ namespace DTXMania
                 {
                     // (B) 同一パスを持つレコードがDBにあった
 
-                    var record = 同一パス検索クエリ.Single();
+                    var song = 同一パス検索クエリ.Single();
 
-                    string レコードの最終更新日時 = record.LastWriteTime;
+                    string レコードの最終更新日時 = song.LastWriteTime;
                     string 調べる曲の最終更新日時 = File.GetLastWriteTime( 曲ファイルの絶対パス.変数なしパス ).ToString( "G" );
 
                     if( レコードの最終更新日時 != 調べる曲の最終更新日時 )
@@ -286,39 +285,38 @@ namespace DTXMania
                         var BPMs = _最小最大BPMを調べて返す( score );
 
                         // HashId 以外のカラムを更新する。
-                        record.Title = score.曲名;
-                        record.LastWriteTime = 調べる曲の最終更新日時;
-                        record.Level = score.難易度;
-                        record.MinBPM = BPMs.最小BPM;
-                        record.MaxBPM = BPMs.最大BPM;
-                        record.TotalNotes_LeftCymbal = ノーツ数[ 表示レーン種別.LeftCymbal ];
-                        record.TotalNotes_HiHat = ノーツ数[ 表示レーン種別.HiHat ];
-                        record.TotalNotes_LeftPedal = ノーツ数[ 表示レーン種別.Foot ];
-                        record.TotalNotes_Snare = ノーツ数[ 表示レーン種別.Snare ];
-                        record.TotalNotes_Bass = ノーツ数[ 表示レーン種別.Bass ];
-                        record.TotalNotes_HighTom = ノーツ数[ 表示レーン種別.Tom1 ];
-                        record.TotalNotes_LowTom = ノーツ数[ 表示レーン種別.Tom2 ];
-                        record.TotalNotes_FloorTom = ノーツ数[ 表示レーン種別.Tom3 ];
-                        record.TotalNotes_RightCymbal = ノーツ数[ 表示レーン種別.RightCymbal ];
-                        record.PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "";
-                        record.Artist = score.アーティスト名;
-                        record.PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "";
-                        record.BGMAdjust = record.BGMAdjust;
+                        song.Title = score.曲名;
+                        song.LastWriteTime = 調べる曲の最終更新日時;
+                        song.Level = score.難易度;
+                        song.MinBPM = BPMs.最小BPM;
+                        song.MaxBPM = BPMs.最大BPM;
+                        song.TotalNotes_LeftCymbal = ノーツ数[ 表示レーン種別.LeftCymbal ];
+                        song.TotalNotes_HiHat = ノーツ数[ 表示レーン種別.HiHat ];
+                        song.TotalNotes_LeftPedal = ノーツ数[ 表示レーン種別.Foot ];
+                        song.TotalNotes_Snare = ノーツ数[ 表示レーン種別.Snare ];
+                        song.TotalNotes_Bass = ノーツ数[ 表示レーン種別.Bass ];
+                        song.TotalNotes_HighTom = ノーツ数[ 表示レーン種別.Tom1 ];
+                        song.TotalNotes_LowTom = ノーツ数[ 表示レーン種別.Tom2 ];
+                        song.TotalNotes_FloorTom = ノーツ数[ 表示レーン種別.Tom3 ];
+                        song.TotalNotes_RightCymbal = ノーツ数[ 表示レーン種別.RightCymbal ];
+                        song.PreImage = ( score.プレビュー画像ファイル名.Nullでも空でもない() ) ? score.プレビュー画像ファイル名 : "";
+                        song.Artist = score.アーティスト名;
+                        song.PreSound = ( score.プレビュー音声ファイル名.Nullでも空でもない() ) ? score.プレビュー音声ファイル名 : "";
+                        song.BGMAdjust = song.BGMAdjust;
 
-                        if( hash != record.HashId )
+                        var newRecord = song.Clone();
+                        if( hash != song.HashId )
                         {
                             // ハッシュはキーなので、これが変わったら、古いレコードを削除して、新しいレコードを追加する。
-                            var newRecord = record.Clone();
-                            songdb.Songs.DeleteOnSubmit( record );
+                            songdb.Songs.DeleteOnSubmit( song );
                             songdb.DataContext.SubmitChanges(); // 一度Submitして先にレコード削除を確定しないと、次のInsertがエラーになる。（PathカラムはUnique属性なので）
-
                             newRecord.HashId = hash;
                             songdb.Songs.InsertOnSubmit( newRecord );
                         }
-
-                        songdb.DataContext.SubmitChanges();
+                        //songdb.DataContext.SubmitChanges();
 
                         Log.Info( $"最終更新日時が変更されているため、曲の情報を更新しました。{曲ファイルの絶対パス.変数付きパス}" );
+                        return newRecord;
                         //----------------
                         #endregion
                     }
@@ -326,6 +324,7 @@ namespace DTXMania
                     {
                         #region " (B-b) それ以外 → 何もしない "
                         //----------------
+                        return song;
                         //----------------
                         #endregion
                     }
@@ -335,6 +334,7 @@ namespace DTXMania
             {
                 Log.ERROR( $"曲DBへの曲の追加に失敗しました。({VariablePath.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )})[{曲ファイルの絶対パス.変数付きパス}]" );
                 //throw;
+                return null;
             }
         }
 

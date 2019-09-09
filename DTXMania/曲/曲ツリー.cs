@@ -506,6 +506,7 @@ namespace DTXMania
                     var timer = Stopwatch.StartNew();
                     using( var recorddb = new RecordDB() )
                     using( var songdb = new SongDB() )
+                    using( var songdb_trans = songdb.Connection.BeginTransaction() )
                     {
                         foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                         {
@@ -513,6 +514,8 @@ namespace DTXMania
                             {
                                 music.現行化する( songdb, recorddb );
                                 musicNode数++;
+
+                                songdb.DataContext.SubmitChanges();
                             }
 
                             // キャンセル？
@@ -525,6 +528,8 @@ namespace DTXMania
                             // 一時停止？
                             this.現行化タスクの一時停止.OFFになるまでブロックする();
                         }
+
+                        songdb_trans.Commit();
                     }
 
                     int 曲数 = this.ルートノード.Traverse().Count( ( n ) => ( n is SetNode || ( n is MusicNode && !( n.親ノード is SetNode ) ) ) ); // MusicNode と SetNode（MusicNodes[]含まない）の数
