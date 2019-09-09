@@ -8,11 +8,11 @@ namespace FDK
 {
     public class 経過時間測定
     {
-        public ConcurrentDictionary<string, float> スタック
+        public ConcurrentDictionary<string, double> スタック
         {
             get;
             protected set;
-        } = new ConcurrentDictionary<string, float>();
+        } = new ConcurrentDictionary<string, double>();
 
         public 経過時間測定()
         {
@@ -39,11 +39,14 @@ namespace FDK
         {
             lock( this._lock )
             {
+                double 直前の時刻 = 0.0;
                 var sortedDic = this.スタック.OrderBy( ( kvp ) => ( kvp.Value ) );
                 for( int i = 0; i < sortedDic.Count(); i++ )
                 {
                     var kvp = sortedDic.ElementAt( i );
-                    Debug.Write( $"{kvp.Key}:{1000 * kvp.Value:0.00000}ms " );
+                    Debug.Write( $"{kvp.Key}:{1000 * kvp.Value:0.00000}ms({1000*(kvp.Value-直前の時刻):0.00000}), " );
+
+                    直前の時刻 = kvp.Value;
                 }
                 Debug.WriteLine( "" );
             }
