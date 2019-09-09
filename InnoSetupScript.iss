@@ -4,16 +4,16 @@
 ; このスクリプトは Release 版を対象にしているので、
 ; このスクリプトをコンパイルする前に Release 版をビルドしておくこと。
 
-#define MyAppVersion "048"
+#define MyAppVersion "049"
 
 #define MyAppName "DTXMania2"
 #define MyAppFolderName "DTXMania2"
 #define MyAppPublisher "ＦＲＯＭ"
 #define MyAppExeName "DTXMania.exe"
-#define MyAppBin "DTXMania\bin\x86\Release"
+#define MyAppBin "DTXMania\bin\Release"
 #define MyEditorName "SSTFEditor"
 #define MyEditorExeName "SSTFEditor.exe"
-#define MyEditorAppBin "SSTFEditor\bin\x86\Release"
+#define MyEditorAppBin "SSTFEditor\bin\Release"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application.
