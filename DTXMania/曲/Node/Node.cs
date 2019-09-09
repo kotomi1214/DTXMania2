@@ -119,23 +119,13 @@ namespace DTXMania
             // (1) 自分。
             yield return this;
 
-            // (2) SetNode内MusicNode。
-            if( this is SetNode setnode )
-            {
-                foreach( var music in setnode.MusicNodes )
-                {
-                    if( null != music )
-                        yield return music;
-                }
-            }
-
-            // (3) 子ノードリスト。
+            // (2) 子ノードリスト。SetNode.MusicNodes[] を含む。
             foreach( var child in this.子ノードリスト )
             {
                 yield return child;
             }
 
-            // (4) 子ノードのその他。
+            // (3) 子ノードのその他。
             foreach( var child in this.子ノードリスト )
             {
                 foreach( var n in child.Traverse() )

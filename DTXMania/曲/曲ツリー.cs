@@ -502,13 +502,18 @@ namespace DTXMania
                     }
 
                     // すべてのMusicNodeを現行化する。
+                    int musicNode数 = 0;
+                    var timer = Stopwatch.StartNew();
                     using( var recorddb = new RecordDB() )
                     using( var songdb = new SongDB() )
                     {
                         foreach( var node in this.ルートノード.Traverse() )   // SetNode.MusicNodes[] も展開される。
                         {
                             if( node is MusicNode music )
+                            {
                                 music.現行化する( songdb, recorddb );
+                                musicNode数++;
+                            }
 
                             // キャンセル？
                             if( this.現行化タスクキャンセル通知.IsCancellationRequested )
@@ -522,7 +527,8 @@ namespace DTXMania
                         }
                     }
 
-                    Log.Info( "曲ツリーの現行化を終了します。" );
+                    int 曲数 = this.ルートノード.Traverse().Count( ( n ) => ( n is SetNode || ( n is MusicNode && !( n.親ノード is SetNode ) ) ) ); // MusicNode と SetNode（MusicNodes[]含まない）の数
+                    Log.Info( $"曲ツリーの現行化を終了します。({曲数}曲, {musicNode数}譜面, {timer.ElapsedMilliseconds / 1000.0}秒)" );
                 }
                 catch( Exception e )
                 {
