@@ -129,6 +129,8 @@ namespace DTXMania
                     this.タイトル = song.Title;
                     this.サブタイトル = song.Artist;
                     this.難易度 = (float) song.Level;
+                    this.難易度ラベル = ( this.親ノード is SetNode setnode ) ? ( setnode.MusicNodes.First( ( m ) => m == this ).難易度ラベル ) : "FREE";
+                    this.曲ファイルハッシュ = song.HashId;
                     this.BGMAdjust = song.BGMAdjust;
 
                     // ノード画像（プレビュー画像）を生成する。
