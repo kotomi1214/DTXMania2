@@ -119,7 +119,8 @@ namespace DTXMania
                         // (A) 同一パスを持つレコードがDBになかった
 
                         // スコアを読み込む。
-                        var score = スコア.ファイルから生成する( this.曲ファイルの絶対パス.変数なしパス );
+                        var score = スコア.ファイルから生成する( this.曲ファイルの絶対パス.変数なしパス, ヘッダだけ: true );
+
                         var ノーツ数 = _ノーツ数を算出して返す( score, App進行描画.ユーザ管理.ログオン中のユーザ );
                         var BPMs = _最小最大BPMを調べて返す( score );
                         var 最終更新日時 = File.GetLastWriteTime( this.曲ファイルの絶対パス.変数なしパス ).ToString( "G" );
