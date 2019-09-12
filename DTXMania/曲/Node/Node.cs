@@ -193,7 +193,6 @@ namespace DTXMania
 
         public Node()
         {
-            this._曲名テクスチャ = new TitleTexture();
             this._プレビュー音声 = new PreviewSound();
 
             if( 0 == _インスタンス数++ )
@@ -207,7 +206,6 @@ namespace DTXMania
         {
             //this.ノード画像?.Dispose();            --> 生成も解放も派生クラスに任せる。
 
-            this._曲名テクスチャ?.Dispose();
             this._プレビュー音声?.Dispose();
 
             if( 0 == --_インスタンス数 )
@@ -227,8 +225,6 @@ namespace DTXMania
 
         public virtual void 進行描画する( DeviceContext dc, Matrix ワールド変換行列, bool キャプション表示 = true )
         {
-            // (1) ノード画像を描画する。
-
             if( null != this.ノード画像 )
             {
                 this.ノード画像.描画する( ワールド変換行列 );
@@ -237,26 +233,12 @@ namespace DTXMania
             {
                 Node.既定のノード画像.描画する( ワールド変換行列 );
             }
-
-
-            // (2) キャプションを描画する。
-
-            if( キャプション表示 )
-            {
-                ワールド変換行列 *= Matrix.Translation( 0f, 0f, 1f );    // ノード画像よりZ方向手前にほんのり移動
-
-                this._曲名テクスチャ.タイトル = this.タイトル;
-                this._曲名テクスチャ.サブタイトル = this.サブタイトル;
-                this._曲名テクスチャ.描画する( ワールド変換行列, 不透明度0to1: 1f, new RectangleF( 0f, 138f, Node.全体サイズ.Width, Node.全体サイズ.Height - 138f + 27f ) );
-            }
         }
 
 
 
         // private
 
-
-        protected Node.TitleTexture _曲名テクスチャ = null;
 
         private double _難易度 = 0.0f;
 
