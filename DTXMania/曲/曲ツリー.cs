@@ -520,6 +520,10 @@ namespace DTXMania
                         {
                             if( node is MusicNode music )
                             {
+                                // DataContext は軽量なので、使い捨てにする。
+                                // DataContext.SubmitChanges() の回数が増えるとどんどん重くなるので注意。
+                                songdb.ResetDataContext();
+
                                 music.現行化する( songdb, recorddb );
                                 musicNode数++;
 
