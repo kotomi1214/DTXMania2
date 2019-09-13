@@ -173,8 +173,11 @@
     <Compile Include="ステージ\07演奏\譜面スクロール速度.cs" />
     <Compile Include="ステージ\07演奏\達成率表示.cs" />
     <Compile Include="ステージ\08結果\ランク.cs" />
+    <Compile Include="ステージ\08結果\曲別SKILL.cs" />
     <Compile Include="ステージ\08結果\演奏パラメータ結果.cs" />
     <Compile Include="ステージ\08結果\結果ステージ.cs" />
+    <Compile Include="ステージ\08結果\達成率.cs" />
+    <Compile Include="ステージ\08結果\難易度.cs" />
     <Compile Include="ステージ\アイキャッチ\GO.cs" />
     <Compile Include="ステージ\アイキャッチ\アイキャッチ.cs" />
     <Compile Include="ステージ\アイキャッチ\シャッター.cs" />
@@ -821,6 +824,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="System\Images\達成率アイコン.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\結果\曲別SKILLアイコン.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="System\Images\結果\達成率アイコン.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="System\Images\結果\難易度アイコン.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="System\Images\結果\MAX.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
