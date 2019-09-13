@@ -166,7 +166,7 @@ namespace DTXMania.結果
 
         private パラメータアニメ _パラメータアニメ = null;
 
-        protected new const float _改行幅dpx = 27f;
+        protected new const float _改行幅dpx = 36f;
 
 
         private bool _フルコンボ再生済み = false;
