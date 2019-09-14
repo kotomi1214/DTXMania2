@@ -9,7 +9,7 @@ using FDK;
 
 namespace DTXMania.結果
 {
-    class 曲別SKILL : IDisposable
+    partial class 曲別SKILL : IDisposable
     {
 
         // 生成と終了
@@ -19,8 +19,11 @@ namespace DTXMania.結果
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._曲別SKILLアイコン = new テクスチャ( @"$(System)Images\結果\曲別SKILLアイコン.png" );
-                this._数字画像 = new 画像フォント( @"$(System)images\パラメータ文字_大.png", @"$(System)images\パラメータ文字_大.yaml", 文字幅補正dpx: 0f );
+                this._アイコン = new アイコン( DXResources.Instance.Animation );
+                this._下線 = new 下線( DXResources.Instance.Animation );
+                this._数値 = new 数値( DXResources.Instance.Animation );
+
+                this._初めての進行描画 = true;
             }
         }
 
@@ -28,8 +31,9 @@ namespace DTXMania.結果
         {
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
-                this._数字画像?.Dispose();
-                this._曲別SKILLアイコン?.Dispose();
+                this._数値?.Dispose();
+                this._下線?.Dispose();
+                this._アイコン?.Dispose();
             }
         }
 
@@ -40,28 +44,25 @@ namespace DTXMania.結果
 
         public void 進行描画する( DeviceContext dc, float left, float top, double スキル値 )
         {
+            if( this._初めての進行描画 )
+            {
+                // アニメーション開始
+                this._アイコン.開始する();
+                this._下線.開始する();
+                this._数値.開始する( スキル値 );
+
+                this._初めての進行描画 = false;
+            }
+
+
             // アイコン
-
-            this._曲別SKILLアイコン.描画する( left, top );
-
+            this._アイコン.進行描画する( dc, left, top );
 
             // 数値
+            this._数値.進行描画する( dc, left + 180f, top + 3f );
 
-            string スキル値文字列 = スキル値.ToString( "0.00" ).PadLeft( 6 );    // 左余白は ' '。例:" 19.00", "199.99"
-
-            // 小数部を描画する
-            this._数字画像.描画する( dc, left + 360f, top + 3f + 17f, スキル値文字列.Substring( 4 ), new Size2F( 1.0f, 1.0f ) );
-
-            // 整数部を描画する（'.'含む）
-            this._数字画像.描画する( dc, left + 180f, top + 3f, スキル値文字列.Substring( 0, 4 ), new Size2F( 1.0f, 1.2f ) );
-
-
-            // アンダーライン
-
-            DXResources.Instance.D2DBatchDraw( dc, () => {
-                using( var brush = new SolidColorBrush( dc, Color4.White ) )
-                    dc.FillRectangle( new RectangleF( left + 33f, top + 113f, 513f, 3f ), brush );
-            } );
+            // 下線
+            this._下線.進行描画する( dc, left + 33f, top + 113f );
         }
 
 
@@ -69,8 +70,16 @@ namespace DTXMania.結果
         // ローカル
 
 
-        private テクスチャ _曲別SKILLアイコン;
+        private const double 最初の待機時間sec = 0.75;
 
-        private 画像フォント _数字画像;
+        private const double アニメ時間sec = 0.5;
+
+        private bool _初めての進行描画;
+
+        private 曲別SKILL.アイコン _アイコン;
+
+        private 曲別SKILL.下線 _下線;
+
+        private 曲別SKILL.数値 _数値;
     }
 }

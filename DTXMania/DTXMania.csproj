@@ -172,7 +172,16 @@
     <Compile Include="ステージ\07演奏\演奏ステージ_ビュアーモード.cs" />
     <Compile Include="ステージ\07演奏\譜面スクロール速度.cs" />
     <Compile Include="ステージ\07演奏\達成率表示.cs" />
+    <Compile Include="ステージ\08結果\曲別SKILL.アイコン.cs" />
+    <Compile Include="ステージ\08結果\達成率.アイコン.cs" />
+    <Compile Include="ステージ\08結果\難易度.アイコン.cs" />
     <Compile Include="ステージ\08結果\ランク.cs" />
+    <Compile Include="ステージ\08結果\曲別SKILL.下線.cs" />
+    <Compile Include="ステージ\08結果\曲別SKILL.数値.cs" />
+    <Compile Include="ステージ\08結果\達成率.下線.cs" />
+    <Compile Include="ステージ\08結果\達成率.数値.cs" />
+    <Compile Include="ステージ\08結果\難易度.数値.cs" />
+    <Compile Include="ステージ\08結果\難易度.下線.cs" />
     <Compile Include="ステージ\08結果\曲別SKILL.cs" />
     <Compile Include="ステージ\08結果\演奏パラメータ結果.cs" />
     <Compile Include="ステージ\08結果\結果ステージ.cs" />
