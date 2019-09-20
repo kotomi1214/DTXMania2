@@ -128,6 +128,8 @@
     <Compile Include="AppForm.Designer.cs">
       <DependentUpon>AppForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Effekseer.NET\EffekseerEffect.cs" />
+    <Compile Include="Effekseer.NET\EffekseerManager.cs" />
     <Compile Include="Version.cs" />
     <Compile Include="ステージ\03認証\ユーザリスト.cs" />
     <Compile Include="ステージ\03認証\認証ステージ.cs" />
@@ -881,8 +883,8 @@ set DESTDIR64="$(TargetDir)x64"
 if not exist %25DESTDIR86%25 mkdir %25DESTDIR86%25
 if not exist %25DESTDIR64%25 mkdir %25DESTDIR64%25
 
-xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x86\EffekseerNET.dll" %25DESTDIR86%25  /Y
-xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x64\EffekseerNET.dll" %25DESTDIR64%25  /Y
+xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x86\EffekseerNET.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x64\EffekseerNET.dll" %25DESTDIR64%25  /Y /D
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
