@@ -434,7 +434,7 @@ namespace DTXMania
                 // 深度バッファを 1.0f でクリアする。
                 d3ddc.ClearDepthStencilView(
                     DXResources.Instance.既定のD3D11DepthStencilView,
-                    SharpDX.Direct3D11.DepthStencilClearFlags.Depth,
+                    SharpDX.Direct3D11.DepthStencilClearFlags.Depth | SharpDX.Direct3D11.DepthStencilClearFlags.Stencil,
                     depth: 1.0f,
                     stencil: 0 );
             }
@@ -442,6 +442,8 @@ namespace DTXMania
             #endregion
 
             this.現在のステージ?.描画する();
+
+            App進行描画.EffekseerManager?.進行描画する();
         }
 
         protected override void メッセージを処理する( 通知 msg )

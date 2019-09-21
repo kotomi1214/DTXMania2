@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using SharpDX;
+using SharpDX.Direct3D;
+using SharpDX.Direct3D11;
 using FDK;
 
 namespace DTXMania
@@ -13,16 +16,33 @@ namespace DTXMania
 
         public EffekseerNET.Renderer Renderer { get; protected set; } = null;
 
-        /// <summary>
-        ///     視点の位置。
-        /// </summary>
-        public SharpDX.Vector3 Position
+        public Vector3 カメラの位置
         {
-            get => this._Position;
+            get => this._カメラの位置;
             set
             {
-                this._Position = value;
-                this.Renderer.SetCameraMatrix( SharpDX.Matrix.LookAtRH( this._Position, new SharpDX.Vector3( 0f, 0f, 0f ), new SharpDX.Vector3( 0f, 1f, 0f ) ) );
+                this._カメラの位置 = value;
+                this._カメラを反映する();
+            }
+        }
+
+        public Vector3 カメラの注視点
+        {
+            get => this._カメラの注視点;
+            set
+            {
+                this._カメラの注視点 = value;
+                this._カメラを反映する();
+            }
+        }
+
+        public Vector3 カメラの上方向
+        {
+            get => this._カメラの上方向;
+            set
+            {
+                this._カメラの上方向 = value;
+                this._カメラを反映する();
             }
         }
 
@@ -57,14 +77,22 @@ namespace DTXMania
                 this.Manager.SetTextureLoader( this.Renderer.CreateTextureLoader() );
                 this.Manager.SetModelLoader( this.Renderer.CreateModelLoader() );
 
-                // 視点位置を確定する。
-                this.Position = new SharpDX.Vector3( 10f, 5f, 20f );
+                // カメラを等倍3D平面に設定する。
+                const float 視野角deg = 45.0f;
+                var dz = (float) ( DXResources.Instance.設計画面サイズ.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
+                this._カメラの位置 = new Vector3( 0f, 0f, -2f * dz );
+                this._カメラの注視点 = new Vector3( 0f, 0f, 0f );
+                this._カメラの上方向 = new Vector3( 0f, 1f, 0f );
+                this._カメラを反映する();
 
-                // 投影行列を設定する。
-                this.Renderer.SetProjectionMatrix( SharpDX.Matrix.PerspectiveFovRH( 90.0f / 180.0f * SharpDX.MathUtil.Pi, (float) DXResources.Instance.設計画面サイズ.Width / (float) DXResources.Instance.設計画面サイズ.Height, 1.0f, 50.0f ) );
+                // 投影行列を等倍3D平面に設定する。
+                var 射影行列 = Matrix.PerspectiveFovRH(
+                    MathUtil.DegreesToRadians( 視野角deg ),
+                    DXResources.Instance.設計画面サイズ.Width / DXResources.Instance.設計画面サイズ.Height,   // アスペクト比
+                    -dz,                                            // 前方投影面までの距離
+                    +dz );                                          // 後方投影面までの距離
 
-                // カメラ行列を設定する。
-                this.Position = SharpDX.Vector3.Zero;
+                this.Renderer.SetProjectionMatrix( 射影行列 );
             }
         }
 
@@ -90,24 +118,30 @@ namespace DTXMania
 
         public void 進行描画する()
         {
-            // エフェクトの更新処理を行う。
             this.Manager.Update( deltaFrame: 1f );
 
-            // エフェクトの描画開始処理を行う。
+            var d3ddc = DXResources.Instance.D3D11Device1.ImmediateContext;
+            d3ddc.HullShader.Set( null );
+            d3ddc.DomainShader.Set( null );
+            d3ddc.GeometryShader.Set( null );
+
             this.Renderer.BeginRendering();
-
-            // エフェクトの描画を行う。
             this.Manager.Draw();
-
-            // エフェクトの描画終了処理を行う。
             this.Renderer.EndRendering();
         }
 
 
+        private Vector3 _カメラの位置 = new Vector3( 0f, 0f, -10f );
 
-        // ローカル
+        private Vector3 _カメラの注視点 = new Vector3( 0f, 0f, 0f );
+
+        private Vector3 _カメラの上方向 = new Vector3( 0f, 1f, 0f );
 
 
-        private SharpDX.Vector3 _Position = SharpDX.Vector3.Zero;
+        private void _カメラを反映する()
+        {
+            // 右手系
+            this.Renderer.SetCameraMatrix( Matrix.LookAtRH( this._カメラの位置, this._カメラの注視点, this._カメラの上方向 ) );
+        }
     }
 }

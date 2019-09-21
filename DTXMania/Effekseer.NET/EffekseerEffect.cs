@@ -17,6 +17,8 @@ namespace DTXMania
         {
             this._Manager = new WeakReference<EffekseerManager>( manager );
             this._Effect = EffekseerNET.Effect.Create( manager.Manager, path.変数なしパス, magnification, materialPath );
+
+            Log.Info( $"Effekseerエフェクトを生成しました。[{path.変数付きパス}]" );
         }
 
         public virtual void Dispose()
