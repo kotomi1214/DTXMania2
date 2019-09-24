@@ -44,7 +44,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'RemoteDebug|AnyCPU'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\RemoteDebug\</OutputPath>
+    <OutputPath>\\DRUMS-PC\DTXMania2リモートデバッグ\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -885,6 +885,11 @@ if not exist %25DESTDIR64%25 mkdir %25DESTDIR64%25
 
 xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x86\EffekseerNET.dll" %25DESTDIR86%25  /Y /D
 xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x64\EffekseerNET.dll" %25DESTDIR64%25  /Y /D
+
+xcopy "$(SolutionDir)packages-selfbuild\vc140\x86\msvcp140.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-selfbuild\vc140\x86\vcruntime140.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-selfbuild\vc140\x64\msvcp140.dll" %25DESTDIR64%25  /Y /D
+xcopy "$(SolutionDir)packages-selfbuild\vc140\x64\vcruntime140.dll" %25DESTDIR64%25  /Y /D
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
