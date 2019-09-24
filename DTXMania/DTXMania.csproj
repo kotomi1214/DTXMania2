@@ -69,13 +69,13 @@
   <ItemGroup>
     <Reference Include="CSCore, Version=1.2.1.2, Culture=neutral, PublicKeyToken=5a08f2b6f4415dea, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath Condition="'$(Configuration)' == 'Debug'">..\packages-selfbuild\cscore\DebugDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'Release'">..\packages-selfbuild\cscore\ReleaseDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'RemoteDebug'">..\packages-selfbuild\cscore\DebugDll\CSCore.dll</HintPath>
-      <HintPath Condition="'$(Configuration)' == 'RemoteRelease'">..\packages-selfbuild\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Debug'">..\packages-local\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'Release'">..\packages-local\cscore\ReleaseDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteDebug'">..\packages-local\cscore\DebugDll\CSCore.dll</HintPath>
+      <HintPath Condition="'$(Configuration)' == 'RemoteRelease'">..\packages-local\cscore\ReleaseDll\CSCore.dll</HintPath>
     </Reference>
     <Reference Include="EffekseerNET">
-      <HintPath>..\packages-selfbuild\Effekseer.NET\x86\EffekseerNET.dll</HintPath>
+      <HintPath>..\packages-local\Effekseer.NET\x86\EffekseerNET.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SharpDX, Version=4.2.0.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
@@ -883,13 +883,13 @@ set DESTDIR64="$(TargetDir)x64"
 if not exist %25DESTDIR86%25 mkdir %25DESTDIR86%25
 if not exist %25DESTDIR64%25 mkdir %25DESTDIR64%25
 
-xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x86\EffekseerNET.dll" %25DESTDIR86%25  /Y /D
-xcopy "$(SolutionDir)packages-selfbuild\Effekseer.NET\x64\EffekseerNET.dll" %25DESTDIR64%25  /Y /D
+xcopy "$(SolutionDir)packages-local\Effekseer.NET\x86\EffekseerNET.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-local\Effekseer.NET\x64\EffekseerNET.dll" %25DESTDIR64%25  /Y /D
 
-xcopy "$(SolutionDir)packages-selfbuild\vc140\x86\msvcp140.dll" %25DESTDIR86%25  /Y /D
-xcopy "$(SolutionDir)packages-selfbuild\vc140\x86\vcruntime140.dll" %25DESTDIR86%25  /Y /D
-xcopy "$(SolutionDir)packages-selfbuild\vc140\x64\msvcp140.dll" %25DESTDIR64%25  /Y /D
-xcopy "$(SolutionDir)packages-selfbuild\vc140\x64\vcruntime140.dll" %25DESTDIR64%25  /Y /D
+xcopy "$(SolutionDir)packages-local\vc140\x86\msvcp140.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-local\vc140\x86\vcruntime140.dll" %25DESTDIR86%25  /Y /D
+xcopy "$(SolutionDir)packages-local\vc140\x64\msvcp140.dll" %25DESTDIR64%25  /Y /D
+xcopy "$(SolutionDir)packages-local\vc140\x64\vcruntime140.dll" %25DESTDIR64%25  /Y /D
 </PostBuildEvent>
   </PropertyGroup>
 </Project>
