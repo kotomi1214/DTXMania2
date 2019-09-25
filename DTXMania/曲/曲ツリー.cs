@@ -76,7 +76,7 @@ namespace DTXMania
         /// <remarks>
         ///		<see cref="フォーカスノード"/>が<see cref="SetNode"/>型である場合は、それが保有する難易度の中で、
         ///		現在の <see cref="ユーザ希望難易度"/> に一番近い難易度の <see cref="MusicNode"/> が返される。
-        ///		それ以外の場合は常に null が返される。
+        ///		該当しないノードの場合は常に null が返される。
         /// </remarks>
         public MusicNode フォーカス曲ノード
         {
@@ -115,14 +115,14 @@ namespace DTXMania
 
                 switch( node )
                 {
-                    case MusicNode musicNode:
+                    case MusicNode _:
                         return 3;   // MASTER 相当で固定
 
                     case SetNode setNode:
                         return setNode.ユーザ希望難易度に最も近い難易度レベルを返す( this.ユーザ希望難易度 );
 
                     default:
-                        return 0;   // BoxNode, BackNode, RandomSelectNode など
+                        return 0;
                 }
             }
         }
@@ -134,17 +134,25 @@ namespace DTXMania
 
         public void ユーザ希望難易度をひとつ増やす()
         {
-            for( int i = 0; i < 5; i++ )   // 最大でも5回まで
+            // RandomSelect 以外は現在のフォーカス難易度を起点として増やす。
+            this.ユーザ希望難易度 = ( this.フォーカスノード is RandomSelectNode ) ? this.ユーザ希望難易度 : this.フォーカス難易度;
+
+            for( int i = 0; i < 5; i++ )   // 最低5回で一周する
             {
                 this.ユーザ希望難易度 = ( this.ユーザ希望難易度 + 1 ) % 5;
 
-                if( this.フォーカスノード is SetNode setnode )
+                switch( this.フォーカスノード )
                 {
-                    if( null != setnode.MusicNodes[ this.ユーザ希望難易度 ] )
-                        return; // その難易度に対応する曲ノードがあればOK。
+                    case SetNode _node:
+                        if( null != _node.MusicNodes[ this.ユーザ希望難易度 ] )
+                            return; // その難易度に対応する曲ノードがあればOK。
+                        break;
+
+                    case RandomSelectNode _node:
+                        return;     // どの難易度でもOK
                 }
 
-                // なければ次のアンカへ。
+                // なければ次の希望難易度へ。
             }
         }
 

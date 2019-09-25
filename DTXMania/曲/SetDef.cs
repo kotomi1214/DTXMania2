@@ -11,6 +11,8 @@ namespace DTXMania
 {
     class SetDef
     {
+        public static readonly string[] デフォルトのラベル = new string[] { "BASIC", "ADVANCED", "EXTREME", "MASTER", "ULTIMATE" };
+
         /// <summary>
         ///		最大５曲をレベル別に保有できるブロック。
         ///		set.def では任意個のブロックを宣言できる。（#TITLE行が登場するたび新しいブロックとみなされる）
@@ -230,8 +232,6 @@ namespace DTXMania
 
         private static void _FILEの指定があるのにLxLABELが省略されているときはデフォルトの名前をセットする( Block block )
         {
-            var デフォルトのラベル = new string[] { "BASIC", "ADVANCED", "EXTREME", "MASTER", "ULTIMATE" };
-
             for( int i = 0; i < 5; i++ )
             {
                 if( block.File[ i ].Nullでも空でもない() &&
