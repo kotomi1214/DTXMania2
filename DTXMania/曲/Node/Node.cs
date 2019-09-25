@@ -186,6 +186,11 @@ namespace DTXMania
 
         private Node.PreviewSound _プレビュー音声;  // null なら未使用
 
+        public static void すべての生存プレビューサウンドを破棄する()
+        {
+            Node.PreviewSound.すべての生存サウンドを破棄する();
+        }
+
 
 
         // 生成と終了

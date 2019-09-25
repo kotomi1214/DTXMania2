@@ -282,6 +282,7 @@ namespace DTXMania
             using( Log.Block( FDKUtilities.現在のメソッド名 ) )
             {
                 this._ノードを削除する( this.ルートノード );
+                Node.すべての生存プレビューサウンドを破棄する();
             }
         }
 

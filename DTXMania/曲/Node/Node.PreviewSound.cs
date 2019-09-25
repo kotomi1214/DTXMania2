@@ -13,12 +13,16 @@ namespace DTXMania
         ///     プレビュー音声の再生と停止。
         /// </summary>
 		class PreviewSound : IDisposable
-		{
+        {
             /// <summary>
             ///		プレビューサウンド。
             ///		未使用なら null 。
             /// </summary>
             public Sound Sound { get; protected set; } = null;
+
+
+
+            // 生成と終了
 
 
             public PreviewSound()
@@ -36,6 +40,20 @@ namespace DTXMania
                 this._SampleSource?.Dispose();
                 this._SampleSource = null;
             }
+
+            /// <summary>
+            ///     キャッシュに存在するすべてのサウンドを解放する。
+            /// </summary>
+            public static void すべての生存サウンドを破棄する()
+            {
+                foreach( var ps in _PreviewSoundCahce )
+                    ps._プレビュー音声を破棄する();
+
+                _PreviewSoundCahce.Clear();
+            }
+
+
+            // 再生と停止
 
 
             /// <summary>
@@ -66,6 +84,8 @@ namespace DTXMania
             }
 
 
+            private static int _キャッシュするサウンド数 = 20;
+
             private string _音声ファイルパス = null;
 
             /// <summary>
@@ -76,20 +96,6 @@ namespace DTXMania
 
             //private System.Windows.Forms.Timer _再生タイマ = null;     --> UIスレッドから呼び出してるのになぜかTickされないので、System.Threading.Timer に変更。
             private System.Threading.Timer _再生タイマ = null;
-
-            /// <summary>
-            ///     再生する（新しい再生タイマが開始する）たびに +1 されていくカウンタ。
-            /// </summary>
-            /// <remarks>
-            ///     Tick コールバックの多重実行によるプレビュー音声の多重再生を防止するために使う。
-            ///     新しい再生タイマが開始される直前に古いタイマが破棄されるが、その時点で既に Tick コールバックが
-            ///     呼び出されていた（プレビュー音声の読み込みが始まっていた）場合は、その実行は止められない。
-            ///     そこで、Tick コールバック内でのプレビュー音声の読み込み前と後とでこのカウンタ値を比較し、
-            ///     両者が等しければその音声の再生を許可するものとする。
-            ///     もし読み込み前後でカウンタ値が異なっていれば、それは読み込み中に新しいタイマが開始されたことを示しているので、
-            ///     その音声の再生はキャンセルするものとする。
-            /// </remarks>
-            private static long _再生番号 = 0;
 
 
             /// <summary>
@@ -116,7 +122,8 @@ namespace DTXMania
                 }
                 else
                 {
-                    // 再生中止。
+                    // もし読み込み前後でカウンタ値が異なっていれば、それは読み込み中に新しいタイマが開始されたことを示しているので、
+                    // その音声の再生はキャンセルするものとする。
                 }
             }
 
@@ -139,11 +146,58 @@ namespace DTXMania
 
                     if( null == this._SampleSource )
                         return;
+
+                    // サウンドキャッシュに追加する。
+                    _PreviewSoundCahce.Enqueue( this );
+
+                    // キャッシュが規定数を超えていれば、一番古いサウンドを解放する。
+                    if( _キャッシュするサウンド数 < _PreviewSoundCahce.Count )    // 規定数 20 個まで（適当）
+                    {
+                        var ps = _PreviewSoundCahce.Dequeue();
+                        ps._プレビュー音声を破棄する();
+                    }
                 }
 
                 // (2) サンプルソースからサウンドを生成する。
                 this.Sound = new Sound( App進行描画.サウンドデバイス, this._SampleSource );
             }
+
+            private void _プレビュー音声を破棄する()
+            {
+                this.Sound?.Stop();
+                this.Sound?.Dispose();
+                this.Sound = null;
+
+                this._SampleSource?.Dispose();
+                this._SampleSource = null;
+            }
+
+
+
+            // ローカル(static)
+
+
+            /// <summary>
+            ///     再生する（新しい再生タイマが開始する）たびに +1 されていくカウンタ。
+            /// </summary>
+            /// <remarks>
+            ///     Tick コールバックの多重実行によるプレビュー音声の多重再生を防止するために使う。
+            ///     新しい再生タイマが開始される直前に古いタイマが破棄されるが、その時点で既に Tick コールバックが
+            ///     呼び出されていた（プレビュー音声の読み込みが始まっていた）場合は、その実行は止められない。
+            ///     そこで、Tick コールバック内でのプレビュー音声の読み込み前と後とでこのカウンタ値を比較し、
+            ///     両者が等しければその音声の再生を許可するものとする。
+            ///     もし読み込み前後でカウンタ値が異なっていれば、それは読み込み中に新しいタイマが開始されたことを示しているので、
+            ///     その音声の再生はキャンセルするものとする。
+            /// </remarks>
+            private static long _再生番号 = 0;
+
+            /// <summary>
+            ///     ISampleSourceのキャッシュ。
+            /// </summary>
+            /// <remarks>
+            ///     プレビュー音声が生成されるたびに追加され、一定数が溜まるたび、古いモノから解放される。
+            /// </remarks>
+            private static Queue<PreviewSound> _PreviewSoundCahce = new Queue<PreviewSound>();
         }
     }
 }
