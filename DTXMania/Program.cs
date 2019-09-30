@@ -96,11 +96,9 @@ namespace DTXMania
                     {
                         // アプリを起動。
                         // アプリが終了するまで、このメソッドからは戻ってこない。
-
                         Application.Run( app );
 
                         // 戻ってきた際、再起動フラグが立っていたらここでアプリを再起動する。
-
                         if( app.再起動が必要 )
                         {
                             // 注意：Visual Sutdio のデバッグ＞例外設定で Common Language Runtime Exceptions にチェックを入れていると、

@@ -184,7 +184,7 @@ namespace FDK
                     break;
 
                 case WM_APP_MESSAGE_ARRIVED:
-                    this.OnAppMessageArrivec( msg );
+                    this.OnAppMessageArrived( msg );
                     break;
             }
 
@@ -194,7 +194,7 @@ namespace FDK
         /// <summary>
         ///     <see cref="WM_APP_MESSAGE_ARRIVED"/> ハンドラ。
         /// </summary>
-        protected virtual void OnAppMessageArrivec( in Message msg )
+        protected virtual void OnAppMessageArrived( in Message msg )
         {
             if( this.通知キュー.TryDequeue( out 通知 threadMessage ) )
             {
