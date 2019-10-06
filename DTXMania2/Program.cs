@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.IO;
+using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,14 +13,77 @@ namespace DTXMania2
 {
     static class Program
     {
+        public readonly static string _ビュアー用パイプライン名 = "DTXMania2Viewer";
+
         [STAThread]
-        static void Main()
+        static void Main( string[] args )
         {
             try
             {
                 // 初期化
 
                 timeBeginPeriod( 1 );
+                Encoding.RegisterProvider( CodePagesEncodingProvider.Instance );    // .NET Core で Shift-JIS 他を利用可能にする
+
+                #region " コマンドライン引数を解析する。"
+                //----------------
+                Global.Options = new CommandLineOptions();
+
+                if( !Global.Options.解析する( args ) ) // 解析に失敗すればfalse
+                {
+                    // 利用法を表示して終了。
+
+                    Trace.WriteLine( Global.Options.Usage );             // Traceと
+                    using( var console = new Console() )
+                        console.Out?.WriteLine( Global.Options.Usage );  // 標準出力の両方へ
+                    return;
+                }
+                //----------------
+                #endregion
+
+                #region " 二重起動チェックまたはオプション送信。"
+                //----------------
+                using( var pipeToViewer = new NamedPipeClientStream( ".", _ビュアー用パイプライン名, PipeDirection.Out ) )
+                {
+                    try
+                    {
+                        // パイプラインサーバへの接続を試みる。
+                        pipeToViewer.Connect( 100 );
+
+                        // (A) サービスが立ち上がっている
+                        if( Global.Options.ビュアーモードである )
+                        {
+                            #region " (A-a) オプション内容をサーバへ送信して正常終了。"
+                            //----------------
+                            var ss = new StreamStringForNamedPipe( pipeToViewer );
+                            var yamlText = Global.Options.ToYaml(); // YAML化
+                            ss.WriteString( yamlText );
+                            return;
+                            //----------------
+                            #endregion
+                        }
+                        else
+                        {
+                            #region " (A-b) 二重起動としてエラー終了。"
+                            //----------------
+                            var ss = new StreamStringForNamedPipe( pipeToViewer );
+                            ss.WriteString( "ping" );
+
+                            var msg = "二重起動はできません。";
+                            Trace.WriteLine( msg );                     // Traceと
+                            MessageBox.Show( msg, "DTXMania2 error" );  // ダイアログ表示。
+                            return;
+                            //----------------
+                            #endregion
+                        }
+                    }
+                    catch( TimeoutException )
+                    {
+                        // (B) サービスが立ち上がっていない → そのまま起動
+                    }
+                }
+                //----------------
+                #endregion
 
                 #region " AppData/DTXMania2 フォルダがなければ作成する。"
                 //----------------
@@ -50,7 +114,7 @@ namespace DTXMania2
 
                 #region " タイトル、著作権、システム情報をログ出力する。"
                 //----------------
-                Log.WriteLine( $"{Application.ProductName} Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) )}" );
+                Log.WriteLine( $"{Application.ProductName} Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000}" );
 
                 var copyrights = (AssemblyCopyrightAttribute[]) Assembly.GetExecutingAssembly().GetCustomAttributes( typeof( AssemblyCopyrightAttribute ), false );
                 Log.WriteLine( $"{copyrights[ 0 ].Copyright}" );
@@ -67,7 +131,10 @@ namespace DTXMania2
                     var exePath = Path.GetDirectoryName( Assembly.GetExecutingAssembly().Location ) ?? "";
 
                     Folder.フォルダ変数を追加または更新する( "Exe", exePath );
-                    Folder.フォルダ変数を追加または更新する( "System", Path.Combine( exePath, "System" ) );
+                    Folder.フォルダ変数を追加または更新する( "ResourcesRoot", Path.Combine( exePath, "Resources" ) );
+                    Folder.フォルダ変数を追加または更新する( "DrumSounds", Path.Combine( exePath, @"Resources\Default\DrumSounds" ) );      // Skin.yaml により変更される
+                    Folder.フォルダ変数を追加または更新する( "SystemSounds", Path.Combine( exePath, @"Resources\Default\SystemSounds" ) );  // Skin.yaml により変更される
+                    Folder.フォルダ変数を追加または更新する( "Images", Path.Combine( exePath, @"Resources\Default\Images" ) );              // Skin.yaml により変更される
                     Folder.フォルダ変数を追加または更新する( "AppData", AppDataフォルダ名 );
                     Folder.フォルダ変数を追加または更新する( "UserProfile", Environment.GetFolderPath( Environment.SpecialFolder.UserProfile ) );
                 }
@@ -80,7 +147,28 @@ namespace DTXMania2
                 Application.SetHighDpiMode( HighDpiMode.SystemAware );
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault( false );
-                Application.Run( new AppForm() );
+                AppForm appForm;
+                do
+                {
+                    appForm = new AppForm();
+                    Application.Run( appForm );
+                    appForm.Dispose();
+                } while( appForm.再起動が必要 );  // 戻ってきた際、再起動フラグが立っていたらここでアプリを再起動する。
+
+                #region " 備考: 再起動について "
+                //----------------
+                // .NET Core 3 で Application.Restart() すると、「起動したプロセスじゃないので却下」と言われる。
+                // おそらく起動プロセスが dotnet であるため？
+                // 　
+                // if( appForm.再起動が必要 )
+                // {
+                //     // 注意：Visual Sutdio のデバッグ＞例外設定で Common Language Runtime Exceptions にチェックを入れていると、
+                //     // ここで InvalidDeploymentException が発生してデバッガが一時停止するが、これは「ファーストチャンス例外」なので、
+                //     // 単に無視すること。
+                //     Application.Restart();
+                // }
+                //----------------
+                #endregion
 
 
                 // 終了

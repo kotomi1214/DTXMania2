@@ -7,6 +7,9 @@ namespace DTXMania2
     /// <summary>
     ///     Raw Input 関連のクラス、構造体、Win32APIの定義。
     /// </summary>
+    /// <remarks>
+    ///     RawInput はすべて GUI スレッドで実行すること。
+    /// </remarks>
     public class RawInput
     {
         [Flags]
@@ -688,7 +691,7 @@ namespace DTXMania2
         public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, ref IntPtr pData, ref int pcbSize, int cbSizeHeader );
 
         [DllImport( "user32.dll", SetLastError = true )]
-        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, [In, Out] byte[] pData, ref int pcbSize, int cbSizeHeader );
+        public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, [In, Out] byte[]? pData, ref int pcbSize, int cbSizeHeader );
 
         /// <summary>
         ///     システムに接続されている Raw Input デバイスを列挙する。

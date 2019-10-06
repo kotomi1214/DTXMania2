@@ -23,11 +23,12 @@ namespace DTXMania2
         /// <summary>
         ///     表示用の専用タスクを生成して、そこで垂直帰線同期とスワップチェーンの表示を行う。
         /// </summary>
-        public async void 表示するAsync( SharpDX.DXGI.Output1 dxgiOutput1, SharpDX.DXGI.SwapChain1 swapChain1 )
+        public void 表示する( SharpDX.DXGI.Output1 dxgiOutput1, SharpDX.DXGI.SwapChain1 swapChain1 )
         {
             this.表示待機中 = true;    // 表示開始
 
-            await Task.Run( () => {
+            // HACK: 毎回 Task.Run を実行しないような実装に変える。
+            Task.Run( () => {
 
                 // SwapChain.Present での垂直帰線待ちは広範囲のリソースを巻き込んで処理を停滞させるため、DXGIで行うようにする。
                 dxgiOutput1.WaitForVerticalBlank();

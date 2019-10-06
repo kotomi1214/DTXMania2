@@ -16,7 +16,7 @@ namespace DTXMania2
             Log.BeginInfo( this._ブロック名 );
         }
 
-        // <-- 終了"
+        // "<-- 終了"
         public void Dispose()
         {
             Log.EndInfo( this._ブロック名 );

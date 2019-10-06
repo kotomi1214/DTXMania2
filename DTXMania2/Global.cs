@@ -27,12 +27,17 @@ namespace DTXMania2
         public static App App { get; set; } = null!;
 
         /// <summary>
+        ///     起動時のコマンドラインオプション。
+        /// </summary>
+        public static CommandLineOptions Options { get; set; } = null!;
+
+        /// <summary>
         ///     <see cref="AppForm"/> インスタンスのウィンドウハンドル。
         ///     <see cref="Global.生成する()"/> の前に設定しておくこと。
         /// </summary>
         /// <remarks>
         ///     <see cref="AppForm.Handle"/> と同じ値であるが、
-        ///     <see cref="AppForm"/> のメンバは必ずGUIスレッドから参照されなれければならない。
+        ///     <see cref="AppForm"/> のメンバは必ずGUIスレッドから参照されなれければならないので、
         ///     GUIスレッド以外のスレッドから参照する場合は、代わりにこのメンバを参照すること。
         /// </remarks>
         public static IntPtr Handle { get; set; } = IntPtr.Zero;
@@ -93,41 +98,41 @@ namespace DTXMania2
         {
             get
             {
-                var fs = DCompDevice2!.FrameStatistics;
+                var fs = DCompDevice2.FrameStatistics;
                 return ( fs.NextEstimatedFrameTime - fs.CurrentTime ) / fs.TimeFrequency;
             }
         }
 
         #region " スワップチェーンに依存しないグラフィックリソース "
         //----------------
-        public static SharpDX.Direct3D11.Device1? D3D11Device1 { get; private set; }
+        public static SharpDX.Direct3D11.Device1 D3D11Device1 { get; private set; } = null!;
 
-        public static SharpDX.DXGI.Output1? DXGIOutput1 { get; private set; }
+        public static SharpDX.DXGI.Output1 DXGIOutput1 { get; private set; } = null!;
 
-        public static SharpDX.MediaFoundation.DXGIDeviceManager? MFDXGIDeviceManager { get; private set; }
+        public static SharpDX.MediaFoundation.DXGIDeviceManager MFDXGIDeviceManager { get; private set; } = null!;
 
-        public static SharpDX.Direct2D1.Factory1? D2D1Factory1 { get; private set; }
+        public static SharpDX.Direct2D1.Factory1 D2D1Factory1 { get; private set; } = null!;
 
-        public static SharpDX.Direct2D1.Device? D2D1Device { get; private set; }
+        public static SharpDX.Direct2D1.Device D2D1Device { get; private set; } = null!;
 
-        public static SharpDX.Direct2D1.DeviceContext? 既定のD2D1DeviceContext { get; private set; }
+        public static SharpDX.Direct2D1.DeviceContext 既定のD2D1DeviceContext { get; private set; } = null!;
 
-        public static SharpDX.DirectComposition.DesktopDevice? DCompDevice2 { get; private set; }    // IDCompositionDevice2 から派生
+        public static SharpDX.DirectComposition.DesktopDevice DCompDevice2 { get; private set; } = null!;    // IDCompositionDevice2 から派生
 
-        public static SharpDX.DirectComposition.Visual2? DCompVisual2ForSwapChain { get; private set; }
+        public static SharpDX.DirectComposition.Visual2 DCompVisual2ForSwapChain { get; private set; } = null!;
 
-        public static SharpDX.DirectComposition.Target? DCompTarget { get; private set; } = null;
+        public static SharpDX.DirectComposition.Target DCompTarget { get; private set; } = null!;
 
-        public static SharpDX.WIC.ImagingFactory2? WicImagingFactory2 { get; private set; } = null;
+        public static SharpDX.WIC.ImagingFactory2 WicImagingFactory2 { get; private set; } = null!;
 
-        public static SharpDX.DirectWrite.Factory? DWriteFactory { get; private set; } = null;
+        public static SharpDX.DirectWrite.Factory DWriteFactory { get; private set; } = null!;
 
-        public static Animation? Animation { get; private set; } = null;
+        public static Animation Animation { get; private set; } = null!;
 
 
         private static void _スワップチェーンに依存しないグラフィックリソースを作成する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " MediaFoundation をセットアップする。"
             //----------------
@@ -155,8 +160,9 @@ namespace DTXMania2
             // （DXVAを使った動画の再生で必須。Windows8 以降のPCで実装されている。）
             using( var videoDevice = D3D11Device1.QueryInterfaceOrNull<SharpDX.Direct3D11.VideoDevice>() )
             {
-                if( videoDevice is null )
-                    throw new Exception( "Direct3D11デバイスが、ID3D11VideoDevice をサポートしていません。" );
+                // ↓以下のコメントを外すと、グラフィックデバッグでは例外が発生する。
+                //if( videoDevice is null )
+                //    throw new Exception( "Direct3D11デバイスが、ID3D11VideoDevice をサポートしていません。" );
             }
             //----------------
             #endregion
@@ -269,101 +275,90 @@ namespace DTXMania2
 
         private static void _スワップチェーンに依存しないグラフィックリソースを解放する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " Windows Animation を解放する。"
             //----------------
-            Animation?.Dispose();
-            Animation = null;
+            Animation.Dispose();
             //----------------
             #endregion
 
             #region " DirectWrite ファクトリを解放する。"
             //----------------
-            DWriteFactory?.Dispose();
-            DWriteFactory = null;
+            DWriteFactory.Dispose();
             //----------------
             #endregion
 
             #region " WICイメージングファクトリを解放する。"
             //----------------
-            WicImagingFactory2?.Dispose();
-            WicImagingFactory2 = null;
+            WicImagingFactory2.Dispose();
             //----------------
             #endregion
 
 
             #region " DirectCompositionターゲットを解放する。"
             //----------------
-            DCompTarget?.Dispose();
-            DCompTarget = null;
+            DCompTarget.Dispose();
             //----------------
             #endregion
 
             #region " スワップチェーン用のVisualを解放する。"
             //----------------
-            DCompVisual2ForSwapChain?.Dispose();
-            DCompVisual2ForSwapChain = null;
+            DCompVisual2ForSwapChain.Dispose();
             //----------------
             #endregion
 
             #region " DirectCompositionデバイスを解放する。"
             //----------------
-            DCompDevice2?.Dispose();
-            DCompDevice2 = null;
+            DCompDevice2.Dispose();
             //----------------
             #endregion
 
 
             #region " 既定のD2Dデバイスコンテキストを解放する。"
             //----------------
-            既定のD2D1DeviceContext?.Dispose();
-            既定のD2D1DeviceContext = null;
+            既定のD2D1DeviceContext.Dispose();
             //----------------
             #endregion
 
             #region " D2Dデバイスを解放する。"
             //----------------
-            D2D1Device?.Dispose();
-            D2D1Device = null;
+            D2D1Device.Dispose();
             //----------------
             #endregion
 
             #region " D2Dファクトリを解放する。"
             //----------------
-            D2D1Factory1?.Dispose();
-            D2D1Factory1 = null;
+            D2D1Factory1.Dispose();
             //----------------
             #endregion
 
 
             #region " DXGIデバイスマネージャを解放する。"
             //----------------
-            MFDXGIDeviceManager?.Dispose();
-            MFDXGIDeviceManager = null;
+            MFDXGIDeviceManager.Dispose();
             //----------------
             #endregion
 
             #region " DXGI出力を解放する。"
             //----------------
-            DXGIOutput1?.Dispose();
-            DXGIOutput1 = null;
+            DXGIOutput1.Dispose();
             //----------------
             #endregion
 
-            #region " D3DDevice を解放する。"
+            #region " D3Dデバイスを解放する。"
             //----------------
 #if DEBUG
             // ReportLiveDeviceObjects。
             // デバッガの「ネイティブデバッグを有効にする」をオンにすれば表示される。
-            using( var d3ddc = D3D11Device1?.ImmediateContext )
+            using( var d3ddc = D3D11Device1.ImmediateContext )
             {
                 d3ddc?.Flush();
                 d3ddc?.ClearState();
             }
             using( var debug = new SharpDX.Direct3D11.DeviceDebug( D3D11Device1 ) )
             {
-                D3D11Device1?.Dispose();
+                D3D11Device1.Dispose();
                 debug.ReportLiveDeviceObjects( SharpDX.Direct3D11.ReportingLevel.Detail | SharpDX.Direct3D11.ReportingLevel.IgnoreInternal );
             }
 #endif
@@ -381,11 +376,11 @@ namespace DTXMania2
 
         #region " スワップチェーン "
         //----------------
-        public static SharpDX.DXGI.SwapChain1? DXGISwapChain1 { get; private set; }
+        public static SharpDX.DXGI.SwapChain1 DXGISwapChain1 { get; private set; } = null!;
 
         private static void _スワップチェーンを作成する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             // DirectComposition用スワップチェーンを作成する。
             var swapChainDesc = new SharpDX.DXGI.SwapChainDescription1() {
@@ -407,7 +402,7 @@ namespace DTXMania2
                 //Flags = SharpDX.DXGI.SwapChainFlags.AllowModeSwitch,
             };
 
-            using var dxgiDevice1 = D3D11Device1!.QueryInterface<SharpDX.DXGI.Device1>();
+            using var dxgiDevice1 = D3D11Device1.QueryInterface<SharpDX.DXGI.Device1>();
             using var dxgiAdapter = dxgiDevice1!.Adapter;
             using var dxgiFactory2 = dxgiAdapter!.GetParent<SharpDX.DXGI.Factory2>();
 
@@ -422,21 +417,19 @@ namespace DTXMania2
                 );
 
             // Visual のコンテンツに指定してコミット。
-            DCompVisual2ForSwapChain!.Content = DXGISwapChain1;
-            DCompDevice2!.Commit();
+            DCompVisual2ForSwapChain.Content = DXGISwapChain1;
+            DCompDevice2.Commit();
         }
 
         private static void _スワップチェーンを解放する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             // Visual のコンテンツから解除してコミット。
-            if( DCompVisual2ForSwapChain is { } )
-                DCompVisual2ForSwapChain.Content = null;
-            DCompDevice2?.Commit();
+            DCompVisual2ForSwapChain.Content = null;
+            DCompDevice2.Commit();
 
-            DXGISwapChain1?.Dispose();
-            DXGISwapChain1 = null;
+            DXGISwapChain1.Dispose();
         }
         //----------------
         #endregion
@@ -446,42 +439,42 @@ namespace DTXMania2
         /// <summary>
         ///     スワップチェーンのバックバッファとメモリを共有するレンダービットマップ。
         /// </summary>
-        public static SharpDX.Direct2D1.Bitmap1? 既定のD2D1RenderBitmap1 { get; private set; }
+        public static SharpDX.Direct2D1.Bitmap1 既定のD2D1RenderBitmap1 { get; private set; } = null!;
 
         /// <summary>
         ///     スワップチェーンのバックバッファに対する既定のレンダーターゲットビュー。
         /// </summary>
-        public static SharpDX.Direct3D11.RenderTargetView? 既定のD3D11RenderTargetView { get; private set; }
+        public static SharpDX.Direct3D11.RenderTargetView 既定のD3D11RenderTargetView { get; private set; } = null!;
 
         /// <summary>
         ///     スワップチェーンのバックバッファに対する既定の深度ステンシル。
         /// </summary>
-        public static SharpDX.Direct3D11.Texture2D? 既定のD3D11DepthStencil { get; private set; } = null;
+        public static SharpDX.Direct3D11.Texture2D 既定のD3D11DepthStencil { get; private set; } = null!;
 
         /// <summary>
         ///     スワップチェーンのバックバッファに対する既定の深度ステンシルビュー。
         /// </summary>
-        public static SharpDX.Direct3D11.DepthStencilView? 既定のD3D11DepthStencilView { get; private set; }
+        public static SharpDX.Direct3D11.DepthStencilView 既定のD3D11DepthStencilView { get; private set; } = null!;
 
         /// <summary>
         ///     スワップチェーンのバックバッファに対する既定の深度ステンシルステート。
         /// </summary>
-        public static SharpDX.Direct3D11.DepthStencilState? 既定のD3D11DepthStencilState { get; private set; }
+        public static SharpDX.Direct3D11.DepthStencilState 既定のD3D11DepthStencilState { get; private set; } = null!;
 
         /// <summary>
         ///     スワップチェーンのバックバッファに対する既定のビューポートの配列。
         /// </summary>
-        public static SharpDX.Mathematics.Interop.RawViewportF[]? 既定のD3D11ViewPort { get; private set; }
+        public static SharpDX.Mathematics.Interop.RawViewportF[] 既定のD3D11ViewPort { get; private set; } = null!;
 
 
         private static void _スワップチェーンに依存するグラフィックリソースを作成する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
 
             // D3D 関連
 
-            using( var backbufferTexture2D = DXGISwapChain1!.GetBackBuffer<SharpDX.Direct3D11.Texture2D>( 0 ) )
+            using( var backbufferTexture2D = DXGISwapChain1.GetBackBuffer<SharpDX.Direct3D11.Texture2D>( 0 ) )
             {
                 #region " バックバッファに対する既定のD3D11レンダーターゲットビューを作成する。"
                 //----------------
@@ -566,7 +559,7 @@ namespace DTXMania2
 
             // D2D 関連
 
-            using( var backbufferSurface = DXGISwapChain1!.GetBackBuffer<SharpDX.DXGI.Surface>( 0 ) )
+            using( var backbufferSurface = DXGISwapChain1.GetBackBuffer<SharpDX.DXGI.Surface>( 0 ) )
             {
                 #region " バックバッファとメモリを共有する、既定のD2Dレンダーターゲットビットマップを作成する。"
                 //----------------
@@ -578,9 +571,9 @@ namespace DTXMania2
                         BitmapOptions = SharpDX.Direct2D1.BitmapOptions.Target | SharpDX.Direct2D1.BitmapOptions.CannotDraw,
                     } );
 
-                既定のD2D1DeviceContext!.Target = 既定のD2D1RenderBitmap1;
-                既定のD2D1DeviceContext!.Transform = SharpDX.Matrix3x2.Identity;
-                既定のD2D1DeviceContext!.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
+                既定のD2D1DeviceContext.Target = 既定のD2D1RenderBitmap1;
+                既定のD2D1DeviceContext.Transform = SharpDX.Matrix3x2.Identity;
+                既定のD2D1DeviceContext.PrimitiveBlend = SharpDX.Direct2D1.PrimitiveBlend.SourceOver;
                 //----------------
                 #endregion
             }
@@ -588,35 +581,26 @@ namespace DTXMania2
 
         private static void _スワップチェーンに依存するグラフィックリソースを解放する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " 既定の深度ステンシルステート、既定の深度ステンシルビュー、深度ステンシルを解放する。"
             //----------------
-            既定のD3D11DepthStencilState?.Dispose();
-            既定のD3D11DepthStencilState = null;
-
-            既定のD3D11DepthStencilView?.Dispose();
-            既定のD3D11DepthStencilView = null;
-
-            既定のD3D11DepthStencil?.Dispose();
-            既定のD3D11DepthStencil = null;
+            既定のD3D11DepthStencilState.Dispose();
+            既定のD3D11DepthStencilView.Dispose();
+            既定のD3D11DepthStencil.Dispose();
             //----------------
             #endregion
 
             #region " 既定のD3D11レンダーターゲットビューを解放する。"
             //----------------
-            既定のD3D11RenderTargetView?.Dispose();
-            既定のD3D11RenderTargetView = null;
+            既定のD3D11RenderTargetView.Dispose();
             //----------------
             #endregion
 
             #region " 既定のD2Dレンダーターゲットビットマップを解放する。"
             //----------------
-            if( 既定のD2D1DeviceContext is { } )
-                既定のD2D1DeviceContext.Target = null;
-
-            既定のD2D1RenderBitmap1?.Dispose();
-            既定のD2D1RenderBitmap1 = null;
+            既定のD2D1DeviceContext.Target = null;
+            既定のD2D1RenderBitmap1.Dispose();
             //----------------
             #endregion
         }
@@ -633,7 +617,7 @@ namespace DTXMania2
         /// </summary>
         public static void 生成する( SharpDX.Size2F 設計画面サイズ, SharpDX.Size2F 物理画面サイズ )
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " Dispose 済みなら例外発出。"
             //----------------
@@ -645,12 +629,15 @@ namespace DTXMania2
             #endregion
 
             // 以下の3つは先行して設定しておくこと。
-            Debug.Assert( AppForm is { } );
-            Debug.Assert( App is { } );
-            Debug.Assert( Handle != IntPtr.Zero );
+            Debug.Assert( null != AppForm );
+            Debug.Assert( null != App );
+            Debug.Assert( IntPtr.Zero != Handle );
 
             Global.設計画面サイズ = 設計画面サイズ;
             Global.物理画面サイズ = 物理画面サイズ;
+
+            Log.Info( $"設計画面サイズ: {設計画面サイズ}" );
+            Log.Info( $"物理画面サイズ: {物理画面サイズ}" );
 
             _スワップチェーンに依存しないグラフィックリソースを作成する();
             _スワップチェーンを作成する();
@@ -662,7 +649,7 @@ namespace DTXMania2
         /// </summary>
         public static void 解放する()
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " Dispose 済みなら何もしない。"
             //----------------
@@ -691,23 +678,28 @@ namespace DTXMania2
         /// <param name="newSize">新しいサイズ。</param>
         public static void 物理画面サイズを変更する( SharpDX.Size2F newSize )
         {
-            using var lb = new LogBlock( Log.現在のメソッド名 );
+            using var _ = new LogBlock( Log.現在のメソッド名 );
 
             // (1) 依存リソースを解放。
             _スワップチェーンに依存するグラフィックリソースを解放する();
 
             // (2) バックバッファのサイズを変更。
-            DXGISwapChain1!.ResizeBuffers(
-                0,                                  // 0: 現在のバッファ数を維持
-                (int) newSize.Width,                // 新しいサイズ
-                (int) newSize.Height,               // 新しいサイズ
-                SharpDX.DXGI.Format.Unknown,        // Unknown: 現在のフォーマットを維持
-                SharpDX.DXGI.SwapChainFlags.None );
+            using( var lb = new LogBlock( "バックバッファのリサイズ" ) )
+            {
+                DXGISwapChain1.ResizeBuffers(
+                    0,                                  // 0: 現在のバッファ数を維持
+                    (int) newSize.Width,                // 新しいサイズ
+                    (int) newSize.Height,               // 新しいサイズ
+                    SharpDX.DXGI.Format.Unknown,        // Unknown: 現在のフォーマットを維持
+                    SharpDX.DXGI.SwapChainFlags.None );
 
-            物理画面サイズ = new SharpDX.Size2F( newSize.Width, newSize.Height );
+                物理画面サイズ = new SharpDX.Size2F( newSize.Width, newSize.Height );
+            }
 
             // (3) 依存リソースを作成。
             _スワップチェーンに依存するグラフィックリソースを作成する();
+
+            Log.Info( $"物理画面サイズを変更しました。{物理画面サイズ}" );
         }
 
         /// <summary>
@@ -746,6 +738,9 @@ namespace DTXMania2
         /// <remarks>
         ///		このメソッドを使うと、D2D描画処理がレンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
         ///		また、D2D描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
+        ///		
+        ///     この処理中に D3Dの描画を実行すると、そちらが先に描画されてしまうので注意！！
+        ///     
         /// </remarks>
         /// <param name="rt">レンダリングターゲット。</param>
         /// <param name="D2D描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>
