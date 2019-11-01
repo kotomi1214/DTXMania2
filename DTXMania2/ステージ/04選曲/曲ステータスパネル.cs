@@ -61,7 +61,7 @@ namespace DTXMania2.選曲
             //----------------
             #endregion
 
-            if( !( フォーカスノード is SongNode snode ) )
+            if( !( フォーカスノード is SongNode snode ) || snode.曲.フォーカス譜面 is null )
                 return;    // 現状、BPMを表示できるノードは MusicNode のみ。
 
             #region " フォーカスノードが変更されていれば更新する。"

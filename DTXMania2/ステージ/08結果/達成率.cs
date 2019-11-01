@@ -8,13 +8,13 @@ using SharpDX.Direct2D1;
 
 namespace DTXMania2.結果
 {
-    partial class 達成率 : IDisposable
+    partial class 達成率 : 達成率Base
     {
 
         // プロパティ
 
 
-        public bool アニメ完了 => this._アイコン.アニメ完了 && this._下線.アニメ完了 && this._数値.アニメ完了;
+        public override bool アニメ完了 => this._アイコン.アニメ完了 && this._下線.アニメ完了 && this._数値.アニメ完了;
 
 
 
@@ -32,7 +32,7 @@ namespace DTXMania2.結果
             this._初めての進行描画 = true;
         }
 
-        public virtual void Dispose()
+        public override void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -46,7 +46,7 @@ namespace DTXMania2.結果
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, float left, float top, double 達成率0to100 )
+        public override void 進行描画する( DeviceContext dc, float left, float top, double 達成率0to100 )
         {
             if( this._初めての進行描画 )
             {
@@ -63,7 +63,7 @@ namespace DTXMania2.結果
             this._下線.進行描画する( dc, left + 33f, top + 198f );
         }
 
-        public void アニメを完了する()
+        public override void アニメを完了する()
         {
             this._アイコン.アニメを完了する();
             this._下線.アニメを完了する();
@@ -75,11 +75,11 @@ namespace DTXMania2.結果
         // ローカル
 
 
+        private bool _初めての進行描画;
+
         private const double 最初の待機時間sec = 1.0;
 
-        private const double アニメ時間sec = 0.5;
-
-        private bool _初めての進行描画;
+        private const double アニメ時間sec = 0.25;
 
         private readonly 達成率.アイコン _アイコン;
 

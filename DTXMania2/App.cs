@@ -282,7 +282,6 @@ namespace DTXMania2
                 //----------------
                 #endregion
 
-
                 QueueTimer timer;
                 AutoResetEvent tick通知;
 
@@ -296,7 +295,6 @@ namespace DTXMania2
                     tick通知 = new AutoResetEvent( false );
                     timer = new QueueTimer( 1, 1, () => tick通知.Set() );   // 1ms ごとに Tick通知を set する
                 }
-
 
                 var スワップチェーン表示タスク = new PresentSwapChainVSync();
                 TaskMessage? 終了指示メッセージ = null;

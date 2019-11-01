@@ -54,10 +54,10 @@ namespace DTXMania2.選曲
             {
                 this._現在表示しているノード = フォーカスノード;
 
-                if( snode.曲.フォーカス譜面.譜面と画像を現行化済み )
+                if( snode.曲.フォーカス譜面?.譜面と画像を現行化済み ?? false )
                 {
-                    this._最小BPM = snode.曲.フォーカス譜面.譜面.MinBPM;
-                    this._最大BPM = snode.曲.フォーカス譜面.譜面.MaxBPM;
+                    this._最小BPM = snode.曲.フォーカス譜面!.譜面.MinBPM;
+                    this._最大BPM = snode.曲.フォーカス譜面!.譜面.MaxBPM;
                 }
                 else
                 {

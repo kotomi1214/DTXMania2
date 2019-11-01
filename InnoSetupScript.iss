@@ -4,7 +4,7 @@
 ; このスクリプトは Publish 版を対象にしているので、
 ; このスクリプトをコンパイルする前に Publish 版を発行しておくこと。
 
-#define MyAppVersion "052"
+#define MyAppVersion "053"
 
 #define MyAppName "DTXMania2"
 #define MyAppFolderName "DTXMania2"

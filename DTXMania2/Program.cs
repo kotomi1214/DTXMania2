@@ -53,7 +53,7 @@ namespace DTXMania2
                         // (A) サービスが立ち上がっている
                         if( Global.Options.ビュアーモードである )
                         {
-                            #region " (A-a) オプション内容をサーバへ送信して正常終了。"
+                            #region " (A-a) ビュアーモードである → オプション内容をサーバへ送信して正常終了。"
                             //----------------
                             var ss = new StreamStringForNamedPipe( pipeToViewer );
                             var yamlText = Global.Options.ToYaml(); // YAML化
@@ -64,14 +64,14 @@ namespace DTXMania2
                         }
                         else
                         {
-                            #region " (A-b) 二重起動としてエラー終了。"
+                            #region " (A-b) 通常モードである → 二重起動としてエラー終了。"
                             //----------------
                             var ss = new StreamStringForNamedPipe( pipeToViewer );
                             ss.WriteString( "ping" );
 
                             var msg = "二重起動はできません。";
                             Trace.WriteLine( msg );                     // Traceと
-                            MessageBox.Show( msg, "DTXMania2 error" );  // ダイアログ表示。
+                            MessageBox.Show( msg, "DTXMania2 error" );  // ダイアログに表示。
                             return;
                             //----------------
                             #endregion
@@ -101,7 +101,10 @@ namespace DTXMania2
                     const int ログファイルの最大保存日数 = 30;
                     Trace.AutoFlush = true;
 
-                    var ログファイル名 = Log.ログファイル名を生成する( Path.Combine( AppDataフォルダ名, "Logs" ), "Log.", TimeSpan.FromDays( ログファイルの最大保存日数 ) );
+                    var ログファイル名 = Log.ログファイル名を生成する(
+                        ログフォルダパス: Path.Combine( AppDataフォルダ名, "Logs" ),
+                        ログファイルの接頭辞: "Log.",
+                        最大保存期間: TimeSpan.FromDays( ログファイルの最大保存日数 ) );
 
                     // ログファイルをTraceリスナとして追加。
                     // 以降、Trace（ならびにLogクラス）による出力は、このリスナ（＝ログファイル）にも出力される。

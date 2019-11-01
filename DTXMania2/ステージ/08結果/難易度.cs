@@ -78,7 +78,7 @@ namespace DTXMania2.結果
 
         private const double 最初の待機時間sec = 0.5;
 
-        private const double アニメ時間sec = 0.5;
+        private const double アニメ時間sec = 0.25;
 
         private bool _初めての進行描画 = false;
 

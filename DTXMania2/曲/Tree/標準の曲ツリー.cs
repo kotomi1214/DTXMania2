@@ -147,6 +147,7 @@ namespace DTXMania2.曲
                     var setDef = new SetDef( setDefPath );
 
                     // set.def 内のすべてのブロックについて、Song と SongNode を作成する。
+                    var list = new List<Node>( 5 );
                     foreach( var block in setDef.Blocks )
                     {
                         // set.def のブロックから Song を生成する。
@@ -154,8 +155,11 @@ namespace DTXMania2.曲
 
                         // L1～L5が1つ以上有効なら、SongNode を生成して登録する。
                         if( song.譜面リスト.Any( ( score ) => null != score ) )
-                            追加ノードリスト.Add( new SongNode( song ) );
+                            list.Add( new SongNode( song ) );
                     }
+                    // 1つ以上の SongNode がある場合のみ登録する。
+                    if( 0 < list.Count )
+                        追加ノードリスト.AddRange( list );
 
                     // set.def があった場合、サブフォルダは検索しない。
                     サブフォルダを検索する = false;

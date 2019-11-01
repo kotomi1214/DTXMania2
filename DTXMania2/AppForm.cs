@@ -25,7 +25,7 @@ namespace DTXMania2
         /// </summary>
         /// <remarks>
         ///     <see cref="AppForm"/> インスタンスの終了時にこのフラグが true になっている場合には、
-        ///     このインスタンスの保持者（おそらくProgramクラス）は適切に再起動（<see cref="Application.Restart"/>の呼び出し）を行うこと。
+        ///     このインスタンスの保持者（おそらくProgramクラス）は適切に再起動を行うこと。
         /// </remarks>
         public bool 再起動が必要 { get; protected set; } = false;
 
@@ -225,6 +225,8 @@ namespace DTXMania2
                 throw e;
             } ) );
         }
+
+
 
         // ローカル
 

@@ -26,7 +26,7 @@ namespace DTXMania2.曲
         // プロパティ
 
 
-        public Score フォーカス譜面 => this.ユーザ希望難易度に最も近い難易度レベルの譜面を返す( Song.現在の難易度レベル() );
+        public Score? フォーカス譜面 => this.ユーザ希望難易度に最も近い難易度レベルの譜面を返す( Song.現在の難易度レベル() );
 
         public Score?[] 譜面リスト { get; } = new Score?[ 5 ] { null, null, null, null, null };
 
@@ -118,7 +118,8 @@ namespace DTXMania2.曲
             if( 最も近いレベル == ユーザ希望難易度レベル0to4 )
             {
                 // 5回回って見つからなかったということはすべて null だということ。
-                throw new Exception( "譜面リストがすべて null です。" );
+                //Log.ERROR( "譜面リストがすべて null です。" );
+                return ユーザ希望難易度レベル0to4;
             }
 
             // 見つかった曲がアンカより下のレベルだった場合……

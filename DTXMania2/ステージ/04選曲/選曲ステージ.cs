@@ -133,7 +133,7 @@ namespace DTXMania2.選曲
                             this._フェートアウト後のフェーズ = フェーズ.確定_選曲;
                             this.現在のフェーズ = フェーズ.フェードアウト;
                         }
-                        else if( フォーカスノード is SongNode snode )
+                        else if( フォーカスノード is SongNode snode && null != snode.曲.フォーカス譜面 )
                         {
                             // 曲ツリーの現行化タスクが動いていれば、一時停止する。
                             Global.App.現行化.一時停止する();
