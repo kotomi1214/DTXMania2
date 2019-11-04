@@ -43,6 +43,8 @@ namespace DTXMania2
         // [key: 譜面ファイルの絶対パス]
         public Dictionary<string, Score> 全譜面リスト { get; }
 
+        public List<Song> 全曲リスト { get; }
+
         public SelectableList<曲ツリー> 曲ツリーリスト { get; }
 
         public 現行化 現行化 { get; }
@@ -101,6 +103,7 @@ namespace DTXMania2
             this.システム設定 = SystemConfig.読み込む();
             this.ユーザリスト = new SelectableList<ユーザ設定>();
             this.全譜面リスト = new Dictionary<string, 曲.Score>();
+            this.全曲リスト = new List<Song>();
             this.曲ツリーリスト = new SelectableList<曲.曲ツリー>();
             this.現行化 = new 曲.現行化();
 
@@ -194,8 +197,8 @@ namespace DTXMania2
             this.ステージ?.Dispose();  // 進行描画メインループ終了時にDispose済みだが念のため
             this.ステージ = null;      // 
 
-            foreach( var score in this.全譜面リスト.Values )
-                score.Dispose();
+            foreach( var song in this.全曲リスト )
+                song.Dispose(); // 全譜面もここで解放される。
 
             foreach( var tree in this.曲ツリーリスト )
                 tree.Dispose();
