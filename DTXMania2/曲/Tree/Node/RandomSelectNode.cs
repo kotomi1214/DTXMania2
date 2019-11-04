@@ -18,12 +18,12 @@ namespace DTXMania2.曲
         // ランダムセレクト
 
 
-        public Score 譜面をランダムに選んで返す( RandomSelectNode rsnode )
+        public Score 譜面をランダムに選んで返す()
         {
             for( int retry = 0; retry < 10; retry++ )
             {
                 // RandomSelect がある階層以降すべての SongNode を取得。
-                var songNode配列 = rsnode.親ノード!.Traverse().Where( ( node ) => node is SongNode ).ToArray();
+                var songNode配列 = this.親ノード!.Traverse().Where( ( node ) => node is SongNode ).ToArray();
                 int songNode数 = songNode配列.Count();
 
                 if( 0 == songNode数 )

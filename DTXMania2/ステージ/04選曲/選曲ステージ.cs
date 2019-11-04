@@ -125,7 +125,7 @@ namespace DTXMania2.選曲
 
                             // ランダムに選曲する
 
-                            Global.App.演奏譜面 = randomNode.譜面をランダムに選んで返す( randomNode );
+                            Global.App.演奏譜面 = randomNode.譜面をランダムに選んで返す();
 
                             Global.App.システムサウンド.再生する( システムサウンド種別.選曲ステージ_曲決定音 );
                             Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( GO ) );

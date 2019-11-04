@@ -108,6 +108,7 @@ namespace DTXMania2.曲
         }
 
         /// <summary>
+        ///     この譜面に存在するノートの、レーン別の総数。
         ///     現行化されていなければ null。
         /// </summary>
         public IReadOnlyDictionary<表示レーン種別, int>? レーン別ノート数

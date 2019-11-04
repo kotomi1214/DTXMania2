@@ -26,6 +26,9 @@ namespace DTXMania2.曲
         // プロパティ
 
 
+        /// <summary>
+        ///     該当譜面がなければ null。
+        /// </summary>
         public Score? フォーカス譜面 => this.ユーザ希望難易度に最も近い難易度レベルの譜面を返す( Song.現在の難易度レベル() );
 
         public Score?[] 譜面リスト { get; } = new Score?[ 5 ] { null, null, null, null, null };

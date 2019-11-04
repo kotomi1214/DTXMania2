@@ -124,7 +124,7 @@ namespace DTXMania2.曲
                     boxNode.子ノードリスト.Add( new RandomSelectNode() { 親ノード = boxNode } );
 
                     // このフォルダを対象として再帰的に構築する。ただし box.def は無効とする。
-                    // 構築結果のノードリストは、BOXノードの子として付与される。
+                    // 親ノードとしてBOXノードを指定しているので、構築結果のノードリストはBOXノードの子として付与される。
                     this._構築する( 基点フォルダパス, boxNode, boxdefが有効: false );
 
                     // box.def があった場合、サブフォルダは検索しない。
@@ -139,7 +139,7 @@ namespace DTXMania2.曲
             }
             else if( File.Exists( setDefPath.変数なしパス ) )
             {
-                #region " (B) このフォルダに set.def がある → その内容でノードを作成する。"
+                #region " (B) このフォルダに set.def がある → その内容で任意個のノードを作成する。"
                 //----------------
                 try
                 {
@@ -203,6 +203,7 @@ namespace DTXMania2.曲
                 #endregion
             }
 
+
             #region " 作成した一時リストを親ノードの子として正式に追加する。"
             //----------------
             foreach( var node in 追加ノードリスト )
@@ -226,6 +227,7 @@ namespace DTXMania2.曲
             }
             //----------------
             #endregion
+
 
             if( サブフォルダを検索する )
             {
