@@ -458,14 +458,14 @@ namespace SSTFormat.v004
 
                 if( 2 < len )
                 {
-                    if( !_16進数2桁の文字列を数値に変換して返す( コマンド[ ( len - 2 ).. ], out zz16進数 ) )
+                    if( !_16進数2桁の文字列を数値に変換して返す( コマンド[ ^2.. ], out zz16進数 ) )
                         zz16進数 = -1;
 
-                    if( !_36進数2桁の文字列を数値に変換して返す( コマンド[ ( len - 2 ).. ], out zz36進数 ) )
+                    if( !_36進数2桁の文字列を数値に変換して返す( コマンド[ ^2.. ], out zz36進数 ) )
                         zz36進数 = -1;
 
                     if( -1 != zz16進数 || -1 != zz36進数 )  // どっちか取得できた
-                        コマンドzzなし = コマンド[ 0..( len - 2 ) ];
+                        コマンドzzなし = コマンド[ ..^2 ];
                 }
 
                 return true;
@@ -656,9 +656,11 @@ namespace SSTFormat.v004
             }
             internal static void _コマンド_オブジェクト記述()
             {
+                var commandSpan = 現在の.コマンド.AsSpan();
+
                 #region " 小節番号とチャンネル番号を取得する。"
                 //----------------
-                if( !_小節番号とチャンネル番号を取得する( 現在の.コマンド, out 現在の.小節番号, out 現在の.チャンネル番号 ) )
+                if( !_小節番号とチャンネル番号を取得する( commandSpan, out 現在の.小節番号, out 現在の.チャンネル番号 ) )
                 {
                     //Trace.TraceWarning( $"小節番号またはチャンネル番号の取得に失敗しました。[{現在の.行番号}行]" );
                     return;
@@ -699,9 +701,11 @@ namespace SSTFormat.v004
 
                 // すべてのオブジェクトについて...
 
+                var parameterSpan = 現在の.パラメータ.AsSpan();
+
                 for( 現在の.オブジェクト番号 = 0; 現在の.オブジェクト番号 < 現在の.オブジェクト総数; 現在の.オブジェクト番号++ )
                 {
-                    string オブジェクト記述 = 現在の.パラメータ.Substring( 現在の.オブジェクト番号 * 2, 2 );
+                    var オブジェクト記述 = parameterSpan.Slice( 現在の.オブジェクト番号 * 2, 2 );
 
                     if( "00" == オブジェクト記述 )
                         continue;   // 00 はスキップ。
@@ -915,17 +919,18 @@ namespace SSTFormat.v004
                 // 整数部＋小数点＋小数部 で CurrentCulture な実数文字列を作成し、double へ変換する。
                 return double.TryParse( $"{整数部}{CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator}{小数部}", out 数値 );
             }
+
             internal static bool _16進数2桁の文字列を数値に変換して返す( string 文字列, out int 値 )
+                => _16進数2桁の文字列を数値に変換して返す( 文字列.AsSpan(), out 値 );
+            internal static bool _16進数2桁の文字列を数値に変換して返す( ReadOnlySpan<char> 文字列, out int 値 )
             {
                 値 = 0;
 
                 if( 2 > 文字列.Length )
                     return false;
 
-                文字列 = 文字列.ToLower();
-
-                int _10の位 = _16進数変換表.IndexOf( 文字列[ 0 ] );
-                int _1の位 = _16進数変換表.IndexOf( 文字列[ 1 ] );
+                int _10の位 = _16進数変換表.IndexOf( 文字列[ 0 ], StringComparison.OrdinalIgnoreCase );
+                int _1の位 = _16進数変換表.IndexOf( 文字列[ 1 ], StringComparison.OrdinalIgnoreCase );
 
                 if( -1 == _10の位 || -1 == _1の位 )
                     return false;
@@ -934,17 +939,18 @@ namespace SSTFormat.v004
 
                 return true;
             }
+
             internal static bool _36進数2桁の文字列を数値に変換して返す( string 文字列, out int 値 )
+                => _36進数2桁の文字列を数値に変換して返す( 文字列.AsSpan(), out 値 );
+            internal static bool _36進数2桁の文字列を数値に変換して返す( ReadOnlySpan<char> 文字列, out int 値 )
             {
                 値 = 0;
 
                 if( 2 > 文字列.Length )
                     return false;
 
-                文字列 = 文字列.ToLower();
-
-                int _10の位 = _36進数変換表.IndexOf( 文字列[ 0 ] );
-                int _1の位 = _36進数変換表.IndexOf( 文字列[ 1 ] );
+                int _10の位 = _36進数変換表.IndexOf( 文字列[ 0 ], StringComparison.OrdinalIgnoreCase );
+                int _1の位 = _36進数変換表.IndexOf( 文字列[ 1 ], StringComparison.OrdinalIgnoreCase );
 
                 if( -1 == _10の位 || -1 == _1の位 )
                     return false;
@@ -953,7 +959,10 @@ namespace SSTFormat.v004
 
                 return true;
             }
+
             internal static bool _小節番号とチャンネル番号を取得する( string コマンド, out int 小節番号, out int チャンネル番号 )
+                => _小節番号とチャンネル番号を取得する( コマンド.AsSpan(), out 小節番号, out チャンネル番号 );
+            internal static bool _小節番号とチャンネル番号を取得する( ReadOnlySpan<char> コマンド, out int 小節番号, out int チャンネル番号 )
             {
                 小節番号 = 0;
                 チャンネル番号 = 0;
@@ -964,11 +973,11 @@ namespace SSTFormat.v004
                 #region " 小節番号を取得する。"
                 //----------------
                 {
-                    var 小節番号文字列 = コマンド[ 0..3 ].ToLower();   // 先頭 3 文字
+                    var 小節番号文字列 = コマンド[ ..3 ];   // 先頭 3 文字
 
-                    int _100の位 = _36進数変換表.IndexOf( 小節番号文字列[ 0 ] );  // 0～Z（36進数1桁）
-                    int _10の位 = _16進数変換表.IndexOf( 小節番号文字列[ 1 ] );   // 0～9（10進数1桁）
-                    int _1の位 = _16進数変換表.IndexOf( 小節番号文字列[ 2 ] );    // 0～9（10進数1桁）
+                    int _100の位 = _36進数変換表.IndexOf( 小節番号文字列[ 0 ], StringComparison.OrdinalIgnoreCase );  // 0～Z（36進数1桁）
+                    int _10の位 = _16進数変換表.IndexOf( 小節番号文字列[ 1 ], StringComparison.OrdinalIgnoreCase );   // 0～9（10進数1桁）
+                    int _1の位 = _16進数変換表.IndexOf( 小節番号文字列[ 2 ], StringComparison.OrdinalIgnoreCase );    // 0～9（10進数1桁）
 
                     if( -1 == _100の位 || -1 == _10の位 || -1 == _1の位 )
                     {
@@ -984,7 +993,7 @@ namespace SSTFormat.v004
                 #region " チャンネル番号を取得する。"
                 //----------------
                 {
-                    var チャンネル文字列 = コマンド[ 3..5 ].ToLower();  // 後ろ 2 文字
+                    var チャンネル文字列 = コマンド[ ^2.. ];  // 後ろ 2 文字
 
                     switch( 現在の.データ種別 )
                     {
@@ -992,7 +1001,9 @@ namespace SSTFormat.v004
                         case データ種別.G2D:
 
                             // 英数字2桁
-                            if( !_GDAtoDTXチャンネルマップ.TryGetValue( チャンネル文字列.ToUpper(), out チャンネル番号 ) )
+                            Span<char> ZZ = stackalloc char[ 2 ];
+                            チャンネル文字列.ToUpper( ZZ, CultureInfo.CurrentCulture );
+                            if( !_GDAtoDTXチャンネルマップ.TryGetValue( ZZ.ToString(), out チャンネル番号 ) )
                             {
                                 //Trace.TraceWarning( $"チャンネル番号が不正です。[{現在の.行番号}行]" );
                                 return false;
