@@ -394,8 +394,8 @@ namespace DTXMania2
         {
             // ステージを進行する。
 
-            Global.Animation.進行する();
             this.ステージ?.進行する();
+            Global.Animation.進行する();
 
             // ステージの現在のフェーズにより処理分岐。
 
