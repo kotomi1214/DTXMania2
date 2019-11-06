@@ -63,24 +63,24 @@ namespace DTXMania2
         ///     選曲ステージで選曲確定後に更新される。
         /// </summary>
         /// <remarks>
-        ///     RandomSelectNode がフォーカスされている場合は、ここには譜面がランダムに設定されるため
+        ///     <see cref="RandomSelectNode"/> がフォーカスされている場合は、ここには譜面がランダムに設定されるため
         ///     曲ツリーのフォーカス譜面とは必ずしも一致しないので注意。
         /// </remarks>
         public Score 演奏譜面 { get; set; } = null!;
 
         /// <summary>
         ///     現在演奏中のスコア。
-        ///     曲読み込みステージで<see cref="演奏譜面"/>を読み込んで生成される。
+        ///     曲読み込みステージで<see cref="App.演奏譜面"/>を読み込んで生成される。
         /// </summary>
         public スコア 演奏スコア { get; set; } = null!;
 
         /// <summary>
-        ///     <see cref="演奏スコア"/> に対応して生成されたWAVサウンドインスタンスの管理。
+        ///     <see cref="App.演奏スコア"/> に対応して生成されたWAVサウンドインスタンスの管理。
         /// </summary>
         public WAV管理 WAV管理 { get; set; } = null!;
 
         /// <summary>
-        ///     <see cref="演奏スコア"/>  に対応して生成されたAVI動画インスタンスの管理。
+        ///     <see cref="App.演奏スコア"/>  に対応して生成されたAVI動画インスタンスの管理。
         /// </summary>
         public AVI管理 AVI管理 { get; set; } = null!;
 
@@ -92,6 +92,10 @@ namespace DTXMania2
         /// <summary>
         ///     コンストラクタ。一部のグローバルリソースを初期化する。
         /// </summary>
+        /// <remarks>
+        ///     アプリの表示を高速化するために、コンストラクタでは必要最低限のグローバルリソースだけを生成し、
+        ///     残りは <see cref="App.グローバルリソースを作成する()"/> メソッドで生成する。
+        /// </remarks>
         public App()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
@@ -107,7 +111,7 @@ namespace DTXMania2
             this.曲ツリーリスト = new SelectableList<曲.曲ツリー>();
             this.現行化 = new 曲.現行化();
 
-            #region " Skin.yaml を読み込んで、リソース関連のフォルダ変数を更新する。"
+            #region " リソース関連のフォルダ変数を更新する。"
             //----------------
             {
                 // DrumSounds
@@ -178,6 +182,7 @@ namespace DTXMania2
             //----------------
             #endregion
 
+            // 各DBを最新版にバージョンアップする。
             ScoreDB.Update();
             RecordDB.Update();
             ScorePropertiesDB.Update();
@@ -192,13 +197,13 @@ namespace DTXMania2
 
             this._パイプラインサーバを終了する();
 
-            //this.現行化.終了する();  --> Globalが破棄されるより前に実行する必要があるので、進行描画のメインループの終了箇所に移動。
+            //this.現行化.終了する();  --> Globalが破棄されるより前に実行する必要があるので、進行描画のメインループの終了箇所（Globalが破棄されるところ）に移動。
 
             this.ステージ?.Dispose();  // 進行描画メインループ終了時にDispose済みだが念のため
             this.ステージ = null;      // 
 
             foreach( var song in this.全曲リスト )
-                song.Dispose(); // 全譜面もここで解放される。
+                song.Dispose(); // 全譜面リストもここで解放される。
 
             foreach( var tree in this.曲ツリーリスト )
                 tree.Dispose();
@@ -275,7 +280,7 @@ namespace DTXMania2
                 //----------------
                 const int 希望オンラインスレッド数 = 32;
 
-                //  既定の数はCPUコア数に同じ。.NET の仕様により、Taskの同時利用数がこの数を超えると、それ以降の Task.Run での起動には最大2回/秒もの制限がかかる。
+                // 既定の数はCPUコア数に同じ。.NET の仕様により、Taskの同時利用数がこの数を超えると、それ以降の Task.Run での起動には最大2回/秒もの制限がかかる。
                 ThreadPool.GetMaxThreads( out int workMax, out int compMax );
                 ThreadPool.GetMinThreads( out int workMin, out int compMin );
 
@@ -389,8 +394,8 @@ namespace DTXMania2
         {
             // ステージを進行する。
 
-            this.ステージ?.進行する();
             Global.Animation.進行する();
+            this.ステージ?.進行する();
 
             // ステージの現在のフェーズにより処理分岐。
 
@@ -622,7 +627,7 @@ namespace DTXMania2
 
                     #region " 即時終了 → ビュアーステージへ "
                     //----------------
-                    else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.即時終了 )
+                    else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.即時終了 ) // ビュアーモードでのみ設定される
                     {
                         this.ステージ.Dispose();
 
