@@ -54,7 +54,7 @@ namespace DTXMania2.演奏
         /// </param>
         public void 進行描画する( DeviceContext dc, Vector2 全体の中央位置, 成績 現在の成績 )
         {
-            int Combo値 = Math.Min( Math.Max( 現在の成績.Combo, 0 ), 9999 );  // 表示は9999でカンスト。
+            int Combo値 = Math.Clamp( 現在の成績.Combo, min: 0, max: 9999 );  // 表示は9999でカンスト。
 
             if( Combo値 < 10 )
                 return; // 10未満は表示しない。

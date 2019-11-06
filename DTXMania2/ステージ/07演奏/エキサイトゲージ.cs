@@ -55,7 +55,7 @@ namespace DTXMania2.演奏
         /// </param>
         public void 進行描画する( DeviceContext dc, double ゲージ量 )
         {
-            ゲージ量 = Math.Max( Math.Min( ゲージ量, 1f ), 0f );
+            ゲージ量 = Math.Clamp( ゲージ量, min: 0f, max: 1f );
 
             var MAXゲージ領域 = new RectangleF( 557f, 971f, 628f, 26f );
 

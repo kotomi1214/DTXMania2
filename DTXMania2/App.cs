@@ -284,9 +284,9 @@ namespace DTXMania2
                 ThreadPool.GetMaxThreads( out int workMax, out int compMax );
                 ThreadPool.GetMinThreads( out int workMin, out int compMin );
 
-                ThreadPool.SetMinThreads( 
-                    Math.Max( Math.Min( 希望オンラインスレッド数, workMax ), workMin ),     // workMin ～ workMax の範囲を越えない
-                    Math.Max( Math.Min( 希望オンラインスレッド数, compMax ), compMin ) );   // compMin ～ compMax の範囲を越えない
+                ThreadPool.SetMinThreads(
+                    Math.Clamp( 希望オンラインスレッド数, min: workMin, max: workMax ),     // workMin ～ workMax の範囲を越えない
+                    Math.Clamp( 希望オンラインスレッド数, min: compMin, max: compMax ) );   // compMin ～ compMax の範囲を越えない
                 //----------------
                 #endregion
 

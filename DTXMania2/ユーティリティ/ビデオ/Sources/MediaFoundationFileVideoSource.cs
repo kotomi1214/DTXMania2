@@ -36,7 +36,7 @@ namespace DTXMania2
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this.再生速度 = Math.Max( 0.01, Math.Min( 10.0, 再生速度 ) );
+            this.再生速度 = Math.Clamp( 再生速度, min: 0.01, max: 10.0 );
 
             #region " フレームキューを生成。"
             //----------------
@@ -283,7 +283,7 @@ namespace DTXMania2
             }
             var 引数 = ((double 再生開始時刻sec, double 再生速度)) obj引数;
 
-            double 再生速度 = Math.Max( 0.01, Math.Min( 10.0, 引数.再生速度 ) );
+            double 再生速度 = Math.Clamp( 引数.再生速度, min: 0.01, max: 10.0 );
             double 再生開始時刻sec = Math.Max( 0.0, 引数.再生開始時刻sec ) / 再生速度;
             long 再生開始時刻100ns = (long) ( 再生開始時刻sec * 10_000_000 + 0.5 );
 

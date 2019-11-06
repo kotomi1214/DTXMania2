@@ -234,7 +234,7 @@ namespace DTXMania2
                 case 判定種別.MISS: this.エキサイトゲージ量 -= 0.08f; break;
             }
 
-            this.エキサイトゲージ量 = Math.Max( Math.Min( this.エキサイトゲージ量, 1.0f ), 0.0f );
+            this.エキサイトゲージ量 = Math.Clamp( this.エキサイトゲージ量, min: 0f, max: 1f );
         }
 
 

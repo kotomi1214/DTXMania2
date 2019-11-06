@@ -21,7 +21,7 @@ namespace DTXMania2
             set
             {
                 lock( this._Stream排他 )
-                    this._読み出し位置 = Math.Min( Math.Max( value, 0 ), this._読み出し位置 + this.読み出し可能サイズ );
+                    this._読み出し位置 = Math.Clamp( value, min: 0, max: this._読み出し位置 + this.読み出し可能サイズ );
             }
         }
         public long 書き込み位置

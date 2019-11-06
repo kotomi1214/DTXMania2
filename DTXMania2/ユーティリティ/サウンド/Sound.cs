@@ -37,7 +37,7 @@ namespace DTXMania2
         public long Position
         {
             get => this._Position;
-            set => this._Position = Math.Min( Math.Max( value, 0 ), this.Length );
+            set => this._Position = Math.Clamp( value, min: 0, max: this.Length );
         }
 
         public long Length
