@@ -155,7 +155,7 @@ namespace DTXMania2
         /// </remarks>
         public void グローバルリソースを作成する()
         {
-            this.ドラム入力 = new ドラム入力( this.システム設定, Global.AppForm.KeyboardHID, Global.AppForm.GameControllersHID, Global.AppForm.MidiIns );
+            this.ドラム入力 = new ドラム入力( Global.AppForm.KeyboardHID, Global.AppForm.GameControllersHID, Global.AppForm.MidiIns );
             this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
             this.アイキャッチ管理 = new アイキャッチ管理();
             this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
