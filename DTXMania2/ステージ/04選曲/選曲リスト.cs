@@ -83,8 +83,12 @@ namespace DTXMania2.選曲
 
                 if( 2 > 距離 )
                     オフセットの加減算速度 = 1;
-                else
+                else if( 4 > 距離 )
                     オフセットの加減算速度 = 2;
+                else if( 6 > 距離 )
+                    オフセットの加減算速度 = 3;
+                else
+                    オフセットの加減算速度 = 4;
                 //------------------
                 #endregion
 
@@ -650,7 +654,7 @@ namespace DTXMania2.選曲
             var focusNode = Global.App.曲ツリーリスト.SelectedItem!.フォーカスノード;
 
             if( null != focusNode && focusNode is SongNode && !focusNode.現行化済み )
-{
+            {
                 await Global.App.現行化.追加するAsync( new Node[] { focusNode } );
             }
         }
