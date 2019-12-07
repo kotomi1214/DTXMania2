@@ -707,7 +707,7 @@ namespace SSTFormat.v004
                 {
                     var オブジェクト記述 = parameterSpan.Slice( 現在の.オブジェクト番号 * 2, 2 );
 
-                    if( "00" == オブジェクト記述 )
+                    if( "00" == オブジェクト記述.ToString() )
                         continue;   // 00 はスキップ。
 
 
