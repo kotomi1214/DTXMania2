@@ -266,7 +266,7 @@ namespace DTXMania2
 
         /// <summary>
         ///     進行描画処理の初期化、メインループ、終了処理を行う。
-        ///     <see "TaskMessage"/>で終了が指示されるまで、このメソッドからは戻らない。
+        ///     <see cref="TaskMessage"/>で終了が指示されるまで、このメソッドからは戻らない。
         /// </summary>
         private void _進行描画のメインループを実行する( Size2F 設計画面サイズ, Size2F 物理画面サイズ )
         {
