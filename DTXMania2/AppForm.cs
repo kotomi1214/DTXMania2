@@ -286,6 +286,7 @@ namespace DTXMania2
 
             #region " RawInput データを取得する。"
             //----------------
+            unsafe 
             {
                 // RawInputData は、可変長構造体である。
                 // ひとまず、その構造体サイズを仮サイズで設定する。
@@ -299,17 +300,15 @@ namespace DTXMania2
                 }
 
                 // RawInputData 構造体の実データを取得する。
-                var dataBytes = new byte[ dataSize ];
-                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, dataBytes, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                var dataBytes = stackalloc byte[ dataSize ];
+                if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, dataBytes, &dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
                 {
                     Log.ERROR( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
                     return;
                 }
 
                 // 取得された実データは byte[] なので、これを RawInputData 構造体に変換する。
-                var gch = GCHandle.Alloc( dataBytes, GCHandleType.Pinned );
-                rawInputData = Marshal.PtrToStructure<RawInput.RawInputData>( gch.AddrOfPinnedObject() );
-                gch.Free();
+                rawInputData = Marshal.PtrToStructure<RawInput.RawInputData>( new IntPtr( dataBytes ) );
             }
             //----------------
             #endregion

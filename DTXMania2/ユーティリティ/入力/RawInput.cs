@@ -693,6 +693,9 @@ namespace DTXMania2
         [DllImport( "user32.dll", SetLastError = true )]
         public static extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, [In, Out] byte[]? pData, ref int pcbSize, int cbSizeHeader );
 
+        [DllImport( "user32.dll", SetLastError = true )]
+        public static unsafe extern int GetRawInputData( IntPtr hDevice, DataType uiCommand, byte* pData, int* pcbSize, int cbSizeHeader );
+
         /// <summary>
         ///     システムに接続されている Raw Input デバイスを列挙する。
         /// </summary>
