@@ -212,7 +212,6 @@ namespace DTXMania2.old.SystemConfig
             var serializer = new SerializerBuilder()
                 .WithTypeInspector( inner => new CommentGatheringTypeInspector( inner ) )
                 .WithEmissionPhaseObjectGraphVisitor( args => new CommentsObjectGraphVisitor( args.InnerVisitor ) )
-                .EmitDefaults()
                 .Build();
 
             // ※ 値が既定値であるプロパティは出力されないので注意。

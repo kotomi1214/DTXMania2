@@ -28,9 +28,9 @@ namespace DTXMania2
         public long Position
         {
             get
-                => ( this.CanSeek ) ? this._vorbisReader.DecodedPosition : 0;
+                => ( this.CanSeek ) ? this._vorbisReader.SamplePosition : 0;
             set
-                => this._vorbisReader.DecodedPosition = ( this.CanSeek ) ?
+                => this._vorbisReader.SamplePosition = ( this.CanSeek ) ?
                     value : throw new InvalidOperationException( "DecodedNVorbisSource is not seekable." );
         }
 

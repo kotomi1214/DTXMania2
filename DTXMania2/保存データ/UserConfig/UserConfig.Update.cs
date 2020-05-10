@@ -198,7 +198,6 @@ namespace DTXMania2
                             var v14serializer = new SerializerBuilder()
                                 .WithTypeInspector( inner => new CommentGatheringTypeInspector( inner ) )
                                 .WithEmissionPhaseObjectGraphVisitor( args => new CommentsObjectGraphVisitor( args.InnerVisitor ) )
-                                .EmitDefaults()
                                 .Build();
                             var v14yaml = v14serializer.Serialize( v14config );
 
