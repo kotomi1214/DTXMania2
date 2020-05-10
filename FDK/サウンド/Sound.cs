@@ -5,9 +5,9 @@ using System.IO;
 using System.Linq;
 using CSCore;
 
-namespace DTXMania2
+namespace FDK
 {
-    class Sound : ISampleSource
+    public class Sound : ISampleSource
     {
 
         // プロパティ

@@ -23,9 +23,22 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.3" />
+    <PackageReference Include="NVorbis" Version="0.10.1" />
+    <PackageReference Include="SharpDX" Version="4.2.0" />
     <PackageReference Include="SharpDX.Animation" Version="4.2.0" />
     <PackageReference Include="SharpDX.DXGI" Version="4.2.0" />
+    <PackageReference Include="SharpDX.Mathematics" Version="4.2.0" />
+    <PackageReference Include="SharpDX.MediaFoundation" Version="4.2.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="bjxa-dotnetstandard">
+      <HintPath>..\packages-selfbuild\bjxa-netstandard-0.4\bjxa-dotnetstandard.dll</HintPath>
+    </Reference>
+    <Reference Include="CSCore">
+      <HintPath>..\packages-selfbuild\CSCore-netstandard-1.2.1.2\CSCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

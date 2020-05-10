@@ -4,14 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using CSCore;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     <see cref="ISampleSource"/> オブジェクトの生成を行う。
     /// </summary>
-    static class SampleSourceFactory
+    public static class SampleSourceFactory
     {
         /// <summary>
         ///		指定されたファイルの音声をデコードし、<see cref="ISampleSource"/> オブジェクトを返す。

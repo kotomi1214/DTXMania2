@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using CSCore;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		オーディオミキサー。
     ///		自身が <see cref="ISampleSource"/> であり、そのまま AudioClient のレンダリングターゲットに指定することで、無限の出力を生成する。
     /// </summary>
-    class Mixer : ISampleSource
+    public class Mixer : ISampleSource
     {
 
         // プロパティ

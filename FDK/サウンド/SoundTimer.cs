@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     サウンドデバイスを基準にしたタイマ。
     /// </summary>
-    class SoundTimer : IDisposable
+    public class SoundTimer : IDisposable
     {
 
         // プロパティ

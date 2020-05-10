@@ -5,14 +5,13 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたメディアファイル（動画, 音楽）をバックグラウンドで読み込む <see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     /// </summary>
-    class MediaFoundationOnStreamingWaveSource : CSCore.IWaveSource
+    public class MediaFoundationOnStreamingWaveSource : CSCore.IWaveSource
     {
 
         // プロパティ
@@ -46,7 +45,7 @@ namespace DTXMania2
             set
             {
                 if( !( this._Disposed ) )
-                    this._DecodedWaveDataQueue.読み出し位置 = Utilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
+                    this._DecodedWaveDataQueue.読み出し位置 = this._位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
             }
         }
 
@@ -268,6 +267,11 @@ namespace DTXMania2
             }
 
             Log.Info( $"デコードタスクを終了しました。[{this.Name}]" );
+        }
+
+        private long _位置をブロック境界単位にそろえて返す( long position, long blockAlign )
+        {
+            return ( position - ( position % blockAlign ) );
         }
     }
 }

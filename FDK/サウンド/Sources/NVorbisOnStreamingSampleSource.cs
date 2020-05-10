@@ -6,14 +6,14 @@ using System.Linq;
 using CSCore;
 using NVorbis;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたメディアファイル（動画, 音楽）を Vorbis としてデコードして、<see cref="CSCore.ISampleSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
     /// </summary>
     /// <seealso cref="https://github.com/filoe/cscore/blob/master/Samples/NVorbisIntegration/Program.cs"/>
-    class NVorbisOnStreamingSampleSource : ISampleSource
+    public class NVorbisOnStreamingSampleSource : ISampleSource
     {
 
         // プロパティ

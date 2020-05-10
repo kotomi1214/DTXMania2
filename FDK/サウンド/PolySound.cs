@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using CSCore;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     多重再生ができるSound。
     /// </summary>
-    class PolySound : IDisposable
+    public class PolySound : IDisposable
     {
 
         // プロパティ

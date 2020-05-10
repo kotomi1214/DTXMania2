@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using CSCore;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたメディアファイルを XA としてデコードして、<see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
     /// </summary>
-    unsafe class XAOnMemoryWaveSource : IWaveSource
+    public unsafe class XAOnMemoryWaveSource : IWaveSource
     {
 
         // プロパティ
@@ -32,7 +31,7 @@ namespace DTXMania2
         public long Position
         {
             get => this._Position;
-            set => this._Position = Utilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
+            set => this._Position = this._位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
         }
 
 
@@ -126,5 +125,10 @@ namespace DTXMania2
         private byte[] _DecodedWaveData;
 
         private long _Position = 0;
+
+        private long _位置をブロック境界単位にそろえて返す( long position, long blockAlign )
+        {
+            return ( position - ( position % blockAlign ) );
+        }
     }
 }

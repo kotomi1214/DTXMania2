@@ -4,15 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using CSCore;
 using CSCore.DSP;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたメディアファイルをデコードし、リサンプルして、
     ///		<see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     /// </summary>
-    class ResampledOnMemoryWaveSource : IWaveSource
+    public class ResampledOnMemoryWaveSource : IWaveSource
     {
 
         // プロパティ
@@ -31,7 +30,7 @@ namespace DTXMania2
         public long Position
         {
             get => this._Position;
-            set => this._Position = Utilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
+            set => this._Position = this._位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
         }
 
         /// <summary>
@@ -74,11 +73,11 @@ namespace DTXMania2
                 //resampler.Read( this._DecodedWaveData, 0, (int) サイズbyte );
                 //　→ 一気にReadすると、内部の Marshal.AllocCoTaskMem() に OutOfMemory例外を出されることがある。
                 // 　　よって、２秒ずつ分解しながら受け取る。
-                int sizeOf2秒 = Utilities.位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
+                int sizeOf2秒 = (int) this._位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
                 long 変換残サイズbyte = サイズbyte;
                 while( 0 < 変換残サイズbyte )
                 {
-                    int 今回の変換サイズbyte = (int) Utilities.位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残サイズbyte ), resampler.WaveFormat.BlockAlign );
+                    int 今回の変換サイズbyte = (int) this._位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残サイズbyte ), resampler.WaveFormat.BlockAlign );
 
                     var 中間バッファ = new byte[ 今回の変換サイズbyte ];
                     int 変換できたサイズbyte = resampler.Read( 中間バッファ, 0, 今回の変換サイズbyte );
@@ -142,5 +141,10 @@ namespace DTXMania2
         private long _Position = 0;
 
         private MemoryTributary _DecodedWaveData;
+
+        private long _位置をブロック境界単位にそろえて返す( long position, long blockAlign )
+        {
+            return ( position - ( position % blockAlign ) );
+        }
     }
 }

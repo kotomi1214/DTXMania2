@@ -8,14 +8,13 @@ using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Win32;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     WASAPI サウンドデバイス。
     /// </summary>
-    class SoundDevice : IDisposable
+    public class SoundDevice : IDisposable
     {
 
         // プロパティ
@@ -345,7 +344,7 @@ namespace DTXMania2
 
                         // 今回の読み込みサイズ（サンプル単位）を計算する。
 
-                        int 読み込むサイズsample = Utilities.位置をブロック境界単位にそろえて返す(
+                        int 読み込むサイズsample = (int) this._位置をブロック境界単位にそろえて返す(
                             空きframe * this.WaveFormat.Channels,       // 前提・レンダリング先.WaveFormat と this.WaveFormat は同一。
                             this.WaveFormat.BlockAlign / this.WaveFormat.BytesPerSample );
 
@@ -690,6 +689,11 @@ namespace DTXMania2
                 Pu64Position = pos;
                 QPCPosition = qpcPos;
             }
+        }
+
+        private long _位置をブロック境界単位にそろえて返す( long position, long blockAlign )
+        {
+            return ( position - ( position % blockAlign ) );
         }
 
 

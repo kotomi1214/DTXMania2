@@ -4,15 +4,14 @@ using System.Diagnostics;
 using System.Linq;
 using CSCore;
 using CSCore.Codecs.WAV;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたメディアファイルを PCM WAVE としてデコードして、<see cref="CSCore.IWaveSource"/> オブジェクトを生成する。
     ///		リサンプラーなし版。
     /// </summary>
-    class WavOnStreamingWaveSource : IWaveSource
+    public class WavOnStreamingWaveSource : IWaveSource
     {
 
         // プロパティ
@@ -28,7 +27,7 @@ namespace DTXMania2
         public long Position
         {
             get => this._WaveFileReader.Position;
-            set => this._WaveFileReader.Position = Utilities.位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
+            set => this._WaveFileReader.Position = this._位置をブロック境界単位にそろえて返す( value, this.WaveFormat.BlockAlign );
         }
 
         /// <summary>
@@ -72,5 +71,10 @@ namespace DTXMania2
 
 
         private WaveFileReader _WaveFileReader;
+
+        private long _位置をブロック境界単位にそろえて返す( long position, long blockAlign )
+        {
+            return ( position - ( position % blockAlign ) );
+        }
     }
 }
