@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using SharpDX;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		任意の文字列から任意の矩形を引き当てるための辞書。
     ///		辞書の内容は、ファイルから読み込むすることができる。
     /// </summary>
-    class 矩形リスト
+    public class 矩形リスト
     {
 
         // プロパティ

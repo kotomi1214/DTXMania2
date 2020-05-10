@@ -7,12 +7,12 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using SharpDX.Mathematics.Interop;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     縁取り文字やドロップシャドウなどに対応した、自分用のTextRenderer。
     /// </summary>
-    class カスタムTextRenderer : TextRendererBase
+    public class カスタムTextRenderer : TextRendererBase
     {
         #region " class DrawingEffect "
         //----------------
@@ -94,9 +94,11 @@ namespace DTXMania2
         #endregion
 
 
-        public カスタムTextRenderer( Color4 既定の文字色, Color4 既定の背景色 )
+        public カスタムTextRenderer( SharpDX.Direct2D1.Factory1 d2dFactory1, DeviceContext d2dDeviceContext, Color4 既定の文字色, Color4 既定の背景色 )
             : base()
         {
+            this._D2DFactory1 = d2dFactory1;
+            this._D2DDeviceContext = d2dDeviceContext;
             this._既定の文字色 = 既定の文字色;
             this._既定の背景色 = 既定の背景色;
         }
@@ -120,9 +122,7 @@ namespace DTXMania2
         /// <returns>成功すれば <see cref="Result.Ok"/>, 失敗したら <see cref="Result.Fail"/>。</returns>
         public override Result DrawGlyphRun( object clientDrawingContext, float baselineOriginX, float baselineOriginY, MeasuringMode measuringMode, GlyphRun glyphRun, GlyphRunDescription glyphRunDescription, ComObject clientDrawingEffect )
         {
-            var factory = Global.D2D1Factory1;
-
-            using var パスジオメトリ = new PathGeometry( factory );
+            using var パスジオメトリ = new PathGeometry( this._D2DFactory1 );
 
             // グリフ実行の輪郭をパスジオメトリとして取得。
             using( var sink = パスジオメトリ.Open() )
@@ -141,7 +141,7 @@ namespace DTXMania2
 
             // ジオメトリを描画する。
             var 変換行列 = Matrix3x2.Translation( baselineOriginX, baselineOriginY );   // ベースラインの原点まで移動
-            using var 原点移動済みパスジオメトリ = new TransformedGeometry( factory, パスジオメトリ, 変換行列 );
+            using var 原点移動済みパスジオメトリ = new TransformedGeometry( this._D2DFactory1, パスジオメトリ, 変換行列 );
             bool drawingEffectを解放する = false;
 
             #region " DrawingEffect の指定があれば受け取る。なければ既定の値で作る。"
@@ -152,7 +152,7 @@ namespace DTXMania2
 
             if( drawingEffect is null )
             {
-                drawingEffect = new DrawingEffect( Global.既定のD2D1DeviceContext ) {
+                drawingEffect = new DrawingEffect( this._D2DDeviceContext ) {
                     文字の色 = this._既定の文字色,
                     背景の色 = this._既定の背景色,
                 };
@@ -164,7 +164,7 @@ namespace DTXMania2
 
             var renderTarget =
                 drawingEffect.renderTarget ??    // 指定されたレンダーターゲットを使う。
-                Global.既定のD2D1DeviceContext;  // 指定がなければ既定のDC。
+                this._D2DDeviceContext;          // 指定がなければ既定のDC。
 
             this._現在の変換行列 = renderTarget.Transform;
             this._現在のDPI = renderTarget.DotsPerInch.Width;
@@ -199,7 +199,7 @@ namespace DTXMania2
                 case 縁取りDrawingEffect effect:
                     using( var 縁ブラシ = new SolidColorBrush( renderTarget, effect.縁の色 ) )
                     using( var 文字ブラシ = new SolidColorBrush( renderTarget, effect.文字の色 ) )
-                    using( var strokeStyle = new StrokeStyle( factory, new StrokeStyleProperties() { LineJoin = LineJoin.Miter } ) )    // 突き抜け防止
+                    using( var strokeStyle = new StrokeStyle( this._D2DFactory1, new StrokeStyleProperties() { LineJoin = LineJoin.Miter } ) )    // 突き抜け防止
                     {
                         renderTarget.DrawGeometry( 原点移動済みパスジオメトリ, 縁ブラシ, effect.縁の太さ, strokeStyle );
                         renderTarget.FillGeometry( 原点移動済みパスジオメトリ, 文字ブラシ );
@@ -211,7 +211,7 @@ namespace DTXMania2
                     using( var 文字ブラシ = new SolidColorBrush( renderTarget, effect.文字の色 ) )
                     {
                         var 影の変換行列 = 変換行列 * Matrix3x2.Translation( effect.影の距離, effect.影の距離 );
-                        using var 影のパスジオメトリ = new TransformedGeometry( factory, パスジオメトリ, 影の変換行列 );
+                        using var 影のパスジオメトリ = new TransformedGeometry( this._D2DFactory1, パスジオメトリ, 影の変換行列 );
                         renderTarget.FillGeometry( 影のパスジオメトリ, 影ブラシ );
                         renderTarget.FillGeometry( 原点移動済みパスジオメトリ, 文字ブラシ );
                     }
@@ -305,6 +305,10 @@ namespace DTXMania2
         /// <returns></returns>
         public override float GetPixelsPerDip( object clientDrawingContext ) => this._現在のDPI;
 
+
+        private SharpDX.Direct2D1.Factory1 _D2DFactory1;
+
+        private SharpDX.Direct2D1.DeviceContext _D2DDeviceContext;
 
         private Color4 _既定の文字色;
 

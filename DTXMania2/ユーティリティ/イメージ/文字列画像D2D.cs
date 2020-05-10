@@ -289,7 +289,7 @@ namespace DTXMania2
             this._Bitmap = null!;
             this._TextFormat = null!;
             this._TextLayout = null!;
-            this._TextRenderer = new カスタムTextRenderer( Color.White, Color.Transparent );    // ビットマップの生成前に。
+            this._TextRenderer = new カスタムTextRenderer( Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Color.White, Color.Transparent );    // ビットマップの生成前に。
 
             this._ビットマップを更新せよ = true;
             this._TextFormatを更新せよ = true;

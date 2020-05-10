@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace DTXMania2
+namespace FDK
 {
-    interface IImage : IDisposable
+    public interface IImage : IDisposable
     {
     }
 }
