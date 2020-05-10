@@ -275,6 +275,7 @@ namespace FDK
                 //----------------
                 int バッファサイズframe = this._AudioClient.BufferSize;
                 var バッファ = new float[ バッファサイズframe * this.WaveFormat.Channels ];    // this._レンダリング先（ミキサー）の出力は 32bit-float で固定。
+                var gchバッファ = GCHandle.Alloc( バッファ, GCHandleType.Pinned );
 
                 // このスレッドの MMCSS 型を登録する。
                 string mmcssType;
@@ -474,6 +475,8 @@ namespace FDK
 
                 // ハードウェアの再生が終わるくらいまで、少し待つ。
                 Thread.Sleep( (int) ( this.再生遅延sec * 1000 / 2 ) );
+
+                gchバッファ.Free();
                 //----------------
                 #endregion
 
