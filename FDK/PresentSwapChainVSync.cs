@@ -4,12 +4,12 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     垂直帰線に合わせてスワップチェーンを表示するタスク。
     /// </summary>
-    class PresentSwapChainVSync
+    public class PresentSwapChainVSync
     {
         /// <summary>
         ///     スワップチェーンの表示待機中なら true。
