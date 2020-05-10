@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     名前付きパイプライン送受信用ストリームクラス。
     /// </summary>
     /// <seealso cref="https://docs.microsoft.com/ja-jp/dotnet/standard/io/how-to-use-named-pipes-for-network-interprocess-communication"/>
-    class StreamStringForNamedPipe
+    public class StreamStringForNamedPipe
     {
         private Stream ioStream;
         private UnicodeEncoding streamEncoding;
