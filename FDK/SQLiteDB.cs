@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Data.Sqlite;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		SQLiteのデータベースを操作するクラスの共通機能。
     /// </summary>
-    class SQLiteDB : IDisposable
+    public class SQLiteDB : IDisposable
     {
 
         // プロパティ
