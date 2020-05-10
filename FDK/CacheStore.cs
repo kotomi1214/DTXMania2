@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     ファイルから生成されるデータをキャッシュし、貸与する。
@@ -40,7 +39,7 @@ namespace DTXMania2
     ///         (8) このクラスは、ファイルAから生成済みのデータSを持っているので、それを利用者に貸与する。
     ///             このとき、データSに割り当てられている世代番号は、その時点での世代番号に更新される。
     /// </remarks>
-    class CacheStore<T> : IDisposable where T : class
+    public class CacheStore<T> : IDisposable where T : class
     {
         /// <summary>
         ///     指定したファイルからデータを生成して返す、外部依存アクション。
