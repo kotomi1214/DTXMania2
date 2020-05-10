@@ -770,6 +770,7 @@ namespace DTXMania2
                 Log.Info( "パイプラインサーバを起動しました。" );
 
                 int 例外発生回数 = 0;
+                bool ビュアーモードではない = !Global.Options.ビュアーモードである;
 
                 while( !cancelToken.IsCancellationRequested )
                 {
@@ -798,7 +799,7 @@ namespace DTXMania2
                             continue;   // テスト送信
 
                         // 受け取ったオプションは、ビュアーモードでなければ実行されない。
-                        if( !Global.Options.ビュアーモードである )
+                        if( ビュアーモードではない )
                             continue;
 
                         // YAMLからコマンドラインオプションを復元する。

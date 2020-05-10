@@ -30,6 +30,8 @@ namespace DTXMania2
             this.Manager = new Manager();
             this.Timer = new Timer();
             this.TrasitionLibrary = new TransitionLibrary();
+
+            this._スレッドID = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
 
         public void Dispose()
@@ -44,10 +46,17 @@ namespace DTXMania2
         // 進行と描画
 
 
-        // 生成スレッドと同じスレッドで呼び出すこと！
         public void 進行する()
         {
+            Debug.Assert( System.Threading.Thread.CurrentThread.ManagedThreadId == this._スレッドID, "生成スレッドではありません。生成スレッドと同じスレッドで呼び出すこと！" );
             this.Manager.Update( this.Timer.Time );
         }
+
+
+
+        // ローカル
+
+
+        private int _スレッドID;
     }
 }

@@ -288,11 +288,8 @@ namespace DTXMania2
             //----------------
             unsafe 
             {
-                // RawInputData は、可変長構造体である。
-                // ひとまず、その構造体サイズを仮サイズで設定する。
-                int dataSize = Marshal.SizeOf<RawInput.RawInputData>();
-
-                // RawInputData 構造体の実サイズを取得する。
+                // RawInputData 構造体（可変長）の実サイズを取得する。
+                int dataSize = 0;
                 if( 0 > RawInput.GetRawInputData( msg.LParam, RawInput.DataType.Input, null, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
                 {
                     Log.ERROR( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );

@@ -22,8 +22,7 @@ namespace DTXMania2
         public bool CanSeek
             => this._stream.CanSeek;
 
-        public WaveFormat WaveFormat
-            => this._waveFormat;
+        public WaveFormat WaveFormat { get; }
 
         public long Position
         {
@@ -51,7 +50,7 @@ namespace DTXMania2
 
             this._stream = stream;
             this._vorbisReader = new VorbisReader( stream, true );
-            this._waveFormat = new WaveFormat(
+            this.WaveFormat = new WaveFormat(
                 this._vorbisReader.SampleRate,
                 32,                             // 32bit 固定
                 this._vorbisReader.Channels,
@@ -81,7 +80,5 @@ namespace DTXMania2
         private Stream _stream;
 
         private VorbisReader _vorbisReader;
-
-        private WaveFormat _waveFormat;
     }
 }
