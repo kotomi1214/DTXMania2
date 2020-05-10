@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		入力イベントデータの最小単位。全入力デバイスで共通。

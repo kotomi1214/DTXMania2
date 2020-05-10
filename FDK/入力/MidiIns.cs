@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     すべてのMIDI入力デバイス。
     /// </summary>
-    class MidiIns : IDisposable
+    public class MidiIns : IDisposable
     {
 
         // プロパティ
@@ -72,7 +71,7 @@ namespace DTXMania2
 
                 // MIDI入力デバイスを開く。コールバックは全デバイスで共通。
                 IntPtr hMidiIn = default;
-                if( ( (uint) CSCore.MmResult.NoError == midiInOpen( ref hMidiIn, id, this._midiInProc, default, CALLBACK_FUNCTION ) ) && ( default != hMidiIn ) )
+                if( ( 0 == midiInOpen( ref hMidiIn, id, this._midiInProc, default, CALLBACK_FUNCTION ) ) && ( default != hMidiIn ) )
                 {
                     this._MIDI入力デバイスハンドルリスト.Add( hMidiIn );
                     midiInStart( hMidiIn );

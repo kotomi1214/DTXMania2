@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using SharpDX.Multimedia;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     Raw Input 関連のクラス、構造体、Win32APIの定義。

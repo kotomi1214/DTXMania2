@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using SharpDX.Multimedia;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
-    class KeyboardHID : IDisposable
+    public class KeyboardHID : IDisposable
     {
 
         // プロパティ

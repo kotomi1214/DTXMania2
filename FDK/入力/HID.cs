@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     HID (Human Interface Devices) 関連の API

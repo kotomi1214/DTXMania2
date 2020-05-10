@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     HIDゲームコントローラのプロパティ。
     /// </summary>
-    class GameControllerHIDProperty : IDisposable
+    public class GameControllerHIDProperty : IDisposable
     {
         public int DeviceID = 0;
         public string Name = "";
