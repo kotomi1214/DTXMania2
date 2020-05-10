@@ -148,7 +148,7 @@ namespace DTXMania2.曲
         {
             try
             {
-                var image = new 文字列画像D2D() {
+                var image = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
                     表示文字列 = タイトル文字列,
                     フォント名 = "HGMaruGothicMPRO", // "メイリオ",
                     フォントの太さ = FontWeight.Regular,
@@ -177,7 +177,7 @@ namespace DTXMania2.曲
 
             try
             {
-                var image = new 文字列画像D2D() {
+                var image = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
                     表示文字列 = サブタイトル文字列,
                     フォント名 = "HGMaruGothicMPRO", // "メイリオ",
                     フォントの太さ = FontWeight.Regular,

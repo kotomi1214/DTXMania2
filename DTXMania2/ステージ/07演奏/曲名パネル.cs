@@ -23,7 +23,7 @@ namespace DTXMania2.演奏
             this._既定のノード画像 = new 画像( @"$(Images)\DefaultPreviewImage.png" );
             this._現行化前のノード画像 = new 画像( @"$(Images)\PreviewImageWaitForActivation.png" );
 
-            this._曲名画像 = new 文字列画像D2D() {
+            this._曲名画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 26f,
                 フォントの太さ = FontWeight.Regular,
@@ -35,7 +35,7 @@ namespace DTXMania2.演奏
                 表示文字列 = Global.App.演奏スコア?.曲名 ?? "",
             };
 
-            this._サブタイトル画像 = new 文字列画像D2D() {
+            this._サブタイトル画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 18f,
                 フォントの太さ = FontWeight.Regular,

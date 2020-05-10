@@ -36,7 +36,11 @@ namespace DTXMania2.タイトル
             this._システム情報 = new システム情報();
             this._タイトルロゴ = new 画像( @"$(Images)\TitleLogo.png" );
             this._帯ブラシ = new SolidColorBrush( Global.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
-            this._パッドを叩いてください = new 文字列画像D2D() { 表示文字列 = "パッドを叩いてください", フォントサイズpt = 40f, 描画効果 = 文字列画像D2D.効果.縁取り };
+            this._パッドを叩いてください = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+                表示文字列 = "パッドを叩いてください",
+                フォントサイズpt = 40f,
+                描画効果 = 文字列画像D2D.効果.縁取り,
+            };
 
             Global.App.システムサウンド.再生する( システムサウンド種別.タイトルステージ_開始音 );
             Global.App.システムサウンド.再生する( システムサウンド種別.タイトルステージ_ループBGM, ループ再生する: true );

@@ -4,9 +4,8 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		DirectWrite を使った Direct2D1ビットマップ。
@@ -14,7 +13,7 @@ namespace DTXMania2
     /// <remarks>
     ///		<see cref="表示文字列"/> メンバを更新すれば、次回の描画時に新しいビットマップが生成される。
     /// </remarks>
-    class 文字列画像D2D : IImage, IDisposable
+    public class 文字列画像D2D : IImage, IDisposable
     {
 
         // プロパティ
@@ -280,23 +279,24 @@ namespace DTXMania2
         // 生成と終了
 
 
-        public 文字列画像D2D()
+        public 文字列画像D2D( SharpDX.DirectWrite.Factory dwFactory, SharpDX.Direct2D1.Factory1 d2dFactory1, DeviceContext d2dDeviceContext, Size2F 設計画面サイズdpx )
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
 
             // 必要なプロパティは呼び出し元で設定すること。
 
+            this._DWFactory = dwFactory;
             this._Bitmap = null!;
             this._TextFormat = null!;
             this._TextLayout = null!;
-            this._TextRenderer = new カスタムTextRenderer( Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Color.White, Color.Transparent );    // ビットマップの生成前に。
+            this._TextRenderer = new カスタムTextRenderer( d2dFactory1, d2dDeviceContext, Color.White, Color.Transparent );    // ビットマップの生成前に。
 
             this._ビットマップを更新せよ = true;
             this._TextFormatを更新せよ = true;
             this._TextLayoutを更新せよ = true;
 
             if( this.レイアウトサイズdpx == Size2F.Zero )
-                this.レイアウトサイズdpx = Global.設計画面サイズ; // 初期サイズとして設計画面サイズを設定。
+                this.レイアウトサイズdpx = 設計画面サイズdpx; // 初期サイズ
         }
 
         public virtual void Dispose()
@@ -319,7 +319,7 @@ namespace DTXMania2
                 //----------------
                 this._TextFormat?.Dispose();
                 this._TextFormat = new TextFormat(
-                    Global.DWriteFactory,
+                    this._DWFactory,
                     this.フォント名,
                     this.フォントの太さ,
                     this.フォントスタイル,
@@ -349,7 +349,7 @@ namespace DTXMania2
                 //----------------
                 this._TextLayout?.Dispose();
                 this._TextLayout = new TextLayout(
-                    Global.DWriteFactory,
+                    this._DWFactory,
                     this.表示文字列,
                     this._TextFormat,
                     this.レイアウトサイズdpx.Width,
@@ -490,6 +490,8 @@ namespace DTXMania2
 
         // ローカル
 
+
+        private SharpDX.DirectWrite.Factory _DWFactory;
 
         private string _表示文字列 = "";
 
