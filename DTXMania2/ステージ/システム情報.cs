@@ -27,7 +27,7 @@ namespace DTXMania2
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._FPS = new FPS();
-            this._文字列画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ );
+            this._文字列画像 = new 文字列画像D2D();
         }
 
         public virtual void Dispose()

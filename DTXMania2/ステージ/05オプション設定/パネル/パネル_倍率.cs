@@ -37,7 +37,7 @@ namespace DTXMania2.オプション設定
             this.最小倍率 = 最小倍率;
             this.最大倍率 = 最大倍率;
             this.増減量 = 増減量;
-            this._項目画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._項目画像 = new 文字列画像D2D() {
                 表示文字列 = "",
                 フォントサイズpt = 34f,
                 前景色 = Color4.White

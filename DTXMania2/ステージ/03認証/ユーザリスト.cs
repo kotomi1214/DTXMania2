@@ -37,7 +37,7 @@ namespace DTXMania2.認証
             this._ユーザパネル = new 画像( @"$(Images)\AuthStage\UserPanel.png" );
             this._ユーザパネル光彩付き = new 画像( @"$(Images)\AuthStage\UserPanelWithFrame.png" );
             this._ユーザ肩書きパネル = new 画像( @"$(Images)\AuthStage\UserSubPanel.png" );
-            this._ユーザ名 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._ユーザ名 = new 文字列画像D2D() {
                 表示文字列 = "",
                 フォントサイズpt = 46f,
                 描画効果 = 文字列画像D2D.効果.縁取り,

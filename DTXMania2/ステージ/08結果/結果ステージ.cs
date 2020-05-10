@@ -58,7 +58,7 @@ namespace DTXMania2.結果
             this._既定のノード画像 = new 画像( @"$(Images)\DefaultPreviewImage.png" );
             this._現行化前のノード画像 = new 画像( @"$(Images)\PreviewImageWaitForActivation.png" );
             this._曲名パネル = new 画像( @"$(Images)\ResultStage\ScoreTitlePanel.png" );
-            this._曲名画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._曲名画像 = new 文字列画像D2D() {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 40f,
                 フォントの太さ = FontWeight.Regular,
@@ -68,7 +68,7 @@ namespace DTXMania2.結果
                 前景色 = Color4.Black,
                 背景色 = Color4.White,
             };
-            this._サブタイトル画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._サブタイトル画像 = new 文字列画像D2D() {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 25f,
                 フォントの太さ = FontWeight.Regular,

@@ -44,7 +44,7 @@ namespace DTXMania2.オプション設定
             this.パネル名 = パネル名;
             this.ヘッダ色 = ( ヘッダ色.HasValue ) ? ヘッダ色.Value : ヘッダ色種別.青;  // 既定値は青
             this._値の変更処理 = 値の変更処理;
-            this._パネル名画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._パネル名画像 = new 文字列画像D2D() {
                 表示文字列 = this.パネル名,
                 フォントサイズpt = 34f,
                 前景色 = Color4.White

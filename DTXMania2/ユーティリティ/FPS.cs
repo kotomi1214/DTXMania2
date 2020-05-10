@@ -20,7 +20,7 @@ namespace DTXMania2
 
         public FPS()
         {
-            this._FPSパラメータ = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ );
+            this._FPSパラメータ = new 文字列画像D2D();
         }
 
         public virtual void Dispose()

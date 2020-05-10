@@ -37,7 +37,7 @@ namespace DTXMania2.認証
 
             this._舞台画像 = new 舞台画像();
             this._ウィンドウ画像 = new 画像( @"$(Images)\AuthStage\UserSelectFrame.png" );
-            this._プレイヤーを選択してください = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._プレイヤーを選択してください = new 文字列画像D2D() {
                 表示文字列 = "プレイヤーを選択してください。",
                 フォントサイズpt = 30f,
                 描画効果 = 文字列画像D2D.効果.ドロップシャドウ,

@@ -56,7 +56,7 @@ namespace DTXMania2.オプション設定
 
             for( int i = 0; i < this.選択肢リスト.Count; i++ )
             {
-                var image = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+                var image = new 文字列画像D2D() {
                     表示文字列 = this.選択肢リスト[ i ].文字列,
                     フォントサイズpt = 34f,
                     前景色 = this.選択肢リスト[ i ].色,

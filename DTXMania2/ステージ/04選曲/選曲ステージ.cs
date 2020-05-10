@@ -52,7 +52,7 @@ namespace DTXMania2.選曲
             this._ステージタイマー = new 画像( @"$(Images)\SelectStage\StageTimer.png" );
             this._既定のノード画像 = new 画像( @"$(Images)\DefaultPreviewImage.png" );
             this._現行化前のノード画像 = new 画像( @"$(Images)\PreviewImageWaitForActivation.png" );
-            this._SongNotFound = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._SongNotFound = new 文字列画像D2D() {
                 表示文字列 =
                     "Song not found...\n" +
                     "Hit BDx2 (in default SPACEx2) to select song folders.",

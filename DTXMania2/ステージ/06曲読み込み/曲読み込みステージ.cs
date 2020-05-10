@@ -39,7 +39,7 @@ namespace DTXMania2.曲読み込み
 
             this._舞台画像 = new 舞台画像();
             this._注意文 = new 画像( @"$(Images)\LoadingStage\Caution.png" );
-            this._曲名画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._曲名画像 = new 文字列画像D2D() {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 70f,
                 フォントの太さ = FontWeight.Regular,
@@ -50,7 +50,7 @@ namespace DTXMania2.曲読み込み
                 背景色 = Color4.White,
                 表示文字列 = Global.App.演奏譜面.譜面.Title,
             };
-            this._サブタイトル画像 = new 文字列画像D2D( Global.DWriteFactory, Global.D2D1Factory1, Global.既定のD2D1DeviceContext, Global.設計画面サイズ ) {
+            this._サブタイトル画像 = new 文字列画像D2D() {
                 フォント名 = "HGMaruGothicMPRO",
                 フォントサイズpt = 45f,
                 フォントの太さ = FontWeight.Regular,
