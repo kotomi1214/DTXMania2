@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		パフォーマンスカウンタを使用した高精度タイマ。
@@ -25,7 +25,7 @@ namespace DTXMania2
     ///		"リアルタイムカウント" …… タイマインスタンスの生成時（または前回のリセット時）から「現時点」までの、パフォーマンスカウンタの差分（相対値）。
     ///		"生カウント" ………………… パフォーマンスカウンタの生の値。::QueryPerformanceCounter() で取得できる値に等しい。システム依存の絶対値。
     /// </remarks>
-    class QPCTimer
+    public class QPCTimer
     {
         /// <summary>
         ///		カウントが無効であることを示す定数。

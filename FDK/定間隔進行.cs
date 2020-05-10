@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		一定間隔ごとの進行処理を実現するクラス。
@@ -24,7 +25,7 @@ namespace DTXMania2
     ///			なお、定間隔処理にラムダ式を使用する場合は、キャプチャ変数のライフサイクル（実行される時点でまだ存在しているか否か）に留意し、弱い参照 の利用も検討すること。
     ///		</para>
     /// </remarks>
-    class 定間隔進行
+    public class 定間隔進行
     {
         /// <summary>
         ///		コンストラクタ。
