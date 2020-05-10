@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using CSCore;
 using CSCore.DSP;
+using FDK;
 
 namespace DTXMania2
 {
