@@ -6,6 +6,7 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX;
+using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
 

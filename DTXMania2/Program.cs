@@ -6,8 +6,8 @@ using System.IO;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using FDK;
 
 namespace DTXMania2
 {

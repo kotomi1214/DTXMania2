@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		フォルダ変数の変換機能を提供する。
@@ -13,7 +13,7 @@ namespace DTXMania2
     ///		「フォルダ変数」を使うことにより、これらを隠蔽可能にする。
     ///		フォルダ変数は、"$("＋名前＋")" で自由に定義できる。
     /// </remarks>
-    class Folder
+    public class Folder
     {
         
         // フォルダ変数関連

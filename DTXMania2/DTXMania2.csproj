@@ -38,6 +38,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FDK\FDK.csproj" />
     <ProjectReference Include="..\SSTFormat\SSTFormat.csproj" />
   </ItemGroup>
 

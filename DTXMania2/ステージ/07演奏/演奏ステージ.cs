@@ -4,10 +4,10 @@ using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
+using FDK;
 using SSTFormat.v004;
 
 namespace DTXMania2.演奏
