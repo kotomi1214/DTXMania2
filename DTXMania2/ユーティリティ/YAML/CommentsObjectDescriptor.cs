@@ -8,7 +8,7 @@ using YamlDotNet.Serialization;
 namespace DTXMania2
 {
     /// <summary>
-    ///     コメント文を表すでスクリプタ。
+    ///     コメント文を表すデスクリプタ。
     /// </summary>
     /// <seealso cref="https://dotnetfiddle.net/8M6iIE"/>
     public sealed class CommentsObjectDescriptor : IObjectDescriptor
