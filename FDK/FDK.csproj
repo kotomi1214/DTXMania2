@@ -22,6 +22,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SharpDX.Animation" Version="4.2.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.1" />
   </ItemGroup>
 

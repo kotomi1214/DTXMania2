@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using SharpDX.Animation;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     Windows Animation API の wrapper。
     /// </summary>
-    class Animation : IDisposable
+    public class Animation : IDisposable
     {
 
         // プロパティ
