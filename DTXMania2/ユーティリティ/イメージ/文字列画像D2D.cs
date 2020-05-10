@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
+using FDK;
 
 namespace DTXMania2
 {
@@ -393,7 +394,7 @@ namespace DTXMania2
                 #region " ビットマップレンダーターゲットをクリアし、テキストを描画する。"
                 //----------------
                 var rt = this._Bitmap;
-                Global.D2DBatchDraw( rt, () => {
+                D2DBatch.Draw( rt, () => {
 
                     using var 前景色ブラシ = new SolidColorBrush( rt, this.前景色 );
                     using var 背景色ブラシ = new SolidColorBrush( rt, this.背景色 );
@@ -467,7 +468,7 @@ namespace DTXMania2
             if( null == this._Bitmap )
                 return;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * dc.Transform;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;

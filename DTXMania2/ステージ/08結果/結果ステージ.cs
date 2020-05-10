@@ -208,7 +208,7 @@ namespace DTXMania2.結果
             this._システム情報.VPSをカウントする();
 
             this._背景.進行描画する( dc );
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
                 dc.FillRectangle( new RectangleF( 0f, 36f, Global.設計画面サイズ.Width, Global.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
             } );
             this._プレビュー画像を描画する( dc );
@@ -236,7 +236,7 @@ namespace DTXMania2.結果
         private void _プレビュー画像を描画する( DeviceContext dc )
         {
             // 枠
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
                 const float 枠の太さdpx = 5f;
                 dc.FillRectangle(
                     new RectangleF(

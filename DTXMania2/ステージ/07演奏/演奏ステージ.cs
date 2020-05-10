@@ -1132,7 +1132,7 @@ namespace DTXMania2.演奏
         {
             Debug.Assert( null != this.キャプチャ画面, "キャプチャ画面が設定されていません。" );
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.DrawBitmap(
                     this.キャプチャ画面,
@@ -1188,7 +1188,7 @@ namespace DTXMania2.演奏
         {
             // 小節線・拍線 と チップ は描画階層（奥行き）が異なるので、別々のメソッドに分ける。
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var userConfig = Global.App.ログオン中のユーザ;
 

@@ -189,7 +189,7 @@ namespace DTXMania2
             if( this.Bitmap is null )
                 return;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
 
@@ -247,7 +247,7 @@ namespace DTXMania2
             if( this.Bitmap is null )
                 return;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

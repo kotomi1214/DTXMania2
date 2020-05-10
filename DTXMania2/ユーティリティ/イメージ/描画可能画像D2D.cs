@@ -60,7 +60,7 @@ namespace DTXMania2
         {
             var dc = Global.既定のD2D1DeviceContext;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.Target = this.Bitmap;            // 描画先
                 dc.Transform = Matrix3x2.Identity;  // 等倍（dpx to dpx）

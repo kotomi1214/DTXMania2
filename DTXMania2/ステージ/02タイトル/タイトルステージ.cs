@@ -169,7 +169,7 @@ namespace DTXMania2.タイトル
         {
             var 領域 = new RectangleF( 0f, 800f, Global.設計画面サイズ.Width, 80f );
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
                 dc.FillRectangle( 領域, this._帯ブラシ );
             } );
 

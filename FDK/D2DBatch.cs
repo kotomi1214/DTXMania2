@@ -12,9 +12,7 @@ namespace FDK
         /// <remarks>
         ///		このメソッドを使うと、D2D描画処理がレンダーターゲットの BeginDraw() と EndDraw() の間で行われることが保証される。
         ///		また、D2D描画処理中に例外が発生しても EndDraw() の呼び出しが確実に保証される。
-        ///		
         ///     この処理中に D3Dの描画を実行すると、そちらが先に描画されてしまうので注意！！
-        ///     
         /// </remarks>
         /// <param name="renderTarget">レンダリングターゲット。</param>
         /// <param name="D2D描画処理">BeginDraw() と EndDraw() の間で行う処理。</param>

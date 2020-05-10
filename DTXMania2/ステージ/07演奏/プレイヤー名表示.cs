@@ -65,7 +65,7 @@ namespace DTXMania2.演奏
                 this._拡大率X = ( 文字列幅dpx <= 描画矩形.Width ) ? 1.0f : ( 描画矩形.Width / 文字列幅dpx );
             }
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

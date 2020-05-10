@@ -5,6 +5,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
+using FDK;
 
 namespace DTXMania2.オプション設定
 {
@@ -131,7 +132,7 @@ namespace DTXMania2.オプション設定
 
             // (1) パネルの下地部分の描画。
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 using( var パネル背景色 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
                 using( var ヘッダ背景色 = new SolidColorBrush( dc, this.ヘッダ色 ) )

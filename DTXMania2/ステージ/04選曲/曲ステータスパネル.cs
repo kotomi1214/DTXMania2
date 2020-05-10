@@ -79,7 +79,7 @@ namespace DTXMania2.選曲
 
                 if( null != map )
                 {
-                    Global.D2DBatchDraw( dc, () => {
+                    D2DBatch.Draw( dc, () => {
 
                         const float Yオフセット = +2f;
 

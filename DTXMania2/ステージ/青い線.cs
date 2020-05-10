@@ -75,7 +75,7 @@ namespace DTXMania2
             if( 0f == check )
                 return; // 面積ゼロ
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.Add; // 加算合成
 

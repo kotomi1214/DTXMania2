@@ -388,7 +388,7 @@ namespace DTXMania2.結果
             }
 
             // 黒帯
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

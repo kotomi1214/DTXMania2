@@ -93,7 +93,7 @@ namespace DTXMania2.演奏
 
             // １桁ずつ描画。
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

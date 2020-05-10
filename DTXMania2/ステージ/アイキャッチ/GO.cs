@@ -863,7 +863,7 @@ namespace DTXMania2
         {
             bool すべて完了 = true;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 
@@ -946,7 +946,7 @@ namespace DTXMania2
             //----------------
             #endregion
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

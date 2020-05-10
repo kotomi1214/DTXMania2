@@ -77,7 +77,7 @@ namespace DTXMania2.演奏
 
         public void 描画する( DeviceContext dc, int BGAの透明度, bool レーンラインを描画する = true )
         {
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 // レーンエリアを描画する。
                 {
