@@ -7,7 +7,7 @@ using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.TypeInspectors;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     [Description("コメント文")] で、YAML にコメントを出力するための TypeInspector。

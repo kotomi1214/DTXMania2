@@ -5,7 +5,7 @@ using System.Linq;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     コメント文を表すデスクリプタ。

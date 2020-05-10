@@ -7,7 +7,7 @@ using YamlDotNet.Core.Events;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.ObjectGraphVisitors;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     コメント文があればYAMLに出力するためのVisitor。
