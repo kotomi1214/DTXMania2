@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     一定時間ごとにコールバックを呼び出す。
@@ -12,7 +12,7 @@ namespace DTXMania2
     ///     前回のコールバック処理が完了しているかどうかにかかわらず、期間が経過するたびにコールバックが呼び出されるので注意。
     ///     精度は timeBeginPeriod() に依存するので注意。
     /// </remarks>
-    class QueueTimer : IDisposable
+    public class QueueTimer : IDisposable
     {
 
         // 生成と終了
