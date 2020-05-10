@@ -583,7 +583,11 @@ namespace DTXMania2
                         this.ステージ = new 演奏.演奏ステージ();
 
                         // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
-                        ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する();
+                        ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
+                            Global.D3D11Device1,
+                            Global.DXGISwapChain1,
+                            Global.既定のD3D11RenderTargetView,
+                            Global.既定のD2D1DeviceContext );
                     }
                     //----------------
                     #endregion
