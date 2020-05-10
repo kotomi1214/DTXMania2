@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		任意の１つの要素を選択できる機能を持つ List。
     /// </summary>
     /// <typeparam name="T">要素の型。</typeparam>
-    class SelectableList<T> : List<T> where T : class
+    public class SelectableList<T> : List<T> where T : class
     {
         /// <summary>
         ///		現在選択されている要素のインデックス番号（0～Count-1）。
