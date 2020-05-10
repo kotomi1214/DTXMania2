@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		インデクサでのset/getアクションを指定できるDictionary。
     /// </summary>
-    class HookedDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TKey : notnull
+    public class HookedDictionary<TKey, TValue> : Dictionary<TKey, TValue> where TKey : notnull
     {
         public Action<TKey, TValue>? get時アクション = null;
 
