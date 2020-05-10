@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.MediaFoundation;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     動画ファイルのビデオストリームからフレームを生成するビデオソース。
     /// </summary>
-    class MediaFoundationFileVideoSource : IVideoSource
+    public class MediaFoundationFileVideoSource : IVideoSource
     {
 
         // プロパティ
@@ -33,9 +32,11 @@ namespace DTXMania2
         // 生成と終了
 
 
-        public MediaFoundationFileVideoSource( VariablePath ファイルパス, double 再生速度 = 1.0 )
+        public MediaFoundationFileVideoSource( DXGIDeviceManager deviceManager, DeviceContext d2dDeviceContext, VariablePath ファイルパス, double 再生速度 = 1.0 )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
+
+            this._D2DDeviceContext = d2dDeviceContext;
 
             this.再生速度 = Math.Clamp( 再生速度, min: 0.01, max: 10.0 );
 
@@ -51,7 +52,7 @@ namespace DTXMania2
             using( var ビデオ属性 = new MediaAttributes() )
             {
                 // DXVAに対応しているGPUの場合には、それをデコードに利用するよう指定する。
-                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, Global.MFDXGIDeviceManager );
+                ビデオ属性.Set( SourceReaderAttributeKeys.D3DManager, deviceManager );
 
                 // 追加のビデオプロセッシングを有効にする。
                 ビデオ属性.Set( SourceReaderAttributeKeys.EnableAdvancedVideoProcessing, true );  // 真偽値が bool だったり
@@ -223,10 +224,10 @@ namespace DTXMania2
         /// <summary>
         ///     MediaFoundation のビデオサンプルを D2DBitmap に変換して返す。
         /// </summary>
-        public unsafe Bitmap サンプルからビットマップを取得する( Sample Sample )
+        public unsafe Bitmap サンプルからビットマップを取得する( Sample sample )
         {
             // 1. Sample → MediaBuffer
-            using var mediaBuffer = Sample.ConvertToContiguousBuffer();
+            using var mediaBuffer = sample.ConvertToContiguousBuffer();
 
             // 2. MediaBuffer → DXGIBuffer
             using var dxgiBuffer = mediaBuffer.QueryInterface<DXGIBuffer>();
@@ -239,7 +240,7 @@ namespace DTXMania2
 
             // 5. DXGISurface → Bitmap
             return new Bitmap(
-                Global.既定のD2D1DeviceContext,
+                this._D2DDeviceContext,
                 dxgiSurface,
                 new BitmapProperties( new PixelFormat( dxgiSurface.Description.Format, AlphaMode.Ignore ) ) );
         }
@@ -257,6 +258,8 @@ namespace DTXMania2
         private MediaType _MediaType;
 
         private SourceReaderEx _SourceReaderEx;
+
+        private DeviceContext _D2DDeviceContext;
 
 
 

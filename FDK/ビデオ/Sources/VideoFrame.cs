@@ -5,7 +5,7 @@ using System.Linq;
 using SharpDX.Direct2D1;
 using SharpDX.MediaFoundation;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     ビデオフレームの定義。

@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 
-namespace DTXMania2
+namespace FDK
 {
-    interface IVideoSource : IDisposable
+    public interface IVideoSource : IDisposable
     {
         /// <summary>
         ///     ビデオフレームのサイズ[width, height]。

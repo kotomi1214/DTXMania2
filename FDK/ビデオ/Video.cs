@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
-using FDK;
+using SharpDX.MediaFoundation;
 
-namespace DTXMania2
+namespace FDK
 {
-    class Video : IDisposable
+    public class Video : IDisposable
     {
 
         // プロパティ
@@ -30,7 +30,7 @@ namespace DTXMania2
             this._再生タイマ = new QPCTimer();
         }
 
-        public Video( VariablePath ファイルパス, double 再生速度 = 1.0 )
+        public Video( DXGIDeviceManager deviceManager, DeviceContext d2dDeviceContext, VariablePath ファイルパス, double 再生速度 = 1.0 )
             : this()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
@@ -38,7 +38,7 @@ namespace DTXMania2
             this.再生速度 = 再生速度;
             try
             {
-                this._VideoSource = new MediaFoundationFileVideoSource( ファイルパス, 再生速度 );
+                this._VideoSource = new MediaFoundationFileVideoSource( deviceManager, d2dDeviceContext, ファイルパス, 再生速度 );
             }
             catch
             {
@@ -250,7 +250,7 @@ namespace DTXMania2
             if( 描画するフレーム is null )
                 return;
 
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
                 dc.Transform = ( 変換行列2D ) * dc.Transform;
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
                 dc.DrawBitmap( 描画するフレーム.Bitmap, 不透明度0to1, InterpolationMode.NearestNeighbor );
