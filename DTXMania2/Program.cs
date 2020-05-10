@@ -6,8 +6,8 @@ using System.IO;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using FDK;
 
 namespace DTXMania2
 {
@@ -34,7 +34,7 @@ namespace DTXMania2
                     // 利用法を表示して終了。
 
                     Trace.WriteLine( Global.Options.Usage );             // Traceと
-                    using( var console = new Console() )
+                    using( var console = new FDK.Console() )
                         console.Out?.WriteLine( Global.Options.Usage );  // 標準出力の両方へ
                     return;
                 }
@@ -123,7 +123,47 @@ namespace DTXMania2
                 Log.WriteLine( $"{copyrights[ 0 ].Copyright}" );
                 Log.WriteLine( "" );
 
-                Log.システム情報をログ出力する();
+                #region " Windows 情報 "
+                //----------------
+                using( var hklmKey = Microsoft.Win32.Registry.LocalMachine )
+                using( var subKey = hklmKey.OpenSubKey( @"SOFTWARE\Microsoft\Windows NT\CurrentVersion" ) ) // キーがなかったら null が返される
+                {
+                    if( null != subKey )
+                    {
+                        var os_product = subKey.GetValue( "ProductName" ).ToString() ?? "Unknown OS";
+                        var os_release = subKey.GetValue( "ReleaseId" ).ToString() ?? "Unknown Release";
+                        var os_build = subKey.GetValue( "CurrentBuild" ).ToString() ?? "Unknown Build";
+                        var os_bit = Environment.Is64BitOperatingSystem ? "64bit" : "32bit";
+                        var process_bit = Environment.Is64BitProcess ? "64bit" : "32bit";
+                        var dotnetcore_version = Environment.Version;
+
+                        Log.WriteLine( $"{os_product} {os_release}.{os_build} ({os_bit} OS, {process_bit} process, .NET Core {dotnetcore_version})" );
+                    }
+                }
+                //----------------
+                #endregion
+
+                #region " メモリ情報 "
+                //----------------
+                {
+                    var output = "";
+                    var info = new ProcessStartInfo();
+                    info.FileName = "wmic";
+                    info.Arguments = "OS get FreePhysicalMemory,TotalVisibleMemorySize /Value";
+                    info.RedirectStandardOutput = true;
+                    using( var process = Process.Start( info ) )
+                        output = process.StandardOutput.ReadToEnd();
+                    var lines = output.Trim().Split( "\n" );
+                    var freeMemoryParts = lines[ 0 ].Split( "=", StringSplitOptions.RemoveEmptyEntries );
+                    var totalMemoryParts = lines[ 1 ].Split( "=", StringSplitOptions.RemoveEmptyEntries );
+                    var Total = Math.Round( double.Parse( totalMemoryParts[ 1 ] ) / 1024 / 1024, 0 );
+                    var Free = Math.Round( double.Parse( freeMemoryParts[ 1 ] ) / 1024 / 1024, 0 );
+
+                    Log.WriteLine( $"{Total}MB Total physical memory, {Free}MB Free" );
+                }
+                //----------------
+                #endregion
+
                 Log.WriteLine( "" );
                 //----------------
                 #endregion

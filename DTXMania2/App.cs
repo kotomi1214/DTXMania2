@@ -6,6 +6,7 @@ using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX;
+using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
 
@@ -297,7 +298,7 @@ namespace DTXMania2
                 {
                     // グローバルリソースの大半は、進行描画タスクの中で生成する。
                     Global.生成する( 設計画面サイズ, 物理画面サイズ );
-                    画像.全インスタンスで共有するリソースを作成する();
+                    画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1 );
 
                     // 1ms ごとに進行描画ループを行うよう仕込む。
                     tick通知 = new AutoResetEvent( false );
@@ -582,7 +583,11 @@ namespace DTXMania2
                         this.ステージ = new 演奏.演奏ステージ();
 
                         // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
-                        ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する();
+                        ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
+                            Global.D3D11Device1,
+                            Global.DXGISwapChain1,
+                            Global.既定のD3D11RenderTargetView,
+                            Global.既定のD2D1DeviceContext );
                     }
                     //----------------
                     #endregion

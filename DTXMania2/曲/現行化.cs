@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DirectWrite;
 using Microsoft.Data.Sqlite;
-using SSTFormat.v004;
+using FDK;
 
 namespace DTXMania2.曲
 {

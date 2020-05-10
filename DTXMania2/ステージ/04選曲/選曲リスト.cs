@@ -6,6 +6,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
+using FDK;
 using DTXMania2.曲;
 
 namespace DTXMania2.選曲
@@ -353,7 +354,7 @@ namespace DTXMania2.選曲
 
             #region " 背景 "
             //----------------
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
@@ -509,8 +510,7 @@ namespace DTXMania2.選曲
                             score.最高記録.Achievement.ToString( "0.00" ).PadLeft( 6 ) + '%',
                             拡大率: new Size2F( 0.3f, 0.3f ) );
 
-                        Global.D2DBatchDraw( dc, () =>
-                        {
+                        D2DBatch.Draw( dc, () => {
 
                             using var ゲージ色 = new SolidColorBrush( dc, new Color( 184, 156, 231, 255 ) );
                             using var ゲージ枠色 = new SolidColorBrush( dc, Color.White );

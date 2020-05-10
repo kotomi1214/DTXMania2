@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
+using FDK;
 
 namespace DTXMania2.結果
 {
@@ -387,7 +388,7 @@ namespace DTXMania2.結果
             }
 
             // 黒帯
-            Global.D2DBatchDraw( dc, () => {
+            D2DBatch.Draw( dc, () => {
 
                 var pretrans = dc.Transform;
 

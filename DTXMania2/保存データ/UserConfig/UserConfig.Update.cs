@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Data.Sqlite;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
+using FDK;
 
 namespace DTXMania2
 {

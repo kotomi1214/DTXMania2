@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
-using SharpDX.Animation;
+using FDK;
 
 namespace DTXMania2.結果
 {
