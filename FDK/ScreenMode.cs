@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
-    class ScreenMode
+    public class ScreenMode
     {
 
         // プロパティ
