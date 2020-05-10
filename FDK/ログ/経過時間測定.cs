@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
-    class 経過時間測定
+    public class 経過時間測定
     {
         public ConcurrentDictionary<string, double> スタック { get; }
 

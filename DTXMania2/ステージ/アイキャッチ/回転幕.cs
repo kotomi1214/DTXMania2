@@ -4,9 +4,9 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
+using FDK;
 
-/*
- * 回転幕の仕様（推定）
+/* 回転幕の仕様（推定）
  * 
  *	※ 画面A ... 切り替え元画面
  *	　 画面B ... アイキャッチ遷移画面1（回転中）

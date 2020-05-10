@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		指定されたストリームに <see cref="Trace"/> の出力を複製するリスナー。
     /// </summary>
-    class TraceLogListener : TraceListener
+    public class TraceLogListener : TraceListener
     {
         public TraceLogListener( StreamWriter stream )
         {

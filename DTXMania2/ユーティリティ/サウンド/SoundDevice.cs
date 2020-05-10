@@ -8,6 +8,7 @@ using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Win32;
+using FDK;
 
 namespace DTXMania2
 {

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		コンストラクタでブロック開始ログ、Disposeでブロック終了ログを出力するインスタンス。
     /// </summary>
-    class LogBlock : IDisposable
+    public class LogBlock : IDisposable
     {
         // "--> 開始"
         public LogBlock( string ブロック名 )

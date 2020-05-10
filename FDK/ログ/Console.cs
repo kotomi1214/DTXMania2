@@ -6,12 +6,12 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///     ウィンドウアプリケーションから、自身が起動されたコンソールにメッセージを出力する。
     /// </summary>
-    class Console : IDisposable
+    public class Console : IDisposable
     {
         public StreamWriter? Out { get; protected set; }
 

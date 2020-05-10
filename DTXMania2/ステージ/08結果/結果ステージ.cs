@@ -6,6 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using Microsoft.Data.Sqlite;
+using FDK;
 using SSTFormat.v004;
 
 namespace DTXMania2.結果

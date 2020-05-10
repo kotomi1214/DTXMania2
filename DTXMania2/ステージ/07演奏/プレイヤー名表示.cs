@@ -5,6 +5,7 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
+using FDK;
 
 namespace DTXMania2.演奏
 {

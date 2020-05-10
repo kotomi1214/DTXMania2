@@ -4,8 +4,9 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
-using DTXMania2.曲;
+using FDK;
 using SSTFormat.v004;
+using DTXMania2.曲;
 
 namespace DTXMania2.選曲
 {

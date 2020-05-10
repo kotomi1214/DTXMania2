@@ -5,6 +5,7 @@ using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using SharpDX.Direct2D1.Effects;
+using FDK;
 
 namespace DTXMania2
 {
