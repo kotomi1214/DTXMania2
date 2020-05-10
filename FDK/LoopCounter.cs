@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		ある int 型整数を、開始値から終了値まで、一定間隔で単純増加させるカウンタ。
     ///		終了値に達したら開始値に戻る。以降、それを繰り返す。
     /// </summary>
-    class LoopCounter
+    public class LoopCounter
     {
         /// <summary>
         ///		カウンタの開始値。
