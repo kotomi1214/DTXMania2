@@ -6,6 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.IO;
 using SharpDX.WIC;
+using FDK;
 
 namespace DTXMania2
 {

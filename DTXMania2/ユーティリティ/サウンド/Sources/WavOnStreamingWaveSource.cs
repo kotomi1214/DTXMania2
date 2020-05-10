@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using CSCore;
 using CSCore.Codecs.WAV;
+using FDK;
 
 namespace DTXMania2
 {

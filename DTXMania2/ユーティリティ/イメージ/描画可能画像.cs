@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
+using FDK;
 
 namespace DTXMania2
 {

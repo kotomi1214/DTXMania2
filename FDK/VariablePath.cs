@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using YamlDotNet.Serialization;
-using FDK;
 
-namespace DTXMania2
+namespace FDK
 {
     /// <summary>
     ///		フォルダ変数（<see cref="Folder"/>参照）の使えるパスを管理する。
-    ///		string の代わりにこの型を使えば、任意のパスを扱う際に、そのパスのフォルダ変数の有無を考慮することなく
-    ///		好きなほうのメンバ（変数なし・変数付き）を使うことができるようになる。
     /// </summary>
     /// <remarks>
+    ///		string の代わりにこの型を使えば、任意のパスを扱う際に、そのパスのフォルダ変数の有無を考慮することなく
+    ///		好きなほうのメンバ（変数なし・変数付き）を使うことができるようになる。
     ///     <see cref="VariablePath"/> 型と string は、暗黙的に相互変換できる。
     /// </remarks>
     public class VariablePath : IYamlConvertible

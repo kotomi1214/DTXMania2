@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.MediaFoundation;
+using FDK;
 
 namespace DTXMania2
 {

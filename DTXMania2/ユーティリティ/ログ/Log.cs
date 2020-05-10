@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Text;
+using FDK;
 
 namespace DTXMania2
 {

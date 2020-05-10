@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using CSCore;
+using FDK;
 
 namespace DTXMania2
 {

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Text.RegularExpressions;
 using SharpDX;
+using FDK;
 
 namespace DTXMania2
 {

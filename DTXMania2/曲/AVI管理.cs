@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using FDK;
 using SSTFormat.v004;
 
 namespace DTXMania2
