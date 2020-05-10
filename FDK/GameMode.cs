@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace DTXMania2
+namespace FDK
 {
-    static class GameMode
+    public static class GameMode
     {
         /// <summary>
         ///     ゲームモードが有効である場合はtrueを、そうでなければfalseを返す。
