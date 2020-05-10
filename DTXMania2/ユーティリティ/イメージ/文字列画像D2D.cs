@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SharpDX;
-using SharpDX.Direct2D1;
-using SharpDX.DirectWrite;
-using FDK;
 
 namespace DTXMania2
 {
