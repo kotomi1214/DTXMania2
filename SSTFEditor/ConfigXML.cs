@@ -19,7 +19,7 @@ namespace SSTFEditor
 
         public List<string> RecentUsedFiles = new List<string>();
 
-        public string ViewerPath = "";
+        public string ViewerPath = @".\DTXMania2.exe";
 
         public Point WindowLocation = new Point( 100, 100 );
 

@@ -11,7 +11,7 @@ namespace DTXMania2.曲
     /// <summary>
     ///		BOX定義ファイルのマッピングクラス。
     /// </summary>
-    public class BoxDef
+    class BoxDef
     {
 
         // プロパティ

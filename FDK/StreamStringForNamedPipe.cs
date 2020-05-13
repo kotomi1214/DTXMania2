@@ -31,10 +31,14 @@ namespace FDK
         public string ReadString()
         {
             // 最初に受信する2バイトをデータ長とする。
-            int len;
-            len = this.ioStream.ReadByte() << 8;
-            len += this.ioStream.ReadByte();
-            
+            int b1 = this.ioStream.ReadByte();
+            if( -1 == b1 ) return "";
+            int b2 = this.ioStream.ReadByte();
+            if( -1 == b2 ) return "";
+
+            int len = ( b1 << 8 ) + b2;
+            if( len < 0 ) return "";    // 念のため
+
             // 次いで、データ本体を受信。
             var inBuffer = new byte[ len ];
             this.ioStream.Read( inBuffer, 0, len );

@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Windows.Forms;
 using SSTFormat.v004;
 using FDK;
+using System.Threading;
 
 namespace SSTFEditor
 {
@@ -312,6 +313,28 @@ namespace SSTFEditor
         //----------------
         #endregion
 
+        #region " Viewer 用パイプライン "
+        //----------------
+        private NamedPipeClientStream _Viewerに接続する()
+        {
+            var pipeToViewer = new NamedPipeClientStream( ".", Program._ビュアー用パイプライン名, PipeDirection.Out );
+            try
+            {
+                // パイプラインサーバへの接続を試みる。
+                pipeToViewer.Connect( 100 );
+            }
+            catch( TimeoutException )
+            {
+                // サーバが立ち上がっていないなら null を返す。
+                pipeToViewer?.Dispose();
+                pipeToViewer = null;
+            }
+
+            return pipeToViewer;    // null じゃない場合は Dispose を忘れないこと。
+        }
+        //----------------
+        #endregion
+
 
         // アクションメソッド
 
@@ -378,23 +401,6 @@ namespace SSTFEditor
         }
         private void _アプリの終了処理を行う()
         {
-            // TODO: WCFファクトリを閉じる。
-
-            //try
-            //{
-            //    this._WCFサービスチャンネル?.Close();
-            //    this._WCFサービスチャンネル = null;
-            //    this._WCFサービス = null;
-
-            //    this._WCFファクトリ?.Close();
-            //    this._WCFファクトリ = null;
-            //}
-            //catch
-            //{
-            //    // エラーは無視。
-            //}
-
-            
             // 一時ファイルが残っていれば、削除する。
 
             if( File.Exists( this._最後にプレイヤーに渡した一時ファイル名 ) )
@@ -886,77 +892,58 @@ namespace SSTFEditor
                 this._最後にプレイヤーに渡した一時ファイル名,
                 一時ファイルである: true );    // 一時ファイルである場合、「最近使ったファイル一覧」には残されない。
 
-            // TODO: 演奏開始を指示する。
+            // ビュアーに演奏開始を指示する。
+            NamedPipeClientStream pipeStream = null;
             try
             {
-                #region " WCFサービスを取得する。（必要あれば、ビュアープロセスを起動する。）"
-                //----------------
-                //this._WCFサービスが起動していれば取得する();
+                // ビュアーに接続を試みる。
+                pipeStream = this._Viewerに接続する();
 
-                //// プロセスの起動が必要か？
+                if( pipeStream is null )
+                {
+                    // 接続に失敗したのでビュアーを起動する。
 
-                //bool ビュアープロセスを起動する = false;
+                    if( this.Config.ViewerPath.Nullまたは空である() || !File.Exists( this.Config.ViewerPath ) )
+                        return; // ビュアーの設定がないか、ビュアーファイルが存在していない。
 
-                //if( null == this._WCFサービス )
-                //{
-                //    ビュアープロセスを起動する = true;       // サービスが起動してなかったので、必要。
-                //}
-                //else
-                //{
-                //    try
-                //    {
-                //        this._WCFサービス.GetSoundDelay();
-                //    }
-                //    catch
-                //    {
-                //        ビュアープロセスを起動する = true;       // サービスAPIが呼び出せなかったので、必要。
-                //    }
-                //}
+                    // ビュアーオプション(-s)を付けてプロセスを起動。
+                    Process.Start( this.Config.ViewerPath, "-s" );
 
-                //// 必要ならビュアープロセスを起動する。
+                    // 再度ビュアーに接続を試みる。
+                    for( int リトライ回数 = 0; リトライ回数 < 50; リトライ回数++ )    // 5秒相当
+                    {
+                        pipeStream = this._Viewerに接続する();
+                        if( null != pipeStream )
+                            break;  // つながった
 
-                //if( ビュアープロセスを起動する )
-                //{
-                //    try
-                //    {
-                //        Process.Start( this.Config.ViewerPath, "-s" ).WaitForInputIdle( 20 * 1000 );  // ビュアーオプション付き。
-                //    }
-                //    catch
-                //    {
-                //        return; // 起動に失敗。
-                //    }
+                        Thread.Sleep( 100 );
+                    }
+                    if( pipeStream is null )
+                    {
+                        // 接続に失敗した。諦める。
+                        this._Viewer再生関連GUIのEnabledを設定する();
+                        return;
+                    }
+                }
 
-                //    // 起動したプロセスの提供するSSTサービスへ接続する。
-
-                //    this._WCFファクトリ = null;
-                //    for( int retry = 0; retry < 10; retry++ )   // 最大10回リトライ。
-                //    {
-                //        this._WCFサービスが起動していれば取得する();
-
-                //        if( null != this._WCFサービス )
-                //            break;  // サービスに接続できた。
-
-                //        // 少し待ってリトライ。
-                //        System.Threading.Thread.Sleep( 500 );
-                //    }
-
-                //    if( null == this._WCFサービス )
-                //    {
-                //        this._Viewer再生関連GUIのEnabledを設定する();
-                //        return; // サービスへの接続に失敗した。
-                //    }
-                //}
-                //----------------
-                #endregion
-
-                //this._WCFサービス.ViewerPlay(
-                //    path: this._最後にプレイヤーに渡した一時ファイル名,
-                //    startPart: 小節番号,
-                //    drumsSound: ドラム音を発声する );
+                // 演奏開始を指示する。
+                var options = new DTXMania2.CommandLineOptions() {
+                    Filename = this._最後にプレイヤーに渡した一時ファイル名,
+                    再生開始 = true,
+                    再生開始小節番号 = 小節番号,
+                    ドラム音を発声する = ドラム音を発声する,
+                };
+                var ss = new StreamStringForNamedPipe( pipeStream );
+                var yamlText = options.ToYaml(); // YAML化
+                ss.WriteString( yamlText );
             }
             catch
             {
                 // 例外は無視。
+            }
+            finally
+            {
+                pipeStream?.Dispose();
             }
         }
         private void _再生を停止する()
@@ -965,12 +952,31 @@ namespace SSTFEditor
                 ( false == File.Exists( this.Config.ViewerPath ) ) )
                 return;
 
-            // TODO: プレイヤーの演奏を停止する。
+            // プレイヤーの演奏を停止する。
+            NamedPipeClientStream pipeStream = null;
+            try
+            {
+                // ビュアーに接続を試みる。
+                pipeStream = this._Viewerに接続する();
+                if( pipeStream is null )
+                    return; // 失敗したら何もしない。
 
-            //this._WCFサービスが起動していれば取得する();
-            //if( null == this._WCFサービス )
-            //    return; // SSTサービスが起動していないなら何もしない。
-            //this._WCFサービス.ViewerStop();
+                // 演奏停止を指示する。
+                var options = new DTXMania2.CommandLineOptions() {
+                    再生停止 = true,
+                };
+                var ss = new StreamStringForNamedPipe( pipeStream );
+                var yamlText = options.ToYaml(); // YAML化
+                ss.WriteString( yamlText );
+            }
+            catch
+            {
+                // 例外は無視。
+            }
+            finally
+            {
+                pipeStream?.Dispose();
+            }
         }
 
         private void _オプションを設定する()
@@ -1669,25 +1675,26 @@ namespace SSTFEditor
 
         private void _Viewer再生関連GUIのEnabledを設定する()
         {
-            bool 各GUIは有効 = false;
+            bool 各GUIは有効;
 
-            // TODO: プレイヤーの有無をGUIに反映
-
-            //if( null != this._WCFサービス )
-            //{
-            //    // (A) サービスが起動しているなら、各GUIは有効。
-            //    各GUIは有効 = true;
-            //}
-            //else if( File.Exists( this.Config.ViewerPath ) )
-            //{
-            //    // (B) サービスが起動していなくても、Viewer が存在するなら、各GUIは有効。
-            //    各GUIは有効 = true;
-            //}
-            //else
-            //{
-            //    // (C) SSTサービスが起動しておらず、Viewer も存在しないなら、各GUIは無効。
-            //    各GUIは有効 = false;
-            //}
+            using( var pipeStream = this._Viewerに接続する() )
+            {
+                if( null != pipeStream )
+                {
+                    // (A) パイプラインサーバが起動しているなら、各GUIは有効。
+                    各GUIは有効 = true;
+                }
+                else if( File.Exists( this.Config.ViewerPath ) )
+                {
+                    // (B) パイプラインサーバが起動していなくても、設定されている Viewer ファイルが存在するなら、各GUIは有効。
+                    各GUIは有効 = true;
+                }
+                else
+                {
+                    // (C) パイプラインサーバが起動しておらず、かつ Viewer ファイルも存在しないなら、各GUIは無効。
+                    各GUIは有効 = false;
+                }
+            }
 
             this.toolStripButton先頭から再生.Enabled = 各GUIは有効;
             this.toolStripButton現在位置から再生.Enabled = 各GUIは有効;
@@ -1778,38 +1785,6 @@ namespace SSTFEditor
         {
             this.toolStripLabel音量.Text = ( this._音量toラベル.ContainsKey( this.現在のチップ音量 ) ) ? this._音量toラベル[ this.現在のチップ音量 ] : @"???";
         }
-
-        //private void _WCFサービスが起動していれば取得する()
-        //{
-        //    // ファクトリが未生成なら生成する。
-        //    if( null == this._WCFファクトリ )
-        //    {
-        //        this._WCFファクトリ = new ChannelFactory<DTXMania.WCF.IDTXManiaService>( new NetNamedPipeBinding( NetNamedPipeSecurityMode.None ) );
-        //        this._WCFサービスチャンネル = null;
-        //        this._WCFサービス = null;
-        //    }
-
-        //    // サービスが未取得なら取得する。
-        //    if( ( null == this._WCFサービス ) || ( null == this._WCFサービスチャンネル ) )
-        //    {
-        //        try
-        //        {
-        //            this._WCFサービス = this._WCFファクトリ.CreateChannel( new EndpointAddress( "net.pipe://localhost/DTXMania/Viewer" ) );
-        //            this._WCFサービスチャンネル = this._WCFサービス as IClientChannel;       // サービスとチャンネルは同じオブジェクト。
-        //            this._WCFサービスチャンネル.Open();
-        //            this._WCFサービスチャンネル.Closed += ( sender, e ) => {
-        //                this._WCFサービスチャンネル = null;
-        //                this._WCFサービス = null;
-        //            };
-        //        }
-        //        catch
-        //        {
-        //            // 取得失敗。
-        //            this._WCFサービス = null;
-        //            this._WCFサービスチャンネル = null;
-        //        }
-        //    }
-        //}
 
         private void _プレビュー画像を更新する()
         {

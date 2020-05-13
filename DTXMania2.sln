@@ -22,7 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ソリューションフォ
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FDK", "FDK\FDK.csproj", "{27159CB2-98AA-4D37-B33C-31CDDC18602F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSTFEditor", "SSTFEditor\SSTFEditor.csproj", "{6BEA50E0-0A24-4487-BF87-CD33701D50DE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SSTFEditor", "SSTFEditor\SSTFEditor.csproj", "{6BEA50E0-0A24-4487-BF87-CD33701D50DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

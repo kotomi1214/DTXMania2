@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -8,6 +9,8 @@ namespace SSTFEditor
 {
     static class Program
     {
+        public readonly static string _ビュアー用パイプライン名 = "DTXMania2Viewer";
+
         [STAThread]
         static void Main()
         {

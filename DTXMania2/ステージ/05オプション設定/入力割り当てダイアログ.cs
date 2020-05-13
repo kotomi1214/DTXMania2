@@ -7,7 +7,7 @@ using FDK;
 
 namespace DTXMania2.オプション設定
 {
-    public partial class 入力割り当てダイアログ : Form
+    partial class 入力割り当てダイアログ : Form
     {
 
         // 生成と終了

@@ -800,8 +800,8 @@ namespace DTXMania2
                         Trace.WriteLine( $"{yamlText}" );
                         Trace.WriteLine( "--- ここまで ---" );
 
-                        if( yamlText == "ping" )
-                            continue;   // テスト送信
+                        if( yamlText.Nullまたは空である() || yamlText == "ping" )
+                            continue;   // 空送信またはテスト送信
 
                         // 受け取ったオプションは、ビュアーモードでなければ実行されない。
                         if( ビュアーモードではない )
