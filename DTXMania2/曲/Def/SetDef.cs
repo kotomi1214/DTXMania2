@@ -8,7 +8,7 @@ using FDK;
 
 namespace DTXMania2.曲
 {
-    public partial class SetDef
+    partial class SetDef
     {
 
         // プロパティ

@@ -8,7 +8,7 @@ using FDK;
 
 namespace DTXMania2
 {
-    class CommandLineOptions
+    public class CommandLineOptions
     {
         [YamlIgnore]
         public bool ビュアーモードである => ( this.再生開始 || this.再生停止 );
