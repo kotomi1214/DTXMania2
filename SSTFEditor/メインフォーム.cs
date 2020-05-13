@@ -190,8 +190,8 @@ namespace SSTFEditor
             int 現在の位置grid = this.vScrollBar譜面用垂直スクロールバー.Value;
             int 最小値grid = this.vScrollBar譜面用垂直スクロールバー.Minimum;
             int 最大値grid = ( this.vScrollBar譜面用垂直スクロールバー.Maximum + 1 ) - this.vScrollBar譜面用垂直スクロールバー.LargeChange;
-            int スクロール後の位置grid = this.vScrollBar譜面用垂直スクロールバー.Value + スクロール量grid;
-            スクロール後の位置grid = Math.Max( 最小値grid, Math.Min( 最大値grid, スクロール後の位置grid ) );
+            int スクロール後の位置grid = 現在の位置grid + スクロール量grid;
+            スクロール後の位置grid = Math.Clamp( スクロール後の位置grid, min: 最小値grid, max: 最大値grid );
 
             this.vScrollBar譜面用垂直スクロールバー.Value = スクロール後の位置grid;
         }
@@ -282,7 +282,7 @@ namespace SSTFEditor
         #region " フォルダ、ファイルパス "
         //----------------
         /// <summary>
-        ///		SSTFEditor.exe と StrokeStyleT.exe が格納されているフォルダへのパス。
+        ///		SSTFEditor.exe が格納されているフォルダへのパス。
         /// </summary>
         private string _システムフォルダパス => ( Path.GetDirectoryName( Application.ExecutablePath ) );
 
@@ -290,7 +290,7 @@ namespace SSTFEditor
         ///		Windowsログインユーザのアプリデータフォルダ。末尾は '\'。
         /// </summary>
         /// <remarks>
-        ///		例: "C:\Users\ログインユーザ名\ApplicationData\SSTFEditor\"
+        ///		例: "C:\Users\ログインユーザ名\AppData\Roaming\SSTFEditor\"
         /// </remarks>
         private string _ユーザフォルダパス
         {
@@ -536,7 +536,7 @@ namespace SSTFEditor
             //-----------------
             string 絶対パスファイル名 = this._ファイル保存ダイアログを開いてファイル名を取得する();
 
-            if( string.IsNullOrEmpty( 絶対パスファイル名 ) )
+            if( 絶対パスファイル名.Nullまたは空である() )
                 return; // キャンセルされたらここで中断。
 
             this._作業フォルダパス = Path.GetDirectoryName( 絶対パスファイル名 );
@@ -560,7 +560,7 @@ namespace SSTFEditor
             // Undo する対象を UndoRedoリストから取得する。
             var cell = this.UndoRedo管理.Undoするセルを取得して返す();
             if( null == cell )
-                return;     // なければ中断
+                return;     // なければ何もしない。
 
             // Undo を実行する。
             cell.Undoを実行する();
@@ -575,7 +575,7 @@ namespace SSTFEditor
             // Redo する対象を UndoRedoリストから取得する。
             var cell = this.UndoRedo管理.Redoするセルを取得して返す();
             if( null == cell )
-                return; // なければ中断
+                return; // なければ何もしない。
 
             // Redo を実行する。
             cell.Redoを実行する();
@@ -920,7 +920,7 @@ namespace SSTFEditor
                     }
                     if( pipeStream is null )
                     {
-                        // 接続に失敗した。諦める。
+                        // すべて接続に失敗した。諦める。
                         this._Viewer再生関連GUIのEnabledを設定する();
                         return;
                     }
@@ -981,32 +981,31 @@ namespace SSTFEditor
 
         private void _オプションを設定する()
         {
-            using( var dialog = new オプションダイアログ() )
+            using var dialog = new オプションダイアログ();
+
+            // Config の現在の値をダイアログへ設定する。
+            dialog.checkBoxオートフォーカス.CheckState = ( this.Config.AutoFocus ) ? CheckState.Checked : CheckState.Unchecked;
+            dialog.checkBox最近使用したファイル.CheckState = ( this.Config.ShowRecentUsedFiles ) ? CheckState.Checked : CheckState.Unchecked;
+            dialog.numericUpDown最近使用したファイルの最大表示個数.Value = this.Config.MaxOfUsedRecentFiles;
+            dialog.textBoxViewerPath.Text = this.Config.ViewerPath;
+            dialog.checkBoxSSTF変換通知ダイアログ.CheckState = ( this.Config.DisplaysConfirmOfSSTFConversion ) ? CheckState.Checked : CheckState.Unchecked;
+
+            if( DialogResult.OK == dialog.ShowDialog( this ) )
             {
-                // Config の現在の値をダイアログへ反映する。
-                dialog.checkBoxオートフォーカス.CheckState = ( this.Config.AutoFocus ) ? CheckState.Checked : CheckState.Unchecked;
-                dialog.checkBox最近使用したファイル.CheckState = ( this.Config.ShowRecentUsedFiles ) ? CheckState.Checked : CheckState.Unchecked;
-                dialog.numericUpDown最近使用したファイルの最大表示個数.Value = this.Config.MaxOfUsedRecentFiles;
-                dialog.textBoxViewerPath.Text = this.Config.ViewerPath;
-                dialog.checkBoxSSTF変換通知ダイアログ.CheckState = ( this.Config.DisplaysConfirmOfSSTFConversion ) ? CheckState.Checked : CheckState.Unchecked;
+                // 決定された値をダイアログから Config に反映する。
+                this.Config.AutoFocus = dialog.checkBoxオートフォーカス.Checked;
+                this.Config.ShowRecentUsedFiles = dialog.checkBox最近使用したファイル.Checked;
+                this.Config.MaxOfUsedRecentFiles = (int) dialog.numericUpDown最近使用したファイルの最大表示個数.Value;
+                this.Config.ViewerPath = dialog.textBoxViewerPath.Text;
+                this.Config.DisplaysConfirmOfSSTFConversion = dialog.checkBoxSSTF変換通知ダイアログ.Checked;
 
-                if( DialogResult.OK == dialog.ShowDialog( this ) )
-                {
-                    // 決定された値をダイアログから Config に反映する。
-                    this.Config.AutoFocus = dialog.checkBoxオートフォーカス.Checked;
-                    this.Config.ShowRecentUsedFiles = dialog.checkBox最近使用したファイル.Checked;
-                    this.Config.MaxOfUsedRecentFiles = (int) dialog.numericUpDown最近使用したファイルの最大表示個数.Value;
-                    this.Config.ViewerPath = dialog.textBoxViewerPath.Text;
-                    this.Config.DisplaysConfirmOfSSTFConversion = dialog.checkBoxSSTF変換通知ダイアログ.Checked;
+                this._Viewer再生関連GUIのEnabledを設定する();
 
-                    this._Viewer再生関連GUIのEnabledを設定する();
+                // [ファイル] メニューを修正。
+                this._ConfigのRecentUsedFilesをファイルメニューへ追加する();
 
-                    // [ファイル] メニューを修正。
-                    this._ConfigのRecentUsedFilesをファイルメニューへ追加する();
-
-                    // Config.xml を保存する。
-                    this.Config.保存する( Path.Combine( this._ユーザフォルダパス, Properties.Resources.CONFIG_FILE_NAME ) );
-                }
+                // Config.xml を保存する。
+                this.Config.保存する( Path.Combine( this._ユーザフォルダパス, Properties.Resources.CONFIG_FILE_NAME ) );
             }
 
             // 画面を再描画してダイアログのゴミを消す。
@@ -1015,8 +1014,8 @@ namespace SSTFEditor
 
         private void _バージョンを表示する()
         {
-            using( var dialog = new バージョン表示ダイアログ() )
-                dialog.ShowDialog( this );
+            using var dialog = new バージョン表示ダイアログ();
+            dialog.ShowDialog( this );
         }
 
         private void _小節長倍率を変更する( int 小節番号 )
@@ -1273,7 +1272,7 @@ namespace SSTFEditor
             {
                 this.UndoRedo管理.トランザクション記録を開始する();
 
-                #region " 削除される小節内のチップをすべて削除する。"
+                #region " 削除する小節内のチップをすべて削除する。"
                 //-----------------
                 for( int i = this.譜面.SSTFormatScore.チップリスト.Count - 1; i >= 0; i-- )
                 {
@@ -1376,7 +1375,7 @@ namespace SSTFEditor
         private void _小節の先頭へ移動する( int 小節番号 )
         {
             // 小節番号をクリッピングする。
-            小節番号 = Math.Max( 0, Math.Min( this.譜面.SSTFormatScore.最大小節番号を返す(), 小節番号 ) );
+            小節番号 = Math.Clamp( 小節番号, min: 0, max: this.譜面.SSTFormatScore.最大小節番号を返す() );
 
             // 垂直スクロールバーを移動させると、画面も自動的に移動する。
             var bar = this.vScrollBar譜面用垂直スクロールバー;
@@ -1430,7 +1429,7 @@ namespace SSTFEditor
             #region " ガイド間隔 "
             //-----------------
             this._ガイド間隔を変更する( 16 ); // 初期値は 1/16。
-                                    //-----------------
+            //-----------------
             #endregion
             #region " 譜面拡大率 "
             //-----------------
@@ -1524,7 +1523,7 @@ namespace SSTFEditor
 
                 if( 拡張子 != ".sstf" )
                 {
-                    // [編集中のデータを保存しますか？] ダイアログを表示。
+                    // [SSTF形式に変換しますか？] ダイアログを表示。
                     var result = MessageBox.Show(
                         Properties.Resources.MSG_SSTF形式に変換します,
                         Properties.Resources.MSG_確認ダイアログのタイトル,
@@ -1583,7 +1582,7 @@ namespace SSTFEditor
                 this.textBoxLevel.Text = 譜面.SSTFormatScore.難易度.ToString( "0.00" );
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
-                this.trackBarLevel.Value = Math.Min( Math.Max( (int) ( 譜面.SSTFormatScore.難易度 * 100 ), 0 ), 999 );
+                this.trackBarLevel.Value = Math.Clamp( (int) ( 譜面.SSTFormatScore.難易度 * 100 ), min: 0, max: 999 );
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
                 this.textBox説明.Text = 譜面.SSTFormatScore.説明文;
@@ -1760,9 +1759,9 @@ namespace SSTFEditor
 
                 // ToolStripMenuItem を手動で作って [ファイル] のサブメニューリストに追加する。
                 var item = new ToolStripMenuItem() {
-                    Name = "最近使ったファイル" + i,
+                    Name = $"最近使ったファイル{i}",
                     Size = this.toolStripMenuItem終了.Size,
-                    Text = "&" + i + " " + ファイルパス,
+                    Text = $"&{i} {ファイルパス}",
                     ToolTipText = ファイルパス,
                 };
                 item.Click += new EventHandler( this.toolStripMenuItem最近使ったファイル_Click );
@@ -2339,6 +2338,7 @@ namespace SSTFEditor
                 }
                 //-----------------
                 #endregion
+
                 #region " 譜面表示下辺の位置を更新する。"
                 //-----------------
                 this.譜面.譜面表示下辺の譜面内絶対位置grid =
@@ -2348,6 +2348,7 @@ namespace SSTFEditor
             }
             //-----------------
             #endregion
+            
             #region " 譜面を描画する。"
             //-----------------
             this.譜面.描画する( e.Graphics, this.pictureBox譜面パネル );
@@ -2470,12 +2471,13 @@ namespace SSTFEditor
                 Y = this.pictureBox譜面パネル.Location.Y,
             };
 
-            #region " 見出し＜小節メモ＞を描画する。"
+            #region " [小節メモ] を描画する。"
             //-----------------
             g.DrawString( Properties.Resources.MSG_小節メモ, this._メモ用フォント, Brushes.White, PointF.Add( メモ領域左上隅の位置, new Size( 24, -24 )/*マージン*/ ) );
             //-----------------
             #endregion
-            #region " 小節メモを描画する。"
+
+            #region " 小節メモの内容を描画する。"
             //-----------------
 
             // グリッド値は 上辺＞下辺 なので注意。
@@ -3142,7 +3144,7 @@ namespace SSTFEditor
         {
             #region " ファイルを開くダイアログでファイルを選択する。"
             //-----------------
-            var dialog = new OpenFileDialog() {
+            using var dialog = new OpenFileDialog() {
                 Title = Properties.Resources.MSG_ファイル選択ダイアログのタイトル,
                 Filter = Properties.Resources.MSG_背景動画ファイル選択ダイアログのフィルタ,
                 FilterIndex = 1,
@@ -3229,7 +3231,7 @@ namespace SSTFEditor
         {
             #region " ファイルを開くダイアログでファイルを選択する。"
             //-----------------
-            var dialog = new OpenFileDialog() {
+            using var dialog = new OpenFileDialog() {
                 Title = Properties.Resources.MSG_ファイル選択ダイアログのタイトル,
                 Filter = Properties.Resources.MSG_背景動画ファイル選択ダイアログのフィルタ,
                 FilterIndex = 1,
@@ -3316,7 +3318,7 @@ namespace SSTFEditor
         {
             #region " ファイルを開くダイアログでファイルを選択する。"
             //-----------------
-            var dialog = new OpenFileDialog() {
+            using var dialog = new OpenFileDialog() {
                 Title = Properties.Resources.MSG_ファイル選択ダイアログのタイトル,
                 Filter = Properties.Resources.MSG_背景動画ファイル選択ダイアログのフィルタ,
                 FilterIndex = 1,
@@ -3405,7 +3407,7 @@ namespace SSTFEditor
         {
             #region " ファイルを開くダイアログでファイルを選択する。"
             //-----------------
-            var dialog = new OpenFileDialog() {
+            using var dialog = new OpenFileDialog() {
                 Title = Properties.Resources.MSG_ファイル選択ダイアログのタイトル,
                 Filter = Properties.Resources.MSG_画像ファイル選択ダイアログのフィルタ,
                 FilterIndex = 1,

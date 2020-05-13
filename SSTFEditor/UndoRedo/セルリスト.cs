@@ -30,8 +30,8 @@ namespace SSTFEditor.UndoRedo
         public override void Redoを実行する()
         {
             // 前から順に実行する。
-            foreach( var cell in this.セルs )
-                cell.Redoを実行する();
+            for( int i = 0; i < this.セルs.Count; i++ )
+                this.セルs[ i ].Redoを実行する();
         }
 
         public override void Undoを実行する()

@@ -235,36 +235,35 @@ namespace SSTFEditor
                         eチップ: this.Form.現在のチップ種別,
                         譜面内絶対位置grid: this.現在のチップカーソルの譜面先頭からのガイド単位の位置grid,
                         チップ文字列: チップ内文字列,
-                        音量: this.Form.現在のチップ音量,
+                        音量: this.Form.現在のチップ音量, // 音量変化は未実装
                         BPM: 0.0,
-                        選択確定中: false ); // 音量変化は未実装
-                                        //-----------------
+                        選択確定中: false );
+                    //-----------------
                     #endregion
                 }
                 else
                 {
                     #region " (B) BPM レーンの場合 "
                     //-----------------
-                    using( var dialog = new 数値入力ダイアログ(
+                    using var dialog = new 数値入力ダイアログ(
                         (decimal) this.Form.譜面.譜面内絶対位置gridにおけるBPMを返す( this.現在のチップカーソルの譜面先頭からのガイド単位の位置grid ),
                         0.0001M,
                         1000M,
-                        Properties.Resources.MSG_BPM選択ダイアログの説明文 ) )
-                    {
-                        if( dialog.ShowDialog( this.Form ) != DialogResult.OK )
-                            return;
+                        Properties.Resources.MSG_BPM選択ダイアログの説明文 );
 
-                        double bpm = (double) dialog.数値;
+                    if( dialog.ShowDialog( this.Form ) != DialogResult.OK )
+                        return;
 
-                        this.Form.譜面.チップを配置または置換する(
-                            e編集レーン: 編集レーン種別.BPM,
-                            eチップ: チップ種別.BPM,
-                            譜面内絶対位置grid: this.現在のチップカーソルの譜面先頭からのガイド単位の位置grid,
-                            チップ文字列: bpm.ToString( "###.##" ),
-                            音量: メインフォーム.最大音量,       // BPM チップは常に最大音量枠
-                            BPM: bpm,
-                            選択確定中: false );
-                    }
+                    double bpm = (double) dialog.数値;
+
+                    this.Form.譜面.チップを配置または置換する(
+                        e編集レーン: 編集レーン種別.BPM,
+                        eチップ: チップ種別.BPM,
+                        譜面内絶対位置grid: this.現在のチップカーソルの譜面先頭からのガイド単位の位置grid,
+                        チップ文字列: bpm.ToString( "###.##" ),
+                        音量: メインフォーム.最大音量,       // BPM チップは常に最大音量枠
+                        BPM: bpm,
+                        選択確定中: false );
                     //-----------------
                     #endregion
                 }

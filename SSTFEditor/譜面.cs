@@ -237,7 +237,7 @@ namespace SSTFEditor
 
             // 後処理
 
-            #region " 小節線・拍線チップをすべて削除する。"
+            #region " 小節線・拍線・Unknown チップをすべて削除する。"
             //-----------------
             this.SSTFormatScore.チップリスト.RemoveAll( ( chip ) => (
                 chip.チップ種別 == チップ種別.小節線 || 
@@ -245,6 +245,7 @@ namespace SSTFEditor
                 chip.チップ種別 == チップ種別.Unknown ) );
             //-----------------
             #endregion
+
             #region " チップリストのすべてのチップを、描画用チップに変換する。"
             //----------------
             {
@@ -262,6 +263,7 @@ namespace SSTFEditor
             }
             //----------------
             #endregion
+
             #region " 全チップに対して「譜面内絶対位置grid」を設定する。"
             //-----------------
             {
@@ -270,7 +272,7 @@ namespace SSTFEditor
 
                 foreach( 描画用チップ chip in this.SSTFormatScore.チップリスト )
                 {
-                    // チップの小節番号が現在の小節番号よりも大きい場合、チップが存在する小節に至るまで、「nチップが存在する小節の先頭grid」を更新する。
+                    // チップの小節番号が現在の小節番号よりも大きい場合、チップが存在する小節に至るまで、「チップが存在する小節の先頭grid」を更新する。
                     while( 現在の小節番号 < chip.小節番号 )
                     {
                         double 現在の小節の小節長倍率 = this.SSTFormatScore.小節長倍率を取得する( 現在の小節番号 );
@@ -290,10 +292,8 @@ namespace SSTFEditor
 
         public void SSTFファイルを書き出す( string ファイル名, string ヘッダ行 )
         {
-            using( var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write ) )
-            {
-                スコア.SSTF.出力する( this.SSTFormatScore, fs, $"{ヘッダ行}{Environment.NewLine}" );
-            }
+            using var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write );
+            スコア.SSTF.出力する( this.SSTFormatScore, fs, $"{ヘッダ行}{Environment.NewLine}" );
         }
 
         public void 描画する( Graphics g, Control panel )
@@ -463,6 +463,7 @@ namespace SSTFEditor
             }
             //-----------------
             #endregion
+
             #region " チップを描画。"
             //-----------------
             var チップ描画領域 = new Rectangle();
@@ -481,7 +482,7 @@ namespace SSTFEditor
 
                 if( chip.譜面内絶対位置grid >= パネル上辺の譜面内絶対位置grid )
                     break;      // 描画範囲外（ここで終了）
-                                //-----------------
+                //-----------------
                 #endregion
 
                 int レーン番号 = this.dicレーン番号[ this.dicチップ編集レーン対応表[ chip.チップ種別 ] ];
@@ -499,6 +500,7 @@ namespace SSTFEditor
             }
             //-----------------
             #endregion
+
             #region " レーン名を描画。"
             //-----------------
             var レーン名描画領域下側 = new Rectangle( 0, 10, panel.Width, 譜面.レーン番号表示高さpx );
@@ -543,6 +545,7 @@ namespace SSTFEditor
             }
             //-----------------
             #endregion
+
             #region " カレントラインを描画。"
             //-----------------
             float y = panel.Size.Height - ( (float) ( this.カレントラインの譜面内絶対位置grid - this.譜面表示下辺の譜面内絶対位置grid ) / (float) this.Form.GRID_PER_PIXEL );
@@ -1073,8 +1076,6 @@ namespace SSTFEditor
 
             if( 間隔grid >= this.Form.GRID_PER_PIXEL * 2 )    // 間隔 1px 以下は描画しない。最低2pxから。
             {
-                int 小節長grid = this.小節長をグリッドで返す( 小節番号 );
-
                 for( int i = 0; true; i++ )
                 {
                     int y = 小節の描画領域.Bottom - ( ( i * 間隔grid ) / this.Form.GRID_PER_PIXEL );
@@ -1094,33 +1095,32 @@ namespace SSTFEditor
 
         protected void チップを描画する_通常( Graphics g, チップ種別 eチップ, int 音量, Rectangle チップ描画領域, string チップ内文字列, Color 描画色 )
         {
-            using( var 背景ブラシ = new SolidBrush( 描画色 ) )
-            using( var 明るいペン = new Pen( Color.FromArgb( チップ明影透明度, 描画色 ) ) )
-            using( var 暗いペン = new Pen( Color.FromArgb( チップ暗影透明度, 描画色 ) ) )
+            using var 背景ブラシ = new SolidBrush( 描画色 );
+            using var 明るいペン = new Pen( Color.FromArgb( チップ明影透明度, 描画色 ) );
+            using var 暗いペン = new Pen( Color.FromArgb( チップ暗影透明度, 描画色 ) );
+
+            this.チップ音量に合わせてチップ描画領域を縮小する( 音量, ref チップ描画領域 );
+
+            // チップ本体
+            g.FillRectangle( 背景ブラシ, チップ描画領域 );
+            g.DrawLine( 明るいペン, チップ描画領域.X, チップ描画領域.Y, チップ描画領域.Right, チップ描画領域.Y );
+            g.DrawLine( 明るいペン, チップ描画領域.X, チップ描画領域.Y, チップ描画領域.X, チップ描画領域.Bottom );
+            g.DrawLine( 暗いペン, チップ描画領域.X, チップ描画領域.Bottom, チップ描画領域.Right, チップ描画領域.Bottom );
+            g.DrawLine( 暗いペン, チップ描画領域.Right, チップ描画領域.Bottom, チップ描画領域.Right, チップ描画領域.Y );
+
+            // チップ内文字列
+            if( チップ内文字列.Nullでも空でもない() )
             {
-                this.チップ音量に合わせてチップ描画領域を縮小する( 音量, ref チップ描画領域 );
-
-                // チップ本体
-                g.FillRectangle( 背景ブラシ, チップ描画領域 );
-                g.DrawLine( 明るいペン, チップ描画領域.X, チップ描画領域.Y, チップ描画領域.Right, チップ描画領域.Y );
-                g.DrawLine( 明るいペン, チップ描画領域.X, チップ描画領域.Y, チップ描画領域.X, チップ描画領域.Bottom );
-                g.DrawLine( 暗いペン, チップ描画領域.X, チップ描画領域.Bottom, チップ描画領域.Right, チップ描画領域.Bottom );
-                g.DrawLine( 暗いペン, チップ描画領域.Right, チップ描画領域.Bottom, チップ描画領域.Right, チップ描画領域.Y );
-
-                // チップ内文字列
-                if( チップ内文字列.Nullでも空でもない() )
-                {
-                    var layout = new RectangleF() {
-                        X = チップ描画領域.X,
-                        Y = チップ描画領域.Y,
-                        Width = チップ描画領域.Width,
-                        Height = チップ描画領域.Height,
-                    };
-                    g.DrawString( チップ内文字列, this.チップ内文字列フォント, Brushes.Black, layout, this.チップ内文字列フォーマット );
-                    layout.X--;
-                    layout.Y--;
-                    g.DrawString( チップ内文字列, チップ内文字列フォント, Brushes.White, layout, this.チップ内文字列フォーマット );
-                }
+                var layout = new RectangleF() {
+                    X = チップ描画領域.X,
+                    Y = チップ描画領域.Y,
+                    Width = チップ描画領域.Width,
+                    Height = チップ描画領域.Height,
+                };
+                g.DrawString( チップ内文字列, this.チップ内文字列フォント, Brushes.Black, layout, this.チップ内文字列フォーマット );
+                layout.X--;
+                layout.Y--;
+                g.DrawString( チップ内文字列, チップ内文字列フォント, Brushes.White, layout, this.チップ内文字列フォーマット );
             }
         }
 
@@ -1191,12 +1191,11 @@ namespace SSTFEditor
             チップ描画領域.Width = w / 3;
             チップ描画領域.X += w / 3;
 
-            using( var 背景ブラシ = new SolidBrush( 描画色 ) )
-            using( var 枠ペン = new Pen( Color.Orange ) )
-            {
-                g.FillEllipse( 背景ブラシ, チップ描画領域 );
-                g.DrawEllipse( 枠ペン, チップ描画領域 );
-            }
+            using var 背景ブラシ = new SolidBrush( 描画色 );
+            using var 枠ペン = new Pen( Color.Orange );
+
+            g.FillEllipse( 背景ブラシ, チップ描画領域 );
+            g.DrawEllipse( 枠ペン, チップ描画領域 );
         }
 
         protected void チップ音量に合わせてチップ描画領域を縮小する( int チップ音量, ref Rectangle 描画領域 )

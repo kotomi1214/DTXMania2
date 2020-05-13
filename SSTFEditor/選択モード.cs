@@ -167,83 +167,83 @@ namespace SSTFEditor
 
         public void 検索する()
         {
-            using( var dialog = new 検索条件入力ダイアログ() )
+            using var dialog = new 検索条件入力ダイアログ();
+
+            if( dialog.ShowDialog( this.Form ) != DialogResult.OK )
+                return; // キャンセルされたら何もしない。
+
+            int 開始小節番号 = ( dialog.小節範囲指定CheckBoxがチェックされている ) ? dialog.小節範囲開始番号 : 0;
+            int 終了小節番号 = ( dialog.小節範囲指定CheckBoxがチェックされている ) ? dialog.小節範囲終了番号 : this.Form.譜面.SSTFormatScore.最大小節番号を返す();
+
+            if( 0 > 開始小節番号 )
+                開始小節番号 = 0; // 省略時は 0 とみなす。
+
+            if( 0 > 終了小節番号 )
+                終了小節番号 = this.Form.譜面.SSTFormatScore.最大小節番号を返す();        // 省略時は 最大小節番号とする。
+
+            int 選択チップ数 = 0;
+            try
             {
-                if( dialog.ShowDialog( this.Form ) != DialogResult.OK )
-                    return;
+                this.Form.UndoRedo管理.トランザクション記録を開始する();
 
-                int 開始小節番号 = ( dialog.小節範囲指定CheckBoxがチェックされている ) ? dialog.小節範囲開始番号 : 0;
-                int 終了小節番号 = ( dialog.小節範囲指定CheckBoxがチェックされている ) ? dialog.小節範囲終了番号 : this.Form.譜面.SSTFormatScore.最大小節番号を返す();
-
-                if( 0 > 開始小節番号 )
-                    開始小節番号 = 0; // 省略時は 0 とみなす。
-
-                if( 0 > 終了小節番号 )
-                    終了小節番号 = this.Form.譜面.SSTFormatScore.最大小節番号を返す();        // 省略時は 最大小節番号とする。
-
-                int 選択チップ数 = 0;
-                try
+                foreach( 描画用チップ chip in this.Form.譜面.SSTFormatScore.チップリスト )
                 {
-                    this.Form.UndoRedo管理.トランザクション記録を開始する();
+                    var e編集レーン = this.Form.譜面.dicチップ編集レーン対応表[ chip.チップ種別 ];
 
-                    foreach( 描画用チップ chip in this.Form.譜面.SSTFormatScore.チップリスト )
+                    // 編集レーンを持たないチップは無視する。
+                    if( e編集レーン == 編集レーン種別.Unknown )
+                        continue;
+
+                    if( ( chip.小節番号 >= 開始小節番号 ) && ( chip.小節番号 <= 終了小節番号 ) )
                     {
-                        var e編集レーン = this.Form.譜面.dicチップ編集レーン対応表[ chip.チップ種別 ];
-
-                        if( e編集レーン == 編集レーン種別.Unknown )
-                            continue;   // 編集レーンを持たないチップは無視する。
-
-                        if( ( chip.小節番号 >= 開始小節番号 ) && ( chip.小節番号 <= 終了小節番号 ) )
+                        if( dialog.選択されている( e編集レーン ) || dialog.選択されている( chip.チップ種別 ) )
                         {
-                            if( dialog.選択されている( e編集レーン ) || dialog.選択されている( chip.チップ種別 ) )
-                            {
-                                // チップを選択する。
-                                var chip変更前 = new 描画用チップ( chip );
-                                var cell = new UndoRedo.セル<描画用チップ>(
-                                    所有者ID: null,
-                                    Undoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => { 変更対象.選択が確定している = 変更前.選択が確定している; },
-                                    Redoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => { 変更対象.選択が確定している = true; },
-                                    変更対象: chip,
-                                    変更前の値: chip変更前,
-                                    変更後の値: null );
+                            // チップを選択する。
+                            var chip変更前 = new 描画用チップ( chip );
+                            var cell = new UndoRedo.セル<描画用チップ>(
+                                所有者ID: null,
+                                Undoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => { 変更対象.選択が確定している = 変更前.選択が確定している; },
+                                Redoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => { 変更対象.選択が確定している = true; },
+                                変更対象: chip,
+                                変更前の値: chip変更前,
+                                変更後の値: null );
 
-                                this.Form.UndoRedo管理.セルを追加する( cell );
-                                cell.Redoを実行する();
+                            this.Form.UndoRedo管理.セルを追加する( cell );
+                            cell.Redoを実行する();
 
-                                選択チップ数++;
-                            }
+                            選択チップ数++;
                         }
                     }
                 }
-                finally
-                {
-                    this.Form.UndoRedo管理.トランザクション記録を終了する();
-
-                    this.Form.UndoRedo用GUIのEnabledを設定する();
-                    this.Form.譜面をリフレッシュする();
-                }
-
-                #region " チップ数に応じて結果を表示する。"
-                //-----------------
-                if( 0 < 選択チップ数 )
-                {
-                    this.Form.選択チップの有無に応じて編集用GUIのEnabledを設定する();
-
-                    MessageBox.Show(
-                        選択チップ数 + Properties.Resources.MSG_個のチップが選択されました,
-                        Properties.Resources.MSG_検索結果ダイアログのタイトル,
-                        MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1 );
-                }
-                else
-                {
-                    MessageBox.Show(
-                        Properties.Resources.MSG_該当するチップはありませんでした,
-                        Properties.Resources.MSG_検索結果ダイアログのタイトル,
-                        MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1 );
-                }
-                //-----------------
-                #endregion
             }
+            finally
+            {
+                this.Form.UndoRedo管理.トランザクション記録を終了する();
+
+                this.Form.UndoRedo用GUIのEnabledを設定する();
+                this.Form.譜面をリフレッシュする();
+            }
+
+            #region " チップ数に応じて結果を表示する。"
+            //-----------------
+            if( 0 < 選択チップ数 )
+            {
+                this.Form.選択チップの有無に応じて編集用GUIのEnabledを設定する();
+
+                MessageBox.Show(
+                    選択チップ数 + Properties.Resources.MSG_個のチップが選択されました,
+                    Properties.Resources.MSG_検索結果ダイアログのタイトル,
+                    MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1 );
+            }
+            else
+            {
+                MessageBox.Show(
+                    Properties.Resources.MSG_該当するチップはありませんでした,
+                    Properties.Resources.MSG_検索結果ダイアログのタイトル,
+                    MessageBoxButtons.OK, MessageBoxIcon.Asterisk, MessageBoxDefaultButton.Button1 );
+            }
+            //-----------------
+            #endregion
         }
 
 
@@ -497,6 +497,7 @@ namespace SSTFEditor
                             }
                             //-----------------
                             #endregion
+
                             #region " チップの移動後のレーン番号 から、チップのチップ種別 or 枠外レーン数 を修正する。"
                             //-----------------
                             if( 0 > チップの移動後のレーン番号 )             // 左にはみ出している
@@ -645,8 +646,8 @@ namespace SSTFEditor
         protected void 範囲選択の継続処理( MouseEventArgs e )
         {
             // クリッピング。
-            int Xpt = Math.Min( Math.Max( e.X, 0 ), this.Form.譜面パネルサイズ.Width );
-            int Ypt = Math.Min( Math.Max( e.Y, 0 ), this.Form.譜面パネルサイズ.Height );
+            int Xpt = Math.Clamp( e.X, min: 0, max: this.Form.譜面パネルサイズ.Width );
+            int Ypt = Math.Clamp( e.Y, min: 0, max: this.Form.譜面パネルサイズ.Height );
 
             // ドラッグ終了位置を現在のマウスの位置に更新。
             this.現在の範囲選択用ドラッグ終了位置Xpx = Xpt;
