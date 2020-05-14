@@ -174,10 +174,11 @@
             resources.ApplyResources(this.splitContainer分割パネルコンテナ, "splitContainer分割パネルコンテナ");
             this.splitContainer分割パネルコンテナ.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer分割パネルコンテナ.Name = "splitContainer分割パネルコンテナ";
+            this.splitContainer分割パネルコンテナ.SplitterDistance = 350;
             // 
             // splitContainer分割パネルコンテナ.Panel1
             // 
-            this.splitContainer分割パネルコンテナ.Panel1.Controls.Add(this.tabControl情報タブコンテナ);
+            this.splitContainer分割パネルコンテナ.Panel1.Controls.Add( this.tabControl情報タブコンテナ );
             // 
             // splitContainer分割パネルコンテナ.Panel2
             // 
