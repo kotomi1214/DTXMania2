@@ -1599,9 +1599,6 @@ namespace SSTFEditor
                 this.textBoxメモ.Text = ( this.譜面.SSTFormatScore.小節メモリスト.ContainsKey( 0 ) ) ? this.譜面.SSTFormatScore.AVIリスト[ 0 ] : "";
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();
-                this.textBoxサウンド遅延ms.Text = this.譜面.SSTFormatScore.サウンドデバイス遅延ms.ToString();
-
-                this._次のプロパティ変更がUndoRedoリストに載らないようにする();
                 this.textBoxプレビュー音声.Text = 譜面.SSTFormatScore.プレビュー音声ファイル名;
 
                 this._次のプロパティ変更がUndoRedoリストに載らないようにする();

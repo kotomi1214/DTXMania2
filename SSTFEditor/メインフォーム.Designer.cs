@@ -50,8 +50,6 @@
             this.textBoxLevel = new System.Windows.Forms.TextBox();
             this.trackBarLevel = new System.Windows.Forms.TrackBar();
             this.labelLevel = new System.Windows.Forms.Label();
-            this.textBoxサウンド遅延ms = new System.Windows.Forms.TextBox();
-            this.labelサウンド遅延ms = new System.Windows.Forms.Label();
             this.textBoxメモ = new System.Windows.Forms.TextBox();
             this.numericUpDownメモ用小節番号 = new System.Windows.Forms.NumericUpDown();
             this.labelメモ小節単位 = new System.Windows.Forms.Label();
@@ -217,8 +215,6 @@
             this.tabPage基本情報.Controls.Add(this.textBoxLevel);
             this.tabPage基本情報.Controls.Add(this.trackBarLevel);
             this.tabPage基本情報.Controls.Add(this.labelLevel);
-            this.tabPage基本情報.Controls.Add(this.textBoxサウンド遅延ms);
-            this.tabPage基本情報.Controls.Add(this.labelサウンド遅延ms);
             this.tabPage基本情報.Controls.Add(this.textBoxメモ);
             this.tabPage基本情報.Controls.Add(this.numericUpDownメモ用小節番号);
             this.tabPage基本情報.Controls.Add(this.labelメモ小節単位);
@@ -340,17 +336,6 @@
             // 
             resources.ApplyResources(this.labelLevel, "labelLevel");
             this.labelLevel.Name = "labelLevel";
-            // 
-            // textBoxサウンド遅延ms
-            // 
-            resources.ApplyResources(this.textBoxサウンド遅延ms, "textBoxサウンド遅延ms");
-            this.textBoxサウンド遅延ms.Name = "textBoxサウンド遅延ms";
-            this.textBoxサウンド遅延ms.ReadOnly = true;
-            // 
-            // labelサウンド遅延ms
-            // 
-            resources.ApplyResources(this.labelサウンド遅延ms, "labelサウンド遅延ms");
-            this.labelサウンド遅延ms.Name = "labelサウンド遅延ms";
             // 
             // textBoxメモ
             // 
@@ -1282,8 +1267,6 @@
 		private System.Windows.Forms.ToolStripButton toolStripButton音量UP;
 		private System.Windows.Forms.ToolStripLabel toolStripLabel音量;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator15;
-		private System.Windows.Forms.TextBox textBoxサウンド遅延ms;
-		private System.Windows.Forms.Label labelサウンド遅延ms;
 		private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemガイド間隔36分;
 		private System.Windows.Forms.TextBox textBoxLevel;
 		private System.Windows.Forms.TrackBar trackBarLevel;
