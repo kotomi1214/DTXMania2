@@ -10,6 +10,7 @@
     <Copyright>Copyright (C) 2000 2020 FROM / Kenji Yamazaki</Copyright>
     <Platforms>x64</Platforms>
     <Configurations>Debug;Release</Configurations>
+    <ApplicationIcon>Resources\DTXMania2.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -50,6 +51,21 @@
     <Reference Include="CSCore">
       <HintPath>..\packages-selfbuild\CSCore-netstandard-1.2.1.2\CSCore.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 
   <ItemGroup>

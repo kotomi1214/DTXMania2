@@ -6,10 +6,10 @@ using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows.Forms;
 using SSTFormat.v004;
 using FDK;
-using System.Threading;
 
 namespace SSTFEditor
 {
@@ -108,6 +108,8 @@ namespace SSTFEditor
         public メインフォーム()
         {
             InitializeComponent();
+
+            this.Icon = Properties.Resources.Icon;
 
             this._アプリの起動処理を行う();
         }

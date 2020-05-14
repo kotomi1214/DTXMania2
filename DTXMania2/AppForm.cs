@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using DTXMania2.Properties;
 using FDK;
 
 namespace DTXMania2
@@ -73,6 +74,7 @@ namespace DTXMania2
             this.KeyboardHID = new KeyboardHID();
             this.GameControllersHID = new GameControllersHID( this.Handle );
             this.MidiIns = new MidiIns();
+            this.Icon = Resources.DTXMania2;
         }
 
         /// <summary>
