@@ -206,7 +206,7 @@ namespace DTXMania2.演奏
             {
                 this._システム情報.FPSをカウントしプロパティを更新する();
 
-                #region " オプションが届いていれば、取り出して処理する。"
+                #region " ビュアーモード時、オプションが届いていれば処理する。"
                 //----------------
                 if( Global.Options.ビュアーモードである && OptionsQueue.TryDequeue( out var options ) )
                 {
