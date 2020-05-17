@@ -64,6 +64,7 @@ namespace DTXMania2.ビュアー
             this._達成率表示 = new 達成率表示();
             this._曲別SKILL = new 曲別SKILL();
             this._エキサイトゲージ = new エキサイトゲージ();
+            this._LoadingSpinner = new LoadingSpinner();
 
             this.現在のフェーズ = フェーズ.指示待機;
         }
@@ -72,6 +73,7 @@ namespace DTXMania2.ビュアー
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
+            this._LoadingSpinner.Dispose();
             this._エキサイトゲージ.Dispose();
             this._曲別SKILL.Dispose();
             this._達成率表示.Dispose();
@@ -179,6 +181,7 @@ namespace DTXMania2.ビュアー
                     break;
 
                 case フェーズ.曲読み込み完了待ち:
+                    this._LoadingSpinner.描画する();
                     break;
 
                 case フェーズ.曲読み込み完了:
@@ -322,6 +325,8 @@ namespace DTXMania2.ビュアー
         private readonly 左サイドクリアパネル _左サイドクリアパネル;
 
         private readonly 右サイドクリアパネル _右サイドクリアパネル;
+
+        private readonly LoadingSpinner _LoadingSpinner;
 
 
 

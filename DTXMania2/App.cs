@@ -813,14 +813,17 @@ namespace DTXMania2
                         // オプションを担当ステージに送る。
                         if( options.再生停止 )
                         {
+                            // 停止
                             if( this.ステージ is 演奏.演奏ステージ )
                                 演奏.演奏ステージ.OptionsQueue.Enqueue( options );
                         }
                         else if( options.再生開始 )
                         {
+                            // 停止と
                             if( this.ステージ is 演奏.演奏ステージ )
                                 演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
 
+                            // 開始
                             ビュアー.ビュアーステージ.OptionsQueue.Enqueue( options );
                         }
                         else
