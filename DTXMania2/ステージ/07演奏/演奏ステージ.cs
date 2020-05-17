@@ -113,39 +113,6 @@ namespace DTXMania2.演奏
             //----------------
             #endregion
 
-            #region " WAVを生成する。"
-            //----------------
-            Global.App.WAVキャッシュ.世代を進める();
-
-            Global.App.WAV管理?.Dispose();
-            Global.App.WAV管理 = new WAV管理();
-
-            foreach( var kvp in Global.App.演奏スコア.WAVリスト )
-            {
-                var wavInfo = kvp.Value;
-
-                var path = Path.Combine( Global.App.演奏スコア.PATH_WAV, wavInfo.ファイルパス );
-                Global.App.WAV管理.登録する( kvp.Key, path, wavInfo.多重再生する, wavInfo.BGMである );
-            }
-            //----------------
-            #endregion
-
-            #region " AVIを生成する。"
-            //----------------
-            Global.App.AVI管理?.Dispose();
-            Global.App.AVI管理 = new AVI管理();
-
-            if( userConfig.演奏中に動画を表示する )
-            {
-                foreach( var kvp in Global.App.演奏スコア.AVIリスト )
-                {
-                    var path = Path.Combine( Global.App.演奏スコア.PATH_WAV, kvp.Value );
-                    Global.App.AVI管理.登録する( kvp.Key, path, userConfig.再生速度 );
-                }
-            }
-            //----------------
-            #endregion
-
             this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.演奏開始 : フェーズ.フェードイン;
         }
 
