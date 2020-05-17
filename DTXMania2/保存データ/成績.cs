@@ -113,15 +113,14 @@ namespace DTXMania2
             this._ユーザ設定 = Global.App.ログオン中のユーザ;
 
             this._Record = new RecordDBRecord() {
-                ScorePath = Global.App.演奏譜面.譜面.ScorePath,
+                ScorePath = Global.App.演奏譜面?.譜面.ScorePath ?? "",
                 UserId = this._ユーザ設定.ID!,
                 Score = 0,
                 Achievement = 0.0f,
             };
             this.MaxCombo = 0;
             this.エキサイトゲージ量 = 0.75f;
-            this.総ノーツ数 = this._総ノーツ数を算出して返す( Global.App.演奏スコア, this._ユーザ設定 );
-
+            this.総ノーツ数 = ( Global.App.演奏スコア != null ) ? this._総ノーツ数を算出して返す( Global.App.演奏スコア, this._ユーザ設定 ) : 0;
             this._難易度 = Global.App.演奏スコア?.難易度 ?? 5.0;
             this._判定別ヒット数 = new Dictionary<判定種別, int>();
             foreach( 判定種別? judge in Enum.GetValues( typeof( 判定種別 ) ) )

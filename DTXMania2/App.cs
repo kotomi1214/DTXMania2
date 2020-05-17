@@ -407,7 +407,7 @@ namespace DTXMania2
             {
                 case 起動.起動ステージ stage:
 
-                    #region " 完了 → タイトルステージまたはビュアーステージへ "
+                    #region " 完了 → タイトルステージまたは演奏ステージへ "
                     //----------------
                     if( stage.現在のフェーズ == 起動.起動ステージ.フェーズ.完了 )
                     {
@@ -415,10 +415,11 @@ namespace DTXMania2
 
                         if( Global.Options.ビュアーモードである )
                         {
-                            #region " (A) ビュアーモードならビュアーステージへ "
+                            #region " (A) ビュアーモードなら演奏ステージへ "
                             //----------------
                             Log.Header( "ビュアーステージ" );
 
+                            // AutoPlayer でログイン。
                             if( !Global.App.ユーザリスト.SelectItem( ( user ) => user.ID == "AutoPlayer" ) )
                             {
                                 System.Windows.Forms.MessageBox.Show( "AutoPlayerでのログオンに失敗しました。", "DTXMania2 error" );
@@ -430,7 +431,7 @@ namespace DTXMania2
                                 Log.Info( "AutoPlayer でログオンしました。" );
                             }
 
-                            this.ステージ = new ビュアー.ビュアーステージ();
+                            this.ステージ = new 演奏.演奏ステージ();
                             //----------------
                             #endregion
                         }
@@ -573,7 +574,7 @@ namespace DTXMania2
 
                 case 曲読み込み.曲読み込みステージ stage:
 
-                    #region " 確定 → 演奏ステージへ "
+                    #region " 完了 → 演奏ステージへ "
                     //----------------
                     if( stage.現在のフェーズ == 曲読み込み.曲読み込みステージ.フェーズ.完了 )
                     {
@@ -608,36 +609,14 @@ namespace DTXMania2
                     //----------------
                     #endregion
 
-                    #region " クリア → 結果ステージまたはビュアーステージへ "
+                    #region " クリア → 結果ステージへ "
                     //----------------
                     else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.クリア )
                     {
-                        if( Global.Options.ビュアーモードである )
-                        {
-                            this.ステージ.Dispose();
-
-                            Log.Header( "ビュアーステージ" );
-                            this.ステージ = new ビュアー.ビュアーステージ();
-                        }
-                        else
-                        {
-                            this.ステージ.Dispose();
-
-                            Log.Header( "結果ステージ" );
-                            this.ステージ = new 結果.結果ステージ( stage.成績 );
-                        }
-                    }
-                    //----------------
-                    #endregion
-
-                    #region " 即時終了 → ビュアーステージへ "
-                    //----------------
-                    else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.即時終了 ) // ビュアーモードでのみ設定される
-                    {
                         this.ステージ.Dispose();
 
-                        Log.Header( "ビュアーステージ" );
-                        this.ステージ = new ビュアー.ビュアーステージ();
+                        Log.Header( "結果ステージ" );
+                        this.ステージ = new 結果.結果ステージ( stage.成績 );
                     }
                     //----------------
                     #endregion
@@ -670,22 +649,6 @@ namespace DTXMania2
                         this.ステージ = null;
 
                         this._アプリを終了する();
-                    }
-                    //----------------
-                    #endregion
-
-                    break;
-
-                case ビュアー.ビュアーステージ stage:
-
-                    #region " 曲読み込み完了 → 演奏ステージへ "
-                    //----------------
-                    if( stage.現在のフェーズ == ビュアー.ビュアーステージ.フェーズ.曲読み込み完了 )
-                    {
-                        this.ステージ.Dispose();
-
-                        Log.Header( "演奏ステージ（ビュアーモード）" );
-                        this.ステージ = new 演奏.演奏ステージ();
                     }
                     //----------------
                     #endregion
@@ -813,18 +776,22 @@ namespace DTXMania2
                         // オプションを担当ステージに送る。
                         if( options.再生停止 )
                         {
-                            // 停止
                             if( this.ステージ is 演奏.演奏ステージ )
+                            {
+                                // 停止
                                 演奏.演奏ステージ.OptionsQueue.Enqueue( options );
+                            }
                         }
                         else if( options.再生開始 )
                         {
-                            // 停止と
                             if( this.ステージ is 演奏.演奏ステージ )
+                            {
+                                // 停止と
                                 演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
 
-                            // 開始
-                            ビュアー.ビュアーステージ.OptionsQueue.Enqueue( options );
+                                // 開始
+                                演奏.演奏ステージ.OptionsQueue.Enqueue( options );
+                            }
                         }
                         else
                         {

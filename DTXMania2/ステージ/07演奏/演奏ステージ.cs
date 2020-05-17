@@ -9,6 +9,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 using SSTFormat.v004;
+using System.Threading.Tasks;
 
 namespace DTXMania2.演奏
 {
@@ -22,6 +23,7 @@ namespace DTXMania2.演奏
 
         public enum フェーズ
         {
+            演奏状態初期化,
             フェードイン,
             演奏開始,
             表示,
@@ -30,7 +32,10 @@ namespace DTXMania2.演奏
             キャンセル通知,
             キャンセル時フェードアウト,
             キャンセル完了,
-            即時終了,
+            // 以下、ビュアーモード用。
+            指示待機,
+            曲読み込み開始,
+            曲読み込み完了待ち,
         }
 
         public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.キャンセル完了;
@@ -94,26 +99,13 @@ namespace DTXMania2.演奏
             this._小節線色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.White );
             this._小節線影色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.Blue );
             this._拍線色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.Gray );
-
-            this._フェードインカウンタ = new Counter( 0, 100, 10 );
-
+            this._スコア指定の背景画像 = null!;
+            this._チップの演奏状態 = null!;
+            this._フェードインカウンタ = null!;   // フェードインに入る前に生成（開始）する。
+            this._LoadingSpinner = new LoadingSpinner();
             this.成績 = new 成績();
 
-            #region " スコアに依存するデータを初期化する。"
-            //----------------
-            this._描画開始チップ番号 = -1;
-
-            this._チップの演奏状態 = new Dictionary<チップ, チップの演奏状態>();
-            foreach( var chip in Global.App.演奏スコア.チップリスト )
-                this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
-
-            this._スコア指定の背景画像 = string.IsNullOrEmpty( Global.App.演奏スコア.背景画像ファイル名 ) ?
-                null! :
-                new 画像( Path.Combine( Global.App.演奏スコア.PATH_WAV, Global.App.演奏スコア.背景画像ファイル名 ) );    // PATH_WAV は絶対パス
-            //----------------
-            #endregion
-
-            this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.演奏開始 : フェーズ.フェードイン;
+            this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.演奏状態初期化;
         }
 
         public virtual void Dispose()
@@ -125,7 +117,7 @@ namespace DTXMania2.演奏
             this._描画開始チップ番号 = -1;
 
             //Global.App.WAV管理?.Dispose();	    --> ここではまだ解放しない。
-            Global.App.AVI管理.Dispose();
+            Global.App.AVI管理?.Dispose();
             //----------------
             #endregion
 
@@ -135,6 +127,7 @@ namespace DTXMania2.演奏
             this.キャプチャ画面?.Dispose();
             this._スコア指定の背景画像?.Dispose();
 
+            this._LoadingSpinner.Dispose();
             this._拍線色.Dispose();
             this._小節線影色.Dispose();
             this._小節線色.Dispose();
@@ -173,15 +166,18 @@ namespace DTXMania2.演奏
             {
                 this._システム情報.FPSをカウントしプロパティを更新する();
 
-                #region " ビュアーモード時、オプションが届いていれば処理する。"
+                CommandLineOptions? options = null!;
+
+                #region " 全フェーズ共通：ビュアーモード時、オプションが届いていれば処理する。"
                 //----------------
-                if( Global.Options.ビュアーモードである && OptionsQueue.TryDequeue( out var options ) )
+                if( Global.Options.ビュアーモードである && OptionsQueue.TryDequeue( out options ) )
                 {
                     if( options.再生停止 )
                     {
                         Log.Info( "演奏を即時終了します。" );
-                        Global.App.WAV管理.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
-                        this.現在のフェーズ = フェーズ.即時終了;
+                        Global.App.WAV管理?.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
+                        
+                        this.現在のフェーズ = フェーズ.指示待機;
                     }
                 }
                 //----------------
@@ -192,37 +188,43 @@ namespace DTXMania2.演奏
                 switch( this.現在のフェーズ )
                 {
                     case フェーズ.フェードイン:
+                        #region " フェードインアニメが完了したら演奏開始フェーズへ。"
+                        //----------------
+                        if( this._フェードインカウンタ.終了値に達した )
                         {
-                            if( this._フェードインカウンタ.終了値に達した )
-                            {
-                                Log.Info( "演奏を開始します。" );
-                                this.現在のフェーズ = フェーズ.演奏開始;
-                            }
+                            Log.Info( "演奏を開始します。" );
+                            this.現在のフェーズ = フェーズ.演奏開始;
                         }
+                        //----------------
+                        #endregion
                         break;
 
                     case フェーズ.演奏開始:
+                        #region " 最初から、または途中から演奏を開始し、表示フェーズへ。"
+                        //----------------
+                        this._描画開始チップ番号 = -1; // -1 以外になれば演奏開始。
+
+                        if( Global.Options.ビュアーモードである && 0 <= 演奏ステージ.演奏開始小節番号 )
                         {
-                            this._描画開始チップ番号 = -1; // -1 以外になれば演奏開始。
-
-                            if( Global.Options.ビュアーモードである && 0 <= 演奏ステージ.演奏開始小節番号 )
-                            {
-                                // ビュアーモードの場合、演奏開始小節番号から演奏を開始する。
-                                var 演奏開始時刻sec = this._指定小節へ移動する( 演奏ステージ.演奏開始小節番号 );
-                                Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
-                            }
-                            else
-                            {
-                                // 通常モードの場合、最初から。
-                                this._描画開始チップ番号 = 0;
-                                Global.App.サウンドタイマ.リセットする();
-                            }
-
-                            this.現在のフェーズ = フェーズ.表示;
+                            // ビュアーモードの場合、演奏開始小節番号から演奏を開始する。
+                            var 演奏開始時刻sec = this._指定小節へ移動する( 演奏ステージ.演奏開始小節番号 );
+                            Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
                         }
+                        else
+                        {
+                            // 通常モードの場合、最初から。
+                            this._描画開始チップ番号 = 0;
+                            Global.App.サウンドタイマ.リセットする();
+                        }
+
+                        this.現在のフェーズ = フェーズ.表示;
+                        //----------------
+                        #endregion
                         break;
 
                     case フェーズ.表示:
+                        #region " 入力処理。"
+                        //----------------
                         {
                             // ※注:クリアや失敗の判定は、ここではなく描画側で行っている。
 
@@ -272,7 +274,7 @@ namespace DTXMania2.演奏
                                             ヒット判定バーと描画との時間sec );
 
                                         // 手動演奏なら MISS はエキサイトゲージに反映。
-                                        this.成績.エキサイトゲージを更新する( 判定種別.MISS ); 
+                                        this.成績.エキサイトゲージを更新する( 判定種別.MISS );
                                         return;
                                     }
                                     else
@@ -476,7 +478,7 @@ namespace DTXMania2.演奏
                                         continue;
 
                                     var プロパティs = userConfig.ドラムチッププロパティリスト.チップtoプロパティ.Where( ( kvp ) => ( kvp.Value.ドラム入力種別 == 入力.Type ) );
-                                    
+
                                     if( 0 < プロパティs.Count() )    // 1つだけのはずだが念のため。
                                     {
                                         var laneType = プロパティs.First().Value.表示レーン種別;
@@ -513,7 +515,7 @@ namespace DTXMania2.演奏
 
                                                 // (A) 空打ちチップの指定があるなら、それを発声する。
                                                 if( 0 != zz )
-                                                    Global.App.WAV管理.発声する( zz, prop.チップ種別, prop.発声前消音, prop.消音グループ種別, true );
+                                                    Global.App.WAV管理?.発声する( zz, prop.チップ種別, prop.発声前消音, prop.消音グループ種別, true );
 
                                                 // (B) 空打ちチップの指定がないなら、一番近いチップを検索し、それを発声する。
                                                 else
@@ -556,7 +558,7 @@ namespace DTXMania2.演奏
                                     //----------------
                                     Log.Info( "ESC キーが押されました。演奏を中断します。" );
 
-                                    Global.App.WAV管理.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
+                                    Global.App.WAV管理?.すべての発声を停止する();    // DTXでのBGMサウンドはこっちに含まれる。
 
                                     // 後の処理は描画処理で。
                                     this.現在のフェーズ = フェーズ.キャンセル通知;
@@ -570,7 +572,7 @@ namespace DTXMania2.演奏
                                         #region " Shift+上 → BGMAdjust 増加 "
                                         //----------------
                                         Global.App.演奏譜面.譜面.BGMAdjust += 10; // ms
-                                        Global.App.WAV管理.すべてのBGMの再生位置を移動する( +10.0 / 1000.0 );  // sec
+                                        Global.App.WAV管理?.すべてのBGMの再生位置を移動する( +10.0 / 1000.0 );  // sec
                                         this._BGMAdjustをデータベースに保存する( Global.App.演奏譜面.譜面 );
                                         //----------------
                                         #endregion
@@ -592,7 +594,7 @@ namespace DTXMania2.演奏
                                         #region " Shift+下 → BGMAdjust 減少 "
                                         //----------------
                                         Global.App.演奏譜面.譜面.BGMAdjust -= 10; // ms
-                                        Global.App.WAV管理.すべてのBGMの再生位置を移動する( -10.0 / 1000.0 );  // sec
+                                        Global.App.WAV管理?.すべてのBGMの再生位置を移動する( -10.0 / 1000.0 );  // sec
                                         this._BGMAdjustをデータベースに保存する( Global.App.演奏譜面.譜面 );
                                         //----------------
                                         #endregion
@@ -632,6 +634,57 @@ namespace DTXMania2.演奏
                             //----------------
                             #endregion
                         }
+                        //----------------
+                        #endregion
+                        break;
+
+                    // 以下、ビュアーモード
+
+                    case フェーズ.指示待機:
+                        #region " オプションが届いていれば、取り出して処理する。"
+                        //----------------
+                        if( options?.再生開始 ?? false )
+                        {
+                            if( File.Exists( options.Filename ) )
+                            {
+                                Global.App.演奏譜面 = new 曲.Score() {   // 読み込みに必要な最低減の譜面情報で生成。
+                                    譜面 = new ScoreDBRecord() {
+                                        ScorePath = options.Filename,
+                                    },
+                                };
+                                演奏ステージ.演奏開始小節番号 = options.再生開始小節番号;
+                                演奏ステージ.ビュアーモードでドラム音を再生する = options.ドラム音を発声する;
+
+                                this.現在のフェーズ = フェーズ.曲読み込み開始;
+                            }
+                            else
+                            {
+                                Log.ERROR( $"ファイルが存在しません。[{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( options.Filename )}]" );
+                            }
+                        }
+                        //----------------
+                        #endregion
+                        break;
+
+                    case フェーズ.曲読み込み開始:
+                        #region " 曲読み込みタスクを起動する。"
+                        //----------------
+                        this._曲読み込みタスク = Task.Run( () => {
+                            曲読み込み.曲読み込みステージ.スコアを読み込む();
+                        } );
+
+                        this.現在のフェーズ = フェーズ.曲読み込み完了待ち;
+                        //----------------
+                        #endregion
+                        break;
+
+                    case フェーズ.曲読み込み完了待ち:
+                        #region " 曲読み込みタスクの完了を待つ。"
+                        //----------------
+                        if( this._曲読み込みタスク.IsCompleted )
+                            this.現在のフェーズ = フェーズ.演奏状態初期化;
+                        //----------------
+                        #endregion
                         break;
                 }
             }
@@ -650,6 +703,20 @@ namespace DTXMania2.演奏
 
             switch( this.現在のフェーズ )
             {
+                case フェーズ.演奏状態初期化:
+                    #region " 初期化 "
+                    //----------------
+                    this._演奏状態を初期化する();
+                    this._フェードインカウンタ = new Counter( 0, 100, 10 );
+
+                    this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.演奏開始 : フェーズ.フェードイン;
+
+                    // 描画処理のないフェーズなので、空フレームが表示されないよう、すぐさま次のフェーズを実行する。
+                    this.描画する();
+                    //----------------
+                    #endregion
+                    break;
+
                 case フェーズ.フェードイン:
                 case フェーズ.キャンセル完了:
                     #region " *** "
@@ -813,41 +880,41 @@ namespace DTXMania2.演奏
                                     switch( userConfig.動画の表示サイズ )
                                     {
                                         case 動画の表示サイズ.全画面:
-                                            #region " *** "
-                                            //----------------
-                                            {
-                                                // 100%全体表示
-                                                float w = Global.設計画面サイズ.Width;
-                                                float h = Global.設計画面サイズ.Height;
-                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
-                                            }
-                                            //----------------
-                                            #endregion
-                                            break;
+                                        #region " *** "
+                                        //----------------
+                                        {
+                                            // 100%全体表示
+                                            float w = Global.設計画面サイズ.Width;
+                                            float h = Global.設計画面サイズ.Height;
+                                            video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
+                                        }
+                                        //----------------
+                                        #endregion
+                                        break;
 
                                         case 動画の表示サイズ.中央寄せ:
-                                            #region " *** "
-                                            //----------------
-                                            {
-                                                // 75%縮小表示
-                                                float w = Global.設計画面サイズ.Width;
-                                                float h = Global.設計画面サイズ.Height;
+                                        #region " *** "
+                                        //----------------
+                                        {
+                                            // 75%縮小表示
+                                            float w = Global.設計画面サイズ.Width;
+                                            float h = Global.設計画面サイズ.Height;
 
-                                                // (1) 画面いっぱいに描画。
-                                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                            // (1) 画面いっぱいに描画。
+                                            video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
 
-                                                // (2) ちょっと縮小して描画。
-                                                float 拡大縮小率 = 0.75f;
-                                                float 上移動 = 100.0f;
-                                                video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
-                                                    w * ( 1f - 拡大縮小率 ) / 2f,
-                                                    h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
-                                                    w * 拡大縮小率,
-                                                    h * 拡大縮小率 ) );
-                                            }
-                                            //----------------
-                                            #endregion
-                                            break;
+                                            // (2) ちょっと縮小して描画。
+                                            float 拡大縮小率 = 0.75f;
+                                            float 上移動 = 100.0f;
+                                            video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
+                                                w * ( 1f - 拡大縮小率 ) / 2f,
+                                                h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
+                                                w * 拡大縮小率,
+                                                h * 拡大縮小率 ) );
+                                        }
+                                        //----------------
+                                        #endregion
+                                        break;
                                     }
                                 }
                             }
@@ -970,8 +1037,8 @@ namespace DTXMania2.演奏
                         //----------------
                         if( userConfig.ダーク == ダーク種別.OFF )
                             this._ドラムキットとヒットバー.ドラムキットを進行描画する();
-                    //----------------
-                    #endregion
+                        //----------------
+                        #endregion
 
                         #region " ドラムチップ; クリア判定はこの中。 "
                         //----------------
@@ -979,7 +1046,8 @@ namespace DTXMania2.演奏
 
                             if( this._ドラムチップ.進行描画する( ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx ) )
                             {
-                                this.現在のフェーズ = フェーズ.クリア;
+                                // true が返されたら演奏終了（クリア）
+                                this.現在のフェーズ = (Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.クリア;
                             }
 
                         } );
@@ -1026,35 +1094,38 @@ namespace DTXMania2.演奏
                     break;
 
                 case フェーズ.クリア:
-                    #region " *** "
+                    #region " 背景画像 "
                     //----------------
-                    {
-                        #region " 背景画像 "
-                        //----------------
-                        this._背景画像.描画する( 0f, 0f );
-                        //----------------
-                        #endregion
-                    }
+                    this._背景画像.描画する( 0f, 0f );
                     //----------------
                     #endregion
                     break;
 
                 case フェーズ.キャンセル通知:
-                    #region " *** "
+                    #region " フェードアウト開始 "
                     //----------------
-                    {
-                        #region " フェードアウト開始 "
-                        //----------------
-                        Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
-                        this.現在のフェーズ = フェーズ.キャンセル時フェードアウト;
-                        //----------------
-                        #endregion
-                    }
+                    Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
+                    this.現在のフェーズ = フェーズ.キャンセル時フェードアウト;
                     //----------------
                     #endregion
                     break;
 
-                case フェーズ.即時終了:
+                case フェーズ.指示待機:
+                case フェーズ.曲読み込み開始:
+                    #region " 背景を描画。"
+                    //----------------
+                    this._ビュアーモードの待機時背景を描画する( dc, userConfig );
+                    //----------------
+                    #endregion
+                    break;
+
+                case フェーズ.曲読み込み完了待ち:
+                    #region " 背景とローディング画像を描画。"
+                    //----------------
+                    this._ビュアーモードの待機時背景を描画する( dc, userConfig );
+                    this._LoadingSpinner.描画する();
+                    //----------------
+                    #endregion
                     break;
             }
         }
@@ -1066,7 +1137,7 @@ namespace DTXMania2.演奏
 
         private readonly 画像 _背景画像;
 
-        private readonly 画像 _スコア指定の背景画像;
+        private 画像 _スコア指定の背景画像;
 
         private readonly 曲名パネル _曲名パネル;
 
@@ -1206,7 +1277,7 @@ namespace DTXMania2.演奏
         /// </remarks>
         private int _描画開始チップ番号 = -1;
 
-        private readonly Dictionary<チップ, チップの演奏状態> _チップの演奏状態;
+        private Dictionary<チップ, チップの演奏状態> _チップの演奏状態;
 
         private double _演奏開始からの経過時間secを返す()
             => Global.App.サウンドタイマ.現在時刻sec;
@@ -1348,6 +1419,23 @@ namespace DTXMania2.演奏
             return 演奏開始時刻sec;
         }
 
+        private void _演奏状態を初期化する()
+        {
+            this._描画開始チップ番号 = -1;
+
+            // スコアに依存するデータを初期化する。
+
+            this.成績 = new 成績();
+
+            this._チップの演奏状態 = new Dictionary<チップ, チップの演奏状態>();
+            foreach( var chip in Global.App.演奏スコア.チップリスト )
+                this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
+
+            this._スコア指定の背景画像 = string.IsNullOrEmpty( Global.App.演奏スコア.背景画像ファイル名 ) ?
+                null! :
+                new 画像( Path.Combine( Global.App.演奏スコア.PATH_WAV, Global.App.演奏スコア.背景画像ファイル名 ) );    // PATH_WAV は絶対パス
+        }
+
 
         // フェードイン（キャプチャ画像とステージ画像とのA-B変換）
         // → 既定のアイキャッチを使わないので独自管理する。
@@ -1356,7 +1444,7 @@ namespace DTXMania2.演奏
         /// <summary>
         ///		読み込み画面: 0 ～ 1: 演奏画面
         /// </summary>
-        private readonly Counter _フェードインカウンタ;
+        private Counter _フェードインカウンタ;
 
 
 
@@ -1562,6 +1650,116 @@ namespace DTXMania2.演奏
             }
 
             return 一番近いチップ;
+        }
+
+
+
+        // ビュアーモード
+
+
+        private readonly LoadingSpinner _LoadingSpinner;
+
+        private Task _曲読み込みタスク = null!;
+
+        private void _ビュアーモードの待機時背景を描画する( DeviceContext dc, ユーザ設定 userConfig )
+        {
+            #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
+            //----------------
+            this._左サイドクリアパネル.クリアする();
+            this._左サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+
+                // プレイヤー名
+                this._プレイヤー名表示.進行描画する( dcp );
+
+                // スコア
+                if( userConfig.ダーク == ダーク種別.OFF )
+                    this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
+
+                // 達成率
+                this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
+
+                // 判定パラメータ
+                this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
+
+                // スキル
+                this._曲別SKILL.進行描画する( dcp, 0f );
+
+            } );
+            this._左サイドクリアパネル.描画する();
+            //----------------
+            #endregion
+
+            #region " 右サイドパネルへの描画と、右サイトパネルの表示 "
+            //----------------
+            this._右サイドクリアパネル.クリアする();
+            this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+                // 特になし
+            } );
+            this._右サイドクリアパネル.描画する();
+            //----------------
+            #endregion
+
+            #region " レーンフレーム "
+            //----------------
+            this._レーンフレーム.描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
+            //----------------
+            #endregion
+
+            #region " 背景画像 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._背景画像.描画する( 0f, 0f );
+            //----------------
+            #endregion
+
+            #region " 譜面スクロール速度 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
+            //----------------
+            #endregion
+
+            #region " エキサイトゲージ "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+            //----------------
+            #endregion
+
+            #region " クリアメーター "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._クリアメーター.進行描画する( dc );
+            //----------------
+            #endregion
+
+            #region " フェーズパネル "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._フェーズパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 曲目パネル "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._曲名パネル.描画する( dc );
+            //----------------
+            #endregion
+
+            #region " ヒットバー "
+            //----------------
+            if( userConfig.ダーク != ダーク種別.FULL )
+                this._ドラムキットとヒットバー.ヒットバーを進行描画する();
+            //----------------
+            #endregion
+
+            #region " ドラムキット "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+            //----------------
+            #endregion
         }
     }
 }
