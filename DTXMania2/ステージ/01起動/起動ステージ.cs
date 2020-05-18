@@ -85,31 +85,32 @@ namespace DTXMania2.起動
             switch( this.現在のフェーズ )
             {
                 case フェーズ.開始:
+                {
                     #region " 一度描画処理を通してから（画面を表示させてから）次のフェーズへ。"
                     //----------------
-                    // 次のフェーズへ。
                     this._コンソール表示内容[ this._コンソール表示内容.Count - 1 ] += " done.";
                     this._コンソール表示内容.Add( "Creating global resources..." );
                     this.現在のフェーズ = フェーズ.グローバルリソース生成中;
+                    break;
                     //----------------
                     #endregion
-                    break;
-
+                }
                 case フェーズ.グローバルリソース生成中:
-                    #region " *** "
+                {
+                    #region " グローバルリソースを生成して次のフェーズへ。"
                     //----------------
                     Global.App.グローバルリソースを作成する();
 
-                    // 次のフェーズへ。
                     this._コンソール表示内容[ this._コンソール表示内容.Count - 1 ] += " done.";
                     this._コンソール表示内容.Add( "Creating system sounds..." );
                     this.現在のフェーズ = フェーズ.システムサウンド構築中;
+                    break;
                     //----------------
                     #endregion
-                    break;
-
+                }
                 case フェーズ.システムサウンド構築中:
-                    #region " *** "
+                {
+                    #region " システムサウンドを構築して次のフェーズへ。"
                     //----------------
                     Global.App.システムサウンド.すべて生成する();
                     Log.Info( "システムサウンドの読み込みが完了しました。" );
@@ -117,16 +118,16 @@ namespace DTXMania2.起動
                     Global.App.ドラムサウンド.すべて生成する();
                     Log.Info( "ドラムサウンドの読み込みが完了しました。" );
 
-                    // 次のフェーズへ。
                     this._コンソール表示内容[ this._コンソール表示内容.Count - 1 ] += " done.";
                     this._コンソール表示内容.Add( "Enumeration songs..." );
                     this.現在のフェーズ = フェーズ.曲ツリー構築中;
+                    break;
                     //----------------
                     #endregion
-                    break;
-
+                }
                 case フェーズ.曲ツリー構築中:
-                    #region " *** "
+                {
+                    #region " 曲ツリーを構築して次のフェーズへ。"
                     //----------------
                     if( Global.Options.ビュアーモードである )
                     {
@@ -149,29 +150,39 @@ namespace DTXMania2.起動
 
                     // 次のフェーズへ。
                     this.現在のフェーズ = フェーズ.開始音終了待ち;
+                    break;
                     //----------------
                     #endregion
-                    break;
-
+                }
                 case フェーズ.開始音終了待ち:
-                    #region " 開始音がまだ鳴っていれば、終了するまで待つ。"
+                {
+                    #region " 開始音が鳴り止むのを待って、次のフェーズへ。"
                     //----------------
+                    // 開始音がまだ鳴っていれば、終了するまで待つ。
                     if( !Global.App.システムサウンド.再生中( システムサウンド種別.起動ステージ_開始音 ) )
                     {
                         // 再生が終わったので次のフェーズへ。
                         this.現在のフェーズ = フェーズ.完了;
                     }
+                    break;
                     //----------------
                     #endregion
-                    break;
-
+                }
                 case フェーズ.完了:
+                {
+                    #region " 遷移終了。Appによるステージ遷移を待つ。"
+                    //----------------
                     break;
+                    //----------------
+                    #endregion
+                }
             }
         }
 
         public void 描画する()
         {
+            Global.App.画面をクリアする();
+
             var dc = Global.既定のD2D1DeviceContext;
             dc.Transform = Global.拡大行列DPXtoPX;
 

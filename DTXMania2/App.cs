@@ -557,10 +557,9 @@ namespace DTXMania2
 
                 case オプション設定.オプション設定ステージ stage:
 
-                    #region " キャンセル/完了 → 選曲ステージへ "
+                    #region " 完了 → 選曲ステージへ "
                     //----------------
-                    if( stage.現在のフェーズ == オプション設定.オプション設定ステージ.フェーズ.キャンセル ||
-                        stage.現在のフェーズ == オプション設定.オプション設定ステージ.フェーズ.完了 )
+                    if( stage.現在のフェーズ == オプション設定.オプション設定ステージ.フェーズ.完了 )
                     {
                         this.ステージ.Dispose();
 
@@ -597,7 +596,7 @@ namespace DTXMania2
 
                 case 演奏.演奏ステージ stage:
 
-                    #region " キャンセル → 選曲ステージへ "
+                    #region " キャンセル完了 → 選曲ステージへ "
                     //----------------
                     if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.キャンセル完了 )   // ビュアーモードではこのフェーズにはならない。
                     {
@@ -621,11 +620,21 @@ namespace DTXMania2
                     //----------------
                     #endregion
 
+                    #region " 失敗 → 現在未対応 "
+                    //----------------
+                    else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.失敗 )
+                    {
+                        // todo: 演奏失敗処理の実装
+                        throw new NotImplementedException();
+                    }
+                    //----------------
+                    #endregion
+
                     break;
 
                 case 結果.結果ステージ stage:
 
-                    #region " 確定 → 選曲ステージへ "
+                    #region " 完了 → 選曲ステージへ "
                     //----------------
                     if( stage.現在のフェーズ == 結果.結果ステージ.フェーズ.完了 )
                     {
@@ -662,27 +671,23 @@ namespace DTXMania2
         /// </summary>
         private void _描画する()
         {
-            #region " 画面クリア "
-            //----------------
-            {
-                var d3ddc = Global.D3D11Device1.ImmediateContext;
-
-                // 既定のD3Dレンダーターゲットビューを黒でクリアする。
-                d3ddc.ClearRenderTargetView( Global.既定のD3D11RenderTargetView, Color4.Black );
-
-                // 深度/ステンシルバッファをクリアする。
-                d3ddc.ClearDepthStencilView(
-                    Global.既定のD3D11DepthStencilView,
-                    SharpDX.Direct3D11.DepthStencilClearFlags.Depth | SharpDX.Direct3D11.DepthStencilClearFlags.Stencil,
-                    depth: 1.0f,
-                    stencil: 0 );
-            }
-            //----------------
-            #endregion
-
             this.ステージ?.描画する();
         }
 
+        internal void 画面をクリアする()
+        {
+            var d3ddc = Global.D3D11Device1.ImmediateContext;
+
+            // 既定のD3Dレンダーターゲットビューを黒でクリアする。
+            d3ddc.ClearRenderTargetView( Global.既定のD3D11RenderTargetView, Color4.Black );
+
+            // 深度/ステンシルバッファをクリアする。
+            d3ddc.ClearDepthStencilView(
+                Global.既定のD3D11DepthStencilView,
+                SharpDX.Direct3D11.DepthStencilClearFlags.Depth | SharpDX.Direct3D11.DepthStencilClearFlags.Stencil,
+                depth: 1.0f,
+                stencil: 0 );
+        }
 
 
         // ウィンドウサイズの変更への対応

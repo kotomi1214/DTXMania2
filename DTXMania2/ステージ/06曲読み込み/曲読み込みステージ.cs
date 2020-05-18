@@ -24,7 +24,6 @@ namespace DTXMania2.曲読み込み
             フェードイン,
             表示,
             完了,
-            キャンセル,
         }
 
         public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
@@ -71,7 +70,9 @@ namespace DTXMania2.曲読み込み
             this._舞台画像.ぼかしと縮小を適用する( 0.0 );
             Global.App.アイキャッチ管理.現在のアイキャッチ.オープンする();
 
+            // 最初のフェーズへ。
             this.現在のフェーズ = フェーズ.フェードイン;
+            this._フェーズ完了 = false;
         }
 
         public void Dispose()
@@ -96,6 +97,42 @@ namespace DTXMania2.曲読み込み
 
         public void 進行する()
         {
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.フェードイン:
+                {
+                    #region " フェードインが完了したら次のフェーズへ。"
+                    //----------------
+                    if( this._フェーズ完了 )
+                    {
+                        this.現在のフェーズ = フェーズ.表示;
+                        this._フェーズ完了 = false;
+                    }
+                    break;
+                    //----------------
+                    #endregion
+                }
+                case フェーズ.表示:
+                {
+                    #region " スコアを読み込んで完了フェーズへ。"
+                    //----------------
+                    スコアを読み込む();
+
+                    Global.App.ドラム入力.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
+                    this.現在のフェーズ = フェーズ.完了;
+                    break;
+                    //----------------
+                    #endregion
+                }
+                case フェーズ.完了:
+                {
+                    #region " 遷移終了。Appによるステージ遷移待ち。"
+                    //----------------
+                    break;
+                    //----------------
+                    #endregion
+                }
+            }
         }
 
         public void 描画する()
@@ -103,27 +140,41 @@ namespace DTXMania2.曲読み込み
             var dc = Global.既定のD2D1DeviceContext;
             dc.Transform = Global.拡大行列DPXtoPX;
 
-            this._舞台画像.進行描画する( dc );
-            this._注意文.描画する( 0f, 760f );
-            this._プレビュー画像.描画する();
-            this._難易度.描画する( dc );
-
-            this._曲名を描画する( dc );
-            this._サブタイトルを描画する( dc );
-
             switch( this.現在のフェーズ )
             {
                 case フェーズ.フェードイン:
+                {
+                    #region " 背景画面＆アイキャッチフェードイン "
+                    //----------------
+                    this._舞台画像.進行描画する( dc );
+                    this._注意文.描画する( 0f, 760f );
+                    this._プレビュー画像.描画する();
+                    this._難易度.描画する( dc );
+                    this._曲名を描画する( dc );
+                    this._サブタイトルを描画する( dc );
+
                     Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
                     if( Global.App.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.オープン完了 )
-                        this.現在のフェーズ = フェーズ.表示;
+                        this._フェーズ完了 = true;    // 完了
                     break;
-
+                    //----------------
+                    #endregion
+                }
                 case フェーズ.表示:
-                    スコアを読み込む();
-                    Global.App.ドラム入力.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
-                    this.現在のフェーズ = フェーズ.完了;
+                case フェーズ.完了:
+                {
+                    #region " 背景画面 "
+                    //----------------
+                    this._舞台画像.進行描画する( dc );
+                    this._注意文.描画する( 0f, 760f );
+                    this._プレビュー画像.描画する();
+                    this._難易度.描画する( dc );
+                    this._曲名を描画する( dc );
+                    this._サブタイトルを描画する( dc );
                     break;
+                    //----------------
+                    #endregion
+                }
             }
         }
 
@@ -207,6 +258,8 @@ namespace DTXMania2.曲読み込み
         private readonly プレビュー画像 _プレビュー画像;
 
         private readonly 難易度 _難易度;
+
+        private bool _フェーズ完了;
 
         private void _曲名を描画する( DeviceContext dc )
         {
