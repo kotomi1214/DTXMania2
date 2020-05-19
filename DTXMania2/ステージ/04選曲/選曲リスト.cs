@@ -41,6 +41,8 @@ namespace DTXMania2.選曲
             this._現行化前のノード画像 = new 画像( @"$(Images)\PreviewImageWaitForActivation.png" );
             this._成績アイコン = new 画像( @"$(Images)\SelectStage\RecordIcon.png" );
             this._成績アイコンの矩形リスト = new 矩形リスト( @"$(Images)\SelectStage\RecordIcon.yaml" );
+            this._評価アイコン = new 画像( @"$(Images)\SelectStage\RatingIcon.png" );
+            this._評価アイコンの矩形リスト = new 矩形リスト( @"$(Images)\SelectStage\RatingIcon.yaml" );
             this._達成率ゲージアイコン = new 画像( @"$(Images)\AchivementIcon.png" );
             this._達成率数字画像 = new フォント画像( @"$(Images)\ParameterFont_LargeBoldItalic.png", @"$(Images)\ParameterFont_LargeBoldItalic.yaml", 文字幅補正dpx: -2f, 不透明度: 0.5f );
             this._プレビュー音声 = new プレビュー音声();
@@ -58,6 +60,7 @@ namespace DTXMania2.選曲
             this._プレビュー音声.Dispose();
             this._達成率数字画像.Dispose();
             this._達成率ゲージアイコン.Dispose();
+            this._評価アイコン.Dispose();
             this._成績アイコン.Dispose();
             this._現行化前のノード画像.Dispose();
             this._既定のノード画像.Dispose();
@@ -299,6 +302,10 @@ namespace DTXMania2.選曲
 
         private readonly 矩形リスト _成績アイコンの矩形リスト;
 
+        private readonly 画像 _評価アイコン;
+
+        private readonly 矩形リスト _評価アイコンの矩形リスト;
+
         private readonly 画像 _達成率ゲージアイコン;
 
         private readonly フォント画像 _達成率数字画像;
@@ -475,7 +482,7 @@ namespace DTXMania2.選曲
             //----------------
             #endregion
 
-            #region " 成績 "
+            #region " 成績・評価 "
             //----------------
             if( node is SongNode snode )
             {
@@ -564,6 +571,20 @@ namespace DTXMania2.選曲
                         //----------------
                         #endregion
                     }
+
+                    #region " 評価アイコン "
+                    //----------------
+                    var 評価 = score.譜面の属性?.Rating ?? 0;    // 0～4; nullは0扱い
+
+                    if( 0 < 評価 )
+                    {
+                        this._評価アイコン.描画する(
+                            ノード左上dpx.X + 6f,
+                            ノード左上dpx.Y + 0f,
+                            転送元矩形: this._評価アイコンの矩形リスト[ 評価.ToString() ] );
+                    }
+                    //----------------
+                    #endregion
                 }
             }
             //----------------
