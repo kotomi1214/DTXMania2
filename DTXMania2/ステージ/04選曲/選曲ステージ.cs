@@ -303,15 +303,13 @@ namespace DTXMania2.選曲
             var dc = Global.既定のD2D1DeviceContext;
             dc.Transform = Global.拡大行列DPXtoPX;
 
-            var 曲ツリー = Global.App.曲ツリーリスト.SelectedItem!;
-
             switch( this.現在のフェーズ )
             {
                 case フェーズ.フェードイン:
                 {
                     #region " 背景画面＆フェードイン "
                     //----------------
-                    背景画面を描画する();
+                    this._背景画面を描画する( dc );
 
                     if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.オープン完了 )
                     {
@@ -330,7 +328,7 @@ namespace DTXMania2.選曲
                 {
                     #region " 背景画面 "
                     //----------------
-                    背景画面を描画する();
+                    this._背景画面を描画する( dc );
                     this._システム情報.描画する( dc );
                     break;
                     //----------------
@@ -340,7 +338,7 @@ namespace DTXMania2.選曲
                 {
                     #region " 背景画面＆フェードアウト "
                     //----------------
-                    背景画面を描画する();
+                    this._背景画面を描画する( dc );
 
                     if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.クローズ完了 )
                         this._フェーズ完了 = true;    // 完了
@@ -361,43 +359,6 @@ namespace DTXMania2.選曲
                     #endregion
                 }
             }
-
-            #region " ローカル関数 "
-            //----------------
-            void 背景画面を描画する()
-            {
-                if( 1 >= Global.App.曲ツリーリスト.SelectedItem!.フォーカスリスト.Count )  // どのリストにも、最低減ランダムセレクトノードがある。
-                {
-                    // (A) ノードがない場合 → SongNotFound 画面
-
-                    this._舞台画像.進行描画する( dc );
-                    this._表示方法選択パネル.進行描画する( dc );
-                    this._ステージタイマー.描画する( 1689f, 37f );
-                    this._SongNotFound.描画する( dc, 1150f, 400f );
-                }
-                else
-                {
-                    // (B) ノードがある場合 → 通常の画面
-
-                    this._舞台画像.進行描画する( dc );
-                    this._選曲リスト.進行描画する( dc );
-                    this._その他パネルを描画する( dc );
-                    this._表示方法選択パネル.進行描画する( dc );
-                    this._難易度と成績.描画する( dc, 曲ツリー.フォーカス難易度レベル, 曲ツリー.フォーカスノード! );
-                    this._曲ステータスパネル.描画する( dc, 曲ツリー.フォーカスノード! );
-                    this._プレビュー画像を描画する( 曲ツリー.フォーカスノード! );
-                    this._BPMパネル.描画する( dc, 曲ツリー.フォーカスノード! );
-                    this._曲別スキルと達成率.進行描画する( dc, 曲ツリー.フォーカスノード! );
-                    this._選択曲を囲む枠を描画する( dc );
-                    this._選択曲枠ランナー.進行描画する();
-                    this._導線を描画する( dc );
-                    this._ステージタイマー.描画する( 1689f, 37f );
-                    this._スクロールバーを描画する( dc, 曲ツリー.フォーカスリスト );
-                    this._UpdatingSoglistパネル.進行描画する( 40f, 740f );
-                }
-            }
-            //----------------
-            #endregion
         }
 
 
@@ -435,6 +396,7 @@ namespace DTXMania2.選曲
 
         private bool _フェーズ完了;
 
+
         private void _その他パネルを描画する( DeviceContext dc )
         {
             D2DBatch.Draw( dc, () => {
@@ -470,6 +432,40 @@ namespace DTXMania2.選曲
             } );
         }
 
+        private void _背景画面を描画する( DeviceContext dc )
+        {
+            var 曲ツリー = Global.App.曲ツリーリスト.SelectedItem!;
+
+            if( 1 >= 曲ツリー.フォーカスリスト.Count )  // どのリストにも、最低減ランダムセレクトノードがある。
+            {
+                // (A) ノードがない場合 → SongNotFound 画面
+
+                this._舞台画像.進行描画する( dc );
+                this._表示方法選択パネル.進行描画する( dc );
+                this._ステージタイマー.描画する( 1689f, 37f );
+                this._SongNotFound.描画する( dc, 1150f, 400f );
+            }
+            else
+            {
+                // (B) ノードがある場合 → 通常の画面
+
+                this._舞台画像.進行描画する( dc );
+                this._選曲リスト.進行描画する( dc );
+                this._その他パネルを描画する( dc );
+                this._表示方法選択パネル.進行描画する( dc );
+                this._難易度と成績.描画する( dc, 曲ツリー.フォーカス難易度レベル, 曲ツリー.フォーカスノード! );
+                this._曲ステータスパネル.描画する( dc, 曲ツリー.フォーカスノード! );
+                this._プレビュー画像を描画する( 曲ツリー.フォーカスノード! );
+                this._BPMパネル.描画する( dc, 曲ツリー.フォーカスノード! );
+                this._曲別スキルと達成率.進行描画する( dc, 曲ツリー.フォーカスノード! );
+                this._選択曲を囲む枠を描画する( dc );
+                this._選択曲枠ランナー.進行描画する();
+                this._導線を描画する( dc );
+                this._ステージタイマー.描画する( 1689f, 37f );
+                this._スクロールバーを描画する( dc, 曲ツリー.フォーカスリスト );
+                this._UpdatingSoglistパネル.進行描画する( 40f, 740f );
+            }
+        }
         private void _選択曲を囲む枠を描画する( DeviceContext dc )
         {
             var 矩形 = new RectangleF( 1015f, 485f, 905f, 113f );
