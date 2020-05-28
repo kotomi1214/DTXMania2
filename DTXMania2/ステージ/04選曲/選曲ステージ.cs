@@ -7,6 +7,7 @@ using SharpDX.Animation;
 using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
+using System.Threading.Tasks;
 
 namespace DTXMania2.選曲
 {
@@ -20,6 +21,7 @@ namespace DTXMania2.選曲
         {
             フェードイン,
             表示,
+            QuickConfig,
             フェードアウト,
             確定_選曲,
             確定_設定,
@@ -57,6 +59,7 @@ namespace DTXMania2.選曲
                     "Song not found...\n" +
                     "Hit BDx2 (in default SPACEx2) to select song folders.",
             };
+            this._QuickConfig画面 = null!; // 使用時に生成
             this._フェートアウト後のフェーズ = フェーズ.確定_選曲;
 
             Global.App.システムサウンド.再生する( システムサウンド種別.選曲ステージ_開始音 );
@@ -72,6 +75,7 @@ namespace DTXMania2.選曲
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
+            //this._QuickConfig画面.Dispose(); 使用時に破棄。
             this._SongNotFound.Dispose();
             this._現行化前のノード画像.Dispose();
             this._既定のノード画像.Dispose();
@@ -149,11 +153,22 @@ namespace DTXMania2.選曲
                         {
                             #region " RANDOM SELECT の場合 → ランダムに選曲してフェードアウトへ。"
                             //----------------
+                            // ランダムに選曲する。
+                            var (score, snode) = randomNode.譜面をランダムに選んで返す();
+
+                            // 選択曲の現行化がまだであれば完了を待つ。
+                            if( !snode.現行化済み )
+                            {
+                                this._選曲リスト.指定したノードを優先して現行化する( snode );
+                                while( !snode.現行化済み )
+                                    Task.Delay( 100 );
+                            }
+
                             // 曲ツリーの現行化タスクが動いていれば、一時停止する。
                             Global.App.現行化.一時停止する();
 
-                            // ランダムに選曲する。
-                            Global.App.演奏譜面 = randomNode.譜面をランダムに選んで返す();
+                            // 選曲する。
+                            Global.App.演奏譜面 = score;
 
                             Global.App.システムサウンド.再生する( システムサウンド種別.選曲ステージ_曲決定音 );
                             Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( GO ) );
@@ -168,10 +183,18 @@ namespace DTXMania2.選曲
                         {
                             #region " 曲の場合 → 選曲してフェードアウトへ。"
                             //----------------
+                            // 選択曲の現行化がまだであれば完了を待つ。
+                            if( !snode.現行化済み )
+                            {
+                                this._選曲リスト.フォーカスノードを優先して現行化する();
+                                while( !snode.現行化済み )
+                                    Task.Delay( 100 );
+                            }
+
                             // 曲ツリーの現行化タスクが動いていれば、一時停止する。
                             Global.App.現行化.一時停止する();
 
-                            // 選曲する
+                            // 選曲する。
                             Global.App.演奏譜面 = snode.曲.フォーカス譜面;
 
                             this._選曲リスト.プレビュー音声を停止する();
@@ -258,13 +281,40 @@ namespace DTXMania2.選曲
                     }
                     else if( 入力.シーケンスが入力された( new[] { レーン種別.Bass, レーン種別.Bass }, Global.App.ログオン中のユーザ.ドラムチッププロパティリスト ) )
                     {
-                        #region " BD×2 → オプション設定 "
+                        #region " BD×2 → QuickConfig画面を生成し、QuickConfig フェーズへ "
                         //----------------
-                        this._選曲リスト.プレビュー音声を停止する();
                         Global.App.システムサウンド.再生する( システムサウンド種別.決定音 );
-                        this.現在のフェーズ = フェーズ.確定_設定;
+
+                        this._選曲リスト.フォーカスノードを優先して現行化する();
+
+                        this._QuickConfig画面 = new QuickConfig.QuickConfigパネル(
+                            score: ( フォーカスノード is SongNode snode && null != snode.曲.フォーカス譜面 ) ? snode.曲.フォーカス譜面 : null,
+                            userId: Global.App.ログオン中のユーザ.ID! );
+
+                        this.現在のフェーズ = フェーズ.QuickConfig;
                         //----------------
                         #endregion
+                    }
+                    break;
+                    //----------------
+                    #endregion
+                }
+                case フェーズ.QuickConfig:
+                {
+                    #region " QuickConfig画面を進行する。完了したら次のフェーズへ。"
+                    //----------------
+                    this._QuickConfig画面.進行する();
+
+                    if( this._QuickConfig画面.現在のフェーズ == QuickConfig.QuickConfigパネル.フェーズ.完了_戻る )
+                    {
+                        this._QuickConfig画面.Dispose();
+                        this.現在のフェーズ = フェーズ.表示;
+                    }
+                    else if( this._QuickConfig画面.現在のフェーズ == QuickConfig.QuickConfigパネル.フェーズ.完了_オプション設定 )
+                    {
+                        this._選曲リスト.プレビュー音声を停止する();
+                        this._QuickConfig画面.Dispose();
+                        this.現在のフェーズ = フェーズ.確定_設定;
                     }
                     break;
                     //----------------
@@ -334,6 +384,17 @@ namespace DTXMania2.選曲
                     //----------------
                     #endregion
                 }
+                case フェーズ.QuickConfig:
+                {
+                    #region " 背景画面＆QuickConfig "
+                    //----------------
+                    this._背景画面を描画する( dc );
+                    this._システム情報.描画する( dc );
+                    this._QuickConfig画面.描画する( 568f, 68f );
+                    break;
+                    //----------------
+                    #endregion
+                }
                 case フェーズ.フェードアウト:
                 {
                     #region " 背景画面＆フェードアウト "
@@ -391,6 +452,8 @@ namespace DTXMania2.選曲
         private readonly 曲別スキルと達成率 _曲別スキルと達成率;
 
         private readonly 画像 _ステージタイマー;
+
+        private QuickConfig.QuickConfigパネル _QuickConfig画面;
 
         private フェーズ _フェートアウト後のフェーズ;
 

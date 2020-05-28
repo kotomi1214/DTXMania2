@@ -25,7 +25,7 @@ namespace DTXMania2
         public string UserId { get; set; }
 
         /// <summary>
-        ///     評価値。0～4。
+        ///     評価値。0～5。
         /// </summary>
         public int Rating { get; set; }
 

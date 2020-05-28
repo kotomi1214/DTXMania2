@@ -18,7 +18,7 @@ namespace DTXMania2.曲
         // ランダムセレクト
 
 
-        public Score 譜面をランダムに選んで返す()
+        public (Score 譜面, SongNode 曲) 譜面をランダムに選んで返す()
         {
             for( int retry = 0; retry < 10; retry++ )
             {
@@ -33,7 +33,7 @@ namespace DTXMania2.曲
                 var songNode = songNode配列[ Global.App.乱数.Next( songNode数 ) ] as SongNode;
 
                 if( null != songNode?.曲.フォーカス譜面 )
-                    return songNode.曲.フォーカス譜面;
+                    return (songNode.曲.フォーカス譜面, songNode);
             }
             throw new Exception( "ランダム選曲に失敗しました。" );
         }

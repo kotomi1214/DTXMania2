@@ -141,6 +141,9 @@
     <None Update="Resources\Default\Images\LoadingSpinner.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Default\Images\SelectStage\QuickConfigPanel.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Default\Images\SelectStage\RatingIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
