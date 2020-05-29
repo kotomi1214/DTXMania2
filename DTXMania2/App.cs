@@ -9,6 +9,7 @@ using SharpDX;
 using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
+using System.Linq;
 
 namespace DTXMania2
 {
@@ -498,8 +499,10 @@ namespace DTXMania2
                     //----------------
                     else if( stage.現在のフェーズ == 認証.認証ステージ.フェーズ.完了 )
                     {
-                        // 曲ツリーの現行化を開始する。
-                        Global.App.現行化.開始する( Global.App.曲ツリーリスト.SelectedItem!.ルートノード, Global.App.ログオン中のユーザ );
+                        // すべての曲ツリーの現行化を開始する。
+                        Global.App.現行化.開始する(
+                            Global.App.曲ツリーリスト.Select( ( t ) => t.ルートノード ),
+                            Global.App.ログオン中のユーザ );
 
                         this.ステージ.Dispose();
 

@@ -10,6 +10,7 @@ using SharpDX;
 using SharpDX.DirectWrite;
 using Microsoft.Data.Sqlite;
 using FDK;
+using System.ComponentModel.Design.Serialization;
 
 namespace DTXMania2.曲
 {
@@ -32,8 +33,8 @@ namespace DTXMania2.曲
         /// <summary>
         ///     指定された曲ツリーの現行化を開始する。
         /// </summary>
-        /// <param name="root">曲ツリーのルートノード。</param>
-        public void 開始する( RootNode root, ユーザ設定 userConfig )
+        /// <param name="root">曲ツリーのルートノードのリスト。</param>
+        public void 開始する( IEnumerable<RootNode> roots, ユーザ設定 userConfig )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -42,27 +43,31 @@ namespace DTXMania2.曲
                 this.終了する();
 
                 // 全譜面のユーザ依存の現行化フラグをリセットする（現在のユーザに合わせて現行化しなおすため）。
-                foreach( var node in root.Traverse() )
+                foreach( var root in roots )
                 {
-                    if( node is SongNode snode )
+                    foreach( var node in root.Traverse() )
                     {
-                        snode.現行化済み = false;
-                        foreach( var score in snode.曲.譜面リスト )
+                        if( node is SongNode snode )
                         {
-                            if( score is null )
-                                continue;
-                            score.最高記録 = null;
-                            score.最高記録を現行化済み = false;
-                            score.譜面の属性 = null;
-                            score.譜面の属性を現行化済み = false;
+                            snode.現行化済み = false;
+                            foreach( var score in snode.曲.譜面リスト )
+                            {
+                                if( score is null )
+                                    continue;
+                                score.最高記録 = null;
+                                score.最高記録を現行化済み = false;
+                                score.譜面の属性 = null;
+                                score.譜面の属性を現行化済み = false;
+                            }
                         }
                     }
                 }
 
                 // 全ノードをスタックに投入。
                 this._現行化待ちスタック.Clear();
-                foreach( var node in root.Traverse() )
-                    this._現行化待ちスタック.Push( node );
+                foreach( var root in roots )
+                    foreach( var node in root.Traverse() )
+                        this._現行化待ちスタック.Push( node );
 
                 this._現行化を開始する( userConfig );
 
