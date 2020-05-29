@@ -143,6 +143,7 @@ namespace DTXMania2
             // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
             // ※「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（した場合の挙動は不安定）
             this.サウンドデバイス.音量 = 0.5f;
+            this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
             this.システムサウンド = new システムサウンド( this.サウンドデバイス );  // 個々のサウンドの生成は後工程で。
             this.ドラムサウンド = new ドラムサウンド( this.サウンドデバイス );      // 　　　　　　〃
         }
@@ -157,7 +158,6 @@ namespace DTXMania2
         public void グローバルリソースを作成する()
         {
             this.ドラム入力 = new ドラム入力( Global.AppForm.KeyboardHID, Global.AppForm.GameControllersHID, Global.AppForm.MidiIns );
-            this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
             this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
                 ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( Global.App.サウンドデバイス, path, Global.App.ログオン中のユーザ.再生速度 ),
             };
@@ -195,8 +195,6 @@ namespace DTXMania2
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._パイプラインサーバを終了する();
-
             //this.現行化.終了する();  --> Globalが破棄されるより前に実行する必要があるので、進行描画のメインループの終了箇所（Globalが破棄されるところ）に移動。
 
             this.ステージ?.Dispose();  // 進行描画メインループ終了時にDispose済みだが念のため
@@ -212,7 +210,7 @@ namespace DTXMania2
             this.システムサウンド.Dispose();
             this.サウンドタイマ.Dispose();
             this.サウンドデバイス.Dispose();
-            this.WAVキャッシュ.Dispose();    // WAVキャッシュの破棄は最後に。
+            this.WAVキャッシュ?.Dispose();    // WAVキャッシュの破棄は最後に。
 
             this.システム設定.保存する();
         }
@@ -339,7 +337,7 @@ namespace DTXMania2
                         break;
                     //----------------
                     #endregion
-                    
+
                     #region " 進行・描画する。"
                     //----------------
                     this._進行する();
