@@ -158,7 +158,6 @@ namespace DTXMania2
         {
             this.ドラム入力 = new ドラム入力( Global.AppForm.KeyboardHID, Global.AppForm.GameControllersHID, Global.AppForm.MidiIns );
             this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
-            this.アイキャッチ管理 = new アイキャッチ管理();
             this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
                 ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( Global.App.サウンドデバイス, path, Global.App.ログオン中のユーザ.再生速度 ),
             };
@@ -209,7 +208,6 @@ namespace DTXMania2
             foreach( var tree in this.曲ツリーリスト )
                 tree.Dispose();
 
-            this.アイキャッチ管理.Dispose();
             this.ドラムサウンド.Dispose();
             this.システムサウンド.Dispose();
             this.サウンドタイマ.Dispose();
@@ -300,6 +298,8 @@ namespace DTXMania2
                     Global.生成する( 設計画面サイズ, 物理画面サイズ );
                     画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1 );
 
+                    this.アイキャッチ管理 = new アイキャッチ管理();
+
                     // 1ms ごとに進行描画ループを行うよう仕込む。
                     tick通知 = new AutoResetEvent( false );
                     timer = new QueueTimer( 1, 1, () => tick通知.Set() );   // 1ms ごとに Tick通知を set する
@@ -371,6 +371,8 @@ namespace DTXMania2
 
                     timer.Dispose();
                     tick通知.Dispose();
+
+                    this.アイキャッチ管理.Dispose();
 
                     画像.全インスタンスで共有するリソースを解放する();
                     Global.解放する();
