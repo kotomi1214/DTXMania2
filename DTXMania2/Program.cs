@@ -41,6 +41,36 @@ namespace DTXMania2
                 //----------------
                 #endregion
 
+                #region " AppData/DTXMania2 フォルダがなければ作成する。"
+                //----------------
+                //var AppDataフォルダ名 = Application.UserAppDataPath;  // %USERPROFILE%/AppData/<会社名>/DTXMania2/
+                var AppDataフォルダ名 = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), "DTXMania2" ); // %USERPROFILE%/AppData/DTXMania2/
+
+                if( !( Directory.Exists( AppDataフォルダ名 ) ) )
+                    Directory.CreateDirectory( AppDataフォルダ名 );
+                //----------------
+                #endregion
+
+                #region " ログファイルへのログの複製出力開始。"
+                //----------------
+                {
+                    const int ログファイルの最大保存日数 = 30;
+                    Trace.AutoFlush = true;
+
+                    var ログファイル名 = Log.ログファイル名を生成する(
+                        ログフォルダパス: Path.Combine( AppDataフォルダ名, "Logs" ),
+                        ログファイルの接頭辞: "Log.",
+                        最大保存期間: TimeSpan.FromDays( ログファイルの最大保存日数 ) );
+
+                    // ログファイルをTraceリスナとして追加。
+                    // 以降、Trace（ならびにLogクラス）による出力は、このリスナ（＝ログファイル）にも出力される。
+                    Trace.Listeners.Add( new TraceLogListener( new StreamWriter( ログファイル名, false, Encoding.GetEncoding( "utf-8" ) ) ) );
+
+                    Log.現在のスレッドに名前をつける( "Form" );
+                }
+                //----------------
+                #endregion
+
                 #region " 二重起動チェックまたはオプション送信。"
                 //----------------
                 using( var pipeToViewer = new NamedPipeClientStream( ".", _ビュアー用パイプライン名, PipeDirection.Out ) )
@@ -81,36 +111,6 @@ namespace DTXMania2
                     {
                         // (B) サービスが立ち上がっていない → そのまま起動
                     }
-                }
-                //----------------
-                #endregion
-
-                #region " AppData/DTXMania2 フォルダがなければ作成する。"
-                //----------------
-                //var AppDataフォルダ名 = Application.UserAppDataPath;  // %USERPROFILE%/AppData/<会社名>/DTXMania2/
-                var AppDataフォルダ名 = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), "DTXMania2" ); // %USERPROFILE%/AppData/DTXMania2/
-
-                if( !( Directory.Exists( AppDataフォルダ名 ) ) )
-                    Directory.CreateDirectory( AppDataフォルダ名 );
-                //----------------
-                #endregion
-
-                #region " ログファイルへのログの複製出力開始。"
-                //----------------
-                {
-                    const int ログファイルの最大保存日数 = 30;
-                    Trace.AutoFlush = true;
-
-                    var ログファイル名 = Log.ログファイル名を生成する(
-                        ログフォルダパス: Path.Combine( AppDataフォルダ名, "Logs" ),
-                        ログファイルの接頭辞: "Log.",
-                        最大保存期間: TimeSpan.FromDays( ログファイルの最大保存日数 ) );
-
-                    // ログファイルをTraceリスナとして追加。
-                    // 以降、Trace（ならびにLogクラス）による出力は、このリスナ（＝ログファイル）にも出力される。
-                    Trace.Listeners.Add( new TraceLogListener( new StreamWriter( ログファイル名, false, Encoding.GetEncoding( "utf-8" ) ) ) );
-
-                    Log.現在のスレッドに名前をつける( "Form" );
                 }
                 //----------------
                 #endregion
