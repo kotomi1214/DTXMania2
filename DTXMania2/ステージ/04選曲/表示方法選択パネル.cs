@@ -18,12 +18,14 @@ namespace DTXMania2.選曲
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._現在選択中の論理パネル番号 = 0;
+            this._論理パネル番号 = new TraceValue( Global.Animation, 初期値: 0.0, 切替時間sec: 0.1 );
         }
 
         public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
+
+            this._論理パネル番号.Dispose();
 
             foreach( var p in this._パネルs )
                 p.Dispose();
@@ -34,24 +36,22 @@ namespace DTXMania2.選曲
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する()
         {
             // パネルを合計８枚表示する。（左隠れ１枚 ＋ 表示６枚 ＋ 右隠れ１枚）
 
-            int 表示元の位置 = this._現在選択中の実パネル番号;
-            for( int i = 0; i < 3; i++ )    // 3つ戻る
-                表示元の位置 = ( 表示元の位置 - 1 + this._パネルs.Count ) % this._パネルs.Count;
+            int 論理パネル番号 = (int) Math.Truncate( this._論理パネル番号.現在値 );
+            double 差分 = this._論理パネル番号.現在値 - (double) 論理パネル番号;   // -1.0 < 差分 < 1.0
 
             for( int i = 0; i < 8; i++ )
             {
-                var 画像 = this._パネルs[ 表示元の位置 ].画像;
+                int 実パネル番号 = this._論理パネル番号を実パネル番号に変換して返す( 論理パネル番号 + i - 3 );    // 現在のパネルの3つ前から表示開始。
+                var 画像 = this._パネルs[ 実パネル番号 ].画像;
 
                 const float パネル幅 = 144f;
                 画像.描画する(
-                    左位置: (float) ( 768f + パネル幅 * i ),
+                    左位置: (float) ( 768f + パネル幅 * ( i + 差分 ) ),
                     上位置: ( 3 == i ) ? 90f : 54f ); // i==3 が現在の選択パネル。他より下に描画。
-
-                表示元の位置 = ( 表示元の位置 + 1 ) % this._パネルs.Count;
             }
         }
 
@@ -62,14 +62,14 @@ namespace DTXMania2.選曲
 
         public void 次のパネルを選択する()
         {
-            this._現在選択中の論理パネル番号++;
+            this._論理パネル番号.目標値++;
 
             Global.App.曲ツリーリスト.SelectNext( Loop: true );
         }
 
         public void 前のパネルを選択する()
         {
-            this._現在選択中の論理パネル番号--;
+            this._論理パネル番号.目標値--;
 
             Global.App.曲ツリーリスト.SelectPrev( Loop: true );
         }
@@ -104,10 +104,17 @@ namespace DTXMania2.選曲
             new Panel( @"$(Images)\SelectStage\Sorting_Evaluation.png" ),
         };
 
-        private int _現在選択中の論理パネル番号;
+        private TraceValue _論理パネル番号;
 
-        private int _現在選択中の実パネル番号 => ( 0 <= this._現在選択中の論理パネル番号 ) ?
-            this._現在選択中の論理パネル番号 % this._パネルs.Count :
-            ( this._パネルs.Count + this._現在選択中の論理パネル番号 ) % this._パネルs.Count;
+        private int _論理パネル番号を実パネル番号に変換して返す( int 論理パネル番号 )
+        {
+            return ( 0 <= 論理パネル番号 ) ?
+
+                // 例:パネル数3の場合、正の時: 0,1,2,3,4,5,... → 0,1,2,0,1,2,...
+                論理パネル番号 % this._パネルs.Count :
+
+                // 例:パネル数3の場合、負の時: -5,-4,-3,-2,-1,... → 1,2,0,1,2,...
+                this._パネルs.Count - ( ( -論理パネル番号 ) % this._パネルs.Count ) - 1;
+        }
     }
 }
