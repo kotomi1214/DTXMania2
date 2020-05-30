@@ -159,7 +159,8 @@ namespace DTXMania2.曲
             while( result.Read() )
             {
                 var prop = new ScorePropertiesDBRecord( result );
-                if( Global.App.全譜面リスト.TryGetValue( prop.ScorePath, out Score? score ) )
+                var scores = Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == prop.ScorePath );
+                foreach( var score in scores )
                 {
                     score.譜面の属性 = prop;
                     score.譜面の属性を現行化済み = true;

@@ -290,7 +290,7 @@ namespace DTXMania2.選曲
                         this._選曲リスト.フォーカスノードを優先して現行化する();
 
                         this._QuickConfig画面 = new QuickConfig.QuickConfigパネル(
-                            score: ( フォーカスノード is SongNode snode && null != snode.曲.フォーカス譜面 ) ? snode.曲.フォーカス譜面 : null,
+                            song: ( フォーカスノード is SongNode snode ) ? snode.曲 : null,
                             userId: Global.App.ログオン中のユーザ.ID! );
 
                         this.現在のフェーズ = フェーズ.QuickConfig;

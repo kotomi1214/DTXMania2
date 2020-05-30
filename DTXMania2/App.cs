@@ -42,8 +42,7 @@ namespace DTXMania2
 
         public ユーザ設定 ログオン中のユーザ => this.ユーザリスト.SelectedItem!;
 
-        // [key: 譜面ファイルの絶対パス]
-        public Dictionary<string, Score> 全譜面リスト { get; }
+        public List<Score> 全譜面リスト { get; }
 
         public List<Song> 全曲リスト { get; }
 
@@ -112,7 +111,7 @@ namespace DTXMania2
             this.乱数 = new Random( DateTime.Now.Millisecond );
             this.システム設定 = SystemConfig.読み込む();
             this.ユーザリスト = new SelectableList<ユーザ設定>();
-            this.全譜面リスト = new Dictionary<string, 曲.Score>();
+            this.全譜面リスト = new List<Score>();
             this.全曲リスト = new List<Song>();
             this.曲ツリーリスト = new SelectableList<曲.曲ツリー>();
             this.現行化 = new 曲.現行化();
@@ -727,10 +726,16 @@ namespace DTXMania2
 
             // 評価順曲ツリーを新しい属性にあわせて再構築する。
             var ratingTree = (曲.曲ツリー_評価順) Global.App.曲ツリーリスト[ 1 ];  // [1]評価順
-
+            ratingTree.再構築する();
 
             // すべての曲ツリーの現行化を開始する。
             Global.App.現行化.開始する( roots, Global.App.ログオン中のユーザ );
+
+            // 選択する曲ツリーリストを初期化。
+            foreach( var tree in Global.App.曲ツリーリスト )
+                tree.ルートノード.子ノードリスト.SelectFirst();
+            Global.App.曲ツリーリスト.SelectFirst();
+
 
             // 完了。
             Log.Info( $"{ユーザID} でログオンしました。" );

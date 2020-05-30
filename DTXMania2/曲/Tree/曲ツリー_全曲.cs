@@ -65,20 +65,15 @@ namespace DTXMania2.曲
                 var record = new ScoreDBRecord( result );
 
                 // レコードに記載されているパスが全譜面リストに存在していれば、レコードの内容で更新する。
-                if( Global.App.全譜面リスト.ContainsKey( record.ScorePath ) )
-                {
-                    Global.App.全譜面リスト[ record.ScorePath ].譜面.UpdateFrom( record );
-                }
-                else
-                {
-                    // 存在していない場合は何もしない。（レコードはScoreDBに残ったまま）
-                }
-            }
+                var scores = Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == record.ScorePath );
+                foreach( var score in scores)
+                     score.譜面.UpdateFrom( record );
+             }
 
 
             // (3) 文字列画像のみ生成する。（現行化待ち中に表示されるため）
 
-            foreach( var score in Global.App.全譜面リスト.Values )
+            foreach( var score in Global.App.全譜面リスト )
             {
                 score.タイトル文字列画像 = 現行化.タイトル文字列画像を生成する( score.譜面.Title );
                 score.サブタイトル文字列画像 = 現行化.サブタイトル文字列画像を生成する( score.譜面.Artist );
@@ -226,7 +221,7 @@ namespace DTXMania2.曲
                     for( int i = 0; i < 5; i++ )
                     {
                         if( null != snode.曲.譜面リスト[ i ] )
-                            Global.App.全譜面リスト[ snode.曲.譜面リスト[ i ]!.譜面.ScorePath ] = snode.曲.譜面リスト[ i ]!;
+                            Global.App.全譜面リスト.Add( snode.曲.譜面リスト[ i ]! );
                     }
                 }
             }
