@@ -52,12 +52,12 @@ namespace DTXMania2.曲
 
             // 評価BOX を追加する。
             var ratingBoxLabel = new[] {
-                "評価 ★★★★★",
-                "評価 ★★★★",
-                "評価 ★★★",
-                "評価 ★★",
-                "評価 ★",
                 "評価 なし",
+                "評価 ★",
+                "評価 ★★",
+                "評価 ★★★",
+                "評価 ★★★★",
+                "評価 ★★★★★",
             };
             this._評価BOX = new BoxNode[ 6 ];   // 0～5
             for( int i = 0; i < this._評価BOX.Length; i++ )
@@ -66,7 +66,8 @@ namespace DTXMania2.曲
                 this._評価BOX[ i ].子ノードリスト.Add( new BackNode() { 親ノード = this._評価BOX[ i ] } );
                 this._評価BOX[ i ].子ノードリスト.Add( new RandomSelectNode() { 親ノード = this._評価BOX[ i ] } );
             }
-            this.ルートノード.子ノードリスト.AddRange( this._評価BOX );
+            for( int i = 0; i < this._評価BOX.Length; i++ )
+                this.ルートノード.子ノードリスト.Add( this._評価BOX[ this._評価BOX.Length - 1 - i ] );
 
             // 最初のノードを選択する。
             this.フォーカスリスト.SelectFirst();
