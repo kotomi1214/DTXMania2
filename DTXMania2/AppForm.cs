@@ -221,8 +221,10 @@ namespace DTXMania2
         /// </remarks>
         public void 例外を通知する( Exception e )
         {
+            var ie = new Exception( e.Message + $"\nStackTrace:\n{e.StackTrace}", e );
+
             this.BeginInvoke( new Action( () => {   // UIスレッドで実行する
-                throw e;
+                throw ie;
             } ) );
         }
 

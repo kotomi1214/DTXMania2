@@ -47,6 +47,10 @@ namespace DTXMania2
 
         public List<Song> 全曲リスト { get; }
 
+        /// <summary>
+        ///     曲ツリーのリスト。選曲画面の「表示方法選択パネル」で変更できる。<br/>
+        ///     [0]全曲、[1]評価順 で固定。
+        /// </summary>
         public SelectableList<曲ツリー> 曲ツリーリスト { get; }
 
         public 現行化 現行化 { get; }
@@ -721,7 +725,8 @@ namespace DTXMania2
             Global.App.現行化.リセットする( roots, userConfig );
             Global.App.現行化.すべての譜面について属性を現行化する( userConfig.ID! );
 
-
+            // 評価順曲ツリーを新しい属性にあわせて再構築する。
+            var ratingTree = (曲.曲ツリー_評価順) Global.App.曲ツリーリスト[ 1 ];  // [1]評価順
 
 
             // すべての曲ツリーの現行化を開始する。

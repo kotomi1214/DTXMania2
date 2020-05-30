@@ -8,13 +8,13 @@ using FDK;
 
 namespace DTXMania2.曲
 {
-    class 標準の曲ツリー : 曲ツリー
+    class 曲ツリー_全曲 : 曲ツリー
     {
 
         // 生成と終了
 
 
-        public 標準の曲ツリー()
+        public 曲ツリー_全曲()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
         }

@@ -137,13 +137,17 @@ namespace DTXMania2.起動
                     else
                     {
                         // (B) 通常モードでは曲ツリーの構築を開始する。
-                        var tree = new 曲.標準の曲ツリー();
-
-                        // 標準の曲ツリーは、全曲/全譜面リストも一緒に構築する。
-                        tree.構築する( Global.App.システム設定.曲検索フォルダ );
-
-                        Global.App.曲ツリーリスト.Add( tree );
+                        
+                        var allTree = new 曲.曲ツリー_全曲();
+                        var ratingTree = new 曲.曲ツリー_評価順();
+                        Global.App.曲ツリーリスト.Add( allTree );
+                        Global.App.曲ツリーリスト.Add( ratingTree );
                         Global.App.曲ツリーリスト.SelectFirst();
+
+                        // 全曲ツリーを構築する。（現行化はまだ）
+                        allTree.構築する( Global.App.システム設定.曲検索フォルダ );
+
+                        // 評価順ツリーの構築は、ユーザのログオン時に行う。
 
                         this._コンソール表示内容[ this._コンソール表示内容.Count - 1 ] += " done.";
                     }
