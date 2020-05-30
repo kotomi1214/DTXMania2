@@ -159,7 +159,7 @@ namespace DTXMania2
                     var Total = Math.Round( double.Parse( totalMemoryParts[ 1 ] ) / 1024 / 1024, 0 );
                     var Free = Math.Round( double.Parse( freeMemoryParts[ 1 ] ) / 1024 / 1024, 0 );
 
-                    Log.WriteLine( $"{Total}MB Total physical memory, {Free}MB Free" );
+                    Log.WriteLine( $"{Total}GB Total physical memory, {Free}GB Free" );
                 }
                 //----------------
                 #endregion
