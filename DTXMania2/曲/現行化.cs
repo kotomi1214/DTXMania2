@@ -10,10 +10,18 @@ using SharpDX;
 using SharpDX.DirectWrite;
 using Microsoft.Data.Sqlite;
 using FDK;
-using System.ComponentModel.Design.Serialization;
 
 namespace DTXMania2.曲
 {
+    /// <summary>
+    ///     <see cref="SongNode"/> を現行化する。
+    /// </summary>
+    /// <remarks>
+    ///     現行化とは、仮の初期状態から、最新の完全な状態に更新する処理である。
+    ///     具体的には、DB から作成された <see cref="SongNode"/> の情報を実際のファイルが持つ
+    ///     最新の情報と比較して DB を更新したり、他の DB からデータを読み込んだり、
+    ///     <see cref="SongNode"/> が持つ画像を生成したりする。
+    /// </remarks>
     class 現行化
     {
 
@@ -60,11 +68,17 @@ namespace DTXMania2.曲
             
             await Task.Run( () => {
 
-                var node_array = new Node[ nodeList.Count ];
-                nodeList.CopyTo( node_array, 0 );
+                if( nodeList is Node[] nodeArray )
+                {
+                    this._現行化待ちスタック.PushRange( nodeArray );
+                }
+                else
+                {
+                    var _nodeArray = new Node[ nodeList.Count ];
+                    nodeList.CopyTo( _nodeArray, 0 );
 
-                this._現行化待ちスタック.PushRange( node_array );
-
+                    this._現行化待ちスタック.PushRange( _nodeArray );
+                }
             } );
         }
 
@@ -271,7 +285,7 @@ namespace DTXMania2.曲
 
             this._現行化タスク = Task.Run( async () => {
 
-                //Log.現在のスレッドに名前をつける( "現行化" );  --> await でスレッドが変わることがある
+                //Log.現在のスレッドに名前をつける( "現行化" );  --> await 後にワーカスレッドが変わることがある
                 Log.Info( "現行化タスクを開始しました。" );
 
                 while( !this._タスク終了通知.IsSet )
@@ -299,7 +313,7 @@ namespace DTXMania2.曲
 
         private void _ノードを現行化する( Node node, ユーザ設定 userConfig )
         {
-            #region " 1. 曲の現行化 "
+            #region " 1. ノードが持つ譜面の現行化 "
             //----------------
             if( node is SongNode snode )
             {

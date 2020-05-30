@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using SharpDX;
 using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
-using System.Linq;
 
 namespace DTXMania2
 {
@@ -69,7 +69,7 @@ namespace DTXMania2
         /// </summary>
         /// <remarks>
         ///     <see cref="RandomSelectNode"/> がフォーカスされている場合は、ここには譜面がランダムに設定されるため
-        ///     曲ツリーのフォーカス譜面とは必ずしも一致しないので注意。
+        ///     <see cref="曲ツリー.フォーカスノード"/> の譜面とは必ずしも一致しないので注意。
         /// </remarks>
         public Score 演奏譜面 { get; set; } = null!;
 
@@ -98,23 +98,23 @@ namespace DTXMania2
         ///     コンストラクタ。一部のグローバルリソースを初期化する。
         /// </summary>
         /// <remarks>
-        ///     アプリの表示を高速化するために、コンストラクタでは必要最低限のグローバルリソースだけを生成し、
+        ///     アプリの起動直後の沈黙期間を短縮するために、コンストラクタでは必要最低限のグローバルリソースだけを生成し、
         ///     残りは <see cref="App.グローバルリソースを作成する()"/> メソッドで生成する。
         /// </remarks>
         public App()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            SystemConfig.Update();
-            UserConfig.Update();
+            SystemConfig.最新版にバージョンアップする();
+            UserConfig.最新版にバージョンアップする();
 
             this.乱数 = new Random( DateTime.Now.Millisecond );
             this.システム設定 = SystemConfig.読み込む();
             this.ユーザリスト = new SelectableList<ユーザ設定>();
             this.全譜面リスト = new List<Score>();
             this.全曲リスト = new List<Song>();
-            this.曲ツリーリスト = new SelectableList<曲.曲ツリー>();
-            this.現行化 = new 曲.現行化();
+            this.曲ツリーリスト = new SelectableList<曲ツリー>();
+            this.現行化 = new 現行化();
 
             #region " リソース関連のフォルダ変数を更新する。"
             //----------------
@@ -145,7 +145,7 @@ namespace DTXMania2
 
             this.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
             // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
-            // ※「音量」はコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（した場合の挙動は不安定）
+            // ※サウンドデバイスの音量プロパティはコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（した場合の挙動は不安定）
             this.サウンドデバイス.音量 = 0.5f;
             this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
             this.システムサウンド = new システムサウンド( this.サウンドデバイス );  // 個々のサウンドの生成は後工程で。
@@ -156,7 +156,7 @@ namespace DTXMania2
         ///     残りのグローバルリソースを初期化する。
         /// </summary>
         /// <remarks>
-        ///     アプリの表示を高速化するために、コンストラクタでは必要最低限のグローバルリソースだけを生成し、
+        ///     アプリの起動直後の沈黙期間を短縮するために、コンストラクタでは必要最低限のグローバルリソースだけを生成し、
         ///     残りはこのメソッドで生成する。
         /// </remarks>
         public void グローバルリソースを作成する()
@@ -187,9 +187,9 @@ namespace DTXMania2
             #endregion
 
             // 各DBを最新版にバージョンアップする。
-            ScoreDB.Update();
-            RecordDB.Update();
-            ScorePropertiesDB.Update();
+            ScoreDB.最新版にバージョンアップする();
+            RecordDB.最新版にバージョンアップする();
+            ScorePropertiesDB.最新版にバージョンアップする();
         }
 
         /// <summary>
@@ -304,7 +304,7 @@ namespace DTXMania2
 
                     // 1ms ごとに進行描画ループを行うよう仕込む。
                     tick通知 = new AutoResetEvent( false );
-                    timer = new QueueTimer( 1, 1, () => tick通知.Set() );   // 1ms ごとに Tick通知を set する
+                    timer = new QueueTimer( 1, 1, () => tick通知.Set() );   // 1ms ごとに tick通知を set する
                 }
 
                 var スワップチェーン表示タスク = new PresentSwapChainVSync();
@@ -503,7 +503,7 @@ namespace DTXMania2
                     else if( stage.現在のフェーズ == 認証.認証ステージ.フェーズ.完了 )
                     {
                         // 選択中のユーザでログインする。ログオン中のユーザがあれば先にログオフされる。
-                        Global.App.ログオンする( Global.App.ユーザリスト[ ( (認証.認証ステージ) stage ).現在選択中のユーザ ].ID ?? "AutoPlayer" );
+                        Global.App.ログオンする( Global.App.ユーザリスト[ stage.現在選択中のユーザ ].ID ?? "AutoPlayer" );
 
                         this.ステージ.Dispose();
 
@@ -685,7 +685,7 @@ namespace DTXMania2
             // 既定のD3Dレンダーターゲットビューを黒でクリアする。
             d3ddc.ClearRenderTargetView( Global.既定のD3D11RenderTargetView, Color4.Black );
 
-            // 深度/ステンシルバッファをクリアする。
+            // 既定の深度/ステンシルバッファをクリアする。
             d3ddc.ClearDepthStencilView(
                 Global.既定のD3D11DepthStencilView,
                 SharpDX.Direct3D11.DepthStencilClearFlags.Depth | SharpDX.Direct3D11.DepthStencilClearFlags.Stencil,
@@ -725,7 +725,7 @@ namespace DTXMania2
             Global.App.現行化.すべての譜面について属性を現行化する( userConfig.ID! );
 
             // 評価順曲ツリーを新しい属性にあわせて再構築する。
-            var ratingTree = (曲.曲ツリー_評価順) Global.App.曲ツリーリスト[ 1 ];  // [1]評価順
+            var ratingTree = (曲ツリー_評価順) Global.App.曲ツリーリスト[ 1 ];  // [1]評価順
             ratingTree.再構築する();
 
             // すべての曲ツリーの現行化を開始する。
@@ -823,7 +823,10 @@ namespace DTXMania2
                     try
                     {
                         // パイプラインサーバを起動する。
-                        using var pipeServer = new NamedPipeServerStream( Program._ビュアー用パイプライン名, PipeDirection.In, 2 ); // 再起動の際に一時的に 2 個開く瞬間がある
+                        using var pipeServer = new NamedPipeServerStream(
+                            pipeName: Program._ビュアー用パイプライン名,
+                            direction: PipeDirection.In,
+                            maxNumberOfServerInstances: 2 ); // 再起動の際に一時的に 2 個開く瞬間がある
 
                         // クライアントの接続を待つ。
                         await pipeServer.WaitForConnectionAsync( cancelToken );

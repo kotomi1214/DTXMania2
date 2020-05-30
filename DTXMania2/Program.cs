@@ -175,9 +175,9 @@ namespace DTXMania2
 
                     Folder.フォルダ変数を追加または更新する( "Exe", exePath );
                     Folder.フォルダ変数を追加または更新する( "ResourcesRoot", Path.Combine( exePath, "Resources" ) );
-                    Folder.フォルダ変数を追加または更新する( "DrumSounds", Path.Combine( exePath, @"Resources\Default\DrumSounds" ) );      // Skin.yaml により変更される
-                    Folder.フォルダ変数を追加または更新する( "SystemSounds", Path.Combine( exePath, @"Resources\Default\SystemSounds" ) );  // Skin.yaml により変更される
-                    Folder.フォルダ変数を追加または更新する( "Images", Path.Combine( exePath, @"Resources\Default\Images" ) );              // Skin.yaml により変更される
+                    Folder.フォルダ変数を追加または更新する( "DrumSounds", Path.Combine( exePath, @"Resources\Default\DrumSounds" ) );
+                    Folder.フォルダ変数を追加または更新する( "SystemSounds", Path.Combine( exePath, @"Resources\Default\SystemSounds" ) );
+                    Folder.フォルダ変数を追加または更新する( "Images", Path.Combine( exePath, @"Resources\Default\Images" ) );
                     Folder.フォルダ変数を追加または更新する( "AppData", AppDataフォルダ名 );
                     Folder.フォルダ変数を追加または更新する( "UserProfile", Environment.GetFolderPath( Environment.SpecialFolder.UserProfile ) );
                 }
@@ -190,12 +190,18 @@ namespace DTXMania2
                 Application.SetHighDpiMode( HighDpiMode.SystemAware );
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault( false );
+                
                 AppForm appForm;
                 do
                 {
                     appForm = new AppForm();
+
+                    // アプリのメインループを実行する。
+                    // アプリが終了するまでこのメソッドからは戻ってこない。
                     Application.Run( appForm );
+                
                     appForm.Dispose();
+                
                 } while( appForm.再起動が必要 );  // 戻ってきた際、再起動フラグが立っていたらここでアプリを再起動する。
 
                 #region " 備考: 再起動について "
