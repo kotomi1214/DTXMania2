@@ -54,16 +54,17 @@ namespace DTXMania2.曲
                 this._構築する( path, this.ルートノード );
 
 
-            // (2) 現状の ScoreDB（現行化前）を読み込んで反映する。
+            // (2) 現状の ScoreDB と ScorePropertiesDB（ともに現行化前）を読み込んで反映する。
 
             using var scoredb = new ScoreDB();
+            using var scorePropertiesdb = new ScorePropertiesDB();
             using var query = new SqliteCommand( "SELECT * FROM Scores", scoredb.Connection );  // 全レコード抽出
             var result = query.ExecuteReader();
             while( result.Read() )
             {
                 var record = new ScoreDBRecord( result );
 
-                // レコードに該当する譜面が存在していれば、レコードの内容で更新する。
+                // レコードに記載されているパスが全譜面リストに存在していれば、レコードの内容で更新する。
                 if( Global.App.全譜面リスト.ContainsKey( record.ScorePath ) )
                 {
                     Global.App.全譜面リスト[ record.ScorePath ].譜面.UpdateFrom( record );

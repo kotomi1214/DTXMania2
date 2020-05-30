@@ -605,14 +605,17 @@ namespace DTXMania2.選曲
 
                     #region " 評価アイコン "
                     //----------------
-                    var 評価 = score.譜面の属性?.Rating ?? 0;    // 0～4; nullは0扱い
-
-                    if( 0 < 評価 )
+                    if( score.譜面の属性を現行化済み )
                     {
-                        this._評価アイコン.描画する(
-                            ノード左上dpx.X + 6f,
-                            ノード左上dpx.Y + 0f,
-                            転送元矩形: this._評価アイコンの矩形リスト[ 評価.ToString() ] );
+                        var 評価 = score.譜面の属性?.Rating ?? 0;    // 0～4; nullは0扱い
+
+                        if( 0 < 評価 )
+                        {
+                            this._評価アイコン.描画する(
+                                ノード左上dpx.X + 6f,
+                                ノード左上dpx.Y + 0f,
+                                転送元矩形: this._評価アイコンの矩形リスト[ 評価.ToString() ] );
+                        }
                     }
                     //----------------
                     #endregion

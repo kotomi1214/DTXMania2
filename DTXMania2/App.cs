@@ -421,7 +421,7 @@ namespace DTXMania2
                             Log.Header( "ビュアーステージ" );
 
                             // AutoPlayer でログイン。
-                            if( !Global.App.ユーザリスト.SelectItem( ( user ) => user.ID == "AutoPlayer" ) )
+                            if( !this.ログオンする( "AutoPlay" ) )
                             {
                                 System.Windows.Forms.MessageBox.Show( "AutoPlayerでのログオンに失敗しました。", "DTXMania2 error" );
                                 this.ステージ = null;
@@ -499,10 +499,8 @@ namespace DTXMania2
                     //----------------
                     else if( stage.現在のフェーズ == 認証.認証ステージ.フェーズ.完了 )
                     {
-                        // すべての曲ツリーの現行化を開始する。
-                        Global.App.現行化.開始する(
-                            Global.App.曲ツリーリスト.Select( ( t ) => t.ルートノード ),
-                            Global.App.ログオン中のユーザ );
+                        // 選択中のユーザでログインする。ログオン中のユーザがあれば先にログオフされる。
+                        Global.App.ログオンする( Global.App.ユーザリスト[ ( (認証.認証ステージ) stage ).現在選択中のユーザ ].ID ?? "AutoPlayer" );
 
                         this.ステージ.Dispose();
 
@@ -691,6 +689,68 @@ namespace DTXMania2
                 depth: 1.0f,
                 stencil: 0 );
         }
+
+
+
+        // ログオンとログオフ
+
+
+        /// <summary>
+        ///     指定されたユーザでログオンする。
+        ///     現在ログオン中のユーザがあれば、先にログオフする。
+        /// </summary>
+        /// <param name="ユーザID"></param>
+        /// <returns>ログオンに成功したらtrue。</returns>
+        public bool ログオンする( string ユーザID )
+        {
+            using var _ = new LogBlock( Log.現在のメソッド名 );
+
+            this.ログオフする();
+
+            // 新しいユーザを選択する。
+            if( !Global.App.ユーザリスト.SelectItem( ( user ) => user.ID == ユーザID ) )
+            {
+                Log.ERROR( $"ユーザ「{ユーザID}」のログオンに失敗しました。ユーザが存在しません。" );
+                return false;
+            }
+
+            var userConfig = Global.App.ログオン中のユーザ;
+            var roots = Global.App.曲ツリーリスト.Select( ( t ) => t.ルートノード );
+
+            // すべての曲ツリーのユーザ依存情報をリセットし、属性のみ今ここで現行化する。
+            Global.App.現行化.リセットする( roots, userConfig );
+            Global.App.現行化.すべての譜面について属性を現行化する( userConfig.ID! );
+
+
+
+
+            // すべての曲ツリーの現行化を開始する。
+            Global.App.現行化.開始する( roots, Global.App.ログオン中のユーザ );
+
+            // 完了。
+            Log.Info( $"{ユーザID} でログオンしました。" );
+            return true;
+        }
+
+        /// <summary>
+        ///     現在ログオン中のユーザをログオフする。
+        /// </summary>
+        public void ログオフする()
+        {
+            using var _ = new LogBlock( Log.現在のメソッド名 );
+
+            var userConfig = this.ユーザリスト.SelectedItem;
+            if( null != userConfig )
+            {
+                Global.App.現行化.終了する();
+
+                Log.Info( $"{userConfig.ID} をログオフしました。" );
+            }
+
+            // ユーザを未選択状態へ。
+            Global.App.ユーザリスト.SelectItem( -1 );
+        }
+
 
 
         // ウィンドウサイズの変更への対応
