@@ -7,6 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 using DTXMania2.曲;
+using System.Linq;
 
 namespace DTXMania2.選曲.QuickConfig
 {
@@ -33,9 +34,9 @@ namespace DTXMania2.選曲.QuickConfig
         /// <summary>
         ///     コンストラクタ。
         /// </summary>
-        /// <param name="score">現在選択中のスコア。何も選択されていないなら null 。</param>
+        /// <param name="song">現在選択中の曲。曲以外が選択されているなら null 。</param>
         /// <param name="userId">現在ログイン中のユーザ名。</param>
-        public QuickConfigパネル(Score? score, string userId )
+        public QuickConfigパネル(Song? song, string userId )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -46,6 +47,7 @@ namespace DTXMania2.選曲.QuickConfig
 
             #region "「この曲の評価」"
             //----------------
+            var score = song?.譜面リスト?.FirstOrDefault( ( s ) => s != null );
             if( null != score )
             {
                 this._設定項目リスト.Add(
@@ -60,47 +62,64 @@ namespace DTXMania2.選曲.QuickConfig
                             #region " 属性DBの該当レコードを、更新または新規作成する。"
                             //----------------
                             using var db = new ScorePropertiesDB();
-                            using var cmd = new SqliteCommand( "SELECT * FROM ScoreProperties WHERE ScorePath = @ScorePath AND UserId = @UserId", db.Connection );
-                            cmd.Parameters.AddRange( new[] {
-                                new SqliteParameter( "@ScorePath", score.譜面.ScorePath ),
-                                new SqliteParameter( "@UserId", Global.App.ログオン中のユーザ.ID ),
-                            } );
-                            var result = cmd.ExecuteReader();
-                            if( result.Read() )
+
+                            for( int i = 0; i < song!.譜面リスト!.Length; i++ )
                             {
-                                // (A) 属性DBにレコードがあった → Ratingを更新して書き戻し
-                                score.譜面の属性 = new ScorePropertiesDBRecord( result );
-                                score.譜面の属性.Rating = 新Rating;
-                                score.譜面の属性.InsertTo( db );
-                            }
-                            else
-                            {
-                                // (B) 属性DBにレコードがなかった → レコードを新規生成
-                                var rc = new ScorePropertiesDBRecord() {
-                                    ScorePath = score.譜面.ScorePath,
-                                    UserId = userId,
-                                    Rating = 新Rating,
-                                };
-                                rc.InsertTo( db );
+                                var score = song.譜面リスト[ i ]!;
+
+                                if( null != score )
+                                {
+                                    using var cmd = new SqliteCommand( "SELECT * FROM ScoreProperties WHERE ScorePath = @ScorePath AND UserId = @UserId", db.Connection );
+                                    cmd.Parameters.AddRange( new[] {
+                                        new SqliteParameter( "@ScorePath", score.譜面.ScorePath ),
+                                        new SqliteParameter( "@UserId", Global.App.ログオン中のユーザ.ID ),
+                                    } );
+                                    var result = cmd.ExecuteReader();
+                                    if( result.Read() )
+                                    {
+                                        // (A) 属性DBにレコードがあった → Ratingを更新して書き戻し
+                                        var prop = new ScorePropertiesDBRecord( result );
+                                        prop.Rating = 新Rating;
+                                        prop.InsertTo( db );
+                                    }
+                                    else
+                                    {
+                                        // (B) 属性DBにレコードがなかった → レコードを新規生成
+                                        var rc = new ScorePropertiesDBRecord() {
+                                            ScorePath = score.譜面.ScorePath,
+                                            UserId = userId,
+                                            Rating = 新Rating,
+                                        };
+                                        rc.InsertTo( db );
+                                    }
+                                }
                             }
                             //----------------
                             #endregion
 
                             #region " DBから読み込み済みの属性も、更新または新規作成する。"
                             //----------------
-                            if( score.譜面の属性 is null )
+                            for( int i = 0; i < song!.譜面リスト!.Length; i++ )
                             {
-                                // (A) 新規作成
-                                score.譜面の属性 = new ScorePropertiesDBRecord() {
-                                    ScorePath = score.譜面.ScorePath,
-                                    UserId = userId,
-                                    Rating = list.現在の選択肢番号,
-                                };
-                            }
-                            else
-                            {
-                                // (B) 更新
-                                score.譜面の属性.Rating = list.現在の選択肢番号;
+                                var score = song.譜面リスト[ i ]!;
+
+                                if( null != score )
+                                {
+                                    if( score.譜面の属性 is null )
+                                    {
+                                        // (A) 新規作成
+                                        score.譜面の属性 = new ScorePropertiesDBRecord() {
+                                            ScorePath = score.譜面.ScorePath,
+                                            UserId = userId,
+                                            Rating = list.現在の選択肢番号,
+                                        };
+                                    }
+                                    else
+                                    {
+                                        // (B) 更新
+                                        score.譜面の属性.Rating = list.現在の選択肢番号;
+                                    }
+                                }
                             }
                             //----------------
                             #endregion

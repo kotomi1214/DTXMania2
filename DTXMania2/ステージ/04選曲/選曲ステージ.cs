@@ -154,28 +154,30 @@ namespace DTXMania2.選曲
                             #region " RANDOM SELECT の場合 → ランダムに選曲してフェードアウトへ。"
                             //----------------
                             // ランダムに選曲する。
-                            var (score, snode) = randomNode.譜面をランダムに選んで返す();
-
-                            // 選択曲の現行化がまだであれば完了を待つ。
-                            if( !snode.現行化済み )
+                            var sn = randomNode.譜面をランダムに選んで返す();
+                            if( sn.HasValue )
                             {
-                                this._選曲リスト.指定したノードを優先して現行化する( snode );
-                                while( !snode.現行化済み )
-                                    Task.Delay( 100 );
+                                // 選択曲の現行化がまだであれば完了を待つ。
+                                if( !sn.Value.曲.現行化済み )
+                                {
+                                    this._選曲リスト.指定したノードを優先して現行化する( sn.Value.曲 );
+                                    while( !sn.Value.曲.現行化済み )
+                                        Task.Delay( 100 );
+                                }
+
+                                // 曲ツリーの現行化タスクが動いていれば、一時停止する。
+                                Global.App.現行化.一時停止する();
+
+                                // 選曲する。
+                                Global.App.演奏譜面 = sn.Value.譜面;
+
+                                Global.App.システムサウンド.再生する( システムサウンド種別.選曲ステージ_曲決定音 );
+                                Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( GO ) );
+
+                                // 次のフェーズへ。
+                                this._フェートアウト後のフェーズ = フェーズ.確定_選曲;
+                                this.現在のフェーズ = フェーズ.フェードアウト;
                             }
-
-                            // 曲ツリーの現行化タスクが動いていれば、一時停止する。
-                            Global.App.現行化.一時停止する();
-
-                            // 選曲する。
-                            Global.App.演奏譜面 = score;
-
-                            Global.App.システムサウンド.再生する( システムサウンド種別.選曲ステージ_曲決定音 );
-                            Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( GO ) );
-
-                            // 次のフェーズへ。
-                            this._フェートアウト後のフェーズ = フェーズ.確定_選曲;
-                            this.現在のフェーズ = フェーズ.フェードアウト;
                             //----------------
                             #endregion
                         }
@@ -288,7 +290,7 @@ namespace DTXMania2.選曲
                         this._選曲リスト.フォーカスノードを優先して現行化する();
 
                         this._QuickConfig画面 = new QuickConfig.QuickConfigパネル(
-                            score: ( フォーカスノード is SongNode snode && null != snode.曲.フォーカス譜面 ) ? snode.曲.フォーカス譜面 : null,
+                            song: ( フォーカスノード is SongNode snode ) ? snode.曲 : null,
                             userId: Global.App.ログオン中のユーザ.ID! );
 
                         this.現在のフェーズ = フェーズ.QuickConfig;
@@ -504,7 +506,7 @@ namespace DTXMania2.選曲
                 // (A) ノードがない場合 → SongNotFound 画面
 
                 this._舞台画像.進行描画する( dc );
-                this._表示方法選択パネル.進行描画する( dc );
+                this._表示方法選択パネル.進行描画する();
                 this._ステージタイマー.描画する( 1689f, 37f );
                 this._SongNotFound.描画する( dc, 1150f, 400f );
             }
@@ -515,7 +517,7 @@ namespace DTXMania2.選曲
                 this._舞台画像.進行描画する( dc );
                 this._選曲リスト.進行描画する( dc );
                 this._その他パネルを描画する( dc );
-                this._表示方法選択パネル.進行描画する( dc );
+                this._表示方法選択パネル.進行描画する();
                 this._難易度と成績.描画する( dc, 曲ツリー.フォーカス難易度レベル, 曲ツリー.フォーカスノード! );
                 this._曲ステータスパネル.描画する( dc, 曲ツリー.フォーカスノード! );
                 this._プレビュー画像を描画する( 曲ツリー.フォーカスノード! );
