@@ -68,6 +68,14 @@ namespace DTXMania2.曲
             for( int i = 0; i < this._評価BOX.Length; i++ )
                 this.ルートノード.子ノードリスト.Add( this._評価BOX[ this._評価BOX.Length - 1 - i ] );
 
+            // ここまで追加したすべてのノードの画像を生成する。（現行化待ち中に表示されるため）
+            foreach( var node in this.ルートノード.Traverse() )
+            {
+                node.タイトル文字列画像 = 現行化.タイトル文字列画像を生成する( node.タイトル );
+                node.サブタイトル文字列画像 = 現行化.サブタイトル文字列画像を生成する( node.サブタイトル );
+                node.ノード画像 = 現行化.ノード画像を生成する( node.ノード画像ファイルの絶対パス );
+            }
+
             // 最初のノードを選択する。
             this.フォーカスリスト.SelectFirst();
         }
