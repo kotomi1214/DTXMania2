@@ -91,8 +91,8 @@ namespace FDK
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._ShaderResourceView.Dispose();
-            this.Texture.Dispose();
+            this._ShaderResourceView?.Dispose();    // 画像の生成に失敗した場合、null のままである。
+            this.Texture?.Dispose();                // 
         }
 
 
