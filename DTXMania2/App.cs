@@ -143,12 +143,21 @@ namespace DTXMania2
             Global.App = this;
             Global.Handle = this.Handle;
 
-            
+
+            // サウンドデバイスとサウンドタイマを初期化する。これらは入力で使用されるので先に初期化する。
+
+            this.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
+            // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
+            // ※サウンドデバイスの音量プロパティはコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（した場合の挙動は不安定）
+            this.サウンドデバイス.音量 = 0.5f;
+            this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
+
+
             // 入力デバイスを初期化する。これらは GUI スレッドで行う必要がある。
-            
-            this.KeyboardHID = new KeyboardHID();
-            this.GameControllersHID = new GameControllersHID( this.Handle );
-            this.MidiIns = new MidiIns();
+
+            this.KeyboardHID = new KeyboardHID( this.サウンドタイマ );
+            this.GameControllersHID = new GameControllersHID( this.Handle, this.サウンドタイマ );
+            this.MidiIns = new MidiIns( this.サウンドタイマ );
 
 
             // システム設定ファイルを読み込む。
@@ -201,7 +210,14 @@ namespace DTXMania2
             this.GameControllersHID.Dispose();
             this.KeyboardHID.Dispose();
 
-            
+
+            // サウンドデバイスとサウンドタイマを破棄する。
+
+            this.サウンドタイマ.Dispose();
+            this.サウンドデバイス.Dispose();
+            this.WAVキャッシュ?.Dispose();   // WAVキャッシュの破棄は最後に。
+
+
             // 未初期化状態へ。
 
             this._未初期化 = true;
@@ -286,13 +302,6 @@ namespace DTXMania2
                 画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
 
                 this._システム設定をもとにリソース関連のフォルダ変数を更新する();
-
-                this.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
-                // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
-                // ※サウンドデバイスの音量プロパティはコンストラクタの実行後でないと set できないので、初期化子にはしないこと。（した場合の挙動は不安定）
-                this.サウンドデバイス.音量 = 0.5f;
-
-                this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
 
                 this.システムサウンド = new システムサウンド( this.サウンドデバイス );  // 個々のサウンドの生成は後工程で。
 
@@ -384,12 +393,6 @@ namespace DTXMania2
                 this.ドラムサウンド.Dispose();
 
                 this.システムサウンド.Dispose();
-
-                this.サウンドタイマ.Dispose();
-
-                this.サウンドデバイス.Dispose();
-
-                this.WAVキャッシュ?.Dispose();   // WAVキャッシュの破棄は最後に。
 
                 画像.全インスタンスで共有するリソースを解放する();
 

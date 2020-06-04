@@ -71,9 +71,9 @@ namespace DTXMania2
             InitializeComponent();
 
             this.ScreenMode = new ScreenMode( this );
-            this.KeyboardHID = new KeyboardHID();
-            this.GameControllersHID = new GameControllersHID( this.Handle );
-            this.MidiIns = new MidiIns();
+            this.KeyboardHID = null!;
+            this.GameControllersHID = null!;
+            this.MidiIns = null!;// new MidiIns();
             this.Icon = Resources.DTXMania2;
         }
 
