@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SharpDX.Direct2D1;
+using SharpDX.WIC;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -35,6 +37,23 @@ namespace FDK
             }
         }
 
+        /// <summary>
+        ///     コンストラクタ時点からの相対経過時間[sec]。
+        ///     リセットや一時停止による影響は受けず、単調に増加する。
+        /// </summary>
+        public double 現在のデバイス時刻sec
+        {
+            get
+            {
+                lock( this._スレッド間同期 )
+                {
+                    if( this._SoundDevice.TryGetTarget( out SoundDevice? device ) )
+                        return device.GetDevicePosition();
+
+                    throw new InvalidOperationException( "サウンドデバイスが無効です。" );
+                }
+            }
+        }
 
 
         // 生成と終了
