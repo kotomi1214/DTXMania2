@@ -45,7 +45,7 @@ namespace FDK
                 for( int i = 0; i < sortedDic.Count(); i++ )
                 {
                     var kvp = sortedDic.ElementAt( i );
-                    Debug.Write( $"{kvp.Key}:{1000 * kvp.Value:0.00000}ms({1000 * ( kvp.Value - 直前の時刻 ):0.00000}), " );
+                    Debug.Write( $"{kvp.Key}:{1000 * kvp.Value:0.00000}ms(+{1000 * ( kvp.Value - 直前の時刻 ):0.00000}ms), " );
 
                     直前の時刻 = kvp.Value;
                 }
