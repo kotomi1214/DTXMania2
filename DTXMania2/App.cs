@@ -369,11 +369,90 @@ namespace DTXMania2
                     {
                         case 起動.起動ステージ stage:
                         {
+                            #region " 完了 → タイトルステージまたは演奏ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 起動.起動ステージ.フェーズ.完了 )
+                            {
+                                this.ステージ.Dispose();
+
+                                if( Global.Options.ビュアーモードである )
+                                {
+                                    #region " (A) ビュアーモードなら演奏ステージへ "
+                                    //----------------
+                                    Log.Header( "ビュアーステージ" );
+
+                                    // AutoPlayer でログイン。
+                                    if( !this.ログオンする( "AutoPlay" ) )
+                                    {
+                                        System.Windows.Forms.MessageBox.Show( "AutoPlayerでのログオンに失敗しました。", "DTXMania2 error" );
+                                        this.ステージ = null;
+                                        this._アプリを終了する();
+                                    }
+                                    else
+                                    {
+                                        Log.Info( "AutoPlayer でログオンしました。" );
+                                    }
+
+                                    //TODO: this.ステージ = new 演奏.演奏ステージ();
+                                    //----------------
+                                    #endregion
+                                }
+                                else
+                                {
+                                    #region " (B) 通常時はタイトルステージへ "
+                                    //----------------
+                                    Log.Header( "タイトルステージ" );
+                                    this.ステージ = new タイトル.タイトルステージ();
+                                    //----------------
+                                    #endregion
+                                }
+                            }
+                            //----------------
+                            #endregion
+
                             break;
                         }
+                        case タイトル.タイトルステージ stage:
+                        {
+                            #region " キャンセル → 終了ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == タイトル.タイトルステージ.フェーズ.キャンセル )
+                            {
+                                this.ステージ.Dispose();
 
-                        default:
+                                Log.Header( "終了ステージ" );
+                                this.ステージ = new 終了.終了ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " 完了 → 認証ステージへ "
+                            //----------------
+                            else if( stage.現在のフェーズ == タイトル.タイトルステージ.フェーズ.完了 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "認証ステージ" );
+                                //TODO: this.ステージ = new 認証.認証ステージ();
+                            }
+                            //----------------
+                            #endregion
+
                             break;
+                        }
+                        case 終了.終了ステージ stage:
+                        {
+                            #region " 完了 → アプリ終了 "
+                            //----------------
+                            if( stage.現在のフェーズ == 終了.終了ステージ.フェーズ.完了 )
+                            {
+                                this._アプリを終了する();
+                            }
+                            //----------------
+                            #endregion
+                            
+                            break;
+                        }
                     }
                     //----------------
                     #endregion
