@@ -592,12 +592,12 @@ namespace DTXMania2
         /// <summary>
         ///     各種グローバルリソースを生成する。
         /// </summary>
-        public static void 生成する( App appForm, SharpDX.Size2F 設計画面サイズ, SharpDX.Size2F 物理画面サイズ )
+        public static void 生成する( SharpDX.Size2F 設計画面サイズ, SharpDX.Size2F 物理画面サイズ )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            Global.App = appForm;
-            Global.Handle = appForm.Handle;
+            Debug.Assert( null != Global.App );
+            Debug.Assert( IntPtr.Zero != Global.Handle);
 
             Global.設計画面サイズ = 設計画面サイズ;
             Global.物理画面サイズ = 物理画面サイズ;
