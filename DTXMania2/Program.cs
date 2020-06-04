@@ -42,10 +42,11 @@ namespace DTXMania2
                 //----------------
                 #endregion
 
-                #region " AppData/DTXMania2 フォルダがなければ作成する。"
+                #region " AppData に DTXMania2 フォルダがなければ作成する。"
                 //----------------
-                //var AppDataフォルダ名 = Application.UserAppDataPath;  // %USERPROFILE%/AppData/<会社名>/DTXMania2/
-                var AppDataフォルダ名 = Path.Combine( Environment.GetFolderPath( Environment.SpecialFolder.ApplicationData, Environment.SpecialFolderOption.Create ), "DTXMania2" ); // %USERPROFILE%/AppData/DTXMania2/
+                var AppDataフォルダ名 = Path.Combine( 
+                    Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create ),
+                    "DTXMania2" ); // %USERPROFILE%/AppData/local/DTXMania2/
 
                 if( !( Directory.Exists( AppDataフォルダ名 ) ) )
                     Directory.CreateDirectory( AppDataフォルダ名 );
