@@ -318,10 +318,10 @@ namespace DTXMania2
                 this.ドラム入力 = new ドラム入力( this.KeyboardHID, this.GameControllersHID, this.MidiIns );
 
 
-                // TODO: 最初のステージを生成する。
+                // 最初のステージを生成する。
 
-                //Log.Header( "起動ステージ" );
-                //this.ステージ = new 起動.起動ステージ();
+                Log.Header( "起動ステージ" );
+                this.ステージ = new 起動.起動ステージ();
                 //----------------
                 #endregion
 
@@ -367,6 +367,11 @@ namespace DTXMania2
                     // TODO: ステージの現在のフェーズにより処理分岐。
                     switch( this.ステージ )
                     {
+                        case 起動.起動ステージ stage:
+                        {
+                            break;
+                        }
+
                         default:
                             break;
                     }
@@ -610,7 +615,7 @@ namespace DTXMania2
 
         private async void _パイプラインサーバを起動する()
         {
-            using var _ = new LogBlock( Log.現在のメソッド名 );
+            //using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._PipeServerCancellationTokenSource?.Dispose();
             this._PipeServerCancellationTokenSource = new CancellationTokenSource();
