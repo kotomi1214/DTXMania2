@@ -19,21 +19,25 @@ namespace DTXMania2
         /// <summary>
         ///     メインフォームインスタンスへの参照。
         /// </summary>
-        public static AppForm AppForm { get; set; } = null!;
+        public static App App { get; set; } = null!;
 
         /// <summary>
         ///     メインフォームインスタンスのウィンドウハンドル。
         /// </summary>
         /// <remarks>
-        ///     <see cref="AppForm.Handle"/> と同じ値であるが、GUIスレッド 以 外 のスレッドから参照する場合は、
-        ///     <see cref="AppForm.Handle"/> ではなくこのメンバを参照すること。
-        ///     （<see cref="DTXMania2.AppForm"/> のメンバはすべて、必ずGUIスレッドから参照されなれければならないため。）
+        ///     <see cref="DTXMania2.App.Handle"/> メンバと同じ値であるが、GUIスレッド 以 外 のスレッドから参照する場合は、
+        ///     <see cref="DTXMania2.App.Handle"/> ではなくこのメンバを参照すること。
+        ///     （<see cref="DTXMania2.App"/> のメンバはすべて、必ずGUIスレッドから参照されなれければならないため。）
         /// </remarks>
         public static IntPtr Handle { get; set; } = IntPtr.Zero;
 
         /// <summary>
         ///     アプリ起動時のコマンドラインオプション。
         /// </summary>
+        /// <remarks>
+        ///     <see cref="Program.Main(string[])"/> の引数から生成される。
+        ///     YAML化することで、ビュアーモードで起動中の DTXMania2 のパイプラインサーバに送信する事が可能。
+        /// </remarks>
         public static CommandLineOptions Options { get; set; } = null!;
 
         /// <summary>
@@ -68,11 +72,11 @@ namespace DTXMania2
         /// <summary>
         ///     各種グローバルリソースを生成する。
         /// </summary>
-        public static void 生成する( AppForm appForm, SharpDX.Size2F 設計画面サイズ, SharpDX.Size2F 物理画面サイズ )
+        public static void 生成する( App appForm, SharpDX.Size2F 設計画面サイズ, SharpDX.Size2F 物理画面サイズ )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            Global.AppForm = appForm;
+            Global.App = appForm;
             Global.Handle = appForm.Handle;
 
             Global.設計画面サイズ = 設計画面サイズ;

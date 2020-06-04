@@ -198,10 +198,10 @@ namespace DTXMania2
                 Application.SetHighDpiMode( HighDpiMode.SystemAware );
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault( false );
-                AppForm appForm;
+                App appForm;
                 do
                 {
-                    appForm = new AppForm();
+                    appForm = new App();
 
                     // アプリのメインループを実行する。
                     // アプリが終了するまでこのメソッドからは戻ってこない。

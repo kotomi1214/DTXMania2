@@ -12,7 +12,7 @@ using FDK;
 
 namespace DTXMania2
 {
-    public partial class AppForm : Form
+    public partial class App : Form
     {
 
         // プロパティ
@@ -22,7 +22,7 @@ namespace DTXMania2
         ///     アプリケーション再起動指示フラグ。
         /// </summary>
         /// <remarks>
-        ///     <see cref="AppForm"/> インスタンスの終了時にこのフラグが true になっている場合には、
+        ///     <see cref="App"/> インスタンスの終了時にこのフラグが true になっている場合には、
         ///     このインスタンスの保持者（おそらくProgramクラス）は適切に再起動を行うこと。
         /// </remarks>
         public bool 再起動が必要 { get; protected set; } = false;
@@ -35,7 +35,7 @@ namespace DTXMania2
         /// <summary>
         ///     コンストラクタ。
         /// </summary>
-        public AppForm()
+        public App()
         {
             InitializeComponent();
         }
@@ -104,6 +104,9 @@ namespace DTXMania2
         ///     アプリの初期化が完了していなければ true。
         ///     起動直後は true, OnLoad() で false, OnClosing() で true になる。
         /// </summary>
+        /// <remarks>
+        ///     アプリの OnLoad() より前に OnResize() が呼び出されることがあるので、その対策用。
+        /// </remarks>
         private bool _未初期化 = true;
 
         /// <summary>
