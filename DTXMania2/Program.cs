@@ -73,6 +73,51 @@ namespace DTXMania2
                 //----------------
                 #endregion
 
+                #region " 二重起動チェックまたはオプション送信。"
+                //----------------
+                using( var pipeToViewer = new NamedPipeClientStream( ".", _ビュアー用パイプライン名, PipeDirection.Out ) )
+                {
+                    try
+                    {
+                        // パイプラインサーバへの接続を試みる。
+                        pipeToViewer.Connect( 100 );
+
+                        // (A) サービスが立ち上がっている場合 → ビュアーモードかどうかでさらに分岐
+
+                        if( Global.Options.ビュアーモードである )
+                        {
+                            #region " (A-a) ビュアーモードである → オプション内容をパイプラインサーバへ送信して正常終了。"
+                            //----------------
+                            var ss = new StreamStringForNamedPipe( pipeToViewer );
+                            var yamlText = Global.Options.ToYaml(); // YAML化
+                            ss.WriteString( yamlText );
+                            return;
+                            //----------------
+                            #endregion
+                        }
+                        else
+                        {
+                            #region " (A-b) 通常モードである → 二重起動としてエラー終了。"
+                            //----------------
+                            var ss = new StreamStringForNamedPipe( pipeToViewer );
+                            ss.WriteString( "ping" );
+
+                            var msg = "二重起動はできません。";
+                            Trace.WriteLine( msg );                     // Traceと
+                            MessageBox.Show( msg, "DTXMania2 error" );  // ダイアログに表示。
+                            return;
+                            //----------------
+                            #endregion
+                        }
+                    }
+                    catch( TimeoutException )
+                    {
+                        // (B) サービスが立ち上がっていない場合 → そのまま起動
+                    }
+                }
+                //----------------
+                #endregion
+
                 #region " タイトル、著作権、システム情報をログ出力する。"
                 //----------------
                 Log.WriteLine( $"{Application.ProductName} Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000}" );
