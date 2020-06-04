@@ -4,7 +4,7 @@ using System.Diagnostics;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		FPS（frames per second; １秒間の進行処理回数）と VPS（views per second; １秒間の描画処理回数）を計測する。

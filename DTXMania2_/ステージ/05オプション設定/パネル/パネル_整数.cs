@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     /// <summary>
     ///		数値ボックス。整数のみ、単位表示は任意。

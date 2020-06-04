@@ -7,7 +7,7 @@ using Microsoft.Data.Sqlite;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class ScoreDBRecord
     {

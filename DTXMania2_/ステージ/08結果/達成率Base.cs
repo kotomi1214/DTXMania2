@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using SharpDX.Direct2D1;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     /// <summary>
     ///     <see cref="達成率"/> と <see cref="達成率更新"/> の共通インターフェース。

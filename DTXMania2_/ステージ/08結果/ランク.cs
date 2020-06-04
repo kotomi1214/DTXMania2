@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     class ランク : IDisposable
     {

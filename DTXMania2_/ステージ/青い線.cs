@@ -5,7 +5,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		枠を形成する青い「線」を一本描画する。

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		入力データの種別を、ドラム様式で定義したもの。

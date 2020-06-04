@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     /// <summary>
     ///		OFF と ON を切り替えられるスイッチ。

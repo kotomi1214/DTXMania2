@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     enum 動画の表示サイズ : int
     {

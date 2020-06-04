@@ -7,9 +7,9 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 
-namespace DTXMania2_.選曲
+namespace DTXMania2.選曲
 {
     /// <summary>
     ///		フォーカスリストの表示、スクロール、フォーカスノードの選択など。

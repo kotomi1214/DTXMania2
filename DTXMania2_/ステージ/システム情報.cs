@@ -5,7 +5,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class システム情報 : IDisposable
     {

@@ -7,7 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.Direct2D1.Effects;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     ステージの背景として使う画像。

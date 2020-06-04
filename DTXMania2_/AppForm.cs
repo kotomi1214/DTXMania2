@@ -5,10 +5,10 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
-using DTXMania2_.Properties;
+using DTXMania2.Properties;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     アプリケーションのメインフォーム（とUIスレッド）。

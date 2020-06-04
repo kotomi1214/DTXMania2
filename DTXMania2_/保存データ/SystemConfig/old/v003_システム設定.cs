@@ -7,9 +7,9 @@ using YamlDotNet.Serialization;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_.old.SystemConfig
+namespace DTXMania2.old.SystemConfig
 {
-    using IdKey = DTXMania2_.SystemConfig.IdKey;
+    using IdKey = DTXMania2.SystemConfig.IdKey;
 
     class v003_システム設定
     {

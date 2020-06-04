@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     /// <summary>
     ///     1曲を曲の長さによらず64等分し、それぞれの区間での成績を大雑把に示すメーター。

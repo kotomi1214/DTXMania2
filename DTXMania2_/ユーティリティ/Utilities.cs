@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class Utilities
     {

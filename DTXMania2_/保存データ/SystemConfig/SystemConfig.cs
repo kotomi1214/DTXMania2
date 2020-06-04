@@ -7,7 +7,7 @@ using YamlDotNet.Serialization;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     partial class SystemConfig
     {

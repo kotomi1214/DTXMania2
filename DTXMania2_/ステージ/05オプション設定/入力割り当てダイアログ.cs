@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     partial class 入力割り当てダイアログ : Form
     {

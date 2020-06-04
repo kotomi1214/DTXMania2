@@ -6,9 +6,9 @@ using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania2_.演奏;
+using DTXMania2.演奏;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     class 演奏パラメータ結果 : 演奏.判定パラメータ表示
     {

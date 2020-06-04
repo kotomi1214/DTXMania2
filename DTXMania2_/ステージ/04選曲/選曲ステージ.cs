@@ -6,10 +6,10 @@ using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
 using SSTFormat.v004;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 using System.Threading.Tasks;
 
-namespace DTXMania2_.選曲
+namespace DTXMania2.選曲
 {
     class 選曲ステージ : IStage
     {

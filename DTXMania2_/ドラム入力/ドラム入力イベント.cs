@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		単一のドラム入力イベントを表す。

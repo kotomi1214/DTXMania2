@@ -1,4 +1,4 @@
-﻿namespace DTXMania2_.オプション設定
+﻿namespace DTXMania2.オプション設定
 {
     partial class 入力割り当てダイアログ
     {

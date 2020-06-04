@@ -7,7 +7,7 @@ using CSCore;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     SSTFにおける既定のドラムサウンド。

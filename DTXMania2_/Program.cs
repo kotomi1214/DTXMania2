@@ -9,7 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     static class Program
     {

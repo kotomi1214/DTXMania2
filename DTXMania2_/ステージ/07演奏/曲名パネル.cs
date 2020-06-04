@@ -7,7 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class 曲名パネル : IDisposable
     {

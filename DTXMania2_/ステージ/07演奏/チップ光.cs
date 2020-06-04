@@ -7,7 +7,7 @@ using SharpDX.Animation;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class チップ光 : IDisposable
     {

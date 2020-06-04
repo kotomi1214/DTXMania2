@@ -4,7 +4,7 @@ using System.Text;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class LoadingSpinner : IDisposable
     {

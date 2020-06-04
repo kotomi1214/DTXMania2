@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_.old.SongDBRecord
+namespace DTXMania2.old.SongDBRecord
 {
     class v002_SongDBRecord
     {

@@ -6,7 +6,7 @@ using System.IO.Pipes;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
+using System.Threading;
 using System.Windows.Forms;
 using FDK;
 
@@ -188,6 +188,24 @@ namespace DTXMania2
                     Folder.フォルダ変数を追加または更新する( "Images", Path.Combine( exePath, @"Resources\Default\Images" ) );
                     Folder.フォルダ変数を追加または更新する( "AppData", AppDataフォルダ名 );
                     Folder.フォルダ変数を追加または更新する( "UserProfile", Environment.GetFolderPath( Environment.SpecialFolder.UserProfile ) );
+                }
+                //----------------
+                #endregion
+
+                #region " スレッドプールのオンラインスレッド数を変更する。"
+                //----------------
+                {
+                    const int 希望オンラインスレッド数 = 32;
+
+                    // 既定の数はCPUコア数。
+                    // .NET の仕様により、Taskの同時利用数が最小値を超えると、それ以降の Task.Run での起動には最大2回/秒もの制限がかかる。
+                    // https://docs.microsoft.com/ja-jp/dotnet/api/system.threading.threadpool.getminthreads
+                    ThreadPool.GetMaxThreads( out int workMax, out int compMax );
+                    ThreadPool.GetMinThreads( out int workMin, out int compMin );
+
+                    ThreadPool.SetMinThreads(
+                        Math.Clamp( 希望オンラインスレッド数, min: workMin, max: workMax ),     // workMin ～ workMax の範囲を越えない
+                        Math.Clamp( 希望オンラインスレッド数, min: compMin, max: compMax ) );   // compMin ～ compMax の範囲を越えない
                 }
                 //----------------
                 #endregion

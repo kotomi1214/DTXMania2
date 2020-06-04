@@ -6,7 +6,7 @@ using System.Linq;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class レーンフラッシュ : IDisposable
     {

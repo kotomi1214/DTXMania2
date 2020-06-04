@@ -11,7 +11,7 @@ using SharpDX.DirectWrite;
 using Microsoft.Data.Sqlite;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     /// <summary>
     ///     <see cref="SongNode"/> を現行化する。

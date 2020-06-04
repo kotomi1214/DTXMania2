@@ -6,7 +6,7 @@ using System.Text;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     /// <summary>
     ///		BOX定義ファイルのマッピングクラス。

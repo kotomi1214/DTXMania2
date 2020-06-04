@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     <see cref="TaskMessage"/> の送受信に使用するキュー。

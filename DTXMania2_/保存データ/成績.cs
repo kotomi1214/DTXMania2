@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using DTXMania2_.演奏;
-using DTXMania2_.結果;
+using DTXMania2.演奏;
+using DTXMania2.結果;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     成績情報。

@@ -5,7 +5,7 @@ using System.IO;
 using CSCore;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class システムサウンド : IDisposable
     {

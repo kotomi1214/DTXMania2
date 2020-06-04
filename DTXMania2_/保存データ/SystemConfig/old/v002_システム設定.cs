@@ -5,7 +5,7 @@ using System.Drawing;
 using System.IO;
 using FDK;
 
-namespace DTXMania2_.old.SystemConfig
+namespace DTXMania2.old.SystemConfig
 {
     /// <summary>
     ///		システム設定。

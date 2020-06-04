@@ -6,9 +6,9 @@ using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania2_.演奏;
+using DTXMania2.演奏;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     /// <summary>
     ///     <see cref="パネル_フォルダ"/> の選択と表示。

@@ -6,7 +6,7 @@ using System.Linq;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		<see cref="スコア.AVIリスト"/> の各動画インスタンスを管理する。

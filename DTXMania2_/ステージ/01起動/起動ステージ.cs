@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania2_.起動
+namespace DTXMania2.起動
 {
     class 起動ステージ : IStage
     {

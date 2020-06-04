@@ -5,9 +5,9 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 
-namespace DTXMania2_.選曲
+namespace DTXMania2.選曲
 {
     class 難易度と成績 : IDisposable
     {

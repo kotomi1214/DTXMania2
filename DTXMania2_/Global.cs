@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     グローバルリソース。すべてが static。
@@ -15,13 +15,13 @@ namespace DTXMania2_
 
 
         /// <summary>
-        ///     <see cref="DTXMania2_.AppForm"/> インスタンスへの参照。
+        ///     <see cref="DTXMania2.AppForm"/> インスタンスへの参照。
         ///     <see cref="Global.生成する()"/> の前に設定しておくこと。
         /// </summary>
         public static AppForm AppForm { get; set; } = null!;
 
         /// <summary>
-        ///     <see cref="DTXMania2_.App"/> インスタンスへの参照。
+        ///     <see cref="DTXMania2.App"/> インスタンスへの参照。
         ///     <see cref="Global.生成する()"/> の前に設定しておくこと。
         /// </summary>
         public static App App { get; set; } = null!;
@@ -32,13 +32,13 @@ namespace DTXMania2_
         public static CommandLineOptions Options { get; set; } = null!;
 
         /// <summary>
-        ///     <see cref="DTXMania2_.AppForm"/> インスタンスのウィンドウハンドル。
+        ///     <see cref="DTXMania2.AppForm"/> インスタンスのウィンドウハンドル。
         ///     <see cref="Global.生成する()"/> の前に設定しておくこと。
         /// </summary>
         /// <remarks>
         ///     <see cref="AppForm.Handle"/> と同じ値であるが、GUIスレッド 以 外 のスレッドから参照する場合は、
         ///     <see cref="AppForm.Handle"/> ではなくこのメンバを参照すること。
-        ///     （<see cref="DTXMania2_.AppForm"/> のメンバは必ずGUIスレッドから参照されなれければならない。）
+        ///     （<see cref="DTXMania2.AppForm"/> のメンバは必ずGUIスレッドから参照されなれければならない。）
         /// </remarks>
         public static IntPtr Handle { get; set; } = IntPtr.Zero;
 

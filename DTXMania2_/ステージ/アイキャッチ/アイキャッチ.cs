@@ -4,7 +4,7 @@ using System.Diagnostics;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     アイキャッチの基本クラス。

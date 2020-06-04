@@ -7,7 +7,7 @@ using SharpDX;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class ドラムチップ : IDisposable
     {

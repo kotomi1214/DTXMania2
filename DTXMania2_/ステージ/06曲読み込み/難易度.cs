@@ -6,9 +6,9 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 
-namespace DTXMania2_.曲読み込み
+namespace DTXMania2.曲読み込み
 {
     class 難易度 : IDisposable
     {

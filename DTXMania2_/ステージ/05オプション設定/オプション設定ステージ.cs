@@ -5,7 +5,7 @@ using System.Threading;
 using System.Windows.Forms;
 using FDK;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     class オプション設定ステージ : IStage
     {

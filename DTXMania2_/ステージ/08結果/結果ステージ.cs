@@ -9,7 +9,7 @@ using Microsoft.Data.Sqlite;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     class 結果ステージ : IStage
     {

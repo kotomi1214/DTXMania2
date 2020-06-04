@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     [DataContract( Name = "LanePosition", Namespace = "" )]
     struct 表示レーンの左右

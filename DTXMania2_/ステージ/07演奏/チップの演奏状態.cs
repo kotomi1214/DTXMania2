@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using SSTFormat.v004;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     /// <summary>
     ///		チップに対応する、チップの演奏情報。

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using SharpDX;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     partial class SetDef
     {

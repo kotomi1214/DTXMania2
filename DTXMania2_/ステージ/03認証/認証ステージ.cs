@@ -4,7 +4,7 @@ using System.Diagnostics;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_.認証
+namespace DTXMania2.認証
 {
     /// <summary>
     ///		ユーザ選択画面。

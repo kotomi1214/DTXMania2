@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 using SharpDX;
 using FDK;
 using SSTFormat.v004;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     アプリケーションの進行描画（とそのタスク）。
@@ -298,7 +298,7 @@ namespace DTXMania2_
                 {
                     // グローバルリソースの大半は、進行描画タスクの中で生成する。
                     Global.生成する( 設計画面サイズ, 物理画面サイズ );
-                    画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1 );
+                    画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
 
                     this.アイキャッチ管理 = new アイキャッチ管理();
 

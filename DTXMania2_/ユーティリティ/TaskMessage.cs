@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     タスク間で送受信されるメッセージ。

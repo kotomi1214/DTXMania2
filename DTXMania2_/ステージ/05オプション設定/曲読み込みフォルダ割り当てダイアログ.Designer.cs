@@ -1,4 +1,4 @@
-﻿namespace DTXMania2_.オプション設定
+﻿namespace DTXMania2.オプション設定
 {
     partial class 曲読み込みフォルダ割り当てダイアログ
     {

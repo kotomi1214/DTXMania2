@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     全アイキャッチのインスタンスを保持する。

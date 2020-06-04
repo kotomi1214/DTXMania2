@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
 
-namespace DTXMania2_.選曲
+namespace DTXMania2.選曲
 {
     class UpdatingSoglistパネル : IDisposable
     {

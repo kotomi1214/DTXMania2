@@ -6,7 +6,7 @@ using SharpDX.Direct2D1;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     /// <summary>
     ///     最高達成率を更新した場合の達成率表示。

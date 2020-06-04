@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class パッド矢印 : IDisposable
     {

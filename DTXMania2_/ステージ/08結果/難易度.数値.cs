@@ -7,7 +7,7 @@ using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     partial class 難易度
     {

@@ -7,7 +7,7 @@ using CSCore;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///		<see cref="スコア.WAVリスト"/> の各サウンドインスタンスを管理する。

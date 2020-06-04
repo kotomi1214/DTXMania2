@@ -6,7 +6,7 @@ using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     public class CommandLineOptions
     {

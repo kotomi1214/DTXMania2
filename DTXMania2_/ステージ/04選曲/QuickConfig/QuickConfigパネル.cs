@@ -6,10 +6,10 @@ using Microsoft.Data.Sqlite;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 using System.Linq;
 
-namespace DTXMania2_.選曲.QuickConfig
+namespace DTXMania2.選曲.QuickConfig
 {
     class QuickConfigパネル : IDisposable
     {

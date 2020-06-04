@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     class RandomSelectNode : Node
     {

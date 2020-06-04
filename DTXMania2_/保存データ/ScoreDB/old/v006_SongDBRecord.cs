@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using FDK;
 
-namespace DTXMania2_.old.SongDBRecord
+namespace DTXMania2.old.SongDBRecord
 {
     class v006_SongDBRecord
     {

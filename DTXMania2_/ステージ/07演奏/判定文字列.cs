@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Animation;
 using FDK;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class 判定文字列 : IDisposable
     {

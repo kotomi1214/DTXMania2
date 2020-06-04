@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using SSTFormat.v004;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     /// <summary>
     ///     譜面のチップ（<see cref="チップ種別"/>）をキーとして、様々なコンフィグプロパティを定義する。

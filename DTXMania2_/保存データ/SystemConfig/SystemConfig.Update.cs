@@ -5,7 +5,7 @@ using System.IO;
 using YamlDotNet.RepresentationModel;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     partial class SystemConfig
     {

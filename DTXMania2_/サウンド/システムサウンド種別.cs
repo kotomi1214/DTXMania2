@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     enum システムサウンド種別
     {

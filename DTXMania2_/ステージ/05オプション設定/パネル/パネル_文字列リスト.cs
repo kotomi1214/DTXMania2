@@ -6,7 +6,7 @@ using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
-namespace DTXMania2_.オプション設定
+namespace DTXMania2.オプション設定
 {
     /// <summary>
     ///		任意個の文字列から１つを選択できるパネル項目（コンボボックス）。

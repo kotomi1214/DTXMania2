@@ -12,7 +12,7 @@ using FDK;
 using SSTFormat.v004;
 using System.Net.Http.Headers;
 
-namespace DTXMania2_.演奏
+namespace DTXMania2.演奏
 {
     class 演奏ステージ : IStage
     {

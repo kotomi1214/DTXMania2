@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 
-namespace DTXMania2_.old.UserConfig
+namespace DTXMania2.old.UserConfig
 {
     class v006_UserConfig
     {

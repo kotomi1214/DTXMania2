@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using FDK;
 
-namespace DTXMania2_.old.RecordDBRecord
+namespace DTXMania2.old.RecordDBRecord
 {
     class v006_RecordDBRecord
     {

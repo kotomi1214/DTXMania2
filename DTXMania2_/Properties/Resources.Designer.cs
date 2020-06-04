@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DTXMania2_.Properties {
+namespace DTXMania2.Properties {
     using System;
     
     

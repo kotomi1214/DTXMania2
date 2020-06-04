@@ -7,9 +7,9 @@ using System.Windows.Forms;
 using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 
-namespace DTXMania2_.old.SystemConfig
+namespace DTXMania2.old.SystemConfig
 {
-    using IdKey = DTXMania2_.SystemConfig.IdKey;
+    using IdKey = DTXMania2.SystemConfig.IdKey;
 
     class v002_キーバインディング : ICloneable
     {

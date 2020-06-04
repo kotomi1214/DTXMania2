@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
-using DTXMania2_.演奏;
+using DTXMania2.演奏;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     /// <summary>
     ///		譜面を表すクラス。

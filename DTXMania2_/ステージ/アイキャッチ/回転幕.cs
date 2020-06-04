@@ -38,7 +38,7 @@ using FDK;
  *		→ 消失後、画面Dの表示は終わり、すべて画面Eに置き換わる。
  */
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class 回転幕 : アイキャッチ
     {

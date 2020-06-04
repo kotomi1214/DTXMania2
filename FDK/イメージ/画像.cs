@@ -383,14 +383,14 @@ namespace FDK
         private static SharpDX.Direct3D11.Buffer _ConstantBuffer = null!;
 
 
-        public static void 全インスタンスで共有するリソースを作成する( Device1 d3dDevice1 )
+        public static void 全インスタンスで共有するリソースを作成する( Device1 d3dDevice1, VariablePath 頂点シェーダCSOパス, VariablePath ピクセルシェーダCSOパス )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             #region " 頂点シェーダを生成する。"
             //----------------
             {
-                var byteCode = File.ReadAllBytes( new VariablePath( @"$(Images)\TextureVS.cso" ).変数なしパス );
+                var byteCode = File.ReadAllBytes( 頂点シェーダCSOパス.変数なしパス );
                 _VertexShader = new VertexShader( d3dDevice1, byteCode );
             }
             //----------------
@@ -399,7 +399,7 @@ namespace FDK
             #region " ピクセルシェーダを生成する。"
             //----------------
             {
-                var byteCode = File.ReadAllBytes( new VariablePath( @"$(Images)\TexturePS.cso" ).変数なしパス );
+                var byteCode = File.ReadAllBytes( ピクセルシェーダCSOパス.変数なしパス );
                 _PixelShader = new PixelShader( d3dDevice1, byteCode );
             }
             //----------------

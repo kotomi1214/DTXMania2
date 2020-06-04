@@ -4,9 +4,9 @@ using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using FDK;
-using DTXMania2_.曲;
+using DTXMania2.曲;
 
-namespace DTXMania2_.曲読み込み
+namespace DTXMania2.曲読み込み
 {
     class プレビュー画像 : IDisposable
     {

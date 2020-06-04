@@ -4,7 +4,7 @@ using System.Text;
 using SharpDX;
 using SharpDX.Direct2D1;
 
-namespace DTXMania2_.選曲.QuickConfig
+namespace DTXMania2.選曲.QuickConfig
 {
     class リスト : ラベル, IDisposable
     {

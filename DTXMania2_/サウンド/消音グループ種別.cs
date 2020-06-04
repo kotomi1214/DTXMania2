@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     同じ消音グループ種別に属する場合、再生前消音の対象となる。

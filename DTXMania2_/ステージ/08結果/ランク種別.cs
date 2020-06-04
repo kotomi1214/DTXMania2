@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_.結果
+namespace DTXMania2.結果
 {
     enum ランク種別
     {

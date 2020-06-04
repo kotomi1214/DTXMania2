@@ -4,7 +4,7 @@ using System.Diagnostics;
 using Microsoft.Data.Sqlite;
 using FDK;
 
-namespace DTXMania2_.old.ScorePropertiesDB
+namespace DTXMania2.old.ScorePropertiesDB
 {
     class v001_SongPropertiesDBRecord
     {

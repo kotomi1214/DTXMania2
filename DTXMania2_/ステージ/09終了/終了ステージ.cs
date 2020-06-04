@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
 
-namespace DTXMania2_.終了
+namespace DTXMania2.終了
 {
     class 終了ステージ : IStage
     {

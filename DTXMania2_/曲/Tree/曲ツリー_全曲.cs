@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     class 曲ツリー_全曲 : 曲ツリー
     {

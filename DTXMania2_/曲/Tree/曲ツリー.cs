@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     abstract class 曲ツリー : IDisposable
     {

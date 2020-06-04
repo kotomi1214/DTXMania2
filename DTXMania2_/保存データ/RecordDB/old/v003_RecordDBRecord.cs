@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_.old.RecordDBRecord
+namespace DTXMania2.old.RecordDBRecord
 {
     class v003_RecordDBRecord
     {

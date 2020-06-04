@@ -7,7 +7,7 @@ using FDK;
 using System.Threading;
 using Windows.ApplicationModel.Background;
 
-namespace DTXMania2_.タイトル
+namespace DTXMania2.タイトル
 {
     class タイトルステージ : IStage
     {

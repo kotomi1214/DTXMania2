@@ -5,7 +5,7 @@ using System.Linq;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     class ドラム入力
     {

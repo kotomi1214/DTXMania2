@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using CSCore;
 using FDK;
 
-namespace DTXMania2_.選曲
+namespace DTXMania2.選曲
 {
     /// <summary>
     ///    プレビュー音声の再生とライフサイクル管理。

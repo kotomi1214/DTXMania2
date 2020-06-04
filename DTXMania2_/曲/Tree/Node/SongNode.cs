@@ -5,7 +5,7 @@ using System.IO;
 using SharpDX;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     class SongNode : Node
     {

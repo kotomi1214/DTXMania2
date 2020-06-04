@@ -8,7 +8,7 @@ using SharpDX.DirectWrite;
 using FDK;
 using SSTFormat.v004;
 
-namespace DTXMania2_.曲読み込み
+namespace DTXMania2.曲読み込み
 {
     /// <summary>
     ///     <see cref="App.演奏譜面"/> を読み込んで、<see cref="App.演奏スコア"/> を生成する。

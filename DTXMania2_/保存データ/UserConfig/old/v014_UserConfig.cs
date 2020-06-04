@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using FDK;
 
-namespace DTXMania2_.old.UserConfig
+namespace DTXMania2.old.UserConfig
 {
     class v014_UserConfig
     {

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     partial class RecordDB : SQLiteDB
     {

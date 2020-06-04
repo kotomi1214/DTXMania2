@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using FDK;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     class 曲ツリー_評価順 : 曲ツリー
     {

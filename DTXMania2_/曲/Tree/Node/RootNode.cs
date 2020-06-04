@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_.曲
+namespace DTXMania2.曲
 {
     class RootNode : BoxNode
     {

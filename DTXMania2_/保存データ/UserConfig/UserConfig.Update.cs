@@ -8,7 +8,7 @@ using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using FDK;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     partial class UserConfig
     {

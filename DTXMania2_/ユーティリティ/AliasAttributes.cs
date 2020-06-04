@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace DTXMania2_
+namespace DTXMania2
 {
     /// <summary>
     ///     <see cref="Enum"/>にAliasという属性を設ける。
