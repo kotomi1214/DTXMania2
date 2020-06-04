@@ -144,7 +144,7 @@ namespace DTXMania2
             Global.Handle = this.Handle;
 
 
-            // サウンドデバイスとサウンドタイマを初期化する。これらは入力で使用されるので先に初期化する。
+            // サウンドデバイスとサウンドタイマを初期化する。これらは入力デバイスで使用されるので先に初期化する。
 
             this.サウンドデバイス = new SoundDevice( CSCore.CoreAudioAPI.AudioClientShareMode.Shared );
             // マスタ音量（小:0～1:大）... 0.5を超えるとだいたいWASAPI共有モードのリミッターに抑制されるようになる
