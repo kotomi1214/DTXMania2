@@ -433,7 +433,23 @@ namespace DTXMania2
                                 this.ステージ.Dispose();
 
                                 Log.Header( "認証ステージ" );
-                                //TODO: this.ステージ = new 認証.認証ステージ();
+                                this.ステージ = new 認証.認証ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case 認証.認証ステージ stage:
+                        {
+                            #region " キャンセル → タイトルステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 認証.認証ステージ.フェーズ.キャンセル )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "タイトルステージ" );
+                                this.ステージ = new タイトル.タイトルステージ();
                             }
                             //----------------
                             #endregion
