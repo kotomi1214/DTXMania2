@@ -255,7 +255,7 @@ namespace DTXMania2
             }
 #if !DEBUG
             // Release 時には、未処理の例外をキャッチしたらダイアログを表示する。
-            catch( Exception e )
+            catch( Exception )
             {
             }
 #else

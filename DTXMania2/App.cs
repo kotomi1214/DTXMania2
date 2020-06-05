@@ -868,7 +868,6 @@ namespace DTXMania2
 
             await Task.Run( async () => {
 
-                Log.現在のスレッドに名前をつける( "PipeIO" );
                 Log.Info( "パイプラインサーバを起動しました。" );
 
                 int 例外発生回数 = 0;
@@ -959,7 +958,7 @@ namespace DTXMania2
             if( !this._PipeServerCancellationTokenSource.IsCancellationRequested )
                 this._PipeServerCancellationTokenSource.Cancel();
 
-            this._PipeServerCancellationTokenSource.Dispose();
+            //this._PipeServerCancellationTokenSource.Dispose();
         }
 
 
