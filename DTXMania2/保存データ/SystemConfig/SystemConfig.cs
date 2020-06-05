@@ -115,7 +115,7 @@ namespace DTXMania2
 
             // (1) 読み込み or 新規作成
 
-            SystemConfig config;
+            SystemConfig config = null!;
             if( File.Exists( path.変数なしパス ) )
             {
                 var yamlText = File.ReadAllText( path.変数なしパス );
@@ -123,11 +123,12 @@ namespace DTXMania2
                 config = deserializer.Deserialize<SystemConfig>( yamlText );
 
                 if( VERSION != config.Version )
-                    throw new Exception( "バージョンが違います。" );
+                    config = null!;
             }
-            else
+            if( config is null )
             {
                 // 新規生成
+                Log.Info( "システム設定ファイルを新規に作成します。" );
                 config = new SystemConfig();
             }
 
