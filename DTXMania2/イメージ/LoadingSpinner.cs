@@ -6,6 +6,9 @@ using FDK;
 
 namespace DTXMania2
 {
+    /// <summary>
+    ///     ローディングスピナー（回転画像アニメーション）。
+    /// </summary>
     class LoadingSpinner : IDisposable
     {
         const int _回転段数 = 9;

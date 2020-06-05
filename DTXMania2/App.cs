@@ -33,7 +33,7 @@ namespace DTXMania2
 
         internal Random 乱数 { get; } = new Random( DateTime.Now.Millisecond );
 
-        internal SystemConfig システム設定 { get; private protected set; } = null!;
+        internal SystemConfig システム設定 { get; set; } = null!;
 
         internal システムサウンド システムサウンド { get; private protected set; } = null!;
 
@@ -179,7 +179,7 @@ namespace DTXMania2
             
             // 全画面モードが設定されているならここで全画面に切り替える。
             
-            if( Global.App.システム設定.全画面モードである )
+            if( this.システム設定.全画面モードである )
                 this.ScreenMode.ToFullscreenMode();
 
             base.OnLoad( e );
@@ -308,7 +308,7 @@ namespace DTXMania2
                 this.ドラムサウンド = new ドラムサウンド( this.サウンドデバイス );      // 　　　　　　〃
 
                 this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
-                    ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( Global.App.サウンドデバイス, path, Global.App.ログオン中のユーザ.再生速度 ),
+                    ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( this.サウンドデバイス, path, this.ログオン中のユーザ.再生速度 ),
                 };
 
                 this._ユーザリストにユーザを登録する();
@@ -327,7 +327,6 @@ namespace DTXMania2
 
                 TaskMessage? 終了指示メッセージ = null;
 
-                // メインループ
                 while( true )
                 {
                     #region " 自分宛のメッセージが届いていたら、すべて処理する。"
@@ -364,7 +363,6 @@ namespace DTXMania2
 
                     #region " ステージの現在のフェーズにより処理分岐。"
                     //----------------
-                    // TODO: ステージの現在のフェーズにより処理分岐。
                     switch( this.ステージ )
                     {
                         case 起動.起動ステージ stage:
@@ -393,7 +391,7 @@ namespace DTXMania2
                                         Log.Info( "AutoPlayer でログオンしました。" );
                                     }
 
-                                    //TODO: this.ステージ = new 演奏.演奏ステージ();
+                                    this.ステージ = new 演奏.演奏ステージ();
                                     //----------------
                                     #endregion
                                 }
@@ -450,6 +448,157 @@ namespace DTXMania2
 
                                 Log.Header( "タイトルステージ" );
                                 this.ステージ = new タイトル.タイトルステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " 完了 → 選曲ステージへ "
+                            //----------------
+                            else if( stage.現在のフェーズ == 認証.認証ステージ.フェーズ.完了 )
+                            {
+                                // 選択中のユーザでログインする。ログオン中のユーザがあれば先にログオフされる。
+                                this.ログオンする( this.ユーザリスト[ stage.現在選択中のユーザ ].ID ?? "AutoPlayer" );
+
+                                this.ステージ.Dispose();
+
+                                Log.Header( "選曲ステージ" );
+                                this.ステージ = new 選曲.選曲ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case 選曲.選曲ステージ stage:
+                        {
+                            #region " キャンセル → タイトルステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 選曲.選曲ステージ.フェーズ.キャンセル )
+                            {
+                                // 曲ツリーの現行化タスクが動いていれば、一時停止する。
+                                this.現行化.一時停止する();
+
+                                this.ステージ.Dispose();
+
+                                Log.Header( "タイトルステージ" );
+                                this.ステージ = new タイトル.タイトルステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " 確定_選曲 → 曲読み込みステージへ "
+                            //----------------
+                            else if( stage.現在のフェーズ == 選曲.選曲ステージ.フェーズ.確定_選曲 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "曲読み込みステージ" );
+                                this.ステージ = new 曲読み込み.曲読み込みステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " 確定_設定 → 設定ステージへ "
+                            //----------------
+                            else if( stage.現在のフェーズ == 選曲.選曲ステージ.フェーズ.確定_設定 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "オプション設定ステージ" );
+                                this.ステージ = new オプション設定.オプション設定ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case オプション設定.オプション設定ステージ stage:
+                        {
+                            #region " 完了 → 選曲ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == オプション設定.オプション設定ステージ.フェーズ.完了 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "選曲ステージ" );
+                                this.ステージ = new 選曲.選曲ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case 曲読み込み.曲読み込みステージ stage:
+                        {
+                            #region " 完了 → 演奏ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 曲読み込み.曲読み込みステージ.フェーズ.完了 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "演奏ステージ" );
+                                this.ステージ = new 演奏.演奏ステージ();
+
+                                // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
+                                ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
+                                    Global.D3D11Device1,
+                                    Global.DXGISwapChain1,
+                                    Global.既定のD3D11RenderTargetView,
+                                    Global.既定のD2D1DeviceContext );
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case 演奏.演奏ステージ stage:
+                        {
+                            #region " キャンセル完了 → 選曲ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.キャンセル完了 )   // ビュアーモードではこのフェーズにはならない。
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "選曲ステージ" );
+                                this.ステージ = new 選曲.選曲ステージ();
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " クリア → 結果ステージへ "
+                            //----------------
+                            else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.クリア )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "結果ステージ" );
+                                this.ステージ = new 結果.結果ステージ( stage.成績 );
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " 失敗 → 現在未対応 "
+                            //----------------
+                            else if( stage.現在のフェーズ == 演奏.演奏ステージ.フェーズ.失敗 )
+                            {
+                                // todo: 演奏失敗処理の実装
+                                throw new NotImplementedException();
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case 結果.結果ステージ stage:
+                        {
+                            #region " 完了 → 選曲ステージへ "
+                            //----------------
+                            if( stage.現在のフェーズ == 結果.結果ステージ.フェーズ.完了 )
+                            {
+                                this.ステージ.Dispose();
+
+                                Log.Header( "選曲ステージ" );
+                                this.ステージ = new 選曲.選曲ステージ();
                             }
                             //----------------
                             #endregion
@@ -554,37 +703,37 @@ namespace DTXMania2
             
             // 新しいユーザを選択する。
 
-            if( !Global.App.ユーザリスト.SelectItem( ( user ) => user.ID == ユーザID ) )
+            if( !this.ユーザリスト.SelectItem( ( user ) => user.ID == ユーザID ) )
             {
                 Log.ERROR( $"ユーザ「{ユーザID}」のログオンに失敗しました。ユーザが存在しません。" );
                 return false;
             }
-            var userConfig = Global.App.ログオン中のユーザ;
-            var roots = Global.App.曲ツリーリスト.Select( ( t ) => t.ルートノード );
+            var userConfig = this.ログオン中のユーザ;
+            var roots = this.曲ツリーリスト.Select( ( t ) => t.ルートノード );
 
 
             // すべての曲ツリーのユーザ依存情報をリセットし、属性のみ今ここで現行化する。
 
-            Global.App.現行化.リセットする( roots, userConfig );
-            Global.App.現行化.すべての譜面について属性を現行化する( userConfig.ID! );
+            this.現行化.リセットする( roots, userConfig );
+            this.現行化.すべての譜面について属性を現行化する( userConfig.ID! );
 
 
             // 評価順曲ツリーを新しい属性にあわせて再構築する。
 
-            var ratingTree = (曲ツリー_評価順) Global.App.曲ツリーリスト[ 1 ];  // [1]評価順
+            var ratingTree = (曲ツリー_評価順) this.曲ツリーリスト[ 1 ];  // [1]評価順
             ratingTree.再構築する();
 
             
             // すべての曲ツリーの現行化を開始する。
 
-            Global.App.現行化.開始する( roots, Global.App.ログオン中のユーザ );
+            this.現行化.開始する( roots, this.ログオン中のユーザ );
 
 
             // 選択する曲ツリーリストを初期化。
 
-            foreach( var tree in Global.App.曲ツリーリスト )
+            foreach( var tree in this.曲ツリーリスト )
                 tree.ルートノード.子ノードリスト.SelectFirst();
-            Global.App.曲ツリーリスト.SelectFirst();
+            this.曲ツリーリスト.SelectFirst();
 
 
             // 完了。
@@ -603,13 +752,13 @@ namespace DTXMania2
             var userConfig = this.ユーザリスト.SelectedItem;
             if( null != userConfig )
             {
-                Global.App.現行化.終了する();
+                this.現行化.終了する();
 
                 Log.Info( $"{userConfig.ID} をログオフしました。" );
             }
 
             // ユーザを未選択状態へ。
-            Global.App.ユーザリスト.SelectItem( -1 );
+            this.ユーザリスト.SelectItem( -1 );
         }
 
 
@@ -764,22 +913,22 @@ namespace DTXMania2
                         // オプションを担当ステージに送る。
                         if( options.再生停止 )
                         {
-                            //TODO: if( this.ステージ is 演奏.演奏ステージ )
-                            //{
-                            //    // 停止
-                            //    演奏.演奏ステージ.OptionsQueue.Enqueue( options );
-                            //}
+                            if( this.ステージ is 演奏.演奏ステージ )
+                            {
+                                // 停止
+                                演奏.演奏ステージ.OptionsQueue.Enqueue( options );
+                            }
                         }
                         else if( options.再生開始 )
                         {
-                            //TODO: if( this.ステージ is 演奏.演奏ステージ )
-                            //{
-                            //    // 停止と
-                            //    演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
+                            if( this.ステージ is 演奏.演奏ステージ )
+                            {
+                                // 停止と
+                                演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
 
-                            //    // 開始
-                            //    演奏.演奏ステージ.OptionsQueue.Enqueue( options );
-                            //}
+                                // 開始
+                                演奏.演奏ステージ.OptionsQueue.Enqueue( options );
+                            }
                         }
                         else
                         {
@@ -840,7 +989,7 @@ namespace DTXMania2
             {
                 // ScreenMode は非同期処理なので、すぐに値が反映されるとは限らない。
                 // なので、ログオン中のユーザへの設定は、その変更より先に行なっておく。
-                Global.App.システム設定.全画面モードである = this.ScreenMode.IsWindowMode; // 先に設定するので Mode が逆になっていることに注意。
+                this.システム設定.全画面モードである = this.ScreenMode.IsWindowMode; // 先に設定するので Mode が逆になっていることに注意。
 
                 if( this.ScreenMode.IsWindowMode )
                     this.ScreenMode.ToFullscreenMode();
