@@ -36,12 +36,12 @@ namespace DTXMania2
         // 進行と描画
 
 
-        public void 描画する()
+        public void 進行描画する()
         {
             var count = this._回転カウンタ.現在値;   // 0～_回転段数-1
             var 変換行列 = Matrix.RotationZ( (float) ( -2.0 * Math.PI * ( (double) count / _回転段数 ) ) );
 
-            this._Spinner画像.描画する( 変換行列 );
+            this._Spinner画像.進行描画する( 変換行列 );
         }
 
 

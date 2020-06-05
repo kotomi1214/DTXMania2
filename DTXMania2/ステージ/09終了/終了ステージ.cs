@@ -51,7 +51,8 @@ namespace DTXMania2.終了
 
         public void 進行描画する()
         {
-            // 進行
+            var dc = Global.既定のD2D1DeviceContext;
+            dc.Transform = Global.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {
@@ -59,69 +60,51 @@ namespace DTXMania2.終了
                 {
                     #region " 終了ステージ開始音を再生し、表示中フェーズへ。"
                     //----------------
+                    this._背景画像.進行描画する( 0f, 0f );
+
                     Global.App.システムサウンド.再生する( システムサウンド種別.終了ステージ_開始音 );
                     this._カウンタ = new Counter( 0, 1, 値をひとつ増加させるのにかける時間ms: 1000 );
+
                     this.現在のフェーズ = フェーズ.表示中;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.表示中:
                 {
                     #region " 一定時間が経過したら開始音終了待ちフェーズへ。"
                     //----------------
+                    this._背景画像.進行描画する( 0f, 0f );
+
                     if( this._カウンタ.終了値に達した )
                         this.現在のフェーズ = フェーズ.開始音終了待ち;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.開始音終了待ち:
                 {
-                    #region " 開始音の再生が終わったら完了フェーズへ。 "
+                    #region " 開始音の再生が終わったら完了フェーズへ。"
                     //----------------
+                    this._背景画像.進行描画する( 0f, 0f );
+
                     if( !Global.App.システムサウンド.再生中( システムサウンド種別.終了ステージ_開始音 ) )
                         this.現在のフェーズ = フェーズ.完了;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.完了:
                 {
                     #region " 遷移終了。Appによるステージ遷移待ち。"
                     //----------------
-                    break;
                     //----------------
                     #endregion
-                }
-            }
 
-
-            // 描画
-
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
-
-            switch( this.現在のフェーズ )
-            {
-                case フェーズ.開始:
-                case フェーズ.表示中:
-                case フェーズ.開始音終了待ち:
-                {
-                    #region " 背景画像 "
-                    //----------------
-                    this._背景画像.描画する( 0f, 0f );
                     break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.完了:
-                {
-                    #region " 最後の画面を維持。"
-                    //----------------
-                    break;
-                    //----------------
-                    #endregion
                 }
             }
         }

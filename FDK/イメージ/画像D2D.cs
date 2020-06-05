@@ -250,7 +250,7 @@ namespace FDK
             D2DBatch.Draw( dc, () => {
 
                 dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-                //dc.Transform = ...    → 呼び出し元で設定しておくこと。（どのdcへ描画するかで値が変わるため）
+                dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * dc.Transform;
 
                 // レイヤーパラメータの指定があれば、描画前に Layer を作成して、Push する。
                 var layer = (Layer?) null;

@@ -108,7 +108,6 @@ namespace DTXMania2.演奏
 
             // 最初のフェーズへ。
             this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.演奏状態初期化;
-            this._フェーズ完了 = false;
         }
 
         public virtual void Dispose()
@@ -165,14 +164,16 @@ namespace DTXMania2.演奏
 
         public void 進行描画する()
         {
-            // 進行する
+            var dc = Global.既定のD2D1DeviceContext;
+            dc.Transform = Global.拡大行列DPXtoPX;
 
+            this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
 
             CommandLineOptions? options = null!;
             var userConfig = Global.App.ログオン中のユーザ;
 
-            #region " 全フェーズ共通：ビュアーモード時、オプションが届いていれば処理する。"
+            #region " ビュアーモード時、オプションが届いていれば処理する。"
             //----------------
             if( Global.Options.ビュアーモードである && OptionsQueue.TryDequeue( out options ) )
             {
@@ -194,16 +195,24 @@ namespace DTXMania2.演奏
                     #region " 演奏状態を初期化し、演奏開始またはフェードインフェーズへ。"
                     //----------------
                     this._演奏状態を初期化する();
-                    this._フェードインカウンタ = new Counter( 0, 100, 10 );
 
                     // 次のフェーズへ。
+                    this._フェードインカウンタ = new Counter( 0, 100, 10 );
                     this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.演奏開始 : フェーズ.フェードイン;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.フェードイン:
                 {
+                    #region " 演奏パーツなし画面＆フェードインを描画する。"
+                    //----------------
+                    this._演奏パーツなし背景画面を描画する( dc );
+                    this._キャプチャ画面を描画する( dc, ( 1.0f - this._フェードインカウンタ.現在値の割合 ) );
+                    //----------------
+                    #endregion
+
                     #region " フェードインが完了したら演奏開始フェーズへ。"
                     //----------------
                     if( this._フェードインカウンタ.終了値に達した )
@@ -211,17 +220,20 @@ namespace DTXMania2.演奏
                         Log.Info( "演奏を開始します。" );
                         this.現在のフェーズ = フェーズ.演奏開始;
                     }
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.演奏開始:
                 {
                     #region " 演奏を開始し、表示フェーズへ。"
                     //----------------
-                    this._描画開始チップ番号 = -1; // -1 以外になれば演奏開始。
+                    this._演奏パーツなし背景画面を描画する( dc );
 
                     // 演奏を開始する。
+                    this._描画開始チップ番号 = -1; // -1 以外になれば演奏開始。
+
                     if( Global.Options.ビュアーモードである && 0 <= 演奏ステージ.演奏開始小節番号 )
                     {
                         #region " (A) 演奏開始小節番号から演奏を開始する。"
@@ -243,24 +255,32 @@ namespace DTXMania2.演奏
 
                     // 次のフェーズへ。
                     this.現在のフェーズ = フェーズ.表示;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.表示:
                 {
-                    #region " フェーズが完了していれば、指示待機またはクリアフェーズへ。"
+                    #region " 演奏パーツあり画面を描画する。"
                     //----------------
-                    if( this._フェーズ完了 )
+                    switch( this._演奏パーツあり背景画面を描画する( dc ) )  // クリア or 失敗判定を返す。
                     {
-                        this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.クリア;
-                        this._フェーズ完了 = false;
-                        break;
+                        case 演奏結果.なし:
+                            break;
+
+                        case 演奏結果.クリア:
+                            // 指示待機またはクリアフェーズへ。
+                            this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.クリア;
+                            break;
+
+                        //todo: case 演奏結果.失敗:
+                        //    break;
                     }
                     //----------------
                     #endregion
 
-                    #region " 入力処理。"
+                    #region " 入力＆ヒット処理。"
                     //----------------
                     double 現在の演奏時刻sec = this._演奏開始からの経過時間secを返す();
 
@@ -664,52 +684,76 @@ namespace DTXMania2.演奏
                     }
                     //----------------
                     #endregion
-
-                    break;
+                    
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.キャンセル通知:
                 {
-                    #region " フェーズが完了すればフェードアウトフェーズへ。 "
+                    #region " フェードアウトを開始してキャセル時フェードアウトフェーズへ。"
                     //----------------
-                    if( this._フェーズ完了 )
-                    {
-                        this.現在のフェーズ = フェーズ.キャンセル時フェードアウト;
-                        this._フェーズ完了 = false;
-                    }
-                    break;
+                    Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
+
+                    this.現在のフェーズ = フェーズ.キャンセル時フェードアウト;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.キャンセル時フェードアウト:
                 {
-                    #region " フェードアウトが完了したらキャンセル完了フェーズへ。"
+                    #region " 演奏パーツあり画面＆フェードアウトを描画する。"
                     //----------------
-                    if( this._フェーズ完了 )
+                    this._演奏パーツあり背景画面を描画する( dc );
+
+                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.クローズ完了 )
                     {
+                        // フェードアウトが完了したらキャンセル完了フェーズへ。
                         this.現在のフェーズ = フェーズ.キャンセル完了;
-                        this._フェーズ完了 = false;
                     }
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.クリア:
-                case フェーズ.失敗:
-                case フェーズ.キャンセル完了:
                 {
-                    #region " 遷移終了。Appによるステージ遷移待ち。"
+                    #region " 背景画像のみ描画する。"
                     //----------------
-                    break;
+                    Global.App.画面をクリアする();
+                    this._背景画像.進行描画する( 0f, 0f );
                     //----------------
                     #endregion
+                    
+                    break;
+                }
+                //TODO: case フェーズ.失敗:
+                //{
+                //}
+                case フェーズ.キャンセル完了:
+                {
+                    #region " 演奏パーツなし画面を描画する。"
+                    //----------------
+                    this._演奏パーツなし背景画面を描画する( dc );
+                    //----------------
+                    #endregion
+
+                    break;
                 }
 
                 // 以下、ビュアーモード用。
 
                 case フェーズ.指示待機:
                 {
+                    #region " 待機画面を描画する。"
+                    //----------------
+                    Global.App.画面をクリアする();
+                    this._ビュアーモードの待機時背景を描画する( dc );
+                    //----------------
+                    #endregion
+
                     #region " オプションが届いていれば、取り出して処理する。 "
                     //----------------
                     if( options?.再生開始 ?? false )
@@ -732,12 +776,20 @@ namespace DTXMania2.演奏
                             Log.ERROR( $"ファイルが存在しません。[{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( options.Filename )}]" );
                         }
                     }
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.曲読み込み開始:
                 {
+                    #region " 待機画面を描画する。"
+                    //----------------
+                    Global.App.画面をクリアする();
+                    this._ビュアーモードの待機時背景を描画する( dc );
+                    //----------------
+                    #endregion
+
                     #region " 曲読み込みタスクを起動し、曲読み込み完了待ちフェーズへ。"
                     //----------------
                     this._曲読み込みタスク = Task.Run( () => {
@@ -746,479 +798,33 @@ namespace DTXMania2.演奏
 
                     // 次のフェーズへ。
                     this.現在のフェーズ = フェーズ.曲読み込み完了待ち;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.曲読み込み完了待ち:
                 {
+                    #region " 待機画面＆ローディング画像を描画する。"
+                    //----------------
+                    Global.App.画面をクリアする();
+                    this._ビュアーモードの待機時背景を描画する( dc );
+
+                    this._LoadingSpinner.進行描画する();
+                    //----------------
+                    #endregion
+
                     #region " 曲読み込みタスクが完了すれば演奏状態初期化フェーズへ。 "
                     //----------------
                     if( this._曲読み込みタスク.IsCompleted )
                         this.現在のフェーズ = フェーズ.演奏状態初期化;
-                    break;
                     //----------------
                     #endregion
-                }
-            }
-
-
-            // 描画
-
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
-
-            switch( this.現在のフェーズ )
-            {
-                case フェーズ.演奏状態初期化:
-                {
-                    #region " 最後の画面を維持。"
-                    //----------------
-                    break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.フェードイン:
-                case フェーズ.演奏開始:
-                case フェーズ.キャンセル完了:
-                {
-                    #region " 演奏パーツなし画面＆フェードイン "
-                    //----------------
-                    Global.App.画面をクリアする();
-
-                    #region " スコア指定の壁紙 "
-                    //----------------
-                    if( userConfig.スコア指定の背景画像を表示する )
-                    {
-                        this._スコア指定の背景画像?.描画する( 0f, 0f,
-                            X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                            Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
-                    }
-                    //----------------
-                    #endregion
-
-                    #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
-                    //----------------
-                    this._左サイドクリアパネル.クリアする();
-                    this._左サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
-
-                        // プレイヤー名
-                        this._プレイヤー名表示.進行描画する( dcp );
-
-                        // スコア
-                        if( userConfig.ダーク == ダーク種別.OFF )
-                            this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
-
-                        // 達成率
-                        this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
-
-                        // 判定パラメータ
-                        this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
-
-                        // スキル
-                        this._曲別SKILL.進行描画する( dcp, 0f );
-
-                    } );
-                    this._左サイドクリアパネル.描画する();
-                    //----------------
-                    #endregion
-
-                    #region " 右サイドパネルへの描画と、右サイトパネルの表示 "
-                    //----------------
-                    this._右サイドクリアパネル.クリアする();
-                    this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
-                        // 特になし
-                    } );
-                    this._右サイドクリアパネル.描画する();
-                    //----------------
-                    #endregion
-
-                    #region " レーンフレーム "
-                    //----------------
-                    this._レーンフレーム.描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
-                    //----------------
-                    #endregion
-
-                    #region " 背景画像 "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._背景画像.描画する( 0f, 0f );
-                    //----------------
-                    #endregion
-
-                    #region " 譜面スクロール速度 "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
-                    //----------------
-                    #endregion
-
-                    #region " エキサイトゲージ "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
-                    //----------------
-                    #endregion
-
-                    #region " クリアメーター "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._クリアメーター.進行描画する( dc );
-                    //----------------
-                    #endregion
-
-                    #region " フェーズパネル "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._フェーズパネル.進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " 曲目パネル "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._曲名パネル.描画する( dc );
-                    //----------------
-                    #endregion
-
-                    #region " ヒットバー "
-                    //----------------
-                    if( userConfig.ダーク != ダーク種別.FULL )
-                        this._ドラムキットとヒットバー.ヒットバーを進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " ドラムキット "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._ドラムキットとヒットバー.ドラムキットを進行描画する();
-                    //----------------
-                    #endregion
-
-                    if( this.現在のフェーズ == フェーズ.フェードイン )
-                    {
-                        #region " キャプチャ画像 "
-                        //----------------
-                        this._キャプチャ画面を描画する( dc, ( 1.0f - this._フェードインカウンタ.現在値の割合 ) );
-                        //----------------
-                        #endregion
-                    }
-                    break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.表示:
-                case フェーズ.キャンセル時フェードアウト:
-                {
-                    #region " 演奏パーツあり画面＆フェードアウト "
-                    //----------------
-                    double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + Global.次のDComp表示までの残り時間sec;
-
-                    Global.App.画面をクリアする();
-
-                    #region " 譜面スクロールの進行 "
-                    //----------------
-                    // チップの表示より前に進行だけ行う。
-                    this._譜面スクロール速度.進行する( userConfig.譜面スクロール速度 );
-                    //----------------
-                    #endregion
-
-                    #region " スコア指定の壁紙 "
-                    //----------------
-                    if( userConfig.スコア指定の背景画像を表示する )
-                    {
-                        this._スコア指定の背景画像?.描画する( 0f, 0f,
-                            X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                            Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
-                    }
-                    //----------------
-                    #endregion
-
-                    #region " 動画 "
-                    //----------------
-                    if( userConfig.演奏中に動画を表示する )
-                    {
-                        foreach( var kvp in Global.App.AVI管理.動画リスト )
-                        {
-                            int zz = kvp.Key;       // zz 番号
-                            var video = kvp.Value;  // Video インスタンス
-
-                            if( video.再生中 )
-                            {
-                                switch( userConfig.動画の表示サイズ )
-                                {
-                                    case 動画の表示サイズ.全画面:
-                                    {
-                                        #region " 100%全体表示 "
-                                        //----------------
-                                        float w = Global.設計画面サイズ.Width;
-                                        float h = Global.設計画面サイズ.Height;
-                                        video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
-                                        break;
-                                        //----------------
-                                        #endregion
-                                    }
-
-                                    case 動画の表示サイズ.中央寄せ:
-                                    {
-                                        #region " 75%縮小表示 "
-                                        //----------------
-                                        float w = Global.設計画面サイズ.Width;
-                                        float h = Global.設計画面サイズ.Height;
-
-                                        // (1) 画面いっぱいに描画。
-                                        video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
-
-                                        // (2) ちょっと縮小して描画。
-                                        float 拡大縮小率 = 0.75f;
-                                        float 上移動 = 100.0f;
-                                        video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
-                                            w * ( 1f - 拡大縮小率 ) / 2f,
-                                            h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
-                                            w * 拡大縮小率,
-                                            h * 拡大縮小率 ) );
-
-                                        break;
-                                        //----------------
-                                        #endregion
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    //----------------
-                    #endregion
-
-                    #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
-                    //----------------
-                    this._左サイドクリアパネル.クリアする();
-                    this._左サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
-
-                        // プレイヤー名
-                        this._プレイヤー名表示.進行描画する( dcp );
-
-                        // スコア
-                        if( userConfig.ダーク == ダーク種別.OFF )
-                            this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
-
-                        // 達成率
-                        this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
-
-                        // 判定パラメータ
-                        this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
-
-                        // スキル
-                        this._曲別SKILL.進行描画する( dcp, this.成績.スキル );
-
-                    } );
-                    this._左サイドクリアパネル.描画する();
-                    //----------------
-                    #endregion
-
-                    #region " 右サイドパネルへの描画と、右サイドパネルの表示 "
-                    //----------------
-                    this._右サイドクリアパネル.クリアする();
-                    this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
-
-                        // コンボ
-                        this._コンボ表示.進行描画する( dcp, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
-
-                    } );
-                    this._右サイドクリアパネル.描画する();
-                    //----------------
-                    #endregion
-
-                    #region " レーンフレーム "
-                    //----------------
-                    this._レーンフレーム.描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
-                    //----------------
-                    #endregion
-
-                    #region " レーンフラッシュ  "
-                    //----------------
-                    this._レーンフラッシュ.進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " 小節線拍線 "
-                    //----------------
-                    if( userConfig.ダーク != ダーク種別.FULL )
-                        this._小節線拍線を描画する( dc, 演奏時刻sec );
-                    //----------------
-                    #endregion
-
-                    #region " 背景画像 "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._背景画像.描画する( 0f, 0f );
-                    //----------------
-                    #endregion
-
-                    #region " 譜面スクロール速度 "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
-                    //----------------
-                    #endregion
-
-                    #region " エキサイトゲージ "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
-                    //----------------
-                    #endregion
-
-                    #region " クリアメーター, フェーズパネル "
-                    //----------------
-                    double 曲の長さsec = Global.App.演奏スコア.チップリスト[ Global.App.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
-                    float 現在位置 = (float) ( 1.0 - ( 曲の長さsec - 演奏時刻sec ) / 曲の長さsec );
-
-                    // クリアメーター
-                    this.成績.CountMap = this._クリアメーター.カウント値を設定する( 現在位置, this.成績.判定別ヒット数 );
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._クリアメーター.進行描画する( dc );
-
-                    // フェーズパネル
-                    this._フェーズパネル.現在位置 = 現在位置;
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._フェーズパネル.進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " 曲名パネル "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._曲名パネル.描画する( dc );
-                    //----------------
-                    #endregion
-
-                    #region " ヒットバー "
-                    //----------------
-                    // ヒットバー
-                    if( userConfig.ダーク != ダーク種別.FULL )
-                        this._ドラムキットとヒットバー.ヒットバーを進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " ドラムキット "
-                    //----------------
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._ドラムキットとヒットバー.ドラムキットを進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " ドラムチップ; クリア判定はこの中。 "
-                    //----------------
-                    this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
-
-                        if( this._ドラムチップ.進行描画する( ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx ) )
-                        {
-                            // true が返されたら演奏終了（クリア）
-                            this._フェーズ完了 = true;
-                        }
-
-                    } );
-                    //----------------
-                    #endregion
-
-                    #region " チップ光 "
-                    //----------------
-                    this._チップ光.進行描画する( dc );
-                    //----------------
-                    #endregion
-
-                    #region " 判定文字列 "
-                    //----------------
-                    this._判定文字列.進行描画する();
-                    //----------------
-                    #endregion
-
-                    #region " システム情報 "
-                    //----------------
-                    this._システム情報.VPSをカウントする();
-
-                    if( userConfig.ダーク == ダーク種別.OFF )
-                        this._システム情報.描画する( dc, $"BGMAdjust: {Global.App.演奏譜面.譜面.BGMAdjust}" );
-                    //----------------
-                    #endregion
-
-                    if( this.現在のフェーズ == フェーズ.キャンセル時フェードアウト )
-                    {
-                        #region " アイキャッチ "
-                        //----------------
-                        if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.クローズ完了 )
-                            this._フェーズ完了 = true;    // 完了
-                        //----------------
-                        #endregion
-                    }
 
                     break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.クリア:
-                {
-                    #region " 背景画像のみ "
-                    //----------------
-                    Global.App.画面をクリアする();
-                    this._背景画像.描画する( 0f, 0f );
-                    break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.失敗:
-                {
-                    #region " 未実装 "
-                    //----------------
-                    // todo: 演奏失敗処理の実装
-                    throw new NotImplementedException();
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.キャンセル通知:
-                {
-                    #region " フェードアウト開始。"
-                    //----------------
-                    if( !this._フェーズ完了 )
-                    {
-                        Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
-                        this._フェーズ完了 = true;    // 完了
-                    }
-                    break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.指示待機:
-                case フェーズ.曲読み込み開始:
-                {
-                    #region " 待機画面 "
-                    //----------------
-                    Global.App.画面をクリアする();
-                    this._ビュアーモードの待機時背景を描画する( dc, userConfig );
-                    break;
-                    //----------------
-                    #endregion
-                }
-                case フェーズ.曲読み込み完了待ち:
-                {
-                    #region " 待機画面＆ローディング画像 "
-                    //----------------
-                    Global.App.画面をクリアする();
-                    this._ビュアーモードの待機時背景を描画する( dc, userConfig );
-                    this._LoadingSpinner.描画する();
-                    break;
-                    //----------------
-                    #endregion
                 }
             }
         }
-
-
-
-        // ローカル
-
-
-        private bool _フェーズ完了;
 
 
 
@@ -1250,6 +856,361 @@ namespace DTXMania2.演奏
         private readonly 左サイドクリアパネル _左サイドクリアパネル;
 
         private readonly 右サイドクリアパネル _右サイドクリアパネル;
+
+        private void _演奏パーツなし背景画面を描画する( DeviceContext dc )
+        {
+            var userConfig = Global.App.ログオン中のユーザ;
+
+            Global.App.画面をクリアする();
+
+            #region " スコア指定の壁紙 "
+            //----------------
+            if( userConfig.スコア指定の背景画像を表示する )
+            {
+                this._スコア指定の背景画像?.進行描画する( 0f, 0f,
+                    X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                    Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+            }
+            //----------------
+            #endregion
+
+            #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
+            //----------------
+            this._左サイドクリアパネル.クリアする();
+            this._左サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+
+                // プレイヤー名
+                this._プレイヤー名表示.進行描画する( dcp );
+
+                // スコア
+                if( userConfig.ダーク == ダーク種別.OFF )
+                    this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
+
+                // 達成率
+                this._達成率表示.進行描画する( dcp, (float) this.成績.Achievement );
+
+                // 判定パラメータ
+                this._判定パラメータ表示.進行描画する( dcp, +118f, +372f, this.成績 );
+
+                // スキル
+                this._曲別SKILL.進行描画する( dcp, 0f );
+
+            } );
+            this._左サイドクリアパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 右サイドパネルへの描画と、右サイトパネルの表示 "
+            //----------------
+            this._右サイドクリアパネル.クリアする();
+            this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+                // 特になし
+            } );
+            this._右サイドクリアパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " レーンフレーム "
+            //----------------
+            this._レーンフレーム.進行描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
+            //----------------
+            #endregion
+
+            #region " 背景画像 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._背景画像.進行描画する( 0f, 0f );
+            //----------------
+            #endregion
+
+            #region " 譜面スクロール速度 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
+            //----------------
+            #endregion
+
+            #region " エキサイトゲージ "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+            //----------------
+            #endregion
+
+            #region " クリアメーター "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._クリアメーター.進行描画する( dc );
+            //----------------
+            #endregion
+
+            #region " フェーズパネル "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._フェーズパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 曲目パネル "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._曲名パネル.進行描画する( dc );
+            //----------------
+            #endregion
+
+            #region " ヒットバー "
+            //----------------
+            if( userConfig.ダーク != ダーク種別.FULL )
+                this._ドラムキットとヒットバー.ヒットバーを進行描画する();
+            //----------------
+            #endregion
+
+            #region " ドラムキット "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+            //----------------
+            #endregion
+        }
+
+        private enum 演奏結果 { なし, クリア, 失敗 };
+
+        private 演奏結果 _演奏パーツあり背景画面を描画する( DeviceContext dc )
+        {
+            var result = 演奏結果.なし;
+            var userConfig = Global.App.ログオン中のユーザ;
+
+            double 演奏時刻sec = this._演奏開始からの経過時間secを返す() + Global.次のDComp表示までの残り時間sec;
+
+            Global.App.画面をクリアする();
+
+            #region " 譜面スクロールの進行 "
+            //----------------
+            // チップの表示より前に進行だけ行う。
+            this._譜面スクロール速度.進行する( userConfig.譜面スクロール速度 );
+            //----------------
+            #endregion
+
+            #region " スコア指定の壁紙 "
+            //----------------
+            if( userConfig.スコア指定の背景画像を表示する )
+            {
+                this._スコア指定の背景画像?.進行描画する( 0f, 0f,
+                    X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                    Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+            }
+            //----------------
+            #endregion
+
+            #region " 動画 "
+            //----------------
+            if( userConfig.演奏中に動画を表示する )
+            {
+                foreach( var kvp in Global.App.AVI管理.動画リスト )
+                {
+                    int zz = kvp.Key;       // zz 番号
+                    var video = kvp.Value;  // Video インスタンス
+
+                    if( video.再生中 )
+                    {
+                        switch( userConfig.動画の表示サイズ )
+                        {
+                            case 動画の表示サイズ.全画面:
+                            {
+                                #region " 100%全体表示 "
+                                //----------------
+                                float w = Global.設計画面サイズ.Width;
+                                float h = Global.設計画面サイズ.Height;
+                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
+                                break;
+                                //----------------
+                                #endregion
+                            }
+
+                            case 動画の表示サイズ.中央寄せ:
+                            {
+                                #region " 75%縮小表示 "
+                                //----------------
+                                float w = Global.設計画面サイズ.Width;
+                                float h = Global.設計画面サイズ.Height;
+
+                                // (1) 画面いっぱいに描画。
+                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+
+                                // (2) ちょっと縮小して描画。
+                                float 拡大縮小率 = 0.75f;
+                                float 上移動 = 100.0f;
+                                video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
+                                    w * ( 1f - 拡大縮小率 ) / 2f,
+                                    h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
+                                    w * 拡大縮小率,
+                                    h * 拡大縮小率 ) );
+
+                                break;
+                                //----------------
+                                #endregion
+                            }
+                        }
+                    }
+                }
+            }
+            //----------------
+            #endregion
+
+            #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
+            //----------------
+            this._左サイドクリアパネル.クリアする();
+            this._左サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+
+                // プレイヤー名
+                this._プレイヤー名表示.進行描画する( dcp );
+
+                // スコア
+                if( userConfig.ダーク == ダーク種別.OFF )
+                    this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
+
+                // 達成率
+                this._達成率表示.進行描画する( dcp, (float) this.成績.Achievement );
+
+                // 判定パラメータ
+                this._判定パラメータ表示.進行描画する( dcp, +118f, +372f, this.成績 );
+
+                // スキル
+                this._曲別SKILL.進行描画する( dcp, this.成績.スキル );
+
+            } );
+            this._左サイドクリアパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 右サイドパネルへの描画と、右サイドパネルの表示 "
+            //----------------
+            this._右サイドクリアパネル.クリアする();
+            this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
+
+                // コンボ
+                this._コンボ表示.進行描画する( dcp, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
+
+            } );
+            this._右サイドクリアパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " レーンフレーム "
+            //----------------
+            this._レーンフレーム.進行描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
+            //----------------
+            #endregion
+
+            #region " レーンフラッシュ  "
+            //----------------
+            this._レーンフラッシュ.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 小節線拍線 "
+            //----------------
+            if( userConfig.ダーク != ダーク種別.FULL )
+                this._小節線拍線を描画する( dc, 演奏時刻sec );
+            //----------------
+            #endregion
+
+            #region " 背景画像 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._背景画像.進行描画する( 0f, 0f );
+            //----------------
+            #endregion
+
+            #region " 譜面スクロール速度 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
+            //----------------
+            #endregion
+
+            #region " エキサイトゲージ "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+            //----------------
+            #endregion
+
+            #region " クリアメーター, フェーズパネル "
+            //----------------
+            double 曲の長さsec = Global.App.演奏スコア.チップリスト[ Global.App.演奏スコア.チップリスト.Count - 1 ].描画時刻sec;
+            float 現在位置 = (float) ( 1.0 - ( 曲の長さsec - 演奏時刻sec ) / 曲の長さsec );
+
+            // クリアメーター
+            this.成績.CountMap = this._クリアメーター.カウント値を設定する( 現在位置, this.成績.判定別ヒット数 );
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._クリアメーター.進行描画する( dc );
+
+            // フェーズパネル
+            this._フェーズパネル.現在位置 = 現在位置;
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._フェーズパネル.進行描画する();
+            //----------------
+            #endregion
+
+            #region " 曲名パネル "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._曲名パネル.進行描画する( dc );
+            //----------------
+            #endregion
+
+            #region " ヒットバー "
+            //----------------
+            // ヒットバー
+            if( userConfig.ダーク != ダーク種別.FULL )
+                this._ドラムキットとヒットバー.ヒットバーを進行描画する();
+            //----------------
+            #endregion
+
+            #region " ドラムキット "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._ドラムキットとヒットバー.ドラムキットを進行描画する();
+            //----------------
+            #endregion
+
+            // ↓クリア判定はこの中。
+            #region " ドラムチップ "
+            //----------------
+            this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
+
+                if( this._ドラムチップ.進行描画する( ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx ) )
+                {
+                    // true が返されたら演奏終了（クリア）
+                    result = 演奏結果.クリア;
+                }
+
+            } );
+            //----------------
+            #endregion
+
+            #region " チップ光 "
+            //----------------
+            this._チップ光.進行描画する( dc );
+            //----------------
+            #endregion
+
+            #region " 判定文字列 "
+            //----------------
+            this._判定文字列.進行描画する();
+            //----------------
+            #endregion
+
+            #region " システム情報 "
+            //----------------
+            if( userConfig.ダーク == ダーク種別.OFF )
+                this._システム情報.描画する( dc, $"BGMAdjust: {Global.App.演奏譜面.譜面.BGMAdjust}" );
+            //----------------
+            #endregion
+
+            return result;
+        }
 
         private void _キャプチャ画面を描画する( DeviceContext dc, float 不透明度 = 1.0f )
         {
@@ -1750,8 +1711,10 @@ namespace DTXMania2.演奏
 
         private Task _曲読み込みタスク = null!;
 
-        private void _ビュアーモードの待機時背景を描画する( DeviceContext dc, ユーザ設定 userConfig )
+        private void _ビュアーモードの待機時背景を描画する( DeviceContext dc )
         {
+            var userConfig = Global.App.ログオン中のユーザ;
+
             #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
             //----------------
             this._左サイドクリアパネル.クリアする();
@@ -1765,16 +1728,16 @@ namespace DTXMania2.演奏
                     this._スコア表示.進行描画する( dcp, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
 
                 // 達成率
-                this._達成率表示.描画する( dcp, (float) this.成績.Achievement );
+                this._達成率表示.進行描画する( dcp, (float) this.成績.Achievement );
 
                 // 判定パラメータ
-                this._判定パラメータ表示.描画する( dcp, +118f, +372f, this.成績 );
+                this._判定パラメータ表示.進行描画する( dcp, +118f, +372f, this.成績 );
 
                 // スキル
                 this._曲別SKILL.進行描画する( dcp, 0f );
 
             } );
-            this._左サイドクリアパネル.描画する();
+            this._左サイドクリアパネル.進行描画する();
             //----------------
             #endregion
 
@@ -1784,20 +1747,20 @@ namespace DTXMania2.演奏
             this._右サイドクリアパネル.クリアパネル.画像へ描画する( ( dcp ) => {
                 // 特になし
             } );
-            this._右サイドクリアパネル.描画する();
+            this._右サイドクリアパネル.進行描画する();
             //----------------
             #endregion
 
             #region " レーンフレーム "
             //----------------
-            this._レーンフレーム.描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
+            this._レーンフレーム.進行描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) ? true : false );
             //----------------
             #endregion
 
             #region " 背景画像 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._背景画像.描画する( 0f, 0f );
+                this._背景画像.進行描画する( 0f, 0f );
             //----------------
             #endregion
 
@@ -1832,7 +1795,7 @@ namespace DTXMania2.演奏
             #region " 曲目パネル "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._曲名パネル.描画する( dc );
+                this._曲名パネル.進行描画する( dc );
             //----------------
             #endregion
 

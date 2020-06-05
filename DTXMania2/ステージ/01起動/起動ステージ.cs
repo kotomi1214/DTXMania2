@@ -99,6 +99,8 @@ namespace DTXMania2.起動
                     #region " 一度描画処理を通してから（画面を表示させてから）次のフェーズへ。"
                     //----------------
                     this._コンソール表示内容[ ^1 ] += " done.";
+
+                    // 次のフェーズへ。
                     this._コンソール表示内容.Add( "Creating global resources..." );
                     this.現在のフェーズ = フェーズ.グローバルリソース生成中;
                     break;
@@ -124,9 +126,8 @@ namespace DTXMania2.起動
                 {
                     #region " システムサウンドの構築を開始して次のフェーズへ。"
                     //----------------
-                    this._コンソール表示内容.Add( "Creating system sounds..." );
-
                     // 次のフェーズへ。
+                    this._コンソール表示内容.Add( "Creating system sounds..." );
                     this.現在のフェーズ = フェーズ.システムサウンド構築完了待ち;
                     break;
                     //----------------
@@ -311,21 +312,8 @@ namespace DTXMania2.起動
 
             #region " 文字列表示 "
             //----------------
-            switch( this.現在のフェーズ )
-            {
-                case フェーズ.曲ツリー構築完了待ち:
-                {
-                    for( int i = 0; i < this._コンソール表示内容.Count; i++ )
-                        this._コンソールフォント.描画する( dc, 0f, i * 32f, this._コンソール表示内容[ i ] );
-                    break;
-                }
-                default:
-                {
-                    for( int i = 0; i < this._コンソール表示内容.Count; i++ )
-                        this._コンソールフォント.描画する( dc, 0f, i * 32f, this._コンソール表示内容[ i ] );
-                    break;
-                }
-            }
+            for( int i = 0; i < this._コンソール表示内容.Count; i++ )
+                this._コンソールフォント.描画する( dc, 0f, i * 32f, this._コンソール表示内容[ i ] );
             //----------------
             #endregion
         }
