@@ -98,7 +98,7 @@ namespace FDK
                 using var waveSource = new MediaFoundationOnMemoryWaveSource( path, device.WaveFormat );
 
                 // デコード完了まで待機。
-                if( waveSource.DecodeComplete.Wait( 60_1000 ) ) // 最大1分
+                if( !waveSource.DecodeComplete.Wait( 60_1000 ) ) // 最大1分
                     throw new TimeoutException( $"デコードタスクがタイムアウトしました。[{path.変数付きパス}]" );
 
                 // IWaveSource をリサンプルして ISampleSource を生成。
