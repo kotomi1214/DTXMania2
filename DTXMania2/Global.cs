@@ -378,7 +378,8 @@ namespace DTXMania2
                 AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される。（意味ない）
                 Stereo = false,
                 SampleDescription = new SharpDX.DXGI.SampleDescription( 1, 0 ), // マルチサンプリングは使わない。
-                SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
+                //SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
+                SwapEffect = SharpDX.DXGI.SwapEffect.FlipDiscard,
                 Scaling = SharpDX.DXGI.Scaling.Stretch,                 // SwapChainForComposition での必須条件。
                 Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                 Flags = SharpDX.DXGI.SwapChainFlags.None,
