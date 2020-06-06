@@ -251,7 +251,10 @@ namespace DTXMania2
 
                 Log.現在のスレッドに名前をつける( "進行描画" );
                 Log.Info( "進行描画タスクを起動しました。" );
+                
                 this._進行描画タスクのNETスレッドID = Thread.CurrentThread.ManagedThreadId;
+                Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
+
                 起動完了通知.Set();
 
                 this._進行描画のメインループを実行する();
