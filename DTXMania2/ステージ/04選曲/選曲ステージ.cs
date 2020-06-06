@@ -8,6 +8,7 @@ using FDK;
 using SSTFormat.v004;
 using DTXMania2.曲;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace DTXMania2.選曲
 {
@@ -175,7 +176,7 @@ namespace DTXMania2.選曲
                                 {
                                     this._選曲リスト.指定したノードを優先して現行化する( sn.Value.曲 );
                                     while( !sn.Value.曲.現行化済み )
-                                        Task.Delay( 100 );
+                                        Thread.Sleep( 100 );
                                 }
 
                                 // 曲ツリーの現行化タスクが動いていれば、一時停止する。
@@ -203,7 +204,7 @@ namespace DTXMania2.選曲
                             {
                                 this._選曲リスト.フォーカスノードを優先して現行化する();
                                 while( !snode.現行化済み )
-                                    Task.Delay( 100 );
+                                    Thread.Sleep( 100 );
                             }
 
                             // 曲ツリーの現行化タスクが動いていれば、一時停止する。

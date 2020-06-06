@@ -66,7 +66,7 @@ namespace DTXMania2.選曲
             Task.Run( () => {
 
                 // 500ミリ秒待つ。
-                Task.Delay( 500 ).Wait();
+                Thread.Sleep( 500 );
                 if( cancelToken.IsCancellationRequested )
                     return; // キャンセルされた
 
