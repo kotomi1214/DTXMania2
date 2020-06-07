@@ -900,8 +900,8 @@ namespace DTXMania2.オプション設定
 
             // (4) パッド矢印（上＆下）を描画。
 
-            this._パッド矢印.描画する( パッド矢印.種類.上_Tom1, new Vector2( left, パネルの高さ * 3f ) );
-            this._パッド矢印.描画する( パッド矢印.種類.下_Tom2, new Vector2( left, パネルの高さ * 4f ) );
+            this._パッド矢印.描画する( dc, パッド矢印.種類.上_Tom1, new Vector2( left, パネルの高さ * 3f ) );
+            this._パッド矢印.描画する( dc, パッド矢印.種類.下_Tom2, new Vector2( left, パネルの高さ * 4f ) );
         }
 
 

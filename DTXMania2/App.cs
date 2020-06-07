@@ -670,7 +670,7 @@ namespace DTXMania2
 
         internal void 画面をクリアする()
         {
-            var d3ddc = Global.D3D11Device1.ImmediateContext;
+            var d3ddc = Global.既定のD3D11DeviceContext;
 
             // 既定のD3Dレンダーターゲットビューを黒でクリアする。
             d3ddc.ClearRenderTargetView( Global.既定のD3D11RenderTargetView, SharpDX.Color4.Black );
