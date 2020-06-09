@@ -401,7 +401,7 @@ namespace DTXMania2
                 SwapEffect = SharpDX.DXGI.SwapEffect.FlipDiscard,
                 Scaling = SharpDX.DXGI.Scaling.Stretch,                 // SwapChainForComposition での必須条件。
                 Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
-                Flags = SharpDX.DXGI.SwapChainFlags.None,
+                Flags = SharpDX.DXGI.SwapChainFlags.AllowTearing,
 
                 // https://msdn.microsoft.com/en-us/library/windows/desktop/bb174579.aspx
                 // > You cannot call SetFullscreenState on a swap chain that you created with IDXGIFactory2::CreateSwapChainForComposition.
@@ -678,7 +678,7 @@ namespace DTXMania2
                     (int) newSize.Width,                // 新しいサイズ
                     (int) newSize.Height,               // 新しいサイズ
                     SharpDX.DXGI.Format.Unknown,        // Unknown: 現在のフォーマットを維持
-                    SharpDX.DXGI.SwapChainFlags.None );
+                    SharpDX.DXGI.SwapChainFlags.AllowTearing );
 
                 Global.物理画面サイズ = new SharpDX.Size2F( newSize.Width, newSize.Height );
             }
