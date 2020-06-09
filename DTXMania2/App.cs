@@ -360,17 +360,7 @@ namespace DTXMania2
 
                     this.ステージ?.進行描画する();
 
-                    if( this.システム設定.垂直帰線同期を行う )
-                    {
-                        Global.DXGISwapChain1.Present( 1, SharpDX.DXGI.PresentFlags.None );
-                    }
-                    else
-                    {
-                        // AllowTearing を使うには、SwapChain の作成・再作成の際に AllowTearing フラグを指定しておく必要がある。
-                        // AllowTearing を使う場合、syncinterval には必ず 0 を指定する必要がある。
-                        // AllowTearing を使わない場合、ボーダーレス全画面ウィンドウの場合、syncinterval を 0 にしても垂直帰線同期するようになる。
-                        Global.DXGISwapChain1.Present( 0, SharpDX.DXGI.PresentFlags.AllowTearing );
-                    }
+                    Global.DXGISwapChain1.Present( this.システム設定.垂直帰線同期を行う ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
                     //----------------
                     #endregion
 
