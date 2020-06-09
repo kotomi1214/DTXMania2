@@ -710,7 +710,7 @@ namespace DTXMania2
         private 黒幕[] _黒幕アニメーション = null!;
 
         private readonly 画像D2D _ロゴ;
-        private readonly RectangleF _ロゴ表示領域 = new RectangleF( ( 1920f - 730f ) / 2f, ( 1080f - 300f ) / 2f, 730f, 300f );
+        private readonly RectangleF _ロゴ表示領域 = new RectangleF( ( 1920f - 730f ) / 2f, ( 1080f - 178f ) / 2f, 730f, 178f );
 
         /// <summary>
         ///		1:全表示 ... 0:非表示

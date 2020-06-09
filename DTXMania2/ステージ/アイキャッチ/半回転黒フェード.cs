@@ -18,7 +18,7 @@ namespace DTXMania2
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._ロゴ画像 = new 画像D2D( @"$(Images)\TitleLogo_Shadow.png" );
+            this._ロゴ画像 = new 画像D2D( @"$(Images)\TitleLogo.png" );
             this._黒ブラシ = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.Black );
 
             this.現在のフェーズ = フェーズ.未定;
@@ -266,8 +266,8 @@ namespace DTXMania2
                         #region " (4) ロゴ "
                         //----------------
                         dc.Transform =
-                            Matrix3x2.Scaling( 639f / this._ロゴ画像.サイズ.Width, 262f / this._ロゴ画像.サイズ.Height ) *
-                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 771f ) *
+                            Matrix3x2.Scaling( 640f / this._ロゴ画像.サイズ.Width, 156f / this._ロゴ画像.サイズ.Height ) *
+                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 800f ) *
                             preTrans;
 
                         dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
@@ -349,8 +349,8 @@ namespace DTXMania2
                         #region " (4) ロゴ "
                         //----------------
                         dc.Transform =
-                            Matrix3x2.Scaling( 639f / this._ロゴ画像.サイズ.Width, 262f / this._ロゴ画像.サイズ.Height ) *
-                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 771f ) *
+                            Matrix3x2.Scaling( 640f / this._ロゴ画像.サイズ.Width, 156f / this._ロゴ画像.サイズ.Height ) *
+                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 800f ) *
                             preTrans;
 
                         dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );

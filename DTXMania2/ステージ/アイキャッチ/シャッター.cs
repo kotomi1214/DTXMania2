@@ -317,13 +317,14 @@ namespace DTXMania2
                 if( this._ロゴボード.Status != StoryboardStatus.Ready )
                     すべて完了 = false;
 
+                float 倍率 = this._ロゴ表示幅 / this._ロゴ.サイズ.Width;
                 this._ロゴ.描画する(
                     dc,
-                    this._ロゴ表示領域.Left,
-                    this._ロゴ表示領域.Top,
+                    this._ロゴ表示位置.Width,
+                    this._ロゴ表示位置.Height,
                     不透明度0to1: (float) this._ロゴ不透明度.Value,
-                    X方向拡大率: ( this._ロゴ表示領域.Width / this._ロゴ.サイズ.Width ),
-                    Y方向拡大率: ( this._ロゴ表示領域.Height / this._ロゴ.サイズ.Height ) );
+                    X方向拡大率: 倍率,
+                    Y方向拡大率: 倍率 );
                 //----------------
                 #endregion
             }
@@ -387,6 +388,7 @@ namespace DTXMania2
         private readonly 画像D2D _ロゴ;
         private Variable _ロゴ不透明度 = null!;
         private Storyboard _ロゴボード = null!;
-        private readonly RectangleF _ロゴ表示領域 = new RectangleF( 1100f, 700f, 730f, 300f );
+        private readonly Size2F _ロゴ表示位置 = new Size2F( 1100f, 800f );
+        private readonly float _ロゴ表示幅 = 730f;
     }
 }
