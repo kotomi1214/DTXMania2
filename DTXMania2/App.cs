@@ -360,6 +360,12 @@ namespace DTXMania2
 
                     this.ステージ?.進行描画する();
 
+                    Global.EffekseerManager.Update();   // ステージ進行の後に。（AddLocationなどのエフェクト操作が行われるかも知れないため）
+                    
+                    Global.EffekseerRenderer.BeginRendering();
+                    Global.EffekseerManager.Draw();
+                    Global.EffekseerRenderer.EndRendering();
+
                     Global.DXGISwapChain1.Present( this.システム設定.垂直帰線同期を行う ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
                     //----------------
                     #endregion

@@ -50,6 +50,9 @@
     <Reference Include="CSCore">
       <HintPath>..\packages-selfbuild\CSCore-netstandard-1.2.1.2\CSCore.dll</HintPath>
     </Reference>
+    <Reference Include="EffekseerNET">
+      <HintPath>..\packages-selfbuild\Effekseer-netcore\EffekseerNET.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +77,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Ijwhost.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Default\DrumSounds\Bass.wav">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
