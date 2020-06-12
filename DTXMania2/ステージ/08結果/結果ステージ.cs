@@ -163,6 +163,7 @@ namespace DTXMania2.結果
                         this._曲別SKILL.アニメを完了する();
                         this._達成率.アニメを完了する();
                         this._難易度.アニメを完了する();
+                        this._ランク.アニメを完了する();
 
                         this.現在のフェーズ = フェーズ.アニメ完了;
                         //----------------
@@ -257,6 +258,22 @@ namespace DTXMania2.結果
             }
         }
 
+        private void _画面を描画する( DeviceContext dc )
+        {
+            this._背景.進行描画する( dc );
+            dc.FillRectangle( new RectangleF( 0f, 36f, Global.設計画面サイズ.Width, Global.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
+            this._プレビュー画像を描画する( dc );
+            this._曲名パネル.描画する( dc, 660f, 796f );
+            this._曲名を描画する( dc );
+            this._サブタイトルを描画する( dc );
+            this._演奏パラメータ結果.進行描画する( dc, 1317f, 716f, this._結果 );
+            this._ランク.進行描画する( dc, this._結果.ランク );
+            this._難易度.進行描画する( dc, 1341f, 208f, Global.App.演奏スコア.難易度 );
+            this._曲別SKILL.進行描画する( dc, 1329f, 327f, this._結果.スキル );
+            this._達成率.進行描画する( dc, 1233f, 428f, this._結果.Achievement );
+            this._システム情報.描画する( dc );
+        }
+
         private void _プレビュー画像を描画する( DeviceContext dc )
         {
             // 枠
@@ -301,22 +318,6 @@ namespace DTXMania2.結果
             float 最大幅dpx = 545f;
             float X方向拡大率 = ( this._サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._サブタイトル画像.画像サイズdpx.Width;
             this._サブタイトル画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
-        }
-
-        private void _画面を描画する( DeviceContext dc )
-        {
-            this._背景.進行描画する( dc );
-            dc.FillRectangle( new RectangleF( 0f, 36f, Global.設計画面サイズ.Width, Global.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
-            this._プレビュー画像を描画する( dc );
-            this._曲名パネル.描画する( dc, 660f, 796f );
-            this._曲名を描画する( dc );
-            this._サブタイトルを描画する( dc );
-            this._演奏パラメータ結果.進行描画する( dc, 1317f, 716f, this._結果 );
-            this._ランク.進行描画する( dc, 200f, 300f, this._結果.ランク );
-            this._難易度.進行描画する( dc, 1341f, 208f, Global.App.演奏スコア.難易度 );
-            this._曲別SKILL.進行描画する( dc, 1329f, 327f, this._結果.スキル );
-            this._達成率.進行描画する( dc, 1233f, 428f, this._結果.Achievement );
-            this._システム情報.描画する( dc );
         }
 
 

@@ -126,8 +126,6 @@ namespace DTXMania2
         public static SharpDX.WIC.ImagingFactory2 WicImagingFactory2 { get; private set; } = null!;
         public static SharpDX.DirectWrite.Factory DWriteFactory { get; private set; } = null!;
         public static Animation Animation { get; private set; } = null!;
-        public static EffekseerNET.Manager EffekseerManager { get; private set; } = null!;
-        public static EffekseerRendererDX11NET.Renderer EffekseerRenderer { get; private set; } = null!;
 
         private static void _スワップチェーンに依存しないグラフィックリソースを作成する()
         {
@@ -278,46 +276,10 @@ namespace DTXMania2
             Animation = new Animation();
             //----------------
             #endregion
-
-            #region " Effekseer.NET をセットアップする。 "
-            //----------------
-            EffekseerRenderer = EffekseerRendererDX11NET.Renderer.Create( D3D11Device1.NativePointer, 既定のD3D11DeviceContext.NativePointer, squareMaxCount: 8000 );
-            EffekseerManager = EffekseerNET.Manager.Create( instance_max: 8000 );
-
-            EffekseerManager.SetSpriteRenderer( EffekseerRenderer.CreateSpriteRenderer() );
-            EffekseerManager.SetRibbonRenderer( EffekseerRenderer.CreateRibbonRenderer() );
-            EffekseerManager.SetRingRenderer( EffekseerRenderer.CreateRingRenderer() );
-            EffekseerManager.SetTrackRenderer( EffekseerRenderer.CreateTrackRenderer() );
-            EffekseerManager.SetModelRenderer( EffekseerRenderer.CreateModelRenderer() );
-
-            EffekseerManager.SetTextureLoader( EffekseerRenderer.CreateTextureLoader() );
-            EffekseerManager.SetModelLoader( EffekseerRenderer.CreateModelLoader() );
-            EffekseerManager.SetMaterialLoader( EffekseerRenderer.CreateMaterialLoader() );
-
-            EffekseerRenderer.SetProjectionMatrix(
-                new EffekseerNET.Matrix44().PerspectiveFovRH(
-                    90.0f / 180.0f * 3.14f,
-                    (float) 物理画面サイズ.Width / (float) 物理画面サイズ.Height,
-                    1.0f, 500.0f ) );
-
-            EffekseerRenderer.SetCameraMatrix(
-                new EffekseerNET.Matrix44().LookAtRH(
-                    eye: new EffekseerNET.Vector3D( 10.0f, 5.0f, 20.0f ),
-                    at: new EffekseerNET.Vector3D( 0.0f, 0.0f, 0.0f ),
-                    up: new EffekseerNET.Vector3D( 0.0f, 1.0f, 0.0f ) ) );
-            //----------------
-            #endregion
         }
         private static void _スワップチェーンに依存しないグラフィックリソースを解放する()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
-
-            #region " Effekseer.NET を解放する。 "
-            //----------------
-            EffekseerManager.Destroy();     // Dispose() じゃないので注意！
-            EffekseerRenderer.Destroy();
-            //----------------
-            #endregion
 
             #region " Windows Animation を解放する。"
             //----------------
@@ -504,6 +466,10 @@ namespace DTXMania2
         ///     スワップチェーンのバックバッファに対する既定のビューポートの配列。
         /// </summary>
         public static SharpDX.Mathematics.Interop.RawViewportF[] 既定のD3D11ViewPort { get; private set; } = null!;
+        /// <summary>
+        ///     Effekseer 関連。
+        /// </summary>
+        public static Effekseer Effekseer { get; private set; } = null!;
 
         private static void _スワップチェーンに依存するグラフィックリソースを作成する()
         {
@@ -593,7 +559,14 @@ namespace DTXMania2
                 };
                 //----------------
                 #endregion
+
+                #region " Effekseer を作成する。"
+                //----------------
+                Effekseer = new Effekseer( D3D11Device1, 既定のD3D11DeviceContext, backbufferTexture2D.Description.Width, backbufferTexture2D.Description.Height );
+                //----------------
+                #endregion
             }
+
 
             // D2D 関連
 
@@ -619,6 +592,12 @@ namespace DTXMania2
         private static void _スワップチェーンに依存するグラフィックリソースを解放する()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
+
+            #region " Effekseer を解放する。"
+            //----------------
+            Effekseer.Dispose();
+            //----------------
+            #endregion
 
             #region " 既定の深度ステンシルステート、既定の深度ステンシルビュー、深度ステンシルを解放する。"
             //----------------
