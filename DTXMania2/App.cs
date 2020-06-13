@@ -348,8 +348,11 @@ namespace DTXMania2
                                 break;
 
                             case TaskMessage.内容名.サイズ変更:
-                                this._リソースを再構築する( msg );
+                            {
+                                var newSize = (System.Drawing.Size) msg.引数![ 0 ];
+                                Global.GraphicResources.物理画面サイズを変更する( new SharpDX.Size2F( newSize.Width, newSize.Height ) );
                                 break;
+                            }
                         }
                     }
 
@@ -831,33 +834,13 @@ namespace DTXMania2
                     内容: TaskMessage.内容名.サイズ変更,
                     引数: new object[] { this.ClientSize } );
 
-                // 進行描画タスクからの完了通知を待つ。
-                if( !Global.TaskMessageQueue.Post( msg ).Wait( 5000 ) )
-                    throw new TimeoutException( "サイズ変更タスクメッセージがタイムアウトしました。" );
+                Global.TaskMessageQueue.Post( msg );
             }
 
             base.OnResize( e );
         }
 
         private bool _リサイズ中 = false;
-
-        private void _リソースを再構築する( TaskMessage msg )
-        {
-            using var _ = new LogBlock( Log.現在のメソッド名 );
-
-            // リソースを解放して、
-            //this.Onスワップチェーンに依存するグラフィックリソースの解放();
-
-            // スワップチェーンを再構築して、
-            var size = (System.Drawing.Size) msg.引数![ 0 ];
-            Global.GraphicResources.物理画面サイズを変更する( new SharpDX.Size2F( size.Width, size.Height ) );
-
-            // リソースを再作成する。
-            //this.Onスワップチェーンに依存するグラフィックリソースの作成();
-
-            // 完了。
-            msg.完了通知.Set();
-        }
 
 
 

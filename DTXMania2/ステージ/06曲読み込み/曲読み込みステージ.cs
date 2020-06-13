@@ -97,7 +97,7 @@ namespace DTXMania2.曲読み込み
         public void 進行描画する()
         {
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             switch( this.現在のフェーズ )
             {

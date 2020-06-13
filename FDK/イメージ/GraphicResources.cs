@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX.DirectComposition;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -31,24 +32,7 @@ namespace FDK
         /// </remarks>
         public SharpDX.Size2F 設計画面サイズ { get; private set; }
 
-        /// <summary>
-        ///     モニタに実際に表示される画面のサイズ[px]。
-        /// </summary>
-        /// <remarks>
-        ///     物理画面サイズは、スワップチェーンのサイズを表す。
-        ///     物理画面サイズは、ユーザが自由に変更することができるため、固定値ではないことに留意。
-        ///     プログラム内では物理画面におけるピクセルの単位として「px (physical pixel)」と称することがある。
-        ///     なお、int より float での利用が多いので、Size や Size2 ではなく Size2F を使う。
-        ///     （int 同士ということを忘れて、割り算しておかしくなるケースも多発したので。）
-        /// </remarks>
         public SharpDX.Size2F 物理画面サイズ { get; private set; }
-
-        public float 拡大率DPXtoPX横 => ( 物理画面サイズ.Width / 設計画面サイズ.Width );
-        public float 拡大率DPXtoPX縦 => ( 物理画面サイズ.Height / 設計画面サイズ.Height );
-        public float 拡大率PXtoDPX横 => ( 設計画面サイズ.Width / 物理画面サイズ.Width );
-        public float 拡大率PXtoDPX縦 => ( 設計画面サイズ.Height / 物理画面サイズ.Height );
-        public SharpDX.Matrix3x2 拡大行列DPXtoPX => SharpDX.Matrix3x2.Scaling( 拡大率DPXtoPX横, 拡大率DPXtoPX縦 );
-        public SharpDX.Matrix3x2 拡大行列PXtoDPX => SharpDX.Matrix3x2.Scaling( 拡大率PXtoDPX横, 拡大率PXtoDPX縦 );
 
         /// <summary>
         ///     等倍3D平面での画面左上の3D座標。
@@ -367,14 +351,13 @@ namespace FDK
             // DirectComposition用スワップチェーンを作成する。
             var swapChainDesc = new SharpDX.DXGI.SwapChainDescription1() {
                 BufferCount = 2,
-                Width = (int) 物理画面サイズ.Width,
-                Height = (int) 物理画面サイズ.Height,
+                Width = (int) 設計画面サイズ.Width,
+                Height = (int) 設計画面サイズ.Height,
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,    // D2D をサポートするなら B8G8R8A8 を指定する必要がある。
                 AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される。（意味ない）
                 Stereo = false,
                 SampleDescription = new SharpDX.DXGI.SampleDescription( 1, 0 ), // マルチサンプリングは使わない。
                 SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
-                //SwapEffect = SharpDX.DXGI.SwapEffect.FlipDiscard,
                 Scaling = SharpDX.DXGI.Scaling.Stretch,                 // SwapChainForComposition での必須条件。
                 Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                 Flags = SharpDX.DXGI.SwapChainFlags.None,
@@ -390,6 +373,7 @@ namespace FDK
             using var dxgiFactory2 = dxgiAdapter!.GetParent<SharpDX.DXGI.Factory2>();
 
             DXGISwapChain1 = new SharpDX.DXGI.SwapChain1( dxgiFactory2, D3D11Device1, ref swapChainDesc );  // CreateSwapChainForComposition()
+            //DXGISwapChain1 = new SharpDX.DXGI.SwapChain1( dxgiFactory2, D3D11Device1, this.Handle, ref swapChainDesc );  // CreateSwapChainForHWnd()
 
             // 標準機能である PrintScreen と Alt+Enter は使わない。
             dxgiFactory2!.MakeWindowAssociation(
@@ -401,6 +385,10 @@ namespace FDK
 
             // Visual のコンテンツに指定してコミット。
             DCompVisual2ForSwapChain.Content = DXGISwapChain1;
+            using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
+            trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
+            trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
+            DCompVisual2ForSwapChain.SetTransform( trans );
             DCompDevice2.Commit();
         }
         private void _スワップチェーンを解放する()
@@ -640,26 +628,13 @@ namespace FDK
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            // (1) 依存リソースを解放。
-            this.スワップチェーンに依存するグラフィックリソースの解放( this, new EventArgs() );
+            this.物理画面サイズ = newSize;
 
-            // (2) バックバッファのサイズを変更。
-            using( var lb = new LogBlock( "バックバッファのリサイズ" ) )
-            {
-                this.DXGISwapChain1.ResizeBuffers(
-                    0,                                  // 0: 現在のバッファ数を維持
-                    (int) newSize.Width,                // 新しいサイズ
-                    (int) newSize.Height,               // 新しいサイズ
-                    SharpDX.DXGI.Format.Unknown,        // Unknown: 現在のフォーマットを維持
-                    SharpDX.DXGI.SwapChainFlags.None );
-
-                this.物理画面サイズ = new SharpDX.Size2F( newSize.Width, newSize.Height );
-            }
-
-            // (3) 依存リソースを作成。
-            this.スワップチェーンに依存するグラフィックリソースの作成( this, new EventArgs() );
-
-            Log.Info( $"物理画面サイズを変更しました。{this.物理画面サイズ}" );
+            using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
+            trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
+            trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
+            DCompVisual2ForSwapChain.SetTransform( trans );
+            DCompDevice2.Commit();
         }
 
         /// <summary>

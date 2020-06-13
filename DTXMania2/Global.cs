@@ -121,8 +121,8 @@ namespace DTXMania2
             Global.Effekseer = new Effekseer(
                 Global.GraphicResources.D3D11Device1,
                 Global.GraphicResources.既定のD3D11DeviceContext,
-                Global.GraphicResources.物理画面サイズ.Width,
-                Global.GraphicResources.物理画面サイズ.Height );
+                Global.GraphicResources.設計画面サイズ.Width,
+                Global.GraphicResources.設計画面サイズ.Height );
         }
 
         private static void _スワップチェーンに依存するグラフィックリソースの解放( object? sender, EventArgs e )

@@ -79,7 +79,7 @@ namespace DTXMania2.タイトル
             this._システム情報.VPSをカウントする();
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             Global.App.ドラム入力.すべての入力デバイスをポーリングする();
 

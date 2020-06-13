@@ -272,7 +272,7 @@ namespace DTXMania2.起動
                     #region " 開始音の終了待ちを開始して次のフェーズへ。"
                     //----------------
                     this._コンソール表示内容.Add( "All setup done." );
-                    
+
                     // 次のフェーズへ。
                     this.現在のフェーズ = フェーズ.開始音終了待ち;
                     break;
@@ -309,7 +309,7 @@ namespace DTXMania2.起動
             Global.App.画面をクリアする();
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             dc.BeginDraw();
 

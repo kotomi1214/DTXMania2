@@ -165,7 +165,7 @@ namespace DTXMania2.演奏
         public void 進行描画する()
         {
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
@@ -1061,7 +1061,9 @@ namespace DTXMania2.演奏
             var result = 演奏結果.なし;
             var userConfig = Global.App.ログオン中のユーザ;
 
-            double 演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec + Global.GraphicResources.次のDComp表示までの残り時間sec;
+            double 演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec;
+            if( Global.Options.VSyncWait )
+                演奏時刻sec += +Global.GraphicResources.次のDComp表示までの残り時間sec;
 
             #region " 譜面スクロールの進行 "
             //----------------

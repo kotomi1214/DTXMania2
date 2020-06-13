@@ -132,7 +132,7 @@ namespace DTXMania2.結果
         public void 進行描画する()
         {
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();

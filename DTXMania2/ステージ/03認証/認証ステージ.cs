@@ -84,7 +84,7 @@ namespace DTXMania2.認証
             var 描画領域 = new RectangleF( 566f, 60f, 784f, 943f );
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             Global.App.ドラム入力.すべての入力デバイスをポーリングする();
 

@@ -106,7 +106,7 @@ namespace DTXMania2.選曲
             var フォーカスノード = 曲ツリー.フォーカスノード!;
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             入力.すべての入力デバイスをポーリングする();
 
