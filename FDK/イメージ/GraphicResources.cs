@@ -373,8 +373,8 @@ namespace FDK
                 AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される。（意味ない）
                 Stereo = false,
                 SampleDescription = new SharpDX.DXGI.SampleDescription( 1, 0 ), // マルチサンプリングは使わない。
-                //SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
-                SwapEffect = SharpDX.DXGI.SwapEffect.FlipDiscard,
+                SwapEffect = SharpDX.DXGI.SwapEffect.FlipSequential,    // SwapChainForComposition での必須条件。
+                //SwapEffect = SharpDX.DXGI.SwapEffect.FlipDiscard,
                 Scaling = SharpDX.DXGI.Scaling.Stretch,                 // SwapChainForComposition での必須条件。
                 Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                 Flags = SharpDX.DXGI.SwapChainFlags.None,
@@ -389,7 +389,7 @@ namespace FDK
             using var dxgiAdapter = dxgiDevice1!.Adapter;
             using var dxgiFactory2 = dxgiAdapter!.GetParent<SharpDX.DXGI.Factory2>();
 
-            DXGISwapChain1 = new SharpDX.DXGI.SwapChain1( dxgiFactory2, D3D11Device1, Handle, ref swapChainDesc );
+            DXGISwapChain1 = new SharpDX.DXGI.SwapChain1( dxgiFactory2, D3D11Device1, ref swapChainDesc );  // CreateSwapChainForComposition()
 
             // 標準機能である PrintScreen と Alt+Enter は使わない。
             dxgiFactory2!.MakeWindowAssociation(
