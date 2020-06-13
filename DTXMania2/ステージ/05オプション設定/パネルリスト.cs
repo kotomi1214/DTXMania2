@@ -866,7 +866,7 @@ namespace DTXMania2.オプション設定
 
             // (1) フレーム１（たて線）を描画。
 
-            this._青い線.描画する( dc, new Vector2( left, 0f ), 高さdpx: Global.設計画面サイズ.Height );
+            this._青い線.描画する( dc, new Vector2( left, 0f ), 高さdpx: Global.GraphicResources.設計画面サイズ.Height );
 
 
             // (2) パネルを描画。（選択中のパネルの3つ上から7つ下までの計11枚。）

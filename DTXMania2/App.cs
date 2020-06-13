@@ -247,6 +247,9 @@ namespace DTXMania2
 
             var 起動完了通知 = new ManualResetEvent( false );
 
+            var app = this;
+            var hWindow = app.Handle;
+
             Task.Run( () => {
 
                 Log.現在のスレッドに名前をつける( "進行描画" );
@@ -257,7 +260,7 @@ namespace DTXMania2
 
                 起動完了通知.Set();
 
-                this._進行描画のメインループを実行する();
+                this._進行描画のメインループを実行する( app, hWindow );
 
             } );
 
@@ -285,7 +288,7 @@ namespace DTXMania2
             }
         }
 
-        private void _進行描画のメインループを実行する()
+        private void _進行描画のメインループを実行する( App app, IntPtr hWindow )
         {
             try
             {
@@ -299,10 +302,12 @@ namespace DTXMania2
                 ScorePropertiesDB.最新版にバージョンアップする();
 
                 Global.生成する(
+                    app,
+                    hWindow,
                     設計画面サイズ: new SharpDX.Size2F( 1920f, 1080f ),
                     物理画面サイズ: new SharpDX.Size2F( this.ClientSize.Width, this.ClientSize.Height ) );
 
-                画像.全インスタンスで共有するリソースを作成する( Global.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
+                画像.全インスタンスで共有するリソースを作成する( Global.GraphicResources.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
 
                 this._システム設定をもとにリソース関連のフォルダ変数を更新する();
 
@@ -361,7 +366,7 @@ namespace DTXMania2
 
                     this.ステージ?.進行描画する();
 
-                    Global.DXGISwapChain1.Present( this.システム設定.垂直帰線同期を行う ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
+                    Global.GraphicResources.DXGISwapChain1.Present( this.システム設定.垂直帰線同期を行う ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
                     //----------------
                     #endregion
 
@@ -545,10 +550,10 @@ namespace DTXMania2
 
                                 // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
                                 ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
-                                    Global.D3D11Device1,
-                                    Global.DXGISwapChain1,
-                                    Global.既定のD3D11RenderTargetView,
-                                    Global.既定のD2D1DeviceContext );
+                                    Global.GraphicResources.D3D11Device1,
+                                    Global.GraphicResources.DXGISwapChain1,
+                                    Global.GraphicResources.既定のD3D11RenderTargetView,
+                                    Global.GraphicResources.既定のD2D1DeviceContext );
                             }
                             //----------------
                             #endregion
@@ -671,14 +676,14 @@ namespace DTXMania2
 
         internal void 画面をクリアする()
         {
-            var d3ddc = Global.既定のD3D11DeviceContext;
+            var d3ddc = Global.GraphicResources.既定のD3D11DeviceContext;
 
             // 既定のD3Dレンダーターゲットビューを黒でクリアする。
-            d3ddc.ClearRenderTargetView( Global.既定のD3D11RenderTargetView, SharpDX.Color4.Black );
+            d3ddc.ClearRenderTargetView( Global.GraphicResources.既定のD3D11RenderTargetView, SharpDX.Color4.Black );
 
             // 既定の深度/ステンシルバッファをクリアする。
             d3ddc.ClearDepthStencilView(
-                Global.既定のD3D11DepthStencilView,
+                Global.GraphicResources.既定のD3D11DepthStencilView,
                 SharpDX.Direct3D11.DepthStencilClearFlags.Depth | SharpDX.Direct3D11.DepthStencilClearFlags.Stencil,
                 depth: 1.0f,
                 stencil: 0 );
@@ -845,7 +850,7 @@ namespace DTXMania2
 
             // スワップチェーンを再構築して、
             var size = (System.Drawing.Size) msg.引数![ 0 ];
-            Global.物理画面サイズを変更する( new SharpDX.Size2F( size.Width, size.Height ) );
+            Global.GraphicResources.物理画面サイズを変更する( new SharpDX.Size2F( size.Width, size.Height ) );
 
             // リソースを再作成する。
             //this.Onスワップチェーンに依存するグラフィックリソースの作成();

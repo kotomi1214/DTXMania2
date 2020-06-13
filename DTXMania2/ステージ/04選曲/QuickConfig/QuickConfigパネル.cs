@@ -297,7 +297,7 @@ namespace DTXMania2.選曲.QuickConfig
                         // 選択カーソルを描画する。
                         if( this._設定項目リスト.SelectedIndex == i )
                         {
-                            dc.Transform = Global.拡大行列DPXtoPX;
+                            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
                          
                             using var brush = new SolidColorBrush( dc, new SharpDX.Color( 0.6f, 0.6f, 1f, 0.4f ) );
                             

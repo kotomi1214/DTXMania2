@@ -51,8 +51,8 @@ namespace DTXMania2.終了
 
         public void 進行描画する()
         {
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {

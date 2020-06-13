@@ -97,9 +97,9 @@ namespace DTXMania2.演奏
             this._エキサイトゲージ = new エキサイトゲージ();
             this._システム情報 = new システム情報();
             this._数字フォント中グレー48x64 = new フォント画像D2D( @"$(Images)\NumberFont48x64White.png", @"$(Images)\NumberFont48x64.yaml", 文字幅補正dpx: -16f, 不透明度: 0.3f );
-            this._小節線色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.White );
-            this._小節線影色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.Blue );
-            this._拍線色 = new SolidColorBrush( Global.既定のD2D1DeviceContext, Color.Gray );
+            this._小節線色 = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, Color.White );
+            this._小節線影色 = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, Color.Blue );
+            this._拍線色 = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, Color.Gray );
             this._スコア指定の背景画像 = null!;
             this._チップの演奏状態 = null!;
             this._フェードインカウンタ = new Counter();
@@ -164,8 +164,8 @@ namespace DTXMania2.演奏
 
         public void 進行描画する()
         {
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
@@ -905,8 +905,8 @@ namespace DTXMania2.演奏
             if( userConfig.スコア指定の背景画像を表示する )
             {
                 this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
-                    X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                    Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                    X方向拡大率: Global.GraphicResources.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                    Y方向拡大率: Global.GraphicResources.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
             }
             //----------------
             #endregion
@@ -1061,7 +1061,7 @@ namespace DTXMania2.演奏
             var result = 演奏結果.なし;
             var userConfig = Global.App.ログオン中のユーザ;
 
-            double 演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec + Global.次のDComp表示までの残り時間sec;
+            double 演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec + Global.GraphicResources.次のDComp表示までの残り時間sec;
 
             #region " 譜面スクロールの進行 "
             //----------------
@@ -1075,8 +1075,8 @@ namespace DTXMania2.演奏
             if( userConfig.スコア指定の背景画像を表示する )
             {
                 this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
-                    X方向拡大率: Global.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
-                    Y方向拡大率: Global.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
+                    X方向拡大率: Global.GraphicResources.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
+                    Y方向拡大率: Global.GraphicResources.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
             }
             //----------------
             #endregion
@@ -1098,8 +1098,8 @@ namespace DTXMania2.演奏
                             {
                                 #region " 100%全体表示 "
                                 //----------------
-                                float w = Global.設計画面サイズ.Width;
-                                float h = Global.設計画面サイズ.Height;
+                                float w = Global.GraphicResources.設計画面サイズ.Width;
+                                float h = Global.GraphicResources.設計画面サイズ.Height;
                                 video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
                                 //----------------
                                 #endregion
@@ -1111,8 +1111,8 @@ namespace DTXMania2.演奏
                             {
                                 #region " 75%縮小表示 "
                                 //----------------
-                                float w = Global.設計画面サイズ.Width;
-                                float h = Global.設計画面サイズ.Height;
+                                float w = Global.GraphicResources.設計画面サイズ.Width;
+                                float h = Global.GraphicResources.設計画面サイズ.Height;
 
                                 // (1) 画面いっぱいに描画。
                                 video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
@@ -1342,7 +1342,7 @@ namespace DTXMania2.演奏
 
             dc.DrawBitmap(
                 this.キャプチャ画面,
-                new RectangleF( 0f, 0f, Global.設計画面サイズ.Width, Global.設計画面サイズ.Height ),
+                new RectangleF( 0f, 0f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Height ),
                 不透明度,
                 BitmapInterpolationMode.Linear );
         }

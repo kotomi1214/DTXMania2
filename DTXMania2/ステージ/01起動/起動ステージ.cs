@@ -308,8 +308,8 @@ namespace DTXMania2.起動
 
             Global.App.画面をクリアする();
 
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             dc.BeginDraw();
 

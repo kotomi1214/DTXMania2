@@ -72,8 +72,8 @@ namespace DTXMania2
 
         public void 描画する()
         {
-            Global.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( Global.既定のD3D11DepthStencilView, Global.既定のD3D11RenderTargetView );
-            Global.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.既定のD3D11ViewPort );
+            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( Global.GraphicResources.既定のD3D11DepthStencilView, Global.GraphicResources.既定のD3D11RenderTargetView );
+            Global.GraphicResources.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.GraphicResources.既定のD3D11ViewPort );
 
             Renderer.BeginRendering();
             Manager.Draw();
@@ -82,8 +82,8 @@ namespace DTXMania2
 
         public void 描画する( int effectHandle )
         {
-            Global.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( Global.既定のD3D11DepthStencilView, Global.既定のD3D11RenderTargetView );
-            Global.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.既定のD3D11ViewPort );
+            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( Global.GraphicResources.既定のD3D11DepthStencilView, Global.GraphicResources.既定のD3D11RenderTargetView );
+            Global.GraphicResources.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.GraphicResources.既定のD3D11ViewPort );
 
             Renderer.BeginRendering();
             Manager.DrawHandle( effectHandle );

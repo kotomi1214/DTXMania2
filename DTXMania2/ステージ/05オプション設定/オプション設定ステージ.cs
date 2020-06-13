@@ -67,8 +67,8 @@ namespace DTXMania2.オプション設定
 
         public void 進行描画する()
         {
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();

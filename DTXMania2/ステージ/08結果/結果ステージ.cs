@@ -85,8 +85,8 @@ namespace DTXMania2.結果
             this._達成率 = ( this._最高成績である ) ? (達成率Base) new 達成率更新() : new 達成率();
 
             this._システム情報 = new システム情報();
-            this._黒マスクブラシ = new SolidColorBrush( Global.既定のD2D1DeviceContext, new Color4( Color3.Black, 0.75f ) );
-            this._プレビュー枠ブラシ = new SolidColorBrush( Global.既定のD2D1DeviceContext, new Color4( 0xFF209292 ) );
+            this._黒マスクブラシ = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, new Color4( Color3.Black, 0.75f ) );
+            this._プレビュー枠ブラシ = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, new Color4( 0xFF209292 ) );
 
 
             var 選択曲 = Global.App.演奏スコア;
@@ -131,8 +131,8 @@ namespace DTXMania2.結果
 
         public void 進行描画する()
         {
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
@@ -261,7 +261,7 @@ namespace DTXMania2.結果
         private void _画面を描画する( DeviceContext dc )
         {
             this._背景.進行描画する( dc );
-            dc.FillRectangle( new RectangleF( 0f, 36f, Global.設計画面サイズ.Width, Global.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
+            dc.FillRectangle( new RectangleF( 0f, 36f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
             this._プレビュー画像を描画する( dc );
             this._曲名パネル.描画する( dc, 660f, 796f );
             this._曲名を描画する( dc );

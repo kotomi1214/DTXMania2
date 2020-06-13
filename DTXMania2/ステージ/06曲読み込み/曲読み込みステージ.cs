@@ -96,8 +96,8 @@ namespace DTXMania2.曲読み込み
 
         public void 進行描画する()
         {
-            var dc = Global.既定のD2D1DeviceContext;
-            dc.Transform = Global.拡大行列DPXtoPX;
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = Global.GraphicResources.拡大行列DPXtoPX;
 
             switch( this.現在のフェーズ )
             {
@@ -239,7 +239,7 @@ namespace DTXMania2.曲読み込み
             var 表示位置dpx = new Vector2( 782f, 409f );
 
             // 拡大率を計算して描画する。            
-            float 最大幅dpx = Global.設計画面サイズ.Width - 表示位置dpx.X - 20f;  // -20f はマージン
+            float 最大幅dpx = Global.GraphicResources.設計画面サイズ.Width - 表示位置dpx.X - 20f;  // -20f はマージン
             float X方向拡大率 = ( this._曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._曲名画像.画像サイズdpx.Width;
             this._曲名画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
@@ -249,7 +249,7 @@ namespace DTXMania2.曲読み込み
             var 表示位置dpx = new Vector2( 782f, 520f );
 
             // 拡大率を計算して描画する。
-            float 最大幅dpx = Global.設計画面サイズ.Width - 表示位置dpx.X;
+            float 最大幅dpx = Global.GraphicResources.設計画面サイズ.Width - 表示位置dpx.X;
             float X方向拡大率 = ( this._サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._サブタイトル画像.画像サイズdpx.Width;
             this._サブタイトル画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
