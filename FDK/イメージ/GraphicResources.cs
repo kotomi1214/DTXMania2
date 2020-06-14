@@ -385,10 +385,7 @@ namespace FDK
 
             // Visual のコンテンツに指定してコミット。
             DCompVisual2ForSwapChain.Content = DXGISwapChain1;
-            using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
-            trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
-            trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
-            DCompVisual2ForSwapChain.SetTransform( trans );
+            this._D2D用Visualのスケールをバックバッファに合せる();
             DCompDevice2.Commit();
         }
         private void _スワップチェーンを解放する()
@@ -630,10 +627,7 @@ namespace FDK
 
             this.物理画面サイズ = newSize;
 
-            using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
-            trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
-            trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
-            DCompVisual2ForSwapChain.SetTransform( trans );
+            this._D2D用Visualのスケールをバックバッファに合せる();
             DCompDevice2.Commit();
         }
 
@@ -661,6 +655,15 @@ namespace FDK
                 設計画面サイズ.Width / 設計画面サイズ.Height,   // アスペクト比
                 -dz,                                            // 前方投影面までの距離
                 +dz );                                          // 後方投影面までの距離
+        }
+
+
+        private void _D2D用Visualのスケールをバックバッファに合せる()
+        {
+            using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
+            trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
+            trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
+            DCompVisual2ForSwapChain.SetTransform( trans );
         }
     }
 }
