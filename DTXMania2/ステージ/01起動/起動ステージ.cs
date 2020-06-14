@@ -89,10 +89,8 @@ namespace DTXMania2.起動
         // 進行と描画
 
 
-        public void 進行描画する()
+        public void 進行する()
         {
-            // 進行
-
             switch( this.現在のフェーズ )
             {
                 case フェーズ.開始:
@@ -302,10 +300,10 @@ namespace DTXMania2.起動
                     #endregion
                 }
             }
+        }
 
-
-            // 描画
-
+        public void 描画する()
+        {
             Global.App.画面をクリアする();
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;

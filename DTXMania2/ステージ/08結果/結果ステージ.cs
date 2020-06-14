@@ -129,12 +129,8 @@ namespace DTXMania2.結果
         // 進行と描画
 
 
-        public void 進行描画する()
+        public void 進行する()
         {
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
-
-            this._システム情報.VPSをカウントする();
             this._システム情報.FPSをカウントしプロパティを更新する();
 
             Global.App.ドラム入力.すべての入力デバイスをポーリングする();
@@ -143,16 +139,6 @@ namespace DTXMania2.結果
             {
                 case フェーズ.表示:
                 {
-                    #region " 背景画面を描画する。"
-                    //----------------
-                    dc.BeginDraw();
-
-                    this._画面を描画する( dc );
-
-                    dc.EndDraw();
-                    //----------------
-                    #endregion
-
                     #region " 入力処理。"
                     //----------------
                     if( Global.App.ドラム入力.確定キーが入力された() ||
@@ -189,17 +175,7 @@ namespace DTXMania2.結果
                 }
                 case フェーズ.アニメ完了:
                 {
-                    #region " 背景画面を描画する。"
-                    //----------------
-                    dc.BeginDraw();
-
-                    this._画面を描画する( dc );
-
-                    dc.EndDraw();
-                    //----------------
-                    #endregion
-
-                    #region " 入力処理 "
+                    #region " 入力処理。"
                     //----------------
                     if( Global.App.ドラム入力.確定キーが入力された() ||
                         Global.App.ドラム入力.キャンセルキーが入力された() )
@@ -228,19 +204,10 @@ namespace DTXMania2.結果
                 }
                 case フェーズ.フェードアウト:
                 {
-                    #region " 背景画面＆フェードアウト "
+                    #region " フェードアウトが完了したら完了フェーズへ。"
                     //----------------
-                    dc.BeginDraw();
-
-                    this._画面を描画する( dc );
-
-                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.クローズ完了 )
-                    {
-                        // フェードアウトが完了したら完了フェーズへ。
+                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
                         this.現在のフェーズ = フェーズ.完了;
-                    }
-
-                    dc.EndDraw();
                     //----------------
                     #endregion
 
@@ -250,6 +217,62 @@ namespace DTXMania2.結果
                 {
                     #region " 遷移終了。Appによるステージ遷移待ち。"
                     //----------------
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+            }
+        }
+
+        public void 描画する()
+        {
+            this._システム情報.VPSをカウントする();
+
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
+
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.表示:
+                case フェーズ.アニメ完了:
+                {
+                    #region " 背景画面を描画する。"
+                    //----------------
+                    dc.BeginDraw();
+
+                    this._画面を描画する( dc );
+
+                    dc.EndDraw();
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+                case フェーズ.フェードアウト:
+                {
+                    #region " 背景画面＆フェードアウト "
+                    //----------------
+                    dc.BeginDraw();
+
+                    this._画面を描画する( dc );
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
+
+                    dc.EndDraw();
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+                case フェーズ.完了:
+                {
+                    #region " フェードアウト "
+                    //----------------
+                    dc.BeginDraw();
+
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
+
+                    dc.EndDraw();
                     //----------------
                     #endregion
 

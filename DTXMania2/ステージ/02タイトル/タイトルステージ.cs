@@ -73,13 +73,9 @@ namespace DTXMania2.タイトル
         // 進行と描画
 
 
-        public void 進行描画する()
+        public void 進行する()
         {
             this._システム情報.FPSをカウントしプロパティを更新する();
-            this._システム情報.VPSをカウントする();
-
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
 
             Global.App.ドラム入力.すべての入力デバイスをポーリングする();
 
@@ -111,6 +107,43 @@ namespace DTXMania2.タイトル
                     //----------------
                     #endregion
 
+                    break;
+                }
+                case フェーズ.フェードアウト:
+                {
+                    #region " フェードアウト描画が完了したら完了フェーズへ。"
+                    //----------------
+                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.クローズ完了 )
+                        this.現在のフェーズ = フェーズ.完了;
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+                case フェーズ.キャンセル:
+                case フェーズ.完了:
+                {
+                    #region " 遷移終了。Appによるステージ遷移を待つ。"
+                    //----------------
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+            }
+        }
+
+        public void 描画する()
+        {
+            this._システム情報.VPSをカウントする();
+
+            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            dc.Transform = SharpDX.Matrix3x2.Identity;
+            
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.表示:
+                {
                     #region " タイトル画面を描画する。"
                     //----------------
                     dc.BeginDraw();
@@ -138,7 +171,7 @@ namespace DTXMania2.タイトル
                     dc.BeginDraw();
 
                     this._舞台画像.進行描画する( dc );
-                    
+
                     dc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
                     this._パッドを叩いてください.描画する( dc, 720f, 810f );
 
@@ -146,25 +179,11 @@ namespace DTXMania2.タイトル
                         ( Global.GraphicResources.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
                         ( Global.GraphicResources.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
 
-                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.クローズ完了 )
-                    {
-                        // フェードアウト描画が完了したら完了フェーズへ。
-                        this.現在のフェーズ = フェーズ.完了;
-                    }
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
 
                     this._システム情報.描画する( dc );
 
                     dc.EndDraw();
-                    //----------------
-                    #endregion
-
-                    break;
-                }
-                case フェーズ.キャンセル:
-                case フェーズ.完了:
-                {
-                    #region " 遷移終了。Appによるステージ遷移を待つ。"
-                    //----------------
                     //----------------
                     #endregion
 

@@ -94,7 +94,48 @@ namespace DTXMania2.曲読み込み
         // 進行と描画
 
 
-        public void 進行描画する()
+        public void 進行する()
+        {
+            switch( this.現在のフェーズ )
+            {
+                case フェーズ.フェードイン:
+                {
+                    #region " フェードインが完了したら次のフェーズへ。"
+                    //----------------
+                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.現在のフェーズ == アイキャッチ.フェーズ.オープン完了 )
+                        this.現在のフェーズ = フェーズ.表示;
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+                case フェーズ.表示:
+                {
+                    #region " スコアを読み込んで完了フェーズへ。"
+                    //----------------
+                    スコアを読み込む();
+                    Global.App.ドラム入力.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
+
+                    // 次のフェーズへ。
+                    this.現在のフェーズ = フェーズ.完了;
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+                case フェーズ.完了:
+                {
+                    #region " 遷移終了。Appによるステージ遷移待ち。"
+                    //----------------
+                    //----------------
+                    #endregion
+
+                    break;
+                }
+            }
+        }
+
+        public void 描画する()
         {
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
             dc.Transform = SharpDX.Matrix3x2.Identity;
@@ -106,14 +147,8 @@ namespace DTXMania2.曲読み込み
                     #region " 背景画面＆アイキャッチフェードインを描画する。"
                     //----------------
                     dc.BeginDraw();
-
                     this._背景画面を描画する( dc );
-                    if( Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc ) == アイキャッチ.フェーズ.オープン完了 )
-                    {
-                        // フェードインが完了したら次のフェーズへ。
-                        this.現在のフェーズ = フェーズ.表示;
-                    }
-
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
                     dc.EndDraw();
                     //----------------
                     #endregion
@@ -127,16 +162,10 @@ namespace DTXMania2.曲読み込み
                     dc.BeginDraw();
                     this._背景画面を描画する( dc );
                     dc.EndDraw();
-
-                    スコアを読み込む();
-
-                    Global.App.ドラム入力.すべての入力デバイスをポーリングする();  // 先行入力があったらここでキャンセル
-
-                    // 次のフェーズへ。
-                    this.現在のフェーズ = フェーズ.完了;
-                    break;
                     //----------------
                     #endregion
+
+                    break;
                 }
                 case フェーズ.完了:
                 {
