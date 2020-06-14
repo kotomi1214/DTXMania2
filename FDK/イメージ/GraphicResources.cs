@@ -218,6 +218,7 @@ namespace FDK
             #region " スワップチェーン用のVisualを作成する。"
             //----------------
             DCompVisual2ForSwapChain = new SharpDX.DirectComposition.Visual2( DCompDevice2 );
+            DCompVisual2ForSwapChain.BitmapInterpolationMode = BitmapInterpolationMode.Linear;
             //----------------
             #endregion
 
