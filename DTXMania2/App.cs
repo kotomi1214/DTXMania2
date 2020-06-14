@@ -333,10 +333,14 @@ namespace DTXMania2
                 //----------------
                 #endregion
 
+                var スワップチェーン表示タスク = new PresentSwapChainVSync();
+                var tick = new ManualResetEvent( false );
                 TaskMessage? 終了指示メッセージ = null;
 
                 while( true )
                 {
+                    tick.WaitOne( 1 );
+
                     #region " 自分宛のメッセージが届いていたら、すべて処理する。"
                     //----------------
                     foreach( var msg in Global.TaskMessageQueue.Get( TaskMessage.タスク名.進行描画 ) )
@@ -366,10 +370,18 @@ namespace DTXMania2
                     //----------------
                     Global.Animation.進行する();
                     Global.Effekseer.進行する();
+                    this.ステージ?.進行する();
 
-                    this.ステージ?.進行描画する();
-
-                    Global.GraphicResources.DXGISwapChain1.Present( this.システム設定.垂直帰線同期を行う ? 1 : 0, SharpDX.DXGI.PresentFlags.None );
+                    if( スワップチェーン表示タスク.表示待機中 )
+                    {
+                        // 表示タスクがすでに起動されているなら、描画と表示は行わない。
+                    }
+                    else
+                    {
+                        // 表示タスクが起動していないなら、描画して、表示タスクを起動する。
+                        this.ステージ?.描画する();
+                        スワップチェーン表示タスク.表示する( Global.GraphicResources.DXGIOutput1, Global.GraphicResources.DXGISwapChain1!, 0 );
+                    }
                     //----------------
                     #endregion
 
@@ -627,7 +639,7 @@ namespace DTXMania2
                             }
                             //----------------
                             #endregion
-                            
+
                             break;
                         }
                     }
@@ -923,7 +935,7 @@ namespace DTXMania2
                         }
                         else
                         {
-                            // HACK: その他のコマンドラインオプションへの対応
+                            // hack: その他のコマンドラインオプションへの対応
                         }
                     }
                     catch( Exception e )

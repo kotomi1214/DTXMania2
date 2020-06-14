@@ -627,6 +627,8 @@ namespace FDK
 
             this.物理画面サイズ = newSize;
 
+            // スワップチェーンのサイズは変更せず、レンダーターゲット（DirectComposition の Visual）の拡大率のみ変更する。
+            // Direct3D については、何もしなくても自動的に拡大縮小される。
             this._D2D用Visualのスケールをバックバッファに合せる();
             DCompDevice2.Commit();
         }
