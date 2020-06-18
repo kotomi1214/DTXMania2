@@ -404,7 +404,7 @@ namespace DTXMania2
                                     Log.Header( "ビュアーステージ" );
 
                                     // AutoPlayer でログイン。
-                                    if( !this.ログオンする( "AutoPlay" ) )
+                                    if( !this.ログオンする( "AutoPlayer" ) )
                                     {
                                         System.Windows.Forms.MessageBox.Show( "AutoPlayerでのログオンに失敗しました。", "DTXMania2 error" );
                                         this.ステージ = null;
