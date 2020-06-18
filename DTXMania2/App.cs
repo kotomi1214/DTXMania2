@@ -919,22 +919,16 @@ namespace DTXMania2
                         // オプションを担当ステージに送る。
                         if( options.再生停止 )
                         {
-                            if( this.ステージ is 演奏.演奏ステージ )
-                            {
-                                // 停止
-                                演奏.演奏ステージ.OptionsQueue.Enqueue( options );
-                            }
+                            // 停止
+                            演奏.演奏ステージ.OptionsQueue.Enqueue( options );
                         }
                         else if( options.再生開始 )
                         {
-                            if( this.ステージ is 演奏.演奏ステージ )
-                            {
-                                // 停止と
-                                演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
+                            // 停止と
+                            演奏.演奏ステージ.OptionsQueue.Enqueue( new CommandLineOptions() { 再生停止 = true } );
 
-                                // 開始
-                                演奏.演奏ステージ.OptionsQueue.Enqueue( options );
-                            }
+                            // 開始
+                            演奏.演奏ステージ.OptionsQueue.Enqueue( options );
                         }
                         else
                         {
