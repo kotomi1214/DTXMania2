@@ -744,8 +744,11 @@ namespace DTXMania2
 
             // 評価順曲ツリーを新しい属性にあわせて再構築する。
 
-            var ratingTree = (曲ツリー_評価順) this.曲ツリーリスト[ 1 ];  // [1]評価順
-            ratingTree.再構築する();
+            if( !Global.Options.ビュアーモードである )
+            {
+                var ratingTree = (曲ツリー_評価順) this.曲ツリーリスト[ 1 ];  // [1]評価順
+                ratingTree.再構築する();
+            }
 
             
             // すべての曲ツリーの現行化を開始する。
