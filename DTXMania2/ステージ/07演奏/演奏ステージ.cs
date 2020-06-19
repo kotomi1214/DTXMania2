@@ -1800,7 +1800,9 @@ namespace DTXMania2.演奏
             }
             else
             {
-                if( Global.Options.ビュアーモードである && !演奏ステージ.ビュアーモードでドラム音を再生する )
+                if( Global.Options.ビュアーモードである && 
+                    !演奏ステージ.ビュアーモードでドラム音を再生する &&
+                    chip.チップ種別 != チップ種別.BGM )   // BGM はドラムサウンドではない
                     return;
 
                 var drumChipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
