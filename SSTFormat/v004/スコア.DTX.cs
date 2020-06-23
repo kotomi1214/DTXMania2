@@ -1054,6 +1054,7 @@ namespace SSTFormat.v004
                 [ "preimage" ] = (true, _コマンド_PREIMAGE),
                 [ "premovie" ] = (true, _コマンド_PREMOVIE),
                 [ "avi" ] = (true, _コマンド_AVIzz),
+                [ "video" ] = (true, _コマンド_AVIzz),
                 [ "bgmwav" ] = (true, _コマンド_BGMWAV),
                 [ "background" ] = (true, _コマンド_BACKGROUND),
                 [ "wall" ] = (true, _コマンド_BACKGROUND),
