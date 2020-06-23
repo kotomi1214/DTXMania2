@@ -209,7 +209,7 @@ namespace SSTFEditor
             { チップ種別.China,              "China" },
             { チップ種別.HiHat_Close,        "HiHat(Close)" },
             { チップ種別.HiHat_Foot,         "FootPedal" },
-            { チップ種別.HiHat_HalfOpen,     "HiHat(HarfOpen)" },
+            { チップ種別.HiHat_HalfOpen,     "HiHat(HalfOpen)" },
             { チップ種別.HiHat_Open,         "HiHat(Open)" },
             { チップ種別.LeftCrash,          "Crash" },
             { チップ種別.Ride,               "Ride" },
