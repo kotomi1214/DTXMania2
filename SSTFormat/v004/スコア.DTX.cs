@@ -616,7 +616,7 @@ namespace SSTFormat.v004
 
                 現在の.BPM定義マップ[ 現在の.zz36進数 ] = BPM値;  // あれば上書き、なければ追加
             }
-            internal static void _コマンド_AVIzz()
+            internal static void _コマンド_AVIzz_VIDEOzz()
             {
                 if( -1 == 現在の.zz36進数 )
                 {
@@ -1053,8 +1053,8 @@ namespace SSTFormat.v004
                 [ "preview" ] = (true, _コマンド_PREVIEW),
                 [ "preimage" ] = (true, _コマンド_PREIMAGE),
                 [ "premovie" ] = (true, _コマンド_PREMOVIE),
-                [ "avi" ] = (true, _コマンド_AVIzz),
-                [ "video" ] = (true, _コマンド_AVIzz),
+                [ "avi" ] = (true, _コマンド_AVIzz_VIDEOzz),
+                [ "video" ] = (true, _コマンド_AVIzz_VIDEOzz),
                 [ "bgmwav" ] = (true, _コマンド_BGMWAV),
                 [ "background" ] = (true, _コマンド_BACKGROUND),
                 [ "wall" ] = (true, _コマンド_BACKGROUND),
