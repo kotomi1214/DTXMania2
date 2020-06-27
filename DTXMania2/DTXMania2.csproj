@@ -22,7 +22,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\Default\Images\TexturePS.hlsl" />
+    <None Remove="Resources\Default\Images\TextureVS.hlsl" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="3.1.3" />
+    <PackageReference Include="Microsoft.HLSL.CSharpVB" Version="1.0.2" />
     <PackageReference Include="Microsoft.Windows.SDK.Contracts" Version="10.0.18362.2005" />
     <PackageReference Include="NVorbis" Version="0.10.1" />
     <PackageReference Include="SharpDX" Version="4.2.0" />
@@ -36,6 +42,10 @@
     <PackageReference Include="SharpDX.MediaFoundation" Version="4.2.0" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.0" />
     <PackageReference Include="YamlDotNet" Version="8.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PixelShader Include="Resources\Default\Images\TexturePS.hlsl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -53,6 +63,10 @@
     <Reference Include="EffekseerNET">
       <HintPath>..\packages-selfbuild\Effekseer-netcore\EffekseerNET.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <VertexShader Include="Resources\Default\Images\TextureVS.hlsl" />
   </ItemGroup>
 
   <ItemGroup>
@@ -276,12 +290,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Default\Images\SelectStage\RatingIcon.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Default\Images\TexturePS.cso">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Resources\Default\Images\TextureVS.cso">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Resources\Default\Images\EyeCatch\!.png">
