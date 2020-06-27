@@ -96,7 +96,7 @@ namespace SSTFormat.v004
 
 
 
-            // DTX to SSTF 変換
+            // 入力
 
 
             /// <summary>
@@ -104,12 +104,217 @@ namespace SSTFormat.v004
             /// </summary>
             private static void _SSTFoverDTXからSSTFに復元する( スコア score )
             {
+                foreach( var chip in score.チップリスト )
+                {
+                    switch( chip.チップ種別 )
+                    {
+                        case チップ種別.SE30:
+                        {
+                            #region " SE30,18～1F → LeftCymbal_Mute "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "18" );
 
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.LeftCymbal_Mute;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.HiHat_Close:
+                        {
+                            #region " HiHat_Close,28～2F → HiHat_Open "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "28" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.HiHat_Open;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " HiHat_Close,2G～2N → HiHat_HalfOpen "
+                            //----------------
+                            else if( 8 <= zz && zz < 16 )
+                            {
+                                chip.チップ種別 = チップ種別.HiHat_HalfOpen;
+                                chip.音量 = zz - 7;
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " HiHat_Close,2O～2V → HiHat_Foot "
+                            //----------------
+                            else if( 16 <= zz && zz < 24 )
+                            {
+                                chip.チップ種別 = チップ種別.HiHat_Foot;
+                                chip.音量 = zz - 15;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.Snare:
+                        {
+                            #region " Snare,38～3F → Snare_OpenRim "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "38" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Snare_OpenRim;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " Snare,3G～3N → Snare_ClosedRim "
+                            //----------------
+                            else if( 8 <= zz && zz < 16 )
+                            {
+                                chip.チップ種別 = チップ種別.Snare_ClosedRim;
+                                chip.音量 = zz - 7;
+                            }
+                            //----------------
+                            #endregion
+
+                            #region " Snare,3O～3V → Snare_Ghost "
+                            //----------------
+                            else if( 16 <= zz && zz < 24 )
+                            {
+                                chip.チップ種別 = チップ種別.Snare_Ghost;
+                                chip.音量 = zz - 15;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.Tom1:
+                        {
+                            #region " Tom1,58～5F → Tom1_Rim "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "58" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Tom1_Rim;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.Tom2:
+                        {
+                            #region " Tom2,68～6F → Tom2_Rim "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "68" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Tom2_Rim;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.Tom3:
+                        {
+                            #region " Tom3,78～7F → Tom3_Rim "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "78" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Tom3_Rim;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.SE31:
+                        {
+                            #region " SE31,88～8F → RightCymbal_Mute "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "88" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.RightCymbal_Mute;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.Ride:
+                        {
+                            #region " Ride,98～9F → Ride_Cup "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "98" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Ride_Cup;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.RightCrash:
+                        {
+                            #region " RightCrash,A0～A7 → China "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "A0" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.China;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                        case チップ種別.LeftCrash:
+                        {
+                            #region " LeftCrash,B0～B7 → Splash "
+                            //----------------
+                            int zz = chip.チップサブID - _zz( "B0" );
+
+                            if( 0 <= zz && zz < 8 )
+                            {
+                                chip.チップ種別 = チップ種別.Splash;
+                                chip.音量 = zz + 1;
+                            }
+                            //----------------
+                            #endregion
+
+                            break;
+                        }
+                    }
+                }
             }
 
 
 
-            // 行出力
+            // 出力
 
 
             private static void _ヘッダ行を出力する( スコア score, StreamWriter sw )
