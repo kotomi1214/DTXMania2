@@ -380,7 +380,7 @@ namespace DTXMania2
                     {
                         // 表示タスクが起動していないなら、描画して、表示タスクを起動する。
                         this.ステージ?.描画する();
-                        スワップチェーン表示タスク.表示する( Global.GraphicResources.DXGIOutput1, Global.GraphicResources.DXGISwapChain1!, 0 );
+                        スワップチェーン表示タスク.表示する( Global.GraphicResources.DXGISwapChain1! );
                     }
                     //----------------
                     #endregion
