@@ -716,7 +716,7 @@ namespace SSTFormat.v004
                 // 生成順序に依存関係がある（36進数変換表はチップ種別マップより先に初期化されている必要がある）ので、
                 // メンバ初期化子ではなく、静的コンストラクタで順序づけて生成する。
 
-                _36進数変換表 = "0123456789ABCEFGGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+                _36進数変換表 = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
                 _チップ種別マップ = new Dictionary<チップ種別, (string ファイル名, int 先頭wav番号, int DTXチャンネル番号)>() {
                     { チップ種別.LeftCrash,          ( @"DrumSounds\LeftCrash.wav",          _zz("10"), 0x1A ) },
