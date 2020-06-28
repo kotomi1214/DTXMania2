@@ -108,9 +108,9 @@ namespace SSTFormat.v004
                 {
                     switch( chip.チップ種別 )
                     {
-                        case チップ種別.SE30:
+                        case チップ種別.SE1:
                         {
-                            #region " SE30,18～1F → LeftCymbal_Mute "
+                            #region " SE1,18～1F → LeftCymbal_Mute "
                             //----------------
                             int zz = chip.チップサブID - _zz( "18" );
 
@@ -184,12 +184,18 @@ namespace SSTFormat.v004
                             //----------------
                             #endregion
 
-                            #region " Snare,3O～3V → Snare_Ghost "
+                            break;
+                        }
+                        case チップ種別.SE2:
+                        {
+                            #region " SE2,3O～3V → Snare_Ghost "
                             //----------------
-                            else if( 16 <= zz && zz < 24 )
+                            int zz = chip.チップサブID - _zz( "3O" );
+                            
+                            if( 0 <= zz && zz < 8 )
                             {
                                 chip.チップ種別 = チップ種別.Snare_Ghost;
-                                chip.音量 = zz - 15;
+                                chip.音量 = zz + 1;
                             }
                             //----------------
                             #endregion
@@ -244,9 +250,9 @@ namespace SSTFormat.v004
 
                             break;
                         }
-                        case チップ種別.SE31:
+                        case チップ種別.SE3:
                         {
-                            #region " SE31,88～8F → RightCymbal_Mute "
+                            #region " SE3,88～8F → RightCymbal_Mute "
                             //----------------
                             int zz = chip.チップサブID - _zz( "88" );
 
@@ -720,7 +726,7 @@ namespace SSTFormat.v004
 
                 _チップ種別マップ = new Dictionary<チップ種別, (string ファイル名, int 先頭wav番号, int DTXチャンネル番号)>() {
                     { チップ種別.LeftCrash,          ( @"DrumSounds\LeftCrash.wav",          _zz("10"), 0x1A ) },
-                    { チップ種別.LeftCymbal_Mute,    ( @"DrumSounds\LeftCymbalMute.wav",     _zz("18"), 0x90 ) },
+                    { チップ種別.LeftCymbal_Mute,    ( @"DrumSounds\LeftCymbalMute.wav",     _zz("18"), 0x61 ) },
                     { チップ種別.HiHat_Close,        ( @"DrumSounds\HiHatClose.wav",         _zz("20"), 0x11 ) },
                     { チップ種別.HiHat_Open,         ( @"DrumSounds\HiHatOpen.wav",          _zz("28"), 0x18 ) },
                     { チップ種別.HiHat_HalfOpen,     ( @"DrumSounds\HiHatHalfOpen.wav",      _zz("2G"), 0x18 ) },
@@ -728,7 +734,7 @@ namespace SSTFormat.v004
                     { チップ種別.Snare,              ( @"DrumSounds\Snare.wav",              _zz("30"), 0x12 ) },
                     { チップ種別.Snare_OpenRim,      ( @"DrumSounds\SnareOpenRim.wav",       _zz("38"), 0x12 ) },
                     { チップ種別.Snare_ClosedRim,    ( @"DrumSounds\SnareClosedRim.wav",     _zz("3G"), 0x12 ) },
-                    { チップ種別.Snare_Ghost,        ( @"DrumSounds\SnareGhost.wav",         _zz("3O"), 0x12 ) },
+                    { チップ種別.Snare_Ghost,        ( @"DrumSounds\SnareGhost.wav",         _zz("3O"), 0x62 ) },
                     { チップ種別.Bass,               ( @"DrumSounds\Bass.wav",               _zz("40"), 0x13 ) },
                     { チップ種別.LeftBass,           ( @"DrumSounds\Bass.wav",               _zz("48"), 0x1C ) },
                     { チップ種別.Tom1,               ( @"DrumSounds\Tom1.wav",               _zz("50"), 0x14 ) },
@@ -738,7 +744,7 @@ namespace SSTFormat.v004
                     { チップ種別.Tom3,               ( @"DrumSounds\Tom3.wav",               _zz("70"), 0x17 ) },
                     { チップ種別.Tom3_Rim,           ( @"DrumSounds\Tom3Rim.wav",            _zz("78"), 0x17 ) },
                     { チップ種別.RightCrash,         ( @"DrumSounds\RightCrash.wav",         _zz("80"), 0x16 ) },
-                    { チップ種別.RightCymbal_Mute,   ( @"DrumSounds\RightCymbalMute.wav",    _zz("88"), 0x91 ) },
+                    { チップ種別.RightCymbal_Mute,   ( @"DrumSounds\RightCymbalMute.wav",    _zz("88"), 0x63 ) },
                     { チップ種別.Ride,               ( @"DrumSounds\Ride.wav",               _zz("90"), 0x19 ) },
                     { チップ種別.Ride_Cup,           ( @"DrumSounds\RideCup.wav",            _zz("98"), 0x19 ) },
                     { チップ種別.China,              ( @"DrumSounds\China.wav",              _zz("A0"), 0x16 ) },
