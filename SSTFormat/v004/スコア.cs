@@ -285,7 +285,14 @@ namespace SSTFormat.v004
                     score = SSTFScoreFactory.CreateFromFile( スコアファイルの絶対パス, ヘッダだけ );
                     break;
 
-                default:    // dtx, gda, 他
+                case ".dtx":
+                    if( SSTFoverDTX.ファイルがSSTFoverDTXである( スコアファイルの絶対パス ) )
+                        score = SSTFoverDTX.ファイルから生成する( スコアファイルの絶対パス, ヘッダだけ );
+                    else
+                        score = DTX.ファイルから生成する( スコアファイルの絶対パス, DTX.データ種別.DTX, ヘッダだけ );
+                    break;
+
+                default:    // 通常dtx, gda, 他
                     score = DTX.ファイルから生成する( スコアファイルの絶対パス, DTX.データ種別.拡張子から判定, ヘッダだけ );
                     break;
             }

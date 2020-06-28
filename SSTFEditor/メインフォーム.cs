@@ -1537,13 +1537,15 @@ namespace SSTFEditor
 
         private void _ファイルを読み込む( string ファイル名 )
         {
-            #region " .sstf 以外のファイルの場合、SSTF形式でインポートする旨を表示する。"
+            bool SSTFoverDTXである = スコア.SSTFoverDTX.ファイルがSSTFoverDTXである( ファイル名 );
+
+            #region " .sstf 以外のファイルの場合（SSTFoverDTXを除く）、SSTF形式でインポートする旨を表示する。"
             //----------------
             if( this.Config.DisplaysConfirmOfSSTFConversion )
             {
                 var 拡張子 = Path.GetExtension( ファイル名 ).ToLower();
 
-                if( 拡張子 != ".sstf" )
+                if( 拡張子 != ".sstf" && !SSTFoverDTXである )   // SSTFoverDTX なら表示しない
                 {
                     // [SSTF形式に変換しますか？] ダイアログを表示。
                     var result = MessageBox.Show(
@@ -1585,7 +1587,13 @@ namespace SSTFEditor
                     ;
 
                 string 読み込み時の拡張子 = Path.GetExtension( ファイル名 ).ToLower();
-                this._編集中のファイル名 = Path.ChangeExtension( Path.GetFileName( ファイル名 ), ".sstf" );       // 読み込んだファイルの拡張子を .sstf に変換。（ファイルはすでに読み込み済み）
+                if( !SSTFoverDTXである )
+                {
+                    // 読み込んだファイルの拡張子を .sstf に変換。（ファイルはすでに読み込み済み）
+                    this._編集中のファイル名 = Path.ChangeExtension( Path.GetFileName( ファイル名 ), ".sstf" );
+                }
+                else
+                    this._編集中のファイル名 = Path.GetFileName( ファイル名 );
                 this._作業フォルダパス = Path.GetDirectoryName( ファイル名 ) + @"\";
 
                 // 読み込んだファイルを [ファイル]メニューの最近使ったファイル一覧に追加する。
@@ -1629,8 +1637,9 @@ namespace SSTFEditor
                 // ウィンドウのタイトルバーの表示変更（str編集中のファイル名 が確定した後に）
                 this.未保存である = true;     // 以前の状態によらず、確実に更新するようにする。
 
-                // sstf 以外を読み込んだ場合は、未保存状態のままとする。
-                if( 読み込み時の拡張子.ToLower() == ".sstf" )
+                // 読み込み時と拡張子が同一である（が読み込み時はSSTFoverDTXではない）場合は、保存済み状態としておく。
+                if( 読み込み時の拡張子.ToLower() == Path.GetExtension( this._編集中のファイル名 ).ToLower() &&
+                    ! SSTFoverDTXである )
                     this.未保存である = false;
             }
             catch( InvalidDataException )
