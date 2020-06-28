@@ -449,6 +449,8 @@ namespace SSTFormat.v004
             {
                 int zz = 1;
 
+                _BPMリスト = new List<double>();
+
                 foreach( var chip in score.チップリスト )
                 {
                     if( chip.チップ種別 == チップ種別.BPM && !_BPMリスト.Contains( chip.BPM ) )
