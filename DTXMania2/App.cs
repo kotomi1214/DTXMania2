@@ -165,6 +165,8 @@ namespace DTXMania2
             SystemConfig.最新版にバージョンアップする();
             this.システム設定 = SystemConfig.読み込む();
 
+            this._システム設定をもとにリソース関連のフォルダ変数を更新する();
+
 
             // メインループを別スレッドで開始する。
 
@@ -308,8 +310,6 @@ namespace DTXMania2
                     物理画面サイズ: new SharpDX.Size2F( this.ClientSize.Width, this.ClientSize.Height ) );
 
                 画像.全インスタンスで共有するリソースを作成する( Global.GraphicResources.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
-
-                this._システム設定をもとにリソース関連のフォルダ変数を更新する();
 
                 this.システムサウンド = new システムサウンド( this.サウンドデバイス );  // 個々のサウンドの生成は後工程で。
 
