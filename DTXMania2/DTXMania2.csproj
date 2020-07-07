@@ -49,6 +49,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <VertexShader Include="Resources\Default\Images\TextureVS.hlsl" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FDK\FDK.csproj" />
     <ProjectReference Include="..\SSTFormat\SSTFormat.csproj" />
   </ItemGroup>
@@ -63,10 +67,6 @@
     <Reference Include="EffekseerNET">
       <HintPath>..\packages-selfbuild\Effekseer-netcore\EffekseerNET.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <VertexShader Include="Resources\Default\Images\TextureVS.hlsl" />
   </ItemGroup>
 
   <ItemGroup>
