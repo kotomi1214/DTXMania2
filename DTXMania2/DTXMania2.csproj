@@ -603,6 +603,11 @@
     </None>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="xcopy /Y $(SolutionDir)packages-selfbuild\Effekseer-netcore\Ijwhost.dll $(TargetDir)&#xD;&#xA;xcopy /Y $(ProjectDir)NativeDlls\*.dll $(TargetDir)" />
+  </Target>
+
+  <!-- ポストビルドイベントでxcopyしたネイティブdllは publish 時には無視されるため、publish 後イベントで同じようにxcopyする。-->
   <Target Name="PostPublish" AfterTargets="Publish">
     <Exec Command="xcopy /Y $(SolutionDir)packages-selfbuild\Effekseer-netcore\Ijwhost.dll ..\publish&#xD;&#xA;xcopy /Y $(ProjectDir)NativeDlls\*.dll ..\publish&#xD;&#xA;" />
   </Target>
