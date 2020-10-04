@@ -9,7 +9,7 @@ using System.Windows.Forms;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using SSTFormat.v004;
+using SSTF=SSTFormat.v004;
 
 namespace DTXMania2.演奏
 {
@@ -1346,7 +1346,7 @@ namespace DTXMania2.演奏
             // ↓クリア判定はこの中。
             #region " ドラムチップ "
             //----------------
-            this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
+            this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( SSTF.チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
 
                 if( this._ドラムチップ.進行描画する( dc, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx ) )
                 {
@@ -1440,7 +1440,7 @@ namespace DTXMania2.演奏
 
             this._描画範囲内のすべてのチップに対して( 現在の演奏時刻sec, ( chip, index, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx ) => {
 
-                if( chip.チップ種別 == チップ種別.小節線 )
+                if( chip.チップ種別 == SSTF.チップ種別.小節線 )
                 {
                     float 上位置dpx = (float) ( ヒット判定位置Ydpx + ヒット判定バーとの距離dpx - 1f );   // -1f は小節線の厚みの半分。
 
@@ -1460,7 +1460,7 @@ namespace DTXMania2.演奏
                         this._数字フォント中グレー48x64.描画する( dc, 右位置dpx, 上位置dpx - 84f, chip.小節番号.ToString(), 右揃え: true );    // -84f は適当なマージン。
                     }
                 }
-                else if( chip.チップ種別 == チップ種別.拍線 )
+                else if( chip.チップ種別 == SSTF.チップ種別.拍線 )
                 {
                     // 拍線
                     if( userConfig.演奏中に小節線と拍線を表示する )
@@ -1488,7 +1488,7 @@ namespace DTXMania2.演奏
         /// </remarks>
         private int _描画開始チップ番号 = -1;
 
-        private Dictionary<チップ, チップの演奏状態> _チップの演奏状態;
+        private Dictionary<SSTF.チップ, チップの演奏状態> _チップの演奏状態;
 
         private bool _一時停止中 = false;
 
@@ -1590,7 +1590,7 @@ namespace DTXMania2.演奏
             {
                 var ヒット済みの動画チップリスト = score.チップリスト.Where( ( chip ) => (
                     this._チップの演奏状態[ chip ].ヒット済みである &&
-                    chip.チップ種別 == チップ種別.背景動画 ) );
+                    chip.チップ種別 == SSTF.チップ種別.背景動画 ) );
 
                 foreach( var aviChip in ヒット済みの動画チップリスト )
                 {
@@ -1608,7 +1608,7 @@ namespace DTXMania2.演奏
             {
                 var ヒット済みのBGMチップリスト = score.チップリスト.Where( ( chip ) => (
                     this._チップの演奏状態[ chip ].ヒット済みである &&
-                    chip.チップ種別 == チップ種別.BGM ) );
+                    chip.チップ種別 == SSTF.チップ種別.BGM ) );
 
                 foreach( var wavChip in ヒット済みのBGMチップリスト )
                 {
@@ -1620,7 +1620,7 @@ namespace DTXMania2.演奏
                         prop.発声前消音,
                         prop.消音グループ種別,
                         BGM以外も再生する: Global.App.ログオン中のユーザ.ドラムの音を発声する && ( Global.Options.ビュアーモードである && ビュアーモードでドラム音を再生する ),
-                        音量: wavChip.音量 / (float) チップ.最大音量, 演奏開始時刻sec - wavChip.発声時刻sec );
+                        音量: wavChip.音量 / (float)SSTF.チップ.最大音量, 演奏開始時刻sec - wavChip.発声時刻sec );
                 }
             }
             //----------------
@@ -1637,7 +1637,7 @@ namespace DTXMania2.演奏
 
             this.成績 = new 成績();
 
-            this._チップの演奏状態 = new Dictionary<チップ, チップの演奏状態>();
+            this._チップの演奏状態 = new Dictionary<SSTF.チップ, チップの演奏状態>();
             foreach( var chip in Global.App.演奏スコア.チップリスト )
                 this._チップの演奏状態.Add( chip, new チップの演奏状態( chip ) );
 
@@ -1670,7 +1670,7 @@ namespace DTXMania2.演奏
         ///		引数は、順に、対象のチップ, チップ番号, ヒット判定バーと描画との時間sec, ヒット判定バーと発声との時間sec, ヒット判定バーとの距離dpx。
         ///		時間と距離はいずれも、負数ならバー未達、0でバー直上、正数でバー通過。
         ///	</param>
-        private void _描画範囲内のすべてのチップに対して( double 現在の演奏時刻sec, Action<チップ, int, double, double, double> 適用する処理 )
+        private void _描画範囲内のすべてのチップに対して( double 現在の演奏時刻sec, Action<SSTF.チップ, int, double, double, double> 適用する処理 )
         {
             var score = Global.App.演奏スコア;
 
@@ -1706,7 +1706,7 @@ namespace DTXMania2.演奏
         /// <param name="非表示">チップを非表示化するならtrue。</param>
         /// <param name="ヒット判定バーと発声との時間sec">負数でバー未達、0で直上、正数でバー通過。</param>
         /// <param name="入力とチップとの間隔sec">チップより入力が早ければ負数、遅ければ正数。</param>
-        private void _チップのヒット処理を行う( チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec, double 入力とチップとの間隔sec )
+        private void _チップのヒット処理を行う( SSTF.チップ chip, 判定種別 judge, bool 再生, bool 判定, bool 非表示, double ヒット判定バーと発声との時間sec, double 入力とチップとの間隔sec )
         {
             this._チップの演奏状態[ chip ].ヒット済みである = true;
 
@@ -1760,11 +1760,11 @@ namespace DTXMania2.演奏
             }
         }
 
-        private void _チップの発声を行う( チップ chip, bool ドラムサウンドを再生する )
+        private void _チップの発声を行う( SSTF.チップ chip, bool ドラムサウンドを再生する )
         {
             var userConfig = Global.App.ログオン中のユーザ;
 
-            if( chip.チップ種別 == チップ種別.背景動画 )
+            if( chip.チップ種別 == SSTF.チップ種別.背景動画 )
             {
                 #region " (A) 背景動画チップ → AVI動画を再生する。"
                 //----------------
@@ -1786,7 +1786,7 @@ namespace DTXMania2.演奏
             {
                 if( Global.Options.ビュアーモードである && 
                     !演奏ステージ.ビュアーモードでドラム音を再生する &&
-                    chip.チップ種別 != チップ種別.BGM )   // BGM はドラムサウンドではない
+                    chip.チップ種別 != SSTF.チップ種別.BGM )   // BGM はドラムサウンドではない
                     return;
 
                 var drumChipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
@@ -1801,7 +1801,7 @@ namespace DTXMania2.演奏
                         0,
                         drumChipProperty.発声前消音,
                         drumChipProperty.消音グループ種別, 
-                        ( chip.音量 / (float) チップ.最大音量 ) );
+                        ( chip.音量 / (float)SSTF.チップ.最大音量 ) );
                     //----------------
                     #endregion
                 }
@@ -1812,12 +1812,12 @@ namespace DTXMania2.演奏
                     // WAVを持つチップなら発声する。（WAVを持つかどうかはこのメソッド↓内で判定される。）
                     Global.App.WAV管理.発声する(
                         chip.
-                        チップサブID, 
+                        チップサブID,
                         chip.チップ種別,
-                        drumChipProperty.発声前消音, 
+                        drumChipProperty.発声前消音,
                         drumChipProperty.消音グループ種別,
                         ドラムサウンドを再生する,
-                         ( chip.音量 / (float) チップ.最大音量 ) );
+                         ( chip.音量 / (float)SSTF.チップ.最大音量 ) );
                     //----------------
                     #endregion
                 }
@@ -1827,11 +1827,11 @@ namespace DTXMania2.演奏
         /// <summary>
         ///     該当するチップが1つもなかったら null を返す。
         /// </summary>
-        private チップ? _指定された時刻に一番近いチップを返す( double 時刻sec, ドラム入力種別 drumType )
+        private SSTF.チップ? _指定された時刻に一番近いチップを返す( double 時刻sec, ドラム入力種別 drumType )
         {
             var チップtoプロパティ = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ;
 
-            var 一番近いチップ = (チップ?) null;
+            var 一番近いチップ = (SSTF.チップ?) null;
             var 一番近いチップの時刻差の絶対値sec = (double) 0.0;
 
             // すべてのチップについて、時刻の若い順に調べていく。
