@@ -180,23 +180,26 @@ namespace SSTFEditor
         protected Dictionary<編集レーン種別, List<SSTF.チップ種別>> dicレーン別チップ種別対応表;
 
 
-        protected void チップカーソルを描画する( Graphics g, SSTF.チップ種別 eチップ )
+        protected void チップカーソルを描画する( Graphics g, SSTF.チップ種別 チップ種別 )
         {
             #region " 事前チェック。"
             //-----------------
             if( ( 0 >= this.現在のチップカーソル領域.Width ) ||
                 ( 0 >= this.現在のチップカーソル領域.Height ) ||
                 ( this.現在チップカーソルがある編集レーン == 編集レーン種別.Unknown ) ||
-                ( eチップ == SSTF.チップ種別.Unknown ) ||
-                ( eチップ == SSTF.チップ種別.小節線 ) ||
-                ( eチップ == SSTF.チップ種別.拍線 ) )
+                ( チップ種別 == SSTF.チップ種別.Unknown ) ||
+                ( チップ種別 == SSTF.チップ種別.小節線 ) ||
+                ( チップ種別 == SSTF.チップ種別.拍線 ) )
             {
                 return;     // 描画しない。
             }
             //-----------------
             #endregion
 
-            this.Form.譜面.チップを指定領域へ描画する( g, eチップ, this.Form.現在のチップ音量, this.現在のチップカーソル領域, null );
+            // チップを描いて、
+            this.Form.譜面.チップを指定領域へ描画する( g, チップ種別, this.Form.現在のチップ音量, this.現在のチップカーソル領域, null );
+
+            // チップをカーソル枠で囲む。
             this.Form.譜面.チップの太枠を指定領域へ描画する( g, this.現在のチップカーソル領域 );
         }
 

@@ -230,6 +230,11 @@ namespace SSTFEditor
         // 描画
 
 
+        /// <summary>
+        ///     コントロールに譜面を描画する。
+        /// </summary>
+        /// <param name="g">描画に使用するグラフィックス</param>
+        /// <param name="panel">描画先のコントロール</param>
         public void 描画する( Graphics g, Control panel )
         {
             #region " panel のレーン背景画像が未作成なら作成する。"
@@ -426,7 +431,7 @@ namespace SSTFEditor
                 チップ描画領域.Width = this.チップサイズpx.Width;
                 チップ描画領域.Height = this.チップサイズpx.Height;
 
-                this.チップを指定領域へ描画する( g, chip.チップ種別, chip.音量, チップ描画領域, chip.チップ内文字列 );
+                this.チップを指定領域へ描画する( g, chip, チップ描画領域 );
 
                 // 選択中なら太枠を付与。
                 if( chip.ドラッグ操作により選択中である || chip.選択が確定している )
@@ -494,11 +499,12 @@ namespace SSTFEditor
             #endregion
         }
 
-        public void チップを指定領域へ描画する( Graphics g, SSTF.チップ種別 eチップ, int 音量, Rectangle チップ描画領域, string チップ内文字列 )
-        {
-            // ※SSTFormat.チップ の描画以外の目的でも呼ばれるため、本メソッドの引数には SSTFormat.チップ を入れていない。
+        public void チップを指定領域へ描画する( Graphics g, 描画用チップ chip, Rectangle チップ描画領域 )
+            => this.チップを指定領域へ描画する( g, chip.チップ種別, chip.音量, チップ描画領域, chip.チップ内文字列 );
 
-            switch( eチップ )
+        public void チップを指定領域へ描画する( Graphics g, SSTF.チップ種別 チップ種別, int 音量, Rectangle チップ描画領域, string チップ内文字列 )
+        {
+            switch( チップ種別 )
             {
                 case SSTF.チップ種別.BPM:
                 case SSTF.チップ種別.LeftCrash:
@@ -513,25 +519,25 @@ namespace SSTFEditor
                 case SSTF.チップ種別.Splash:
                 case SSTF.チップ種別.背景動画:
                 case SSTF.チップ種別.BGM:
-                    this.チップを描画する_通常( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_通常( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
 
                 case SSTF.チップ種別.Snare_Ghost:
-                    this.チップを描画する_小丸( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_小丸( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
 
                 case SSTF.チップ種別.Ride:
-                    this.チップを描画する_幅狭( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_幅狭( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
 
                 case SSTF.チップ種別.Snare_OpenRim:
                 case SSTF.チップ種別.HiHat_Open:
-                    this.チップを描画する_幅狭白丸( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_幅狭白丸( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
 
                 case SSTF.チップ種別.HiHat_HalfOpen:
                 case SSTF.チップ種別.Ride_Cup:
-                    this.チップを描画する_幅狭白狭丸( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_幅狭白狭丸( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
 
                 case SSTF.チップ種別.HiHat_Foot:
@@ -541,7 +547,7 @@ namespace SSTFEditor
                 case SSTF.チップ種別.Tom3_Rim:
                 case SSTF.チップ種別.LeftCymbal_Mute:
                 case SSTF.チップ種別.RightCymbal_Mute:
-                    this.チップを描画する_幅狭白バツ( g, eチップ, 音量, チップ描画領域, チップ内文字列 );
+                    this.チップを描画する_幅狭白バツ( g, チップ種別, 音量, チップ描画領域, チップ内文字列 );
                     break;
             }
         }
@@ -825,6 +831,8 @@ namespace SSTFEditor
         /// </summary>
         /// <remarks>
         ///     <see cref="編集レーンtoレーン位置"/> の逆引き。
+        ///     レーン位置は、左に表示されるレーンから順に 0, 1, 2, ... の値が振られる。
+        ///     負数は無効。
         /// </remarks>
         public readonly Dictionary<int, 編集レーン種別> レーン位置to編集レーン;
 
