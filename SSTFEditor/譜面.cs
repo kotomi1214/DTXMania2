@@ -51,14 +51,22 @@ namespace SSTFEditor
 
         public int レーンの合計幅px
         {
-            get => ( Enum.GetValues( typeof( 編集レーン種別 ) ).Length - 1 ) * this.チップサイズpx.Width;    // -1 は Unknown の分
+            get
+            {
+                int レーン数 = Enum.GetValues( typeof( 編集レーン種別 ) ).Length;
+                return ( レーン数 - 1 ) * this.チップサイズpx.Width;    // -1 は Unknown をカウントしないため
+            }
         }
 
         public int 譜面表示下辺に位置する小節番号
-            => this.譜面内絶対位置gridに位置する小節の情報を返す( this.譜面表示下辺の譜面内絶対位置grid ).小節番号;
+        {
+            get => this.譜面内絶対位置gridに位置する小節の情報を返す( this.譜面表示下辺の譜面内絶対位置grid ).小節番号;
+        }
 
         public int カレントラインに位置する小節番号
-            => this.譜面内絶対位置gridに位置する小節の情報を返す( this.カレントラインの譜面内絶対位置grid ).小節番号;
+        {
+            get => this.譜面内絶対位置gridに位置する小節の情報を返す( this.カレントラインの譜面内絶対位置grid ).小節番号;
+        }
 
 
 
@@ -70,6 +78,7 @@ namespace SSTFEditor
             this.Form = form;
 
             this.スコア = new SSTF.スコア();
+
             this.譜面表示下辺の譜面内絶対位置grid = 0;
 
             this.レーン位置to編集レーン = new Dictionary<int, 編集レーン種別>();
@@ -215,14 +224,14 @@ namespace SSTFEditor
 
         public void SSTFファイルを書き出す( string ファイル名, string ヘッダ行 )
         {
-            using var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write );
-            SSTF.スコア.SSTF.出力する( this.スコア, fs, $"{ヘッダ行}{Environment.NewLine}" );
+            using( var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write ) )
+                SSTF.スコア.SSTF.出力する( this.スコア, fs, $"{ヘッダ行}{Environment.NewLine}" );
         }
 
         public void SSTFoverDTXファイルを書き出す( string ファイル名, string ヘッダ行 )
         {
-            using var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write );
-            SSTF.スコア.SSTFoverDTX.出力する( this.スコア, fs, $"{ヘッダ行}{Environment.NewLine}" );
+            using( var fs = new FileStream( ファイル名, FileMode.Create, FileAccess.Write ) )
+                SSTF.スコア.SSTFoverDTX.出力する( this.スコア, fs, $"{ヘッダ行}{Environment.NewLine}" );
         }
 
 
@@ -242,6 +251,7 @@ namespace SSTFEditor
             if( null == panel.BackgroundImage )
             {
                 this.譜面パネル背景 = new Bitmap( this.レーンの合計幅px, 1 );
+
                 using( var graphics = Graphics.FromImage( this.譜面パネル背景 ) )
                 {
                     int x = 0;
