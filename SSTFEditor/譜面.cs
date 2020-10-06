@@ -70,6 +70,44 @@ namespace SSTFEditor
 
 
 
+        /// <summary>
+        ///     チップの色。
+        /// </summary>
+        protected readonly Dictionary<SSTF.チップ種別, Color> チップto色 = new Dictionary<SSTF.チップ種別, Color>() {
+            #region " *** "
+            //-----------------
+            { SSTF.チップ種別.BPM,                Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.LeftCrash,          Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
+            { SSTF.チップ種別.LeftCymbal_Mute,    Color.FromArgb( チップ背景色透明度, Color.Gray ) },
+            { SSTF.チップ種別.HiHat_Close,        Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.HiHat_Foot,         Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.HiHat_HalfOpen,     Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.HiHat_Open,         Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.Snare,              Color.FromArgb( チップ背景色透明度, Color.Orange ) },
+            { SSTF.チップ種別.Snare_ClosedRim,    Color.FromArgb( チップ背景色透明度, Color.OrangeRed ) },
+            { SSTF.チップ種別.Snare_Ghost,        Color.FromArgb( チップ背景色透明度, Color.DeepPink ) },
+            { SSTF.チップ種別.Snare_OpenRim,      Color.FromArgb( チップ背景色透明度, Color.Orange ) },
+            { SSTF.チップ種別.Tom1,               Color.FromArgb( チップ背景色透明度, Color.Lime ) },
+            { SSTF.チップ種別.Tom1_Rim,           Color.FromArgb( チップ背景色透明度, Color.Lime ) },
+            { SSTF.チップ種別.Bass,               Color.FromArgb( チップ背景色透明度, Color.Gainsboro ) },
+            { SSTF.チップ種別.Tom2,               Color.FromArgb( チップ背景色透明度, Color.Red ) },
+            { SSTF.チップ種別.Tom2_Rim,           Color.FromArgb( チップ背景色透明度, Color.Red ) },
+            { SSTF.チップ種別.Tom3,               Color.FromArgb( チップ背景色透明度, Color.Magenta ) },
+            { SSTF.チップ種別.Tom3_Rim,           Color.FromArgb( チップ背景色透明度, Color.Magenta ) },
+            { SSTF.チップ種別.RightCrash,         Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
+            { SSTF.チップ種別.RightCymbal_Mute,   Color.FromArgb( チップ背景色透明度, Color.Gray ) },
+            { SSTF.チップ種別.Ride,               Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
+            { SSTF.チップ種別.Ride_Cup,           Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
+            { SSTF.チップ種別.China,              Color.FromArgb( チップ背景色透明度, Color.Tan ) },
+            { SSTF.チップ種別.Splash,             Color.FromArgb( チップ背景色透明度, Color.LightGray ) },
+            { SSTF.チップ種別.背景動画,           Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            { SSTF.チップ種別.BGM,                Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
+            //-----------------
+            #endregion
+        };
+
+
+
         // 生成と終了
 
 
@@ -146,6 +184,15 @@ namespace SSTFEditor
             this.白丸白バツペン = null;
 
             this.Form = null;
+        }
+
+        public void コンフィグを譜面に反映する( Config config )
+        {
+            // RideLeft, ChinaLeft, SplashLeft に従ってレーンの位置を決定する。
+            this.チップ種別to編集レーン[ SSTF.チップ種別.Ride ] = ( config.RideLeft ) ? 編集レーン種別.左シンバル : 編集レーン種別.右シンバル;
+            this.チップ種別to編集レーン[ SSTF.チップ種別.Ride_Cup ] = ( config.RideLeft ) ? 編集レーン種別.左シンバル : 編集レーン種別.右シンバル;
+            this.チップ種別to編集レーン[ SSTF.チップ種別.China ] = ( config.ChinaLeft ) ? 編集レーン種別.左シンバル : 編集レーン種別.右シンバル;
+            this.チップ種別to編集レーン[ SSTF.チップ種別.Splash ] = ( config.SplashLeft ) ? 編集レーン種別.左シンバル : 編集レーン種別.右シンバル;
         }
 
 
@@ -1029,39 +1076,6 @@ namespace SSTFEditor
         protected const int チップ暗影透明度 = 64;
 
         protected const int レーン背景色透明度 = 25;
-
-        protected readonly Dictionary<SSTF.チップ種別, Color> チップto色 = new Dictionary<SSTF.チップ種別, Color>() {
-            #region " *** "
-            //-----------------
-            { SSTF.チップ種別.BPM,                Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.LeftCrash,          Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.LeftCymbal_Mute,    Color.FromArgb( チップ背景色透明度, Color.Gray ) },
-            { SSTF.チップ種別.HiHat_Close,        Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.HiHat_Foot,         Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.HiHat_HalfOpen,     Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.HiHat_Open,         Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.Snare,              Color.FromArgb( チップ背景色透明度, Color.Orange ) },
-            { SSTF.チップ種別.Snare_ClosedRim,    Color.FromArgb( チップ背景色透明度, Color.OrangeRed ) },
-            { SSTF.チップ種別.Snare_Ghost,        Color.FromArgb( チップ背景色透明度, Color.DeepPink ) },
-            { SSTF.チップ種別.Snare_OpenRim,      Color.FromArgb( チップ背景色透明度, Color.Orange ) },
-            { SSTF.チップ種別.Tom1,               Color.FromArgb( チップ背景色透明度, Color.Lime ) },
-            { SSTF.チップ種別.Tom1_Rim,           Color.FromArgb( チップ背景色透明度, Color.Lime ) },
-            { SSTF.チップ種別.Bass,               Color.FromArgb( チップ背景色透明度, Color.Gainsboro ) },
-            { SSTF.チップ種別.Tom2,               Color.FromArgb( チップ背景色透明度, Color.Red ) },
-            { SSTF.チップ種別.Tom2_Rim,           Color.FromArgb( チップ背景色透明度, Color.Red ) },
-            { SSTF.チップ種別.Tom3,               Color.FromArgb( チップ背景色透明度, Color.Magenta ) },
-            { SSTF.チップ種別.Tom3_Rim,           Color.FromArgb( チップ背景色透明度, Color.Magenta ) },
-            { SSTF.チップ種別.RightCrash,         Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.RightCymbal_Mute,   Color.FromArgb( チップ背景色透明度, Color.Gray ) },
-            { SSTF.チップ種別.Ride,               Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.Ride_Cup,           Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.China,              Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.Splash,             Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
-            { SSTF.チップ種別.背景動画,           Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            { SSTF.チップ種別.BGM,                Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            //-----------------
-            #endregion
-        };
 
         protected Bitmap 譜面パネル背景 = null;
 
