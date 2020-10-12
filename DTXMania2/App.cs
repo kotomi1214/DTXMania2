@@ -311,9 +311,8 @@ namespace DTXMania2
 
                 画像.全インスタンスで共有するリソースを作成する( Global.GraphicResources.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
 
-                this.システムサウンド = new システムサウンド( this.サウンドデバイス );  // 個々のサウンドの生成は後工程で。
-
-                this.ドラムサウンド = new ドラムサウンド( this.サウンドデバイス );      // 　　　　　　〃
+                this.システムサウンド = new システムサウンド();  // 個々のサウンドの生成は後工程で。
+                this.ドラムサウンド = new ドラムサウンド();      // 　　　　　　〃
 
                 this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
                     ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( this.サウンドデバイス, path, this.ログオン中のユーザ.再生速度 ),

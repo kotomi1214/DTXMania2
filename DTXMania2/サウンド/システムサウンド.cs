@@ -13,11 +13,10 @@ namespace DTXMania2
         // 生成と終了
 
 
-        public システムサウンド( SoundDevice device )
+        public システムサウンド()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._SoundDevice = new WeakReference<SoundDevice>( device );
             this._種別toサウンドマップ = new Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)>();
         }
 
@@ -35,12 +34,12 @@ namespace DTXMania2
         /// <remarks>
         ///     既に生成済みのサウンドは再生成しない。
         /// </remarks>
-        public void すべて生成する()
+        public void すべて生成する( SoundDevice device )
         {
             foreach( システムサウンド種別? type in Enum.GetValues( typeof( システムサウンド種別 ) ) )
             {
                 if( type.HasValue )
-                    this.読み込む( type.Value );
+                    this.読み込む( device, type.Value );
             }
         }
 
@@ -50,7 +49,7 @@ namespace DTXMania2
         /// <remarks>
         ///     既に生成済みのサウンドは再生成しない。
         /// </remarks>
-        public void 読み込む( システムサウンド種別 type )
+        public void 読み込む( SoundDevice device, システムサウンド種別 type )
         {
             // 既に生成済みなら何もしない。
             if( this._種別toサウンドマップ.ContainsKey( type ) )
@@ -66,16 +65,13 @@ namespace DTXMania2
                 return;
             }
 
-            if( this._SoundDevice.TryGetTarget( out var device ) )
-            {
-                // サンプルソースを読み込む。
-                var sampleSource = SampleSourceFactory.Create( device, path.変数なしパス, 1.0 ) ??  // システムサウンドは常に再生速度 = 1.0
-                    throw new Exception( $"システムサウンドの読み込みに失敗しました。[{path.変数付きパス}]" );
+            // サンプルソースを読み込む。
+            var sampleSource = SampleSourceFactory.Create( device, path.変数なしパス, 1.0 ) ??  // システムサウンドは常に再生速度 = 1.0
+                throw new Exception( $"システムサウンドの読み込みに失敗しました。[{path.変数付きパス}]" );
 
-                // サウンドを生成してマップに登録。
-                var sound = new PolySound( device, sampleSource, 多重度: 2 );
-                this._種別toサウンドマップ[ type ] = (sampleSource, sound);
-            }
+            // サウンドを生成してマップに登録。
+            var sound = new PolySound( device, sampleSource, 多重度: 2 );
+            this._種別toサウンドマップ[ type ] = (sampleSource, sound);
 
             Log.Info( $"システムサウンドを読み込みました。[{path.変数付きパス}]" );
         }
@@ -120,9 +116,6 @@ namespace DTXMania2
         // ローカル
 
 
-        private WeakReference<SoundDevice> _SoundDevice;
-
         private Dictionary<システムサウンド種別, (ISampleSource source, PolySound sound)> _種別toサウンドマップ;
-
     }
 }

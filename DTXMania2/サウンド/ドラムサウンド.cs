@@ -21,11 +21,10 @@ namespace DTXMania2
         // 生成と終了
 
 
-        public ドラムサウンド( SoundDevice device )
+        public ドラムサウンド()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            this._SoundDevice = new WeakReference<SoundDevice>( device );
             this._チップtoコンテキスト = new Dictionary<(SSTF.チップ種別 chipType, int サブチップID), ドラムサウンドコンテキスト>();
         }
 
@@ -36,7 +35,7 @@ namespace DTXMania2
             this._すべて解放する();
         }
 
-        public void すべて生成する()
+        public void すべて生成する( SoundDevice device )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -79,34 +78,32 @@ namespace DTXMania2
                         continue;
                     }
 
-                    if( this._SoundDevice.TryGetTarget( out var device ) )
+
+                    // サウンドファイルを読み込んでデコードする。
+                    var sampleSource = SampleSourceFactory.Create( device, sound.path, 1.0 ); // ドラムサウンドは常に 1.0
+                    if( sampleSource is null )
                     {
-                        // サウンドファイルを読み込んでデコードする。
-                        var sampleSource = SampleSourceFactory.Create( device, sound.path, 1.0 ); // ドラムサウンドは常に 1.0
-                        if( sampleSource is null )
-                        {
-                            Log.ERROR( $"サウンドの生成に失敗しました。[{sound.path.変数付きパス}]" );
-                            continue;
-                        }
-
-                        // コンテキストを作成する。
-                        var context = new ドラムサウンドコンテキスト( sampleSource, ドラムサウンド.多重度 );
-
-                        // 多重度分のサウンドを生成する。
-                        for( int i = 0; i < context.Sounds.Length; i++ )
-                            context.Sounds[ i ] = new Sound( device, context.SampleSource );
-
-                        // コンテキストを辞書に追加する。
-                        if( this._チップtoコンテキスト.ContainsKey( (sound.type, 0) ) )
-                        {
-                            // すでに辞書に存在してるなら、解放してから削除する。
-                            this._チップtoコンテキスト[ (sound.type, 0) ].Dispose();
-                            this._チップtoコンテキスト.Remove( (sound.type, 0) );
-                        }
-                        this._チップtoコンテキスト.Add( (sound.type, 0), context );
-
-                        Log.Info( $"ドラムサウンドを生成しました。[({sound.type.ToString()},0) = {sound.path.変数付きパス}]" );
+                        Log.ERROR( $"サウンドの生成に失敗しました。[{sound.path.変数付きパス}]" );
+                        continue;
                     }
+
+                    // コンテキストを作成する。
+                    var context = new ドラムサウンドコンテキスト( sampleSource, ドラムサウンド.多重度 );
+
+                    // 多重度分のサウンドを生成する。
+                    for( int i = 0; i < context.Sounds.Length; i++ )
+                        context.Sounds[ i ] = new Sound( device, context.SampleSource );
+
+                    // コンテキストを辞書に追加する。
+                    if( this._チップtoコンテキスト.ContainsKey( (sound.type, 0) ) )
+                    {
+                        // すでに辞書に存在してるなら、解放してから削除する。
+                        this._チップtoコンテキスト[ (sound.type, 0) ].Dispose();
+                        this._チップtoコンテキスト.Remove( (sound.type, 0) );
+                    }
+                    this._チップtoコンテキスト.Add( (sound.type, 0), context );
+
+                    Log.Info( $"ドラムサウンドを生成しました。[({sound.type.ToString()},0) = {sound.path.変数付きパス}]" );
                 }
             }
         }
@@ -208,8 +205,6 @@ namespace DTXMania2
         };
 
         private Dictionary<(SSTF.チップ種別 chipType, int サブチップID), ドラムサウンドコンテキスト> _チップtoコンテキスト;
-
-        private WeakReference<SoundDevice> _SoundDevice;
 
         private readonly object _Sound利用権 = new object();
     }
