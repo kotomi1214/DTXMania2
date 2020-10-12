@@ -12,17 +12,14 @@ namespace FDK
     /// <seealso cref="https://docs.microsoft.com/ja-jp/dotnet/standard/io/how-to-use-named-pipes-for-network-interprocess-communication"/>
     public class StreamStringForNamedPipe
     {
-        private Stream ioStream;
-        private UnicodeEncoding streamEncoding;
-
         /// <summary>
         ///     バイトストリーム用の送受信インスタンスを生成する。
         /// </summary>
         /// <param name="ioStream">送受信に使用するバイトストリーム。</param>
         public StreamStringForNamedPipe( Stream ioStream )
         {
-            this.ioStream = ioStream;
-            this.streamEncoding = new UnicodeEncoding();
+            this._IoStream = ioStream;
+            this._StreamEncoding = new UnicodeEncoding();
         }
 
         /// <summary>
@@ -31,9 +28,9 @@ namespace FDK
         public string ReadString()
         {
             // 最初に受信する2バイトをデータ長とする。
-            int b1 = this.ioStream.ReadByte();
+            int b1 = this._IoStream.ReadByte();
             if( -1 == b1 ) return "";
-            int b2 = this.ioStream.ReadByte();
+            int b2 = this._IoStream.ReadByte();
             if( -1 == b2 ) return "";
 
             int len = ( b1 << 8 ) + b2;
@@ -41,10 +38,10 @@ namespace FDK
 
             // 次いで、データ本体を受信。
             var inBuffer = new byte[ len ];
-            this.ioStream.Read( inBuffer, 0, len );
+            this._IoStream.Read( inBuffer, 0, len );
 
             // 受信した byte[] を string にして返す。
-            return this.streamEncoding.GetString( inBuffer );
+            return this._StreamEncoding.GetString( inBuffer );
         }
 
         /// <summary>
@@ -54,21 +51,26 @@ namespace FDK
         /// <returns></returns>
         public int WriteString( string 送信文字列 )
         {
-            var outBuffer = streamEncoding.GetBytes( 送信文字列 );
+            var outBuffer = _StreamEncoding.GetBytes( 送信文字列 );
 
             // 最初にデータ長として2バイトを送信する。
             int len = outBuffer.Length;
             if( len > UInt16.MaxValue )
                 throw new Exception( "送信文字列が長すぎます。" );
-            this.ioStream.WriteByte( (byte) ( len >> 8 ) );
-            this.ioStream.WriteByte( (byte) ( len & 0xFF ) );
+            this._IoStream.WriteByte( (byte) ( len >> 8 ) );
+            this._IoStream.WriteByte( (byte) ( len & 0xFF ) );
             
             // 次いで、データ本体を送信。
-            this.ioStream.Write( outBuffer, 0, len );
-            this.ioStream.Flush();
+            this._IoStream.Write( outBuffer, 0, len );
+            this._IoStream.Flush();
 
             // 送信したデータ数[byte]を返す。
             return outBuffer.Length + 2;
         }
+
+
+        private readonly Stream _IoStream;
+
+        private readonly UnicodeEncoding _StreamEncoding;
     }
 }

@@ -11,6 +11,7 @@ namespace FDK
     /// <remarks>
     ///     前回のコールバック処理が完了しているかどうかにかかわらず、期間が経過するたびにコールバックが呼び出されるので注意。
     ///     精度は timeBeginPeriod() に依存するので注意。
+    ///     （※2020年10月現在、精度は16ms程度にまで落ちている。）
     /// </remarks>
     public class QueueTimer : IDisposable
     {

@@ -44,7 +44,6 @@ namespace FDK
         {
             this.表示待機中 = true;    // 表示開始
 
-            // HACK: 毎回 Task.Run を実行しないような実装に変える。
             Task.Run( () => {
 
                 // SwapChain.Present での垂直帰線待ちは広範囲のリソースを巻き込んで処理を停滞させるため、DXGIで行うようにする。

@@ -5,6 +5,9 @@ using SharpDX.Animation;
 
 namespace FDK
 {
+    /// <summary>
+    ///     一定速度（Linear遷移）で目標値へ近づく double 値。
+    /// </summary>
     public class TraceValue : IDisposable
     {
 
@@ -56,11 +59,11 @@ namespace FDK
         // ローカル
 
 
-        private Animation _Animation;
+        private readonly Animation _Animation;
+
+        private readonly Variable _現在値;
 
         private double _目標値;
-
-        private Variable _現在値;
 
         private Storyboard _ストーリーボード;
 

@@ -174,8 +174,8 @@ namespace FDK
 
         private long _書き込み位置 = 0;
 
-        private object _Stream排他 = new object();
-
         private bool _Canceled = false;
+
+        private readonly object _Stream排他 = new object();
     }
 }

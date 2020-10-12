@@ -5,6 +5,10 @@ using System.Runtime.InteropServices;
 
 namespace FDK
 {
+    /// <summary>
+    ///     Game Mode API。
+    /// </summary>
+    /// <seealso cref="https://docs.microsoft.com/en-us/previous-versions/windows/desktop/gamemode/game-mode-portal"/>
     public static class GameMode
     {
         /// <summary>

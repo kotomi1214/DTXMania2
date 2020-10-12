@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace FDK
 {
+    /// <summary>
+    ///     ウィンドウモードと全画面モード（ボーダーレス）を切り替える。
+    /// </summary>
     public class ScreenMode
     {
 

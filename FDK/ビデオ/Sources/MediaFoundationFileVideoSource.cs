@@ -11,7 +11,7 @@ using SharpDX.MediaFoundation;
 namespace FDK
 {
     /// <summary>
-    ///     動画ファイルのビデオストリームからフレームを生成するビデオソース。
+    ///     動画ファイルのビデオストリームを MediaFoundation でデコードしフレームを生成するビデオソース。
     /// </summary>
     public class MediaFoundationFileVideoSource : IVideoSource
     {
@@ -73,7 +73,10 @@ namespace FDK
 
             #region " ビデオの長さを取得する。"
             //----------------
-            this.総演奏時間sec = (long) ( ( this._SourceReaderEx.GetPresentationAttribute( SourceReaderIndex.MediaSource, PresentationDescriptionAttributeKeys.Duration ) / this.再生速度 ) / 10_000_000.0 );
+            {
+                var mediaSourceDuration = this._SourceReaderEx.GetPresentationAttribute( SourceReaderIndex.MediaSource, PresentationDescriptionAttributeKeys.Duration );
+                this.総演奏時間sec = (long)( mediaSourceDuration / this.再生速度 / 10_000_000.0 );
+            }
             //----------------
             #endregion
 
@@ -253,13 +256,13 @@ namespace FDK
         /// <summary>
         ///     デコードされたビデオフレームを格納しておくキュー。
         /// </summary>
-        private BlockingQueue<VideoFrame> _FrameQueue;
+        private readonly BlockingQueue<VideoFrame> _FrameQueue;
 
-        private MediaType _MediaType;
+        private readonly MediaType _MediaType;
 
-        private SourceReaderEx _SourceReaderEx;
+        private readonly SourceReaderEx _SourceReaderEx;
 
-        private DeviceContext _D2DDeviceContext;
+        private readonly DeviceContext _D2DDeviceContext;
 
 
 
@@ -268,11 +271,11 @@ namespace FDK
 
         private Task? _デコードタスク = null;
 
-        private CancellationTokenSource _デコードキャンセル;
+        private readonly CancellationTokenSource _デコードキャンセル;
 
-        private ManualResetEventSlim _デコード起動完了通知;
+        private readonly ManualResetEventSlim _デコード起動完了通知;
 
-        private ManualResetEventSlim _一時停止解除通知;
+        private readonly ManualResetEventSlim _一時停止解除通知;
 
 
         private void _デコードタスクエントリ( object? obj引数 )

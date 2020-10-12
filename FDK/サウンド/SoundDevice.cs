@@ -116,10 +116,11 @@ namespace FDK
 
                         // 再度初期化。
                         this._AudioClient.Initialize( this._共有モード, AudioClientStreamFlags.StreamFlagsEventCallback, 期間100ns, 期間100ns, this.WaveFormat, Guid.Empty );
+                        // それでも例外なら知らん。
                     }
                     else
                     {
-                        throw;  // それでも例外なら知らん。
+                        throw;
                     }
                 }
                 //----------------
