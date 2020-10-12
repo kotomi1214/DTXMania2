@@ -9,6 +9,9 @@ using FDK;
 
 namespace DTXMania2.演奏
 {
+    /// <summary>
+    ///     チップがヒットされた時に放つ光。
+    /// </summary>
     class チップ光 : IDisposable
     {
 

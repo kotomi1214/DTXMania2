@@ -9,6 +9,9 @@ using FDK;
 
 namespace DTXMania2.演奏
 {
+    /// <summary>
+    ///     ドラム入力に対するレーンの反応。
+    /// </summary>
     class レーンフラッシュ : IDisposable
     {
 
