@@ -23,29 +23,29 @@ namespace DTXMania2
         // プロパティ
 
 
-        internal ScreenMode ScreenMode { get; private protected set; } = null!;
+        internal ドラム入力 ドラム入力 { get; private protected set; } = null!;
 
-        internal KeyboardHID KeyboardHID { get; private protected set; } = null!;
-
-        internal GameControllersHID GameControllersHID { get; private protected set; } = null!;
-
-        internal MidiIns MidiIns { get; private protected set; } = null!;
 
         internal Random 乱数 { get; } = new Random( DateTime.Now.Millisecond );
 
+        internal ScreenMode ScreenMode { get; private protected set; } = null!;
+
+
         internal SystemConfig システム設定 { get; set; } = null!;
+
 
         internal システムサウンド システムサウンド { get; private protected set; } = null!;
 
         internal ドラムサウンド ドラムサウンド { get; private protected set; } = null!;
 
-        internal ドラム入力 ドラム入力 { get; private protected set; } = null!;
 
         internal SoundDevice サウンドデバイス { get; private protected set; } = null!;
 
         internal SoundTimer サウンドタイマ { get; private protected set; } = null!;
 
+
         internal アイキャッチ管理 アイキャッチ管理 { get; private protected set; } = null!;
+
 
         internal SelectableList<ユーザ設定> ユーザリスト { get; } = new SelectableList<ユーザ設定>();
 
@@ -63,7 +63,9 @@ namespace DTXMania2
 
         internal 現行化 現行化 { get; } = new 現行化();
 
+
         internal CacheStore<CSCore.ISampleSource> WAVキャッシュ { get; private protected set; } = null!;
+
 
         internal IStage? ステージ { get; private protected set; } = null;
 
@@ -155,9 +157,7 @@ namespace DTXMania2
 
             // 入力デバイスを初期化する。これらは GUI スレッドで行う必要がある。
 
-            this.KeyboardHID = new KeyboardHID( this.サウンドタイマ );
-            this.GameControllersHID = new GameControllersHID( this.Handle, this.サウンドタイマ );
-            this.MidiIns = new MidiIns( this.サウンドタイマ );
+            this.ドラム入力 = new ドラム入力( this.Handle, this.サウンドタイマ );
 
 
             // システム設定ファイルを読み込む。
@@ -208,9 +208,7 @@ namespace DTXMania2
 
             // 入力デバイスを破棄する。
 
-            this.MidiIns.Dispose();
-            this.GameControllersHID.Dispose();
-            this.KeyboardHID.Dispose();
+            this.ドラム入力.Dispose();
 
 
             // サウンドデバイスとサウンドタイマを破棄する。
@@ -321,8 +319,6 @@ namespace DTXMania2
                 this._ユーザリストにユーザを登録する();
 
                 this.アイキャッチ管理 = new アイキャッチ管理();
-
-                this.ドラム入力 = new ドラム入力( this.KeyboardHID, this.GameControllersHID, this.MidiIns );
 
 
                 // 最初のステージを生成する。
@@ -1031,8 +1027,7 @@ namespace DTXMania2
             //----------------
             #endregion
 
-            this.KeyboardHID.OnInput( rawInputData );
-            this.GameControllersHID.OnInput( rawInputData );
+            this.ドラム入力.OnInput( rawInputData );
         }
 
 

@@ -7,7 +7,7 @@ using SSTF=SSTFormat.v004;
 
 namespace DTXMania2
 {
-    class ドラム入力
+    class ドラム入力 : IDisposable
     {
 
         // プロパティ
@@ -23,40 +23,46 @@ namespace DTXMania2
         /// </remarks>
         public List<ドラム入力イベント> ポーリング結果 { get; }
 
-        public WeakReference<KeyboardHID> Keybaord { get; }
+        public KeyboardHID Keyboard { get; }
 
-        public WeakReference<GameControllersHID> GameControllers { get; }
+        public GameControllersHID GameControllers { get; }
 
-        public WeakReference<MidiIns> MidiIn { get; }
-
+        public MidiIns MidiIns { get; }
 
 
 
         // 生成と終了
 
 
-        public ドラム入力( KeyboardHID keyboard, GameControllersHID gameControllers, MidiIns midiIns, int 最大入力履歴数 = 32 )
+        /// <summary>
+        ///     各入力デバイスを初期化する。
+        ///     このコンストラクタは、GUI スレッドから呼び出すこと。
+        /// </summary>
+        /// <param name="hWindow"></param>
+        /// <param name="最大入力履歴数"></param>
+        public ドラム入力( IntPtr hWindow, SoundTimer soundTimer, int 最大入力履歴数 = 32 )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            var config = Global.App.システム設定;
-            this.Keybaord = new WeakReference<KeyboardHID>( keyboard );
-            this.GameControllers = new WeakReference<GameControllersHID>( gameControllers );
-            this.MidiIn = new WeakReference<MidiIns>( midiIns );
-            this._最大入力履歴数 = 最大入力履歴数;
-
             this.ポーリング結果 = new List<ドラム入力イベント>();
+            this.Keyboard = new KeyboardHID( soundTimer );
+            this.GameControllers = new GameControllersHID( hWindow, soundTimer );
+            this.MidiIns = new MidiIns( soundTimer );
+
+            this._最大入力履歴数 = 最大入力履歴数;
             this._入力履歴 = new List<ドラム入力イベント>( this._最大入力履歴数 );
 
-            // MIDI入力デバイスの可変IDへの対応を行う。
-            if( 0 < midiIns.DeviceName.Count )
+            #region " MIDI入力デバイスの可変IDへの対応を行う。"
+            //----------------
+            if( 0 < this.MidiIns.DeviceName.Count )
             {
+                var config = Global.App.システム設定;
                 var デバイスリスト = new Dictionary<int, string>();    // <デバイスID, デバイス名>
 
                 #region " (1) 先に列挙された実際のデバイスに合わせて、デバイスリスト（配列番号がデバイス番号）を作成する。"
                 //----------------
-                for( int i = 0; i < midiIns.DeviceName.Count; i++ )
-                    デバイスリスト.Add( i, midiIns.DeviceName[ i ] );
+                for( int i = 0; i < this.MidiIns.DeviceName.Count; i++ )
+                    デバイスリスト.Add( i, this.MidiIns.DeviceName[ i ] );
                 //----------------
                 #endregion
                 
@@ -121,6 +127,26 @@ namespace DTXMania2
             {
                 // 列挙されたMIDI入力デバイスがまったくないなら、キーバインディングは何もいじらない。
             }
+            //----------------
+            #endregion
+        }
+
+        public void Dispose()
+        {
+            this.MidiIns.Dispose();
+            this.GameControllers.Dispose();
+            this.Keyboard.Dispose();
+        }
+
+
+
+        // WM_INPUT 処理
+
+
+        public void OnInput( RawInput.RawInputData rawInputData )
+        {
+            this.Keyboard.OnInput( rawInputData );
+            this.GameControllers.OnInput( rawInputData );
         }
 
 
@@ -185,9 +211,7 @@ namespace DTXMania2
         /// <returns><see cref="ポーリング結果"/>に含まれていれば true。</returns>
         public bool キャンセルキーが入力された()
         {
-            return
-                this.Keybaord.TryGetTarget( out var keyboard ) &&
-                keyboard.キーが押された( 0, System.Windows.Forms.Keys.Escape );
+            return this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Escape );
         }
 
         /// <summary>
@@ -197,14 +221,12 @@ namespace DTXMania2
         public bool 上移動キーが入力された()
         {
             return
-                ( this.Keybaord.TryGetTarget( out var keyboard ) && keyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ) ||
+                this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
                 this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom1, ドラム入力種別.Tom1_Rim } );
         }
         public bool 上移動キーが押されている()
         {
-            return
-                this.Keybaord.TryGetTarget( out var keyboard ) &&
-                keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Up );
+            return this.Keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Up );
         }
 
         /// <summary>
@@ -214,14 +236,12 @@ namespace DTXMania2
         public bool 下移動キーが入力された()
         {
             return
-                ( this.Keybaord.TryGetTarget( out var keyboard ) && keyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ) ||
+                this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
                 this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom2, ドラム入力種別.Tom2_Rim } );
         }
         public bool 下移動キーが押されている()
         {
-            return
-                this.Keybaord.TryGetTarget( out var keyboard ) &&
-                keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Down );
+            return this.Keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Down );
         }
 
         /// <summary>
@@ -231,14 +251,13 @@ namespace DTXMania2
         public bool 左移動キーが入力された()
         {
             return
-                ( this.Keybaord.TryGetTarget( out var keyboard ) && keyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ) ||
+                this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
                 this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Snare, ドラム入力種別.Snare_ClosedRim, ドラム入力種別.Snare_OpenRim } );
         }
         public bool 左移動キーが押されている()
         {
             return
-                this.Keybaord.TryGetTarget( out var keyboard ) &&
-                keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Left );
+                this.Keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Left );
         }
 
         /// <summary>
@@ -248,14 +267,12 @@ namespace DTXMania2
         public bool 右移動キーが入力された()
         {
             return
-                ( this.Keybaord.TryGetTarget( out var keyboard ) && keyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ) ||
+                this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
                 this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom3, ドラム入力種別.Tom3_Rim } );
         }
         public bool 右移動キーが押されている()
         {
-            return
-                this.Keybaord.TryGetTarget( out var keyboard ) &&
-                keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Right );
+            return this.Keyboard.キーが押されている( 0, System.Windows.Forms.Keys.Right );
         }
 
         /// <summary>
@@ -431,21 +448,14 @@ namespace DTXMania2
 
             var config = Global.App.システム設定;
             {
-                if( this.Keybaord.TryGetTarget( out var keyboard ) )
-                {
-                    keyboard.ポーリングする();
-                    this._入力イベントを取得する( keyboard.入力イベントリスト, config.キーボードtoドラム, 入力履歴を記録する );
-                }
-                if( this.GameControllers.TryGetTarget( out var gameController ) )
-                {
-                    gameController.ポーリングする();
-                    this._入力イベントを取得する( gameController.入力イベントリスト, config.ゲームコントローラtoドラム, 入力履歴を記録する );
-                }
-                if( this.MidiIn.TryGetTarget( out var midiIns ) )
-                {
-                    midiIns.ポーリングする();
-                    this._入力イベントを取得する( midiIns.入力イベントリスト, config.MIDItoドラム, 入力履歴を記録する );
-                }
+                this.Keyboard.ポーリングする();
+                this._入力イベントを取得する( this.Keyboard.入力イベントリスト, config.キーボードtoドラム, 入力履歴を記録する );
+
+                this.GameControllers.ポーリングする();
+                this._入力イベントを取得する( this.GameControllers.入力イベントリスト, config.ゲームコントローラtoドラム, 入力履歴を記録する );
+
+                this.MidiIns.ポーリングする();
+                this._入力イベントを取得する( this.MidiIns.入力イベントリスト, config.MIDItoドラム, 入力履歴を記録する );
             }
 
 

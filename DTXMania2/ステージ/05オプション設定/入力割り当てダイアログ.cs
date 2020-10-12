@@ -52,8 +52,8 @@ namespace DTXMania2.オプション設定
 
             // 初期メッセージを出力。
             this.listView入力リスト.Items.Add( $"HID Keyboard の受付を開始しました。" );
-            for( int i = 0; i < Global.App.MidiIns.DeviceName.Count; i++ )
-                this.listView入力リスト.Items.Add( $"MIDI IN [{i}] '{Global.App.MidiIns.DeviceName[ i ]}' の受付を開始しました。" );
+            for( int i = 0; i < Global.App.ドラム入力.MidiIns.DeviceName.Count; i++ )
+                this.listView入力リスト.Items.Add( $"MIDI IN [{i}] '{Global.App.ドラム入力.MidiIns.DeviceName[ i ]}' の受付を開始しました。" );
             this.listView入力リスト.Items.Add( "" );
             this.listView入力リスト.Items.Add( "* タイミングクロック信号、アクティブ信号は無視します。" );
             this.listView入力リスト.Items.Add( "* 入力と入力の間が500ミリ秒以上開いた場合は、間に空行を表示します。" );
@@ -68,11 +68,11 @@ namespace DTXMania2.オプション設定
 
                 #region " ゲームコントローラをポーリングし、入力値を入力リストへ出力。"
                 //----------------
-                Global.App.GameControllersHID.ポーリングする();
+                Global.App.ドラム入力.GameControllers.ポーリングする();
 
-                for( int i = 0; i < Global.App.GameControllersHID.入力イベントリスト.Count; i++ )
+                for( int i = 0; i < Global.App.ドラム入力.GameControllers.入力イベントリスト.Count; i++ )
                 {
-                    var inputEvent = Global.App.GameControllersHID.入力イベントリスト[ i ];
+                    var inputEvent = Global.App.ドラム入力.GameControllers.入力イベントリスト[ i ];
 
                     if( inputEvent.押された )
                     {
@@ -99,11 +99,11 @@ namespace DTXMania2.オプション設定
                 //----------------
                 // MidiInChecker の機能もかねて、NoteOFF や ControlChange も表示する。（割り当てはできない。）
 
-                Global.App.MidiIns.ポーリングする();
+                Global.App.ドラム入力.MidiIns.ポーリングする();
 
-                for( int i = 0; i < Global.App.MidiIns.入力イベントリスト.Count; i++ )
+                for( int i = 0; i < Global.App.ドラム入力.MidiIns.入力イベントリスト.Count; i++ )
                 {
-                    var inputEvent = Global.App.MidiIns.入力イベントリスト[ i ];
+                    var inputEvent = Global.App.ドラム入力.MidiIns.入力イベントリスト[ i ];
 
                     if( inputEvent.押された && ( 255 == inputEvent.Key ) && ( 4 == inputEvent.Control ) )
                     {

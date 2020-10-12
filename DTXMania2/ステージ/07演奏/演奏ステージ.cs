@@ -569,7 +569,7 @@ namespace DTXMania2.演奏
 
                 if( チップはヒットされていない && チップはMISSエリアに達している )
                 {
-                   if( チップはAutoPlayである && chipProperty.AutoPlayON_Miss判定 )
+                    if( チップはAutoPlayである && chipProperty.AutoPlayON_Miss判定 )
                     {
                         #region " MISS(A) 自動演奏(AutoPlay)チップ "
                         //----------------
@@ -859,18 +859,16 @@ namespace DTXMania2.演奏
 
             #region " (3) 入力に応じたハイハットの開閉 "
             //----------------
-            if( Global.App.ドラム入力.MidiIn.TryGetTarget( out var midiIns ) )
-            {
-                foreach( var ev in midiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
-                    this._ドラムキットとヒットバー.ハイハットの開度を設定する( ev.Velocity );
-            }
+            foreach( var ev in Global.App.ドラム入力.MidiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
+                this._ドラムキットとヒットバー.ハイハットの開度を設定する( ev.Velocity );
             //----------------
             #endregion
 
             #region " (4) その他の操作。"
             //----------------
-            if( Global.App.ドラム入力.Keybaord.TryGetTarget( out var keyboard ) )
             {
+                var keyboard = Global.App.ドラム入力.Keyboard;
+
                 if( !Global.Options.ビュアーモードである && keyboard.キーが押された( 0, Keys.Escape ) )
                 {
                     #region " ESC → キャンセル通知フェーズへ（ビュアーモード時は無効）"
