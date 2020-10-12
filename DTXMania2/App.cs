@@ -155,17 +155,17 @@ namespace DTXMania2
             this.サウンドタイマ = new SoundTimer( this.サウンドデバイス );
 
 
-            // 入力デバイスを初期化する。これらは GUI スレッドで行う必要がある。
-
-            this.ドラム入力 = new ドラム入力( this.Handle, this.サウンドタイマ );
-
-
             // システム設定ファイルを読み込む。
 
             SystemConfig.最新版にバージョンアップする();
             this.システム設定 = SystemConfig.読み込む();
 
             this._システム設定をもとにリソース関連のフォルダ変数を更新する();
+
+
+            // 入力デバイスを初期化する。これらは GUI スレッドで行う必要がある。
+
+            this.ドラム入力 = new ドラム入力( this.Handle, this.サウンドタイマ );
 
 
             // メインループを別スレッドで開始する。

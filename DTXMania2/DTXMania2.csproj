@@ -15,6 +15,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>\\DRUMS-PC\DTXMania2リモートデバッグ</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
