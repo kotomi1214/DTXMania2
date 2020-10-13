@@ -103,6 +103,11 @@ namespace DTXMania2
         /// </summary>
         public IReadOnlyDictionary<判定種別, int> 判定別ヒット割合 => this._ヒット割合を算出して返す();
 
+        /// <summary>
+        ///     このプロパティが true である場合、成績は無効である。（早戻しを使った等）
+        /// </summary>
+        public bool 無効 { get; set; } = false;
+
 
 
         // 生成と終了
@@ -162,10 +167,12 @@ namespace DTXMania2
 
             #region " スコアを加算する。"
             //----------------
+            const int 最大スコア = 100_0000;
+
             if( this.総ノーツ数 == this._判定別ヒット数[ 判定種別.PERFECT ] )
             {
                 // Excellent（最後のチップまですべてPERFECT）の場合、スコアは100万点ジャストに調整する。
-                this.Score = 100 * 10000;
+                this.Score = 最大スコア;
             }
             else
             {
@@ -174,6 +181,9 @@ namespace DTXMania2
                 int コンボ数 = Math.Min( this.Combo, 50 );  // 最大50
 
                 this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ 判定 ] );
+
+                if( this.Score > 最大スコア )
+                    this.Score = 最大スコア;
             }
             //----------------
             #endregion
@@ -261,7 +271,12 @@ namespace DTXMania2
 
             // 判定値とCOMBO値にはAutoチップも含まれるので、すべてAutoPlayONであっても、達成率はゼロにはならない。
             // その代わり、オプション補正でガシガシ削る。
-            return _小数第3位以下切り捨て( ( 判定値 + COMBO値 ) * オプション補正 );
+            double 達成率 = _小数第3位以下切り捨て( ( 判定値 + COMBO値 ) * オプション補正 );
+
+            if( 達成率 > 100.0 )
+                達成率 = 100.0;
+
+            return 達成率;
         }
 
         /// <summary>
