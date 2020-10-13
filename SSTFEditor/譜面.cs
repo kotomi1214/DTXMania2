@@ -76,14 +76,8 @@ namespace SSTFEditor
         public 譜面( メインフォーム form )
         {
             this.Form = form;
-
             this.スコア = new SSTF.スコア();
-
             this.譜面表示下辺の譜面内絶対位置grid = 0;
-
-            this.レーン位置to編集レーン = new Dictionary<int, 編集レーン種別>();
-            foreach( var kvp in this.編集レーンtoレーン位置 )
-                this.レーン位置to編集レーン.Add( kvp.Value, kvp.Key );
 
             // 最初は10小節ほど用意しておく → 10小節目の先頭に Unknown チップを置くことで実現
             this.スコア.チップリスト.Add(
@@ -248,23 +242,18 @@ namespace SSTFEditor
         {
             #region " panel のレーン背景画像が未作成なら作成する。"
             //-----------------
-            if( null == panel.BackgroundImage )
+            if( null == this.譜面パネル背景 )
             {
                 this.譜面パネル背景 = new Bitmap( this.レーンの合計幅px, 1 );
+                using var graphics = Graphics.FromImage( this.譜面パネル背景 );
 
-                using( var graphics = Graphics.FromImage( this.譜面パネル背景 ) )
+                foreach( var laneProp in this.レーン属性.Values )
                 {
-                    int x = 0;
-                    foreach( var kvp in this.レーンto背景色 )
-                    {
-                        using( var brush = new SolidBrush( kvp.Value ) )
-                            graphics.FillRectangle( brush, x, 0, this.チップサイズpx.Width, 1 );
-
-                        x += this.チップサイズpx.Width;
-                    }
+                    using( var brush = new SolidBrush( laneProp.背景色 ) )
+                        graphics.FillRectangle( brush, laneProp.位置 * this.チップサイズpx.Width, 0, this.チップサイズpx.Width, 1 );
                 }
 
-                panel.Width = レーンの合計幅px;
+                panel.Width = this.レーンの合計幅px;
                 panel.BackgroundImage = this.譜面パネル背景;
                 panel.BackgroundImageLayout = ImageLayout.Tile;
             }
@@ -418,7 +407,7 @@ namespace SSTFEditor
             var チップ描画領域 = new Rectangle();
             foreach( 描画用チップ chip in this.スコア.チップリスト )
             {
-                #region " クリッピング。"
+                #region " クリッピングと終了判定。"
                 //-----------------
                 if( chip.チップ種別 == SSTF.チップ種別.Unknown )
                     continue;   // 描画対象外
@@ -427,14 +416,17 @@ namespace SSTFEditor
                     continue;   // 描画範囲外
 
                 if( chip.譜面内絶対位置grid < パネル下辺の譜面内絶対位置grid )
-                    continue;   // 描画範囲外（次のチップへ）
+                    continue;   // 描画範囲外
 
                 if( chip.譜面内絶対位置grid >= パネル上辺の譜面内絶対位置grid )
                     break;      // 描画範囲外（ここで終了）
                 //-----------------
                 #endregion
 
-                int レーン位置 = this.編集レーンtoレーン位置[ this.チップ種別to編集レーン[ chip.チップ種別 ] ];
+                var チップの編集レーン種別 = this.チップ種別to編集レーン[ chip.チップ種別 ];
+                if( チップの編集レーン種別 == 編集レーン種別.Unknown )
+                    continue;
+                int レーン位置 = this.レーン属性[ チップの編集レーン種別 ].位置;
 
                 チップ描画領域.X = レーン位置 * this.チップサイズpx.Width;
                 チップ描画領域.Y = panel.ClientSize.Height - ( chip.譜面内絶対位置grid - this.譜面表示下辺の譜面内絶対位置grid ) / this.Form.GRID_PER_PIXEL - this.チップサイズpx.Height;
@@ -452,31 +444,27 @@ namespace SSTFEditor
 
             #region " レーン名を描画。"
             //-----------------
-            var レーン名描画領域下側 = new Rectangle( 0, 10, panel.Width, 譜面.レーン名表示高さpx );
             var レーン名描画領域上側 = new Rectangle( 0, 0, panel.Width, 10 );
+            var レーン名描画領域下側 = new Rectangle( 0, 10, panel.Width, 譜面.レーン名表示高さpx );
 
-            // グラデーション描画。
+            // レーン名の背景のグラデーションを描画。
             using( var brush = new LinearGradientBrush( レーン名描画領域下側, Color.FromArgb( 255, 50, 155, 50 ), Color.FromArgb( 0, 0, 255, 0 ), LinearGradientMode.Vertical ) )
                 g.FillRectangle( brush, レーン名描画領域下側 );
 
             using( var brush = new LinearGradientBrush( レーン名描画領域上側, Color.FromArgb( 255, 0, 100, 0 ), Color.FromArgb( 255, 50, 155, 50 ), LinearGradientMode.Vertical ) )
                 g.FillRectangle( brush, レーン名描画領域上側 );
 
-            // レーン名を描画。
-            var レーン名描画領域 = new Rectangle( 0, 0, 0, 0 );
-
-            foreach( 編集レーン種別 editLaneType in Enum.GetValues( typeof( 編集レーン種別 ) ) )
+            // 各レーン名を描画。
+            foreach( var laneProp in this.レーン属性.Values )
             {
-                if( editLaneType == 編集レーン種別.Unknown )
-                    break;
-
-                レーン名描画領域.X = レーン名描画領域下側.X + ( this.編集レーンtoレーン位置[ editLaneType ] * this.チップサイズpx.Width ) + 2;
-                レーン名描画領域.Y = レーン名描画領域下側.Y + 2;
-                レーン名描画領域.Width = this.チップサイズpx.Width;
-                レーン名描画領域.Height = 24;
+                var レーン名描画領域 = new Rectangle(
+                    x: レーン名描画領域下側.X + ( laneProp.位置 * this.チップサイズpx.Width ) + 2,
+                    y: レーン名描画領域下側.Y + 2,
+                    width: this.チップサイズpx.Width,
+                    height: 24 );
 
                 g.DrawString(
-                    this.レーンto名前[ editLaneType ],
+                    laneProp.名前,
                     this.レーン名文字フォント,
                     this.レーン名文字影ブラシ,
                     レーン名描画領域,
@@ -486,7 +474,7 @@ namespace SSTFEditor
                 レーン名描画領域.Y -= 2;
 
                 g.DrawString(
-                    this.レーンto名前[ editLaneType ],
+                    laneProp.名前,
                     this.レーン名文字フォント,
                     this.レーン名文字ブラシ,
                     レーン名描画領域,
@@ -590,8 +578,7 @@ namespace SSTFEditor
                 var 小節情報 = this.譜面内絶対位置gridに位置する小節の情報を返す( 譜面内絶対位置grid );
                 int 小節の長さgrid = this.小節長をグリッドで返す( 小節情報.小節番号 );
 
-                var chip = new 描画用チップ()
-                {
+                var chip = new 描画用チップ() {
                     選択が確定している = 選択確定中,
                     BPM = BPM,
                     発声時刻sec = 0,     // SSTFEditorでは使わない
@@ -632,7 +619,6 @@ namespace SSTFEditor
             finally
             {
                 this.Form.UndoRedo管理.トランザクション記録を終了する();
-
                 this.Form.UndoRedo用GUIのEnabledを設定する();
                 this.Form.未保存である = true;
             }
@@ -688,8 +674,7 @@ namespace SSTFEditor
             this.チップを削除する( 編集レーン種別.Unknown, 小節先頭位置grid );
 
             // 新しくダミーの Unknown チップを、最終小節番号の控え＋４の小節の先頭に置く。
-            var dummyChip = new 描画用チップ()
-            {
+            var dummyChip = new 描画用チップ() {
                 チップ種別 = SSTF.チップ種別.Unknown,
                 小節番号 = 最大小節番号 + 4,
                 小節解像度 = 1,
@@ -811,40 +796,24 @@ namespace SSTFEditor
         };
 
         /// <summary>
-        ///     レーンの位置を定義する。
+        ///     レーンの表示情報。
         /// </summary>
         /// <remarks>
-        ///     レーン位置は、左に表示されるレーンから順に 0, 1, 2, ... の値が振られる。
-        ///     負数は無効。
+        ///     <see cref="編集レーン種別.Unknown"/> の指定は不可。
         /// </remarks>
-        public readonly Dictionary<編集レーン種別, int> 編集レーンtoレーン位置 = new Dictionary<編集レーン種別, int>() {
-            #region " *** "
-            //-----------------
-            { 編集レーン種別.BPM,          0 },
-            { 編集レーン種別.左シンバル,   1 },
-            { 編集レーン種別.ハイハット,   2 },
-            { 編集レーン種別.スネア,       3 },
-            { 編集レーン種別.ハイタム,     4 },
-            { 編集レーン種別.バス,         5 },
-            { 編集レーン種別.ロータム,     6 },
-            { 編集レーン種別.フロアタム,   7 },
-            { 編集レーン種別.右シンバル,   8 },
-            { 編集レーン種別.BGV,          9 },
-            { 編集レーン種別.BGM,         10 },
-            { 編集レーン種別.Unknown,     -1 },
-            //-----------------
-            #endregion
+        public readonly Dictionary<編集レーン種別, (int 位置, string 名前, Color 背景色, bool 区分線が太線)> レーン属性 = new Dictionary<編集レーン種別, (int 位置, string 名前, Color 背景色, bool 区分線が太線)>() {
+            { 編集レーン種別.BPM,        (位置:  0, 名前: "BPM", 背景色: Color.FromArgb( レーン背景色透明度, Color.SkyBlue ),   区分線が太線: true ) },
+            { 編集レーン種別.左シンバル, (位置:  1, 名前: "LC",  背景色: Color.FromArgb( レーン背景色透明度, Color.WhiteSmoke), 区分線が太線: false) },
+            { 編集レーン種別.ハイハット, (位置:  2, 名前: "HH",  背景色: Color.FromArgb( レーン背景色透明度, Color.SkyBlue),    区分線が太線: false) },
+            { 編集レーン種別.スネア,     (位置:  3, 名前: "SD",  背景色: Color.FromArgb( レーン背景色透明度, Color.Orange),     区分線が太線: false) },
+            { 編集レーン種別.ハイタム,   (位置:  4, 名前: "HT",  背景色: Color.FromArgb( レーン背景色透明度, Color.Lime),       区分線が太線: false) },
+            { 編集レーン種別.バス,       (位置:  5, 名前: "BD",  背景色: Color.FromArgb( レーン背景色透明度, Color.Gainsboro),  区分線が太線: false) },
+            { 編集レーン種別.ロータム,   (位置:  6, 名前: "LT",  背景色: Color.FromArgb( レーン背景色透明度, Color.Red),        区分線が太線: false) },
+            { 編集レーン種別.フロアタム, (位置:  7, 名前: "FT",  背景色: Color.FromArgb( レーン背景色透明度, Color.Magenta),    区分線が太線: false) },
+            { 編集レーン種別.右シンバル, (位置:  8, 名前: "RC",  背景色: Color.FromArgb( レーン背景色透明度, Color.WhiteSmoke), 区分線が太線: true ) },
+            { 編集レーン種別.BGV,        (位置:  9, 名前: "BGV", 背景色: Color.FromArgb( レーン背景色透明度, Color.SkyBlue),    区分線が太線: false) },
+            { 編集レーン種別.BGM,        (位置: 10, 名前: "BGM", 背景色: Color.FromArgb( レーン背景色透明度, Color.SkyBlue),    区分線が太線: false) },
         };
-
-        /// <summary>
-        ///     レーン位置に対応するレーンを定義する。
-        /// </summary>
-        /// <remarks>
-        ///     <see cref="編集レーンtoレーン位置"/> の逆引き。
-        ///     レーン位置は、左に表示されるレーンから順に 0, 1, 2, ... の値が振られる。
-        ///     負数は無効。
-        /// </remarks>
-        public readonly Dictionary<int, 編集レーン種別> レーン位置to編集レーン;
 
         // 小節番号 → grid
         public int 小節先頭の譜面内絶対位置gridを返す( int 小節番号 )
@@ -892,21 +861,42 @@ namespace SSTFEditor
         // Xpx → 編集レーン種別
         public 編集レーン種別 譜面パネル内X座標pxにある編集レーンを返す( int 譜面パネル内X座標px )
         {
-            int レーン位置 = 譜面パネル内X座標px / this.チップサイズpx.Width;
+            int レーン位置 = this.譜面パネル内X座標pxにある表示レーン位置を返す( 譜面パネル内X座標px );
 
-            if( !this.レーン位置to編集レーン.TryGetValue( レーン位置, out var レーン種別 ) )
-                レーン種別 = 編集レーン種別.Unknown;
+            var kvp = this.レーン属性.FirstOrDefault( ( kvp ) => kvp.Value.位置 == レーン位置 );
+            return ( kvp.Value.名前 != null ) ? kvp.Key : 編集レーン種別.Unknown;
+        }
 
-            return レーン種別;
+        // Xpx → 表示レーン位置
+        public int 譜面パネル内X座標pxにある表示レーン位置を返す( int 譜面パネル内X座標px )
+        {
+            return 譜面パネル内X座標px / this.チップサイズpx.Width;
+        }
+
+        // 編集レーン → 表示レーン位置
+        public int 編集レーンの表示レーン位置を返す( 編集レーン種別 lane )
+        {
+            return ( this.レーン属性.ContainsKey( lane ) ) ?
+                this.レーン属性[ lane ].位置 : -1;
         }
 
         // 編集レーン → Xpx
         public int 編集レーンのX座標pxを返す( 編集レーン種別 lane )
         {
-            if( !this.編集レーンtoレーン位置.TryGetValue( lane, out var レーン位置 ) )
-                return 0;
+            int レーン位置 = this.編集レーンの表示レーン位置を返す( lane );
+            return ( 0 <= レーン位置 ) ? レーン位置 * this.チップサイズpx.Width : 0;
+        }
 
-            return this.チップサイズpx.Width * レーン位置;
+        // 表示レーン位置 → 編集レーン種別
+        public 編集レーン種別 表示レーン位置にある編集レーンを返す( int 表示レーン位置 )
+        {
+            foreach( var kvp in this.レーン属性 )
+            {
+                if( kvp.Value.位置 == 表示レーン位置 )
+                    return kvp.Key;
+            }
+
+            return 編集レーン種別.Unknown;
         }
 
         // Ypx → 小節番号
@@ -1040,25 +1030,6 @@ namespace SSTFEditor
 
         protected const int レーン背景色透明度 = 25;
 
-        protected readonly Dictionary<編集レーン種別, Color> レーンto背景色 = new Dictionary<編集レーン種別, Color>() {
-            #region " *** "
-            //-----------------
-            { 編集レーン種別.BPM,          Color.FromArgb( レーン背景色透明度, Color.SkyBlue ) },
-            { 編集レーン種別.左シンバル,   Color.FromArgb( レーン背景色透明度, Color.WhiteSmoke ) },
-            { 編集レーン種別.ハイハット,   Color.FromArgb( レーン背景色透明度, Color.SkyBlue ) },
-            { 編集レーン種別.スネア,       Color.FromArgb( レーン背景色透明度, Color.Orange ) },
-            { 編集レーン種別.ハイタム,     Color.FromArgb( レーン背景色透明度, Color.Lime ) },
-            { 編集レーン種別.バス,         Color.FromArgb( レーン背景色透明度, Color.Gainsboro) },
-            { 編集レーン種別.ロータム,     Color.FromArgb( レーン背景色透明度, Color.Red ) },
-            { 編集レーン種別.フロアタム,   Color.FromArgb( レーン背景色透明度, Color.Magenta ) },
-            { 編集レーン種別.右シンバル,   Color.FromArgb( レーン背景色透明度, Color.WhiteSmoke ) },
-            { 編集レーン種別.BGV,          Color.FromArgb( レーン背景色透明度, Color.SkyBlue ) },
-            { 編集レーン種別.BGM,          Color.FromArgb( レーン背景色透明度, Color.SkyBlue ) },
-            { 編集レーン種別.Unknown,      Color.FromArgb( レーン背景色透明度, Color.White ) },
-            //-----------------
-            #endregion
-        };
-
         protected readonly Dictionary<SSTF.チップ種別, Color> チップto色 = new Dictionary<SSTF.チップ種別, Color>() {
             #region " *** "
             //-----------------
@@ -1088,25 +1059,6 @@ namespace SSTFEditor
             { SSTF.チップ種別.Splash,             Color.FromArgb( チップ背景色透明度, Color.WhiteSmoke ) },
             { SSTF.チップ種別.背景動画,           Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
             { SSTF.チップ種別.BGM,                Color.FromArgb( チップ背景色透明度, Color.SkyBlue ) },
-            //-----------------
-            #endregion
-        };
-
-        protected readonly Dictionary<編集レーン種別, string> レーンto名前 = new Dictionary<編集レーン種別, string>() {
-            #region " *** "
-            //-----------------
-            { 編集レーン種別.BPM,          "BPM" },
-            { 編集レーン種別.左シンバル,   "LC" },
-            { 編集レーン種別.ハイハット,   "HH" },
-            { 編集レーン種別.スネア,       "SD" },
-            { 編集レーン種別.ハイタム,     "HT" },
-            { 編集レーン種別.バス,         "BD" },
-            { 編集レーン種別.ロータム,     "LT" },
-            { 編集レーン種別.フロアタム,   "FT" },
-            { 編集レーン種別.右シンバル,   "RC" },
-            { 編集レーン種別.BGV,          "BGV" },
-            { 編集レーン種別.BGM,          "BGM" },
-            { 編集レーン種別.Unknown,      "NG" },
             //-----------------
             #endregion
         };
