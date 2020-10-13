@@ -489,7 +489,6 @@ namespace DTXMania2.結果
                 // WAVを持つチップなら発声する。（持つかどうかはこのメソッド↓内で判定される。）
                 Global.App.WAV管理.発声する( 
                     chip.チップサブID, 
-                    chip.チップ種別,
                     prop.発声前消音, 
                     prop.消音グループ種別, 
                     BGM以外も再生する: ドラムサウンドを再生する, 
@@ -523,7 +522,6 @@ namespace DTXMania2.結果
                     // (B) DTX他の場合 → チップのWAVを再生する。
                     Global.App.WAV管理.発声する(
                         chip.チップサブID,   // zz 番号を示す
-                        prop.チップ種別,
                         prop.発声前消音,
                         prop.消音グループ種別,
                         BGM以外も再生する: Global.App.ログオン中のユーザ.ドラムの音を発声する,

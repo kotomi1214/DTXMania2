@@ -225,7 +225,7 @@ namespace DTXMania2.演奏
                     {
                         #region " (A) 演奏開始小節番号から演奏を開始する。"
                         //----------------
-                        var 演奏開始時刻sec = this._指定小節へ移動する( 演奏ステージ.演奏開始小節番号 );
+                        this._指定小節へ移動する( 演奏ステージ.演奏開始小節番号, out this._描画開始チップ番号, out double 演奏開始時刻sec );
                         Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
                         //----------------
                         #endregion
@@ -241,7 +241,7 @@ namespace DTXMania2.演奏
                     }
 
                     // 次のフェーズへ。
-                    this._表示フェーズの結果 = 演奏結果.なし;
+                    this._表示フェーズの結果 = 演奏結果.演奏中;
                     this.現在のフェーズ = フェーズ.表示;
                     //----------------
                     #endregion
@@ -250,29 +250,22 @@ namespace DTXMania2.演奏
                 }
                 case フェーズ.表示:
                 {
-                    #region " 演奏パーツあり画面を描画する。"
-                    //----------------
-                    switch( this._表示フェーズの結果 )
+                    if( this._表示フェーズの結果 == 演奏結果.クリア )
                     {
-                        case 演奏結果.なし:
-                            break;
-
-                        case 演奏結果.クリア:
-                            this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.クリア;
-                            break;
-
-                        //todo: case 演奏結果.失敗:
-                        //    break;
+                        #region " 演奏をクリアしたら、クリア or 指示待機フェーズへ。"
+                        //----------------
+                        this.現在のフェーズ = ( Global.Options.ビュアーモードである ) ? フェーズ.指示待機 : フェーズ.クリア;
+                        //----------------
+                        #endregion
                     }
-                    //----------------
-                    #endregion
-
-                    #region " 入力＆ヒット処理。"
-                    //----------------
-                    this._入力とヒット処理を行う();
-                    //----------------
-                    #endregion
-
+                    else if( this._表示フェーズの結果 == 演奏結果.失敗 )
+                    {
+                    // todo: StageFailed したら失敗フェーズへ
+                    }
+                    else
+                    {
+                        this._入力とヒット処理を行う();
+                    }
                     break;
                 }
                 case フェーズ.キャンセル通知:
@@ -419,6 +412,11 @@ namespace DTXMania2.演奏
                     #region " 演奏パーツあり画面を描画する。"
                     //----------------
                     Global.App.画面をクリアする();
+
+                    // D2DとD3Dの混在描画について：
+                    // 　Direct2D の BeginDraw()～EndDraw() の負荷はかなり高い。（～30組/描画 程度が許容限界）
+                    // 　そこで、描画メソッド全体を1つの BeginDraw() と EndDraw() で囲むことにする。
+                    // 　途中で Direct3D の Draw を行いたい場合には、いったん EndDraw()し、D3Dで描画し、そして再びBeginDraw()するようにする。
 
                     dc.BeginDraw();
 
@@ -838,7 +836,6 @@ namespace DTXMania2.演奏
                                 // (B) DTX他の場合 → チップのWAVを再生する。
                                 Global.App.WAV管理.発声する(
                                     chip.チップサブID,   // zz 番号を示す
-                                    prop.チップ種別,
                                     prop.発声前消音,
                                     prop.消音グループ種別,
                                     BGM以外も再生する: true,
@@ -943,7 +940,7 @@ namespace DTXMania2.演奏
         // ローカル
 
 
-        演奏結果 _表示フェーズの結果 = 演奏結果.なし;
+        演奏結果 _表示フェーズの結果 = 演奏結果.演奏中;
 
 
 
@@ -976,7 +973,7 @@ namespace DTXMania2.演奏
 
         private readonly 右サイドクリアパネル _右サイドクリアパネル;
 
-        private void _演奏パーツなし背景画面を描画する( DeviceContext dc )
+        private void _演奏パーツなし背景画面を描画する( DeviceContext d2ddc )
         {
             var userConfig = Global.App.ログオン中のユーザ;
 
@@ -984,7 +981,7 @@ namespace DTXMania2.演奏
             //----------------
             if( userConfig.スコア指定の背景画像を表示する )
             {
-                this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
+                this._スコア指定の背景画像?.描画する( d2ddc, 0f, 0f,
                     X方向拡大率: Global.GraphicResources.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
                     Y方向拡大率: Global.GraphicResources.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
             }
@@ -994,39 +991,39 @@ namespace DTXMania2.演奏
             #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
             //----------------
             {
-                var preTarget = dc.Target;
-                var preTrans = dc.Transform;
-                var preBlend = dc.PrimitiveBlend;
+                var preTarget = d2ddc.Target;
+                var preTrans = d2ddc.Transform;
+                var preBlend = d2ddc.PrimitiveBlend;
 
-                dc.Target = this._左サイドクリアパネル.クリアパネル.Bitmap;
-                dc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+                d2ddc.Target = this._左サイドクリアパネル.クリアパネル.Bitmap;
+                d2ddc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
+                d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 // 背景画像
-                dc.Clear( new Color4( Color3.Black, 0f ) );
-                dc.DrawBitmap( this._左サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
+                d2ddc.Clear( new Color4( Color3.Black, 0f ) );
+                d2ddc.DrawBitmap( this._左サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
 
                 // プレイヤー名
-                this._プレイヤー名表示.進行描画する( dc );
+                this._プレイヤー名表示.進行描画する( d2ddc );
 
                 // スコア
                 if( userConfig.ダーク == ダーク種別.OFF )
-                    this._スコア表示.進行描画する( dc, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
+                    this._スコア表示.進行描画する( d2ddc, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
 
                 // 達成率
-                this._達成率表示.進行描画する( dc, (float) this.成績.Achievement );
+                this._達成率表示.進行描画する( d2ddc, (float) this.成績.Achievement );
 
                 // 判定パラメータ
-                this._判定パラメータ表示.進行描画する( dc, +118f, +372f, this.成績 );
+                this._判定パラメータ表示.進行描画する( d2ddc, +118f, +372f, this.成績 );
 
                 // スキル
-                this._曲別SKILL.進行描画する( dc, 0f );
+                this._曲別SKILL.進行描画する( d2ddc, 0f );
 
-                dc.Flush(); // いったんここまで描画
+                d2ddc.Flush(); // いったんここまで描画
 
-                dc.Target = preTarget;
-                dc.Transform = preTrans;
-                dc.PrimitiveBlend = preBlend;
+                d2ddc.Target = preTarget;
+                d2ddc.Transform = preTrans;
+                d2ddc.PrimitiveBlend = preBlend;
 
                 ( (IUnknown) preTarget ).Release(); // 要Release
             }
@@ -1038,23 +1035,23 @@ namespace DTXMania2.演奏
             #region " 右サイドパネルへの描画と、右サイトパネルの表示 "
             //----------------
             {
-                var preTarget = dc.Target;
-                var preTrans = dc.Transform;
-                var preBlend = dc.PrimitiveBlend;
+                var preTarget = d2ddc.Target;
+                var preTrans = d2ddc.Transform;
+                var preBlend = d2ddc.PrimitiveBlend;
 
-                dc.Target = this._右サイドクリアパネル.クリアパネル.Bitmap;
-                dc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+                d2ddc.Target = this._右サイドクリアパネル.クリアパネル.Bitmap;
+                d2ddc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
+                d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 // 背景画像
-                dc.Clear( new Color4( Color3.Black, 0f ) );
-                dc.DrawBitmap( this._右サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
+                d2ddc.Clear( new Color4( Color3.Black, 0f ) );
+                d2ddc.DrawBitmap( this._右サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
 
-                dc.Flush(); // いったんここまで描画
+                d2ddc.Flush(); // いったんここまで描画
 
-                dc.Target = preTarget;
-                dc.Transform = preTrans;
-                dc.PrimitiveBlend = preBlend;
+                d2ddc.Target = preTarget;
+                d2ddc.Transform = preTrans;
+                d2ddc.PrimitiveBlend = preBlend;
 
                 ( (IUnknown) preTarget ).Release(); // 要Release
             }
@@ -1065,77 +1062,75 @@ namespace DTXMania2.演奏
 
             #region " レーンフレーム "
             //----------------
-            this._レーンフレーム.進行描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) );
+            this._レーンフレーム.進行描画する( d2ddc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) );
             //----------------
             #endregion
 
             #region " 背景画像 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._背景画像.描画する( dc, 0f, 0f );
+                this._背景画像.描画する( d2ddc, 0f, 0f );
             //----------------
             #endregion
 
             #region " 譜面スクロール速度 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
+                this._譜面スクロール速度.描画する( d2ddc, userConfig.譜面スクロール速度 );
             //----------------
             #endregion
 
             #region " エキサイトゲージ "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+                this._エキサイトゲージ.進行描画する( d2ddc, this.成績.エキサイトゲージ量 );
             //----------------
             #endregion
 
             #region " クリアメーター "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._クリアメーター.進行描画する( dc );
+                this._クリアメーター.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " フェーズパネル "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._フェーズパネル.進行描画する( dc );
+                this._フェーズパネル.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " 曲目パネル "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._曲名パネル.進行描画する( dc );
+                this._曲名パネル.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " ヒットバー "
             //----------------
             if( userConfig.ダーク != ダーク種別.FULL )
-                this._ドラムキットとヒットバー.ヒットバーを進行描画する( dc );
+                this._ドラムキットとヒットバー.ヒットバーを進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " ドラムキット "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._ドラムキットとヒットバー.ドラムキットを進行描画する( dc );
+                this._ドラムキットとヒットバー.ドラムキットを進行描画する( d2ddc );
             //----------------
             #endregion
         }
 
-        private enum 演奏結果 { なし, クリア, 失敗 };
-
-        private 演奏結果 _演奏パーツあり背景画面を描画する( DeviceContext dc )
+        private 演奏結果 _演奏パーツあり背景画面を描画する( DeviceContext d2ddc )
         {
-            var result = 演奏結果.なし;
+            var result = 演奏結果.演奏中;
             var userConfig = Global.App.ログオン中のユーザ;
 
             double 演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec;
             if( Global.Options.VSyncWait )
-                演奏時刻sec += +Global.GraphicResources.次のDComp表示までの残り時間sec;
+                演奏時刻sec += Global.GraphicResources.次のDComp表示までの残り時間sec;
 
             #region " 譜面スクロールの進行 "
             //----------------
@@ -1148,7 +1143,7 @@ namespace DTXMania2.演奏
             //----------------
             if( userConfig.スコア指定の背景画像を表示する )
             {
-                this._スコア指定の背景画像?.描画する( dc, 0f, 0f,
+                this._スコア指定の背景画像?.描画する( d2ddc, 0f, 0f,
                     X方向拡大率: Global.GraphicResources.設計画面サイズ.Width / this._スコア指定の背景画像.サイズ.Width,
                     Y方向拡大率: Global.GraphicResources.設計画面サイズ.Height / this._スコア指定の背景画像.サイズ.Height );
             }
@@ -1174,7 +1169,7 @@ namespace DTXMania2.演奏
                                 //----------------
                                 float w = Global.GraphicResources.設計画面サイズ.Width;
                                 float h = Global.GraphicResources.設計画面サイズ.Height;
-                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ) );
+                                video.描画する( d2ddc, new RectangleF( 0f, 0f, w, h ) );
                                 //----------------
                                 #endregion
 
@@ -1189,12 +1184,12 @@ namespace DTXMania2.演奏
                                 float h = Global.GraphicResources.設計画面サイズ.Height;
 
                                 // (1) 画面いっぱいに描画。
-                                video.描画する( dc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
+                                video.描画する( d2ddc, new RectangleF( 0f, 0f, w, h ), 0.2f );    // 不透明度は 0.2 で暗くする。
 
                                 // (2) ちょっと縮小して描画。
                                 float 拡大縮小率 = 0.75f;
                                 float 上移動 = 100.0f;
-                                video.最後のフレームを再描画する( dc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
+                                video.最後のフレームを再描画する( d2ddc, new RectangleF(   // 直前に取得したフレームをそのまま描画。
                                     w * ( 1f - 拡大縮小率 ) / 2f,
                                     h * ( 1f - 拡大縮小率 ) / 2f - 上移動,
                                     w * 拡大縮小率,
@@ -1214,39 +1209,39 @@ namespace DTXMania2.演奏
             #region " 左サイドパネルへの描画と、左サイドパネルの表示 "
             //----------------
             {
-                var preTarget = dc.Target;
-                var preTrans = dc.Transform;
-                var preBlend = dc.PrimitiveBlend;
+                var preTarget = d2ddc.Target;
+                var preTrans = d2ddc.Transform;
+                var preBlend = d2ddc.PrimitiveBlend;
 
-                dc.Target = this._左サイドクリアパネル.クリアパネル.Bitmap;
-                dc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+                d2ddc.Target = this._左サイドクリアパネル.クリアパネル.Bitmap;
+                d2ddc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
+                d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 // 背景画像
-                dc.Clear( new Color4( Color3.Black, 0f ) );
-                dc.DrawBitmap( this._左サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
+                d2ddc.Clear( new Color4( Color3.Black, 0f ) );
+                d2ddc.DrawBitmap( this._左サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
 
                 // プレイヤー名
-                this._プレイヤー名表示.進行描画する( dc );
+                this._プレイヤー名表示.進行描画する( d2ddc );
 
                 // スコア
                 if( userConfig.ダーク == ダーク種別.OFF )
-                    this._スコア表示.進行描画する( dc, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
+                    this._スコア表示.進行描画する( d2ddc, Global.Animation, new Vector2( +280f, +120f ), this.成績 );
 
                 // 達成率
-                this._達成率表示.進行描画する( dc, (float) this.成績.Achievement );
+                this._達成率表示.進行描画する( d2ddc, (float) this.成績.Achievement );
 
                 // 判定パラメータ
-                this._判定パラメータ表示.進行描画する( dc, +118f, +372f, this.成績 );
+                this._判定パラメータ表示.進行描画する( d2ddc, +118f, +372f, this.成績 );
 
                 // スキル
-                this._曲別SKILL.進行描画する( dc, this.成績.スキル );
+                this._曲別SKILL.進行描画する( d2ddc, this.成績.スキル );
 
-                dc.Flush(); // いったんここまで描画。
+                d2ddc.Flush(); // いったんここまで描画。
 
-                dc.Target = preTarget;
-                dc.Transform = preTrans;
-                dc.PrimitiveBlend = preBlend;
+                d2ddc.Target = preTarget;
+                d2ddc.Transform = preTrans;
+                d2ddc.PrimitiveBlend = preBlend;
 
                 ( (IUnknown) preTarget ).Release(); // 要Release
             }
@@ -1258,26 +1253,26 @@ namespace DTXMania2.演奏
             #region " 右サイドパネルへの描画と、右サイドパネルの表示 "
             //----------------
             {
-                var preTarget = dc.Target;
-                var preTrans = dc.Transform;
-                var preBlend = dc.PrimitiveBlend;
+                var preTarget = d2ddc.Target;
+                var preTrans = d2ddc.Transform;
+                var preBlend = d2ddc.PrimitiveBlend;
 
-                dc.Target = this._右サイドクリアパネル.クリアパネル.Bitmap;
-                dc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
-                dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+                d2ddc.Target = this._右サイドクリアパネル.クリアパネル.Bitmap;
+                d2ddc.Transform = Matrix3x2.Identity;  // 等倍描画(DPXtoDPX)
+                d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
                 // 背景画像
-                dc.Clear( new Color4( Color3.Black, 0f ) );
-                dc.DrawBitmap( this._右サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
+                d2ddc.Clear( new Color4( Color3.Black, 0f ) );
+                d2ddc.DrawBitmap( this._右サイドクリアパネル.背景.Bitmap, opacity: 1f, interpolationMode: InterpolationMode.Linear );
 
                 // コンボ
-                this._コンボ表示.進行描画する( dc, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
+                this._コンボ表示.進行描画する( d2ddc, new Vector2( +228f + 264f / 2f, +234f ), this.成績 );
 
-                dc.Flush(); // いったんここまで描画。
+                d2ddc.Flush(); // いったんここまで描画。
 
-                dc.Target = preTarget;
-                dc.Transform = preTrans;
-                dc.PrimitiveBlend = preBlend;
+                d2ddc.Target = preTarget;
+                d2ddc.Transform = preTrans;
+                d2ddc.PrimitiveBlend = preBlend;
 
                 ( (IUnknown) preTarget ).Release(); // 要Release
             }
@@ -1288,41 +1283,41 @@ namespace DTXMania2.演奏
 
             #region " レーンフレーム "
             //----------------
-            this._レーンフレーム.進行描画する( dc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) );
+            this._レーンフレーム.進行描画する( d2ddc, userConfig.レーンの透明度, レーンラインを描画する: ( userConfig.ダーク == ダーク種別.OFF ) );
             //----------------
             #endregion
 
             #region " レーンフラッシュ  "
             //----------------
-            this._レーンフラッシュ.進行描画する( dc );
+            this._レーンフラッシュ.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " 小節線拍線 "
             //----------------
             if( userConfig.ダーク != ダーク種別.FULL )
-                this._小節線拍線を描画する( dc, 演奏時刻sec );
+                this._小節線拍線を描画する( d2ddc, 演奏時刻sec );
             //----------------
             #endregion
 
             #region " 背景画像 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._背景画像.描画する( dc, 0f, 0f );
+                this._背景画像.描画する( d2ddc, 0f, 0f );
             //----------------
             #endregion
 
             #region " 譜面スクロール速度 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._譜面スクロール速度.描画する( dc, userConfig.譜面スクロール速度 );
+                this._譜面スクロール速度.描画する( d2ddc, userConfig.譜面スクロール速度 );
             //----------------
             #endregion
 
             #region " エキサイトゲージ "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._エキサイトゲージ.進行描画する( dc, this.成績.エキサイトゲージ量 );
+                this._エキサイトゲージ.進行描画する( d2ddc, this.成績.エキサイトゲージ量 );
             //----------------
             #endregion
 
@@ -1334,19 +1329,19 @@ namespace DTXMania2.演奏
             // クリアメーター
             this.成績.CountMap = this._クリアメーター.カウント値を設定する( 現在位置, this.成績.判定別ヒット数 );
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._クリアメーター.進行描画する( dc );
+                this._クリアメーター.進行描画する( d2ddc );
 
             // フェーズパネル
             this._フェーズパネル.現在位置 = 現在位置;
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._フェーズパネル.進行描画する( dc );
+                this._フェーズパネル.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " 曲名パネル "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._曲名パネル.進行描画する( dc );
+                this._曲名パネル.進行描画する( d2ddc );
             //----------------
             #endregion
 
@@ -1354,14 +1349,14 @@ namespace DTXMania2.演奏
             //----------------
             // ヒットバー
             if( userConfig.ダーク != ダーク種別.FULL )
-                this._ドラムキットとヒットバー.ヒットバーを進行描画する( dc );
+                this._ドラムキットとヒットバー.ヒットバーを進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " ドラムキット "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._ドラムキットとヒットバー.ドラムキットを進行描画する( dc );
+                this._ドラムキットとヒットバー.ドラムキットを進行描画する( d2ddc );
             //----------------
             #endregion
 
@@ -1370,11 +1365,7 @@ namespace DTXMania2.演奏
             //----------------
             this._描画範囲内のすべてのチップに対して( 演奏時刻sec, ( SSTF.チップ chip, int index, double ヒット判定バーと描画との時間sec, double ヒット判定バーと発声との時間sec, double ヒット判定バーとの距離dpx ) => {
 
-                if( this._ドラムチップ.進行描画する( dc, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx ) )
-                {
-                    // true が返されたら演奏終了（クリア）
-                    result = 演奏結果.クリア;
-                }
+                result = this._ドラムチップ.進行描画する( d2ddc, ref this._描画開始チップ番号, this._チップの演奏状態[ chip ], chip, index, ヒット判定バーとの距離dpx );
 
             } );
             //----------------
@@ -1382,20 +1373,20 @@ namespace DTXMania2.演奏
 
             #region " チップ光 "
             //----------------
-            this._チップ光.進行描画する( dc );
+            this._チップ光.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " 判定文字列 "
             //----------------
-            this._判定文字列.進行描画する( dc );
+            this._判定文字列.進行描画する( d2ddc );
             //----------------
             #endregion
 
             #region " システム情報 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
-                this._システム情報.描画する( dc, $"BGMAdjust: {Global.App.演奏譜面.譜面.BGMAdjust}" );
+                this._システム情報.描画する( d2ddc, $"BGMAdjust: {Global.App.演奏譜面.譜面.BGMAdjust}" );
             //----------------
             #endregion
 
@@ -1497,7 +1488,7 @@ namespace DTXMania2.演奏
 
 
 
-        // 演奏状態
+        // 演奏状態、操作
 
 
         /// <summary>
@@ -1513,6 +1504,7 @@ namespace DTXMania2.演奏
         private Dictionary<SSTF.チップ, チップの演奏状態> _チップの演奏状態;
 
         private bool _一時停止中 = false;
+
 
         private void _演奏を一時停止または再開する()
         {
@@ -1544,61 +1536,65 @@ namespace DTXMania2.演奏
             } );
         }
 
-        private double _指定小節へ移動する( int 演奏開始小節番号 )
+        /// <summary>
+        ///     指定された小節に演奏箇所を移動する。
+        /// </summary>
+        /// <param name="移動先小節番号">移動先の小節番号。</param>
+        /// <param name="描画開始チップ番号">移動先に位置する先頭のチップが返される。なければ 0 。</param>
+        /// <param name="演奏開始時刻sec">移動先に移動した場合の演奏開始時刻[秒]。なければ 0.0 。</param>
+        /// <remarks>
+        ///     指定された小節に演奏箇所を移動し、新しい描画開始チップ番号と、新しい演奏開始時刻secを返す。
+        ///     また、新しい演奏開始時刻sec より前のAVI/WAVチップについては、途中からの再生を行う。
+        /// </remarks>
+        private void _指定小節へ移動する( int 移動先小節番号, out int 描画開始チップ番号, out double 演奏開始時刻sec )
         {
-            this._描画開始チップ番号 = -1;
-
-            if( 0 > 演奏開始小節番号 )
+            // 移動先の小節番号が -1 なら、一番最初へ移動。
+            if( 0 > 移動先小節番号 )
             {
-                this._描画開始チップ番号 = 0;
-                return 0.0; // 最初から。
+                描画開始チップ番号 = 0;
+                演奏開始時刻sec = 0.0;
+                return;
             }
-
 
             var score = Global.App.演奏スコア;
 
-            var 最初のチップ番号 = -1;
-
-            #region " 演奏開始小節番号に位置する最初のチップを検索する。"
-            //----------------
-            for( int i = 0; i < score.チップリスト.Count; i++ )
-            {
-                if( score.チップリスト[ i ].小節番号 >= 演奏開始小節番号 )
-                {
-                    最初のチップ番号 = i;
-                    break;
-                }
-            }
-            //----------------
-            #endregion
+            // 移動先小節番号に位置している最初のチップを検索する。
+            int 最初のチップ番号 = score.チップリスト.FindIndex( ( c ) => c.小節番号 >= 移動先小節番号 );    // 見つからなければ -1。
 
             if( -1 == 最初のチップ番号 )
             {
-                // すべて演奏終了している
-                this._描画開始チップ番号 = score.チップリスト.Count - 1;
-                return score.チップリスト.Last().発声時刻sec;
+                // すべて演奏終了しているなら、最後のチップを指定する。
+                描画開始チップ番号 = score.チップリスト.Count - 1;
+                演奏開始時刻sec = score.チップリスト.Last().発声時刻sec;
+                return;
             }
 
-
             // 演奏開始時刻を、最初のチップの描画より少し手前に設定。
+            演奏開始時刻sec = Math.Max( 0.0, score.チップリスト[ 最初のチップ番号 ].描画時刻sec - 0.5 );   // 0.5 秒早く
 
-            double 演奏開始時刻sec = Math.Max( 0.0, score.チップリスト[ 最初のチップ番号 ].描画時刻sec - 0.5 );   // 0.5 秒早く
-
-            #region " 演奏開始時刻をもとに、描画開始チップ番号を確定する。"
+            #region " 演奏開始時刻をもとに描画開始チップ番号を確定するとともに、全チップのヒット状態をリセットする。"
             //----------------
+            描画開始チップ番号 = -1;
+
+            // すべてのチップについて……
             for( int i = 0; i < score.チップリスト.Count; i++ )
             {
                 var chip = score.チップリスト[ i ];
 
                 if( chip.描画時刻sec >= 演奏開始時刻sec )
                 {
-                    this._描画開始チップ番号 = i;
+                    // (A) 演奏開始時刻以降のチップ → 未ヒット状態にする。
+                    this._チップの演奏状態[ chip ].ヒット前の状態にする();
+
+                    if( -1 == 描画開始チップ番号 )
+                        描画開始チップ番号 = i;  // 先頭チップ
                     break;
                 }
-
-                // 同時に、開始時刻より前のチップはヒット済みとする。
-
-                this._チップの演奏状態[ chip ].ヒット済みの状態にする();
+                else
+                {
+                    // (B) 演奏開始時刻より前のチップ → ヒット済みとする。
+                    this._チップの演奏状態[ chip ].ヒット済みの状態にする();
+                }
             }
             //----------------
             #endregion
@@ -1610,15 +1606,19 @@ namespace DTXMania2.演奏
             //----------------
             if( Global.App.ログオン中のユーザ.演奏中に動画を表示する )
             {
-                var ヒット済みの動画チップリスト = score.チップリスト.Where( ( chip ) => (
-                    this._チップの演奏状態[ chip ].ヒット済みである &&
-                    chip.チップ種別 == SSTF.チップ種別.背景動画 ) );
+                var ヒット済みの動画チップリスト =
+                    from chip in score.チップリスト
+                    where chip.チップ種別 == SSTF.チップ種別.背景動画 && this._チップの演奏状態[ chip ].ヒット済みである
+                    select chip;
 
                 foreach( var aviChip in ヒット済みの動画チップリスト )
                 {
                     if( Global.App.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video? video ) )
                     {
-                        video?.再生を開始する( 演奏開始時刻sec - aviChip.発声時刻sec );
+                        double 再生開始時刻sec = 演奏開始時刻sec - aviChip.発声時刻sec;
+
+                        if( 0 <= 再生開始時刻sec )    // 念のため。
+                            video?.再生を開始する( 再生開始時刻sec );
                     }
                 }
             }
@@ -1628,28 +1628,31 @@ namespace DTXMania2.演奏
             #region " WAV音声の途中再生 "
             //----------------
             {
-                var ヒット済みのBGMチップリスト = score.チップリスト.Where( ( chip ) => (
-                    this._チップの演奏状態[ chip ].ヒット済みである &&
-                    chip.チップ種別 == SSTF.チップ種別.BGM ) );
+                var ヒット済みのWAVチップリスト =
+                    from chip in score.チップリスト
+                    where 
+                        ( chip.チップ種別 == SSTF.チップ種別.BGM ) &&
+                        this._チップの演奏状態[ chip ].ヒット済みである
+                    select chip;
 
-                foreach( var wavChip in ヒット済みのBGMチップリスト )
+                foreach( var wavChip in ヒット済みのWAVチップリスト )
                 {
                     var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ wavChip.チップ種別 ];
 
                     Global.App.WAV管理.発声する(
                         wavChip.チップサブID,
-                        wavChip.チップ種別,
                         prop.発声前消音,
                         prop.消音グループ種別,
-                        BGM以外も再生する: Global.App.ログオン中のユーザ.ドラムの音を発声する && ( Global.Options.ビュアーモードである && ビュアーモードでドラム音を再生する ),
+                        BGM以外も再生する: 
+                            Global.App.ログオン中のユーザ.ドラムの音を発声する && 
+                            Global.Options.ビュアーモードである && 
+                            ビュアーモードでドラム音を再生する,
                         音量: wavChip.音量 / (float)SSTF.チップ.最大音量,
                         再生開始時刻sec: 演奏開始時刻sec - wavChip.発声時刻sec );
                 }
             }
             //----------------
             #endregion
-
-            return 演奏開始時刻sec;
         }
 
         private void _演奏状態を初期化する()
@@ -1670,6 +1673,7 @@ namespace DTXMania2.演奏
         }
 
 
+
         // フェードイン（キャプチャ画像とステージ画像とのA-B変換）→ 既定のアイキャッチを使わないので独自管理する。
 
 
@@ -1684,7 +1688,7 @@ namespace DTXMania2.演奏
 
 
         /// <summary>
-        ///		描画範囲内にイチするすべてのチップに対して、指定された処理を実行する。
+        ///		現在の描画範囲内のすべてのチップに対して、指定された処理を実行する。
         /// </summary>
         /// <remarks>
         ///		「描画範囲内のチップ」とは、<see cref="_描画開始チップ番号"/> のチップを画面最下位のチップとし、画面上端にはみ出すまでの間のすべてのチップを示す。
@@ -1862,7 +1866,6 @@ namespace DTXMania2.演奏
                     Global.App.WAV管理.発声する(
                         chip.
                         チップサブID,
-                        chip.チップ種別,
                         drumChipProperty.発声前消音,
                         drumChipProperty.消音グループ種別,
                         ドラムサウンドを再生する,
@@ -1878,32 +1881,32 @@ namespace DTXMania2.演奏
         /// </summary>
         private SSTF.チップ? _指定された時刻に一番近いチップを返す( double 時刻sec, int 検索開始チップ番号, Func<SSTF.チップ, bool> 検索条件 )
         {
+            if( 0 == 検索開始チップ番号 )
+                return null;    // 演奏が完全に終わっていたらチップも返さない。
+
             var 一番近いチップ = (SSTF.チップ?)null;
             var 一番近いチップの時刻差の絶対値sec = (double)0.0;
 
-            if( 0 < 検索開始チップ番号 )
+            // すべてのチップについて、描画時刻の早い順に調べていく。
+            for( int i = 検索開始チップ番号; i < Global.App.演奏スコア.チップリスト.Count; i++ )
             {
-                // すべてのチップについて、描画時刻の早い順に調べていく。
-                for( int i = 検索開始チップ番号; i < Global.App.演奏スコア.チップリスト.Count; i++ )
+                var chip = Global.App.演奏スコア.チップリスト[ i ];
+
+                if( !検索条件( chip ) )
+                    continue;   // 検索条件を満たさないチップは無視
+
+                var 今回の時刻差の絶対値sec = Math.Abs( chip.描画時刻sec - 時刻sec );
+
+                if( null != 一番近いチップ &&
+                    一番近いチップの時刻差の絶対値sec < 今回の時刻差の絶対値sec )
                 {
-                    var chip = Global.App.演奏スコア.チップリスト[ i ];
-
-                    if( !検索条件( chip ) )
-                        continue;   // 検索条件を満たさないチップは無視
-
-                    var 今回の時刻差の絶対値sec = Math.Abs( chip.描画時刻sec - 時刻sec );
-
-                    if( null != 一番近いチップ &&
-                        一番近いチップの時刻差の絶対値sec < 今回の時刻差の絶対値sec )
-                    {
-                        // 時刻差の絶対値が前回より増えた → 前回のチップが指定時刻への再接近だった
-                        break;
-                    }
-
-                    // 更新して次へ
-                    一番近いチップ = chip;
-                    一番近いチップの時刻差の絶対値sec = 今回の時刻差の絶対値sec;
+                    // 時刻差の絶対値が前回より増えた → 前回のチップが指定時刻への再接近だった
+                    break;
                 }
+
+                // 更新して次へ
+                一番近いチップ = chip;
+                一番近いチップの時刻差の絶対値sec = 今回の時刻差の絶対値sec;
             }
 
             return 一番近いチップ;

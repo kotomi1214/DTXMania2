@@ -104,7 +104,7 @@ namespace DTXMania2
         ///		指定した番号のWAVを、指定したチップ種別として発声する。
         /// </summary>
         /// <param name="音量">0:無音～1:原音</param>
-        public void 発声する( int WAV番号, SSTF.チップ種別 chipType, bool 発声前に消音する, 消音グループ種別 muteGroupType, bool BGM以外も再生する, float 音量 = 1f, double 再生開始時刻sec = 0.0 )
+        public void 発声する( int WAV番号, bool 発声前に消音する, 消音グループ種別 muteGroupType, bool BGM以外も再生する, float 音量 = 1f, double 再生開始時刻sec = 0.0 )
         {
             if( !( this._WAV情報リスト.ContainsKey( WAV番号 ) ) ||
                 ( !( BGM以外も再生する ) && !( this._WAV情報リスト[ WAV番号 ].BGMである ) ) )
@@ -245,14 +245,16 @@ namespace DTXMania2
             /// <param name="音量">0:無音～1:原音</param>
             public void 発声する( 消音グループ種別 muteGroupType, float 音量, double 再生開始時刻sec = 0.0 )
             {
+                var sound = this.Sounds[ this._次に再生するSound番号 ];
+
+                if( sound.Length <= 再生開始時刻sec )
+                    return; // 再生範囲外なので無視
+
                 this.最後に発声したときの消音グループ種別 = muteGroupType;
 
                 // 発声。
-                音量 =
-                    ( 0f > 音量 ) ? 0f :
-                    ( 1f < 音量 ) ? 1f : 音量;
-                this.Sounds[ this._次に再生するSound番号 ].Volume = 音量;
-                this.Sounds[ this._次に再生するSound番号 ].Play( 再生開始時刻sec );
+                sound.Volume = Math.Clamp( 音量, min: 0f, max: 1f );
+                sound.Play( 再生開始時刻sec );
 
                 // サウンドローテーション。
                 this._現在再生中のSound番号 = this._次に再生するSound番号;
