@@ -104,6 +104,7 @@ namespace DTXMania2.演奏
             this._チップの演奏状態 = null!;
             this._フェードインカウンタ = new Counter();
             this._LoadingSpinner = new LoadingSpinner();
+            this._早送りアイコン = new 早送りアイコン();
             this.成績 = new 成績();
 
             // 最初のフェーズへ。
@@ -129,6 +130,7 @@ namespace DTXMania2.演奏
             this.キャプチャ画面?.Dispose();
             this._スコア指定の背景画像?.Dispose();
 
+            this._早送りアイコン.Dispose();
             this._LoadingSpinner.Dispose();
             this._拍線色.Dispose();
             this._小節線影色.Dispose();
@@ -922,6 +924,44 @@ namespace DTXMania2.演奏
                         #endregion
                     }
                 }
+                if( keyboard.キーが押された( 0, Keys.PageUp ) && 0 <= this._描画開始チップ番号 )
+                {
+                    #region " PageUp → 1小節先に進む "
+                    //----------------
+                    // 現在時刻における小節番号を取得する。
+                    int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
+                    double 現在時刻sec = Global.App.サウンドタイマ.現在時刻sec;
+                    for( int i = this._描画開始チップ番号; i < Global.App.演奏スコア.チップリスト.Count; i++ )
+                    {
+                        var chip = Global.App.演奏スコア.チップリスト[ i ];
+                        if( chip.チップ種別 == SSTF.チップ種別.小節線 && 現在時刻sec <= chip.描画時刻sec )
+                            break;
+                        現在の小節番号 = chip.小節番号;
+                    }
+
+                    // 取得した小節の1つ次の小節へ移動する。
+                    this._指定小節へ移動する( 現在の小節番号 + 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
+                    Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+
+                    this._早送りアイコン.早送りする();
+                    //----------------
+                    #endregion
+                }
+                if( keyboard.キーが押された( 0, Keys.PageDown ) && 1 <= this._描画開始チップ番号 )
+                {
+                    #region " PageDown → 1小節前に戻る "
+                    //----------------
+                    // こちらは描画開始チップの小節番号を基点とする。
+                    int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
+
+                    // 取得した小節の1つ前の小節へ移動する。
+                    this._指定小節へ移動する( 現在の小節番号 - 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
+                    Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+
+                    this._早送りアイコン.早戻しする();
+                    //----------------
+                    #endregion
+                }
             }
             if( Global.App.ドラム入力.ドラムが入力された( ドラム入力種別.Pause_Resume ) )
             {
@@ -972,6 +1012,8 @@ namespace DTXMania2.演奏
         private readonly 左サイドクリアパネル _左サイドクリアパネル;
 
         private readonly 右サイドクリアパネル _右サイドクリアパネル;
+
+        private readonly 早送りアイコン _早送りアイコン;
 
         private void _演奏パーツなし背景画面を描画する( DeviceContext d2ddc )
         {
@@ -1383,6 +1425,12 @@ namespace DTXMania2.演奏
             //----------------
             #endregion
 
+            #region " 早送りアイコン "
+            //----------------
+            this._早送りアイコン.進行描画する( d2ddc );
+            //----------------
+            #endregion
+
             #region " システム情報 "
             //----------------
             if( userConfig.ダーク == ダーク種別.OFF )
@@ -1548,6 +1596,16 @@ namespace DTXMania2.演奏
         /// </remarks>
         private void _指定小節へ移動する( int 移動先小節番号, out int 描画開始チップ番号, out double 演奏開始時刻sec )
         {
+            var score = Global.App.演奏スコア;
+
+            // AVI動画、WAV音声を停止する。
+            Global.App.AVI管理.再生中の動画をすべて一時停止する();
+            Global.App.WAV管理.再生中の音声をすべて一時停止する();
+
+            // 一度、すべてのチップを未ヒット状態に戻す。
+            foreach( var chip in score.チップリスト )
+                this._チップの演奏状態[ chip ].ヒット前の状態にする();
+
             // 移動先の小節番号が -1 なら、一番最初へ移動。
             if( 0 > 移動先小節番号 )
             {
@@ -1555,8 +1613,6 @@ namespace DTXMania2.演奏
                 演奏開始時刻sec = 0.0;
                 return;
             }
-
-            var score = Global.App.演奏スコア;
 
             // 移動先小節番号に位置している最初のチップを検索する。
             int 最初のチップ番号 = score.チップリスト.FindIndex( ( c ) => c.小節番号 >= 移動先小節番号 );    // 見つからなければ -1。
@@ -1572,20 +1628,15 @@ namespace DTXMania2.演奏
             // 演奏開始時刻を、最初のチップの描画より少し手前に設定。
             演奏開始時刻sec = Math.Max( 0.0, score.チップリスト[ 最初のチップ番号 ].描画時刻sec - 0.5 );   // 0.5 秒早く
 
-            #region " 演奏開始時刻をもとに描画開始チップ番号を確定するとともに、全チップのヒット状態をリセットする。"
-            //----------------
+            // 演奏開始時刻をもとに描画開始チップ番号を確定するとともに、全チップのヒット状態をリセットする。
             描画開始チップ番号 = -1;
-
-            // すべてのチップについて……
             for( int i = 0; i < score.チップリスト.Count; i++ )
             {
                 var chip = score.チップリスト[ i ];
 
                 if( chip.描画時刻sec >= 演奏開始時刻sec )
                 {
-                    // (A) 演奏開始時刻以降のチップ → 未ヒット状態にする。
-                    this._チップの演奏状態[ chip ].ヒット前の状態にする();
-
+                    // (A) 演奏開始時刻以降のチップ
                     if( -1 == 描画開始チップ番号 )
                         描画開始チップ番号 = i;  // 先頭チップ
                     break;
@@ -1596,9 +1647,6 @@ namespace DTXMania2.演奏
                     this._チップの演奏状態[ chip ].ヒット済みの状態にする();
                 }
             }
-            //----------------
-            #endregion
-
 
             // 必要なら、AVI動画, WAV音声の途中再生を行う。
 

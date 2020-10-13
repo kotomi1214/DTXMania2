@@ -194,6 +194,9 @@
     <None Update="Resources\Default\Images\LoadingSpinner.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\Default\Images\PlayStage\FastForward.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\Default\Images\ResultStage\rankA.efkefc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
