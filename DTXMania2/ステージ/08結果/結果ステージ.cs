@@ -42,14 +42,14 @@ namespace DTXMania2.結果
 
             #region " 成績をDBへ反映する。"
             //----------------
-            if( !Global.App.ログオン中のユーザ.AutoPlayがすべてONである )
+            if( Global.App.ログオン中のユーザ.AutoPlayがすべてONである || result.無効 )
             {
-                this._最高成績である = this._成績を反映する();
+                // 全Autoまたは無効の場合は反映しない。
+                this._最高成績である = false;
             }
             else
             {
-                // 全AUTOなら反映しない。
-                this._最高成績である = false;
+                this._最高成績である = this._成績を反映する();
             }
             //----------------
             #endregion

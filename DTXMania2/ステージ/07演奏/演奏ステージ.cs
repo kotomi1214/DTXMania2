@@ -944,6 +944,8 @@ namespace DTXMania2.演奏
                     Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
 
                     this._早送りアイコン.早送りする();
+
+                    this.成績.無効 = true;
                     //----------------
                     #endregion
                 }
@@ -959,6 +961,8 @@ namespace DTXMania2.演奏
                     Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
 
                     this._早送りアイコン.早戻しする();
+
+                    this.成績.無効 = true;
                     //----------------
                     #endregion
                 }
