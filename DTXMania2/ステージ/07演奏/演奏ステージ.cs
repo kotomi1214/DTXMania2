@@ -1658,23 +1658,24 @@ namespace DTXMania2.演奏
             //----------------
             if( Global.App.ログオン中のユーザ.演奏中に動画を表示する )
             {
-                // todo: AVI動画の途中再生
+                var ヒット済みの動画チップリスト =
+                    from chip in score.チップリスト
+                    where chip.チップ種別 == SSTF.チップ種別.背景動画 //&& this._チップの演奏状態[ chip ].ヒット済みである    --> 未ヒットも再構築する
+                    select chip;
 
-                //var ヒット済みの動画チップリスト =
-                //    from chip in score.チップリスト
-                //    where chip.チップ種別 == SSTF.チップ種別.背景動画 && this._チップの演奏状態[ chip ].ヒット済みである
-                //    select chip;
+                foreach( var aviChip in ヒット済みの動画チップリスト )
+                {
+                    int avi番号 = aviChip.チップサブID;
 
-                //foreach( var aviChip in ヒット済みの動画チップリスト )
-                //{
-                //    if( Global.App.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video? video ) )
-                //    {
-                //        double 再生開始時刻sec = 演奏開始時刻sec - aviChip.発声時刻sec;
+                    if( Global.App.AVI管理.動画リスト.ContainsKey( avi番号 ) )
+                    {
+                        Global.App.AVI管理.再構築する( avi番号 );
 
-                //        if( 0 <= 再生開始時刻sec )    // 念のため。
-                //            video?.再生を開始する( 再生開始時刻sec );
-                //    }
-                //}
+                        double 再生開始時刻sec = 演奏開始時刻sec - aviChip.発声時刻sec;
+                        if( 0 <= 再生開始時刻sec )    // 念のため。
+                            Global.App.AVI管理.動画リスト[ avi番号 ]?.再生を開始する( 再生開始時刻sec );
+                    }
+                }
             }
             //----------------
             #endregion
