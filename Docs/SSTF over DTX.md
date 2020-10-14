@@ -58,7 +58,7 @@ DrumSounds/
 | プレビュー画像ファイル名  | → | #PREIMAGE             |           |
 | BGVファイル名             | → | #VIDEO01              | 01 で固定 |
 | BGMファイル名             | → | #WAVC0, #BGMWAV: C0   | C0 で固定 |
-
+| Viewerでの再生速度        | → | #DTXVPLAYSPEED        |           |
 
 ### ドラムチップ
 

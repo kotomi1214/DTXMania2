@@ -59,6 +59,11 @@ namespace SSTFormat.v004
         /// </summary>
         public float サウンドデバイス遅延ms { get; set; } = 0f;
 
+        /// <summary>
+        ///     このスコアがビュアーで再生される時の再生速度。
+        /// </summary>
+        public double Viewerでの再生速度 { get; set; } = 1.0;
+
 
 
         // ヘッダ：プレビュー

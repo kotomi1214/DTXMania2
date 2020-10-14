@@ -340,17 +340,16 @@ namespace SSTFormat.v004
                         return false;
                     }
 
-                    try
+                    if( double.TryParse( items[ 1 ].Trim(), out double level ) )
                     {
-                        現在の.スコア.難易度 = Math.Clamp( double.Parse( items[ 1 ].Trim() ), min: 0.00, max: 9.99 );
+                        現在の.スコア.難易度 = Math.Clamp( level, min: 0.00, max: 9.99 );
+                        return true;
                     }
-                    catch
+                    else
                     {
                         Trace.TraceError( $"Level の右辺が不正です。スキップします。[{現在の.行番号}行目]" );
                         return false;
                     }
-
-                    return true;
                 }
                 //----------------
                 #endregion
@@ -448,6 +447,31 @@ namespace SSTFormat.v004
                     現在の.スコア.プレビュー動画ファイル名 = items[ 1 ].Trim();
 
                     return true;
+                }
+                //----------------
+                #endregion
+                #region " ViewerPlaySpeed "
+                //----------------
+                if( 行.StartsWith( "viewerplayspeed", StringComparison.OrdinalIgnoreCase ) )
+                {
+                    string[] items = 行.Split( '=' );
+
+                    if( 2 != items.Length )
+                    {
+                        Trace.TraceError( $"ViewerPlaySpeed の書式が不正です。スキップします。[{現在の.行番号}行目]" );
+                        return false;
+                    }
+
+                    if( double.TryParse( items[ 1 ].Trim(), out double speed ) )
+                    {
+                        現在の.スコア.Viewerでの再生速度 = double.Parse( items[ 1 ].Trim() );
+                        return true;
+                    }
+                    else
+                    {
+                        Trace.TraceError( $"Level の右辺が不正です。スキップします。[{現在の.行番号}行目]" );
+                        return false;
+                    }
                 }
                 //----------------
                 #endregion
@@ -1199,6 +1223,14 @@ namespace SSTFormat.v004
                 //----------------
                 if( !string.IsNullOrEmpty( score.プレビュー動画ファイル名 ) )
                     sw.WriteLine( $"Preview.Movie=" + score.プレビュー動画ファイル名 );
+                //----------------
+                #endregion
+                #region " ViewerPlaySpeed "
+                //----------------
+                if( score.Viewerでの再生速度 != 1.0 )
+                {
+                    sw.WriteLine( $"ViewerPlaySpeed=" + score.Viewerでの再生速度 );
+                }
                 //----------------
                 #endregion
 

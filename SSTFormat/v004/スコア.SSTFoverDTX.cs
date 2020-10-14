@@ -404,6 +404,15 @@ namespace SSTFormat.v004
                 //----------------
                 #endregion
 
+                #region " Viewerでの再生速度 → #DTXVPLAYSPEED "
+                //----------------
+                if( score.Viewerでの再生速度 != 1.0 )
+                {
+                    sw.WriteLine( $"#DTXVPLAYSPEED: {score.Viewerでの再生速度}" );
+                }
+                //----------------
+                #endregion
+
                 sw.WriteLine( "" );
             }
 
