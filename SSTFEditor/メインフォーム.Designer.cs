@@ -135,6 +135,7 @@
             this.toolStripButton現在位置から再生 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton現在位置からBGMのみ再生 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton再生停止 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripComboBox再生速度 = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton音量Down = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel音量 = new System.Windows.Forms.ToolStripLabel();
@@ -174,11 +175,10 @@
             resources.ApplyResources(this.splitContainer分割パネルコンテナ, "splitContainer分割パネルコンテナ");
             this.splitContainer分割パネルコンテナ.FixedPanel = System.Windows.Forms.FixedPanel.Panel1;
             this.splitContainer分割パネルコンテナ.Name = "splitContainer分割パネルコンテナ";
-            this.splitContainer分割パネルコンテナ.SplitterDistance = 350;
             // 
             // splitContainer分割パネルコンテナ.Panel1
             // 
-            this.splitContainer分割パネルコンテナ.Panel1.Controls.Add( this.tabControl情報タブコンテナ );
+            this.splitContainer分割パネルコンテナ.Panel1.Controls.Add(this.tabControl情報タブコンテナ);
             // 
             // splitContainer分割パネルコンテナ.Panel2
             // 
@@ -231,7 +231,6 @@
             // pictureBoxプレビュー画像
             // 
             this.pictureBoxプレビュー画像.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pictureBoxプレビュー画像.Image = global::SSTFEditor.Properties.Resources.既定のプレビュー画像;
             resources.ApplyResources(this.pictureBoxプレビュー画像, "pictureBoxプレビュー画像");
             this.pictureBoxプレビュー画像.Name = "pictureBoxプレビュー画像";
             this.pictureBoxプレビュー画像.TabStop = false;
@@ -454,21 +453,18 @@
             // 
             // toolStripMenuItem新規作成
             // 
-            this.toolStripMenuItem新規作成.Image = global::SSTFEditor.Properties.Resources.DocumentHS;
             this.toolStripMenuItem新規作成.Name = "toolStripMenuItem新規作成";
             resources.ApplyResources(this.toolStripMenuItem新規作成, "toolStripMenuItem新規作成");
             this.toolStripMenuItem新規作成.Click += new System.EventHandler(this.toolStripMenuItem新規作成_Click);
             // 
             // toolStripMenuItem開く
             // 
-            this.toolStripMenuItem開く.Image = global::SSTFEditor.Properties.Resources.openHS;
             this.toolStripMenuItem開く.Name = "toolStripMenuItem開く";
             resources.ApplyResources(this.toolStripMenuItem開く, "toolStripMenuItem開く");
             this.toolStripMenuItem開く.Click += new System.EventHandler(this.toolStripMenuItem開く_Click);
             // 
             // toolStripMenuItem上書き保存
             // 
-            this.toolStripMenuItem上書き保存.Image = global::SSTFEditor.Properties.Resources.saveHS;
             this.toolStripMenuItem上書き保存.Name = "toolStripMenuItem上書き保存";
             resources.ApplyResources(this.toolStripMenuItem上書き保存, "toolStripMenuItem上書き保存");
             this.toolStripMenuItem上書き保存.Click += new System.EventHandler(this.toolStripMenuItem上書き保存_Click);
@@ -513,14 +509,12 @@
             // 
             // toolStripMenuItem元に戻す
             // 
-            this.toolStripMenuItem元に戻す.Image = global::SSTFEditor.Properties.Resources.Edit_UndoHS;
             this.toolStripMenuItem元に戻す.Name = "toolStripMenuItem元に戻す";
             resources.ApplyResources(this.toolStripMenuItem元に戻す, "toolStripMenuItem元に戻す");
             this.toolStripMenuItem元に戻す.Click += new System.EventHandler(this.toolStripMenuItem元に戻す_Click);
             // 
             // toolStripMenuItemやり直す
             // 
-            this.toolStripMenuItemやり直す.Image = global::SSTFEditor.Properties.Resources.Edit_RedoHS;
             this.toolStripMenuItemやり直す.Name = "toolStripMenuItemやり直す";
             resources.ApplyResources(this.toolStripMenuItemやり直す, "toolStripMenuItemやり直す");
             this.toolStripMenuItemやり直す.Click += new System.EventHandler(this.toolStripMenuItemやり直す_Click);
@@ -533,28 +527,24 @@
             // toolStripMenuItem切り取り
             // 
             resources.ApplyResources(this.toolStripMenuItem切り取り, "toolStripMenuItem切り取り");
-            this.toolStripMenuItem切り取り.Image = global::SSTFEditor.Properties.Resources.CutHS;
             this.toolStripMenuItem切り取り.Name = "toolStripMenuItem切り取り";
             this.toolStripMenuItem切り取り.Click += new System.EventHandler(this.toolStripMenuItem切り取り_Click);
             // 
             // toolStripMenuItemコピー
             // 
             resources.ApplyResources(this.toolStripMenuItemコピー, "toolStripMenuItemコピー");
-            this.toolStripMenuItemコピー.Image = global::SSTFEditor.Properties.Resources.CopyHS;
             this.toolStripMenuItemコピー.Name = "toolStripMenuItemコピー";
             this.toolStripMenuItemコピー.Click += new System.EventHandler(this.toolStripMenuItemコピー_Click);
             // 
             // toolStripMenuItem貼り付け
             // 
             resources.ApplyResources(this.toolStripMenuItem貼り付け, "toolStripMenuItem貼り付け");
-            this.toolStripMenuItem貼り付け.Image = global::SSTFEditor.Properties.Resources.PasteHS;
             this.toolStripMenuItem貼り付け.Name = "toolStripMenuItem貼り付け";
             this.toolStripMenuItem貼り付け.Click += new System.EventHandler(this.toolStripMenuItem貼り付け_Click);
             // 
             // toolStripMenuItem削除
             // 
             resources.ApplyResources(this.toolStripMenuItem削除, "toolStripMenuItem削除");
-            this.toolStripMenuItem削除.Image = global::SSTFEditor.Properties.Resources.DeleteHS;
             this.toolStripMenuItem削除.Name = "toolStripMenuItem削除";
             this.toolStripMenuItem削除.Click += new System.EventHandler(this.toolStripMenuItem削除_Click);
             // 
@@ -576,14 +566,12 @@
             // 
             // toolStripMenuItem選択モード
             // 
-            this.toolStripMenuItem選択モード.Image = global::SSTFEditor.Properties.Resources.PointerHS;
             this.toolStripMenuItem選択モード.Name = "toolStripMenuItem選択モード";
             resources.ApplyResources(this.toolStripMenuItem選択モード, "toolStripMenuItem選択モード");
             this.toolStripMenuItem選択モード.Click += new System.EventHandler(this.toolStripMenuItem選択モード_Click);
             // 
             // toolStripMenuItem編集モード
             // 
-            this.toolStripMenuItem編集モード.Image = global::SSTFEditor.Properties.Resources.pencil;
             this.toolStripMenuItem編集モード.Name = "toolStripMenuItem編集モード";
             resources.ApplyResources(this.toolStripMenuItem編集モード, "toolStripMenuItem編集モード");
             this.toolStripMenuItem編集モード.Click += new System.EventHandler(this.toolStripMenuItem編集モード_Click);
@@ -734,28 +722,24 @@
             // 
             // toolStripMenuItem先頭から再生
             // 
-            this.toolStripMenuItem先頭から再生.Image = global::SSTFEditor.Properties.Resources.PlayFromStart;
             this.toolStripMenuItem先頭から再生.Name = "toolStripMenuItem先頭から再生";
             resources.ApplyResources(this.toolStripMenuItem先頭から再生, "toolStripMenuItem先頭から再生");
             this.toolStripMenuItem先頭から再生.Click += new System.EventHandler(this.toolStripMenuItem先頭から再生_Click);
             // 
             // toolStripMenuItem現在位置から再生
             // 
-            this.toolStripMenuItem現在位置から再生.Image = global::SSTFEditor.Properties.Resources.DataContainer_MoveNextHS;
             this.toolStripMenuItem現在位置から再生.Name = "toolStripMenuItem現在位置から再生";
             resources.ApplyResources(this.toolStripMenuItem現在位置から再生, "toolStripMenuItem現在位置から再生");
             this.toolStripMenuItem現在位置から再生.Click += new System.EventHandler(this.toolStripMenuItem現在位置から再生_Click);
             // 
             // toolStripMenuItem現在位置からBGMのみ再生
             // 
-            this.toolStripMenuItem現在位置からBGMのみ再生.Image = global::SSTFEditor.Properties.Resources.DataContainer_NewRecordHS;
             this.toolStripMenuItem現在位置からBGMのみ再生.Name = "toolStripMenuItem現在位置からBGMのみ再生";
             resources.ApplyResources(this.toolStripMenuItem現在位置からBGMのみ再生, "toolStripMenuItem現在位置からBGMのみ再生");
             this.toolStripMenuItem現在位置からBGMのみ再生.Click += new System.EventHandler(this.toolStripMenuItem現在位置からBGMのみ再生_Click);
             // 
             // toolStripMenuItem再生停止
             // 
-            this.toolStripMenuItem再生停止.Image = global::SSTFEditor.Properties.Resources.StopHS;
             this.toolStripMenuItem再生停止.Name = "toolStripMenuItem再生停止";
             resources.ApplyResources(this.toolStripMenuItem再生停止, "toolStripMenuItem再生停止");
             this.toolStripMenuItem再生停止.Click += new System.EventHandler(this.toolStripMenuItem再生停止_Click);
@@ -810,6 +794,7 @@
             this.toolStripButton現在位置から再生,
             this.toolStripButton現在位置からBGMのみ再生,
             this.toolStripButton再生停止,
+            this.toolStripComboBox再生速度,
             this.toolStripSeparator11,
             this.toolStripButton音量Down,
             this.toolStripLabel音量,
@@ -821,7 +806,6 @@
             // toolStripButton新規作成
             // 
             this.toolStripButton新規作成.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton新規作成.Image = global::SSTFEditor.Properties.Resources.DocumentHS;
             resources.ApplyResources(this.toolStripButton新規作成, "toolStripButton新規作成");
             this.toolStripButton新規作成.Name = "toolStripButton新規作成";
             this.toolStripButton新規作成.Click += new System.EventHandler(this.toolStripButton新規作成_Click);
@@ -829,7 +813,6 @@
             // toolStripButton開く
             // 
             this.toolStripButton開く.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton開く.Image = global::SSTFEditor.Properties.Resources.openHS;
             resources.ApplyResources(this.toolStripButton開く, "toolStripButton開く");
             this.toolStripButton開く.Name = "toolStripButton開く";
             this.toolStripButton開く.Click += new System.EventHandler(this.toolStripButton開く_Click);
@@ -837,7 +820,6 @@
             // toolStripButton上書き保存
             // 
             this.toolStripButton上書き保存.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton上書き保存.Image = global::SSTFEditor.Properties.Resources.saveHS;
             resources.ApplyResources(this.toolStripButton上書き保存, "toolStripButton上書き保存");
             this.toolStripButton上書き保存.Name = "toolStripButton上書き保存";
             this.toolStripButton上書き保存.Click += new System.EventHandler(this.toolStripButton上書き保存_Click);
@@ -851,7 +833,6 @@
             // 
             this.toolStripButton切り取り.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButton切り取り, "toolStripButton切り取り");
-            this.toolStripButton切り取り.Image = global::SSTFEditor.Properties.Resources.CutHS;
             this.toolStripButton切り取り.Name = "toolStripButton切り取り";
             this.toolStripButton切り取り.Click += new System.EventHandler(this.toolStripButton切り取り_Click);
             // 
@@ -859,7 +840,6 @@
             // 
             this.toolStripButtonコピー.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButtonコピー, "toolStripButtonコピー");
-            this.toolStripButtonコピー.Image = global::SSTFEditor.Properties.Resources.CopyHS;
             this.toolStripButtonコピー.Name = "toolStripButtonコピー";
             this.toolStripButtonコピー.Click += new System.EventHandler(this.toolStripButtonコピー_Click);
             // 
@@ -867,7 +847,6 @@
             // 
             this.toolStripButton貼り付け.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButton貼り付け, "toolStripButton貼り付け");
-            this.toolStripButton貼り付け.Image = global::SSTFEditor.Properties.Resources.PasteHS;
             this.toolStripButton貼り付け.Name = "toolStripButton貼り付け";
             this.toolStripButton貼り付け.Click += new System.EventHandler(this.toolStripButton貼り付け_Click);
             // 
@@ -875,7 +854,6 @@
             // 
             this.toolStripButton削除.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButton削除, "toolStripButton削除");
-            this.toolStripButton削除.Image = global::SSTFEditor.Properties.Resources.DeleteHS;
             this.toolStripButton削除.Name = "toolStripButton削除";
             this.toolStripButton削除.Click += new System.EventHandler(this.toolStripButton削除_Click);
             // 
@@ -888,7 +866,6 @@
             // 
             this.toolStripButton元に戻す.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButton元に戻す, "toolStripButton元に戻す");
-            this.toolStripButton元に戻す.Image = global::SSTFEditor.Properties.Resources.Edit_UndoHS;
             this.toolStripButton元に戻す.Name = "toolStripButton元に戻す";
             this.toolStripButton元に戻す.Click += new System.EventHandler(this.toolStripButton元に戻す_Click);
             // 
@@ -896,7 +873,6 @@
             // 
             this.toolStripButtonやり直す.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             resources.ApplyResources(this.toolStripButtonやり直す, "toolStripButtonやり直す");
-            this.toolStripButtonやり直す.Image = global::SSTFEditor.Properties.Resources.Edit_RedoHS;
             this.toolStripButtonやり直す.Name = "toolStripButtonやり直す";
             this.toolStripButtonやり直す.Click += new System.EventHandler(this.toolStripButtonやり直す_Click);
             // 
@@ -951,7 +927,6 @@
             // toolStripButton選択モード
             // 
             this.toolStripButton選択モード.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton選択モード.Image = global::SSTFEditor.Properties.Resources.PointerHS;
             resources.ApplyResources(this.toolStripButton選択モード, "toolStripButton選択モード");
             this.toolStripButton選択モード.Name = "toolStripButton選択モード";
             this.toolStripButton選択モード.Click += new System.EventHandler(this.toolStripButton選択モード_Click);
@@ -959,7 +934,6 @@
             // toolStripButton編集モード
             // 
             this.toolStripButton編集モード.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton編集モード.Image = global::SSTFEditor.Properties.Resources.pencil;
             resources.ApplyResources(this.toolStripButton編集モード, "toolStripButton編集モード");
             this.toolStripButton編集モード.Name = "toolStripButton編集モード";
             this.toolStripButton編集モード.Click += new System.EventHandler(this.toolStripButton編集モード_Click);
@@ -972,7 +946,6 @@
             // toolStripButton先頭から再生
             // 
             this.toolStripButton先頭から再生.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton先頭から再生.Image = global::SSTFEditor.Properties.Resources.PlayFromStart;
             resources.ApplyResources(this.toolStripButton先頭から再生, "toolStripButton先頭から再生");
             this.toolStripButton先頭から再生.Name = "toolStripButton先頭から再生";
             this.toolStripButton先頭から再生.Click += new System.EventHandler(this.toolStripButton先頭から再生_Click);
@@ -980,7 +953,6 @@
             // toolStripButton現在位置から再生
             // 
             this.toolStripButton現在位置から再生.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton現在位置から再生.Image = global::SSTFEditor.Properties.Resources.DataContainer_MoveNextHS;
             resources.ApplyResources(this.toolStripButton現在位置から再生, "toolStripButton現在位置から再生");
             this.toolStripButton現在位置から再生.Name = "toolStripButton現在位置から再生";
             this.toolStripButton現在位置から再生.Click += new System.EventHandler(this.toolStripButton現在位置から再生_Click);
@@ -988,7 +960,6 @@
             // toolStripButton現在位置からBGMのみ再生
             // 
             this.toolStripButton現在位置からBGMのみ再生.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton現在位置からBGMのみ再生.Image = global::SSTFEditor.Properties.Resources.DataContainer_NewRecordHS;
             resources.ApplyResources(this.toolStripButton現在位置からBGMのみ再生, "toolStripButton現在位置からBGMのみ再生");
             this.toolStripButton現在位置からBGMのみ再生.Name = "toolStripButton現在位置からBGMのみ再生";
             this.toolStripButton現在位置からBGMのみ再生.Click += new System.EventHandler(this.toolStripButton現在位置からBGMのみ再生_Click);
@@ -996,10 +967,33 @@
             // toolStripButton再生停止
             // 
             this.toolStripButton再生停止.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton再生停止.Image = global::SSTFEditor.Properties.Resources.StopHS;
             resources.ApplyResources(this.toolStripButton再生停止, "toolStripButton再生停止");
             this.toolStripButton再生停止.Name = "toolStripButton再生停止";
             this.toolStripButton再生停止.Click += new System.EventHandler(this.toolStripButton再生停止_Click);
+            // 
+            // toolStripComboBox再生速度
+            // 
+            this.toolStripComboBox再生速度.DropDownHeight = 150;
+            this.toolStripComboBox再生速度.DropDownWidth = 35;
+            resources.ApplyResources(this.toolStripComboBox再生速度, "toolStripComboBox再生速度");
+            this.toolStripComboBox再生速度.Items.AddRange(new object[] {
+            resources.GetString("toolStripComboBox再生速度.Items"),
+            resources.GetString("toolStripComboBox再生速度.Items1"),
+            resources.GetString("toolStripComboBox再生速度.Items2"),
+            resources.GetString("toolStripComboBox再生速度.Items3"),
+            resources.GetString("toolStripComboBox再生速度.Items4"),
+            resources.GetString("toolStripComboBox再生速度.Items5"),
+            resources.GetString("toolStripComboBox再生速度.Items6"),
+            resources.GetString("toolStripComboBox再生速度.Items7"),
+            resources.GetString("toolStripComboBox再生速度.Items8"),
+            resources.GetString("toolStripComboBox再生速度.Items9"),
+            resources.GetString("toolStripComboBox再生速度.Items10"),
+            resources.GetString("toolStripComboBox再生速度.Items11"),
+            resources.GetString("toolStripComboBox再生速度.Items12"),
+            resources.GetString("toolStripComboBox再生速度.Items13"),
+            resources.GetString("toolStripComboBox再生速度.Items14")});
+            this.toolStripComboBox再生速度.Name = "toolStripComboBox再生速度";
+            this.toolStripComboBox再生速度.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox再生速度_SelectedIndexChanged);
             // 
             // toolStripSeparator11
             // 
@@ -1009,7 +1003,6 @@
             // toolStripButton音量Down
             // 
             this.toolStripButton音量Down.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton音量Down.Image = global::SSTFEditor.Properties.Resources.DownArrowHS;
             resources.ApplyResources(this.toolStripButton音量Down, "toolStripButton音量Down");
             this.toolStripButton音量Down.Name = "toolStripButton音量Down";
             this.toolStripButton音量Down.Click += new System.EventHandler(this.toolStripButton音量Down_Click);
@@ -1022,7 +1015,6 @@
             // toolStripButton音量UP
             // 
             this.toolStripButton音量UP.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripButton音量UP.Image = global::SSTFEditor.Properties.Resources.UpArrowHS;
             resources.ApplyResources(this.toolStripButton音量UP, "toolStripButton音量UP");
             this.toolStripButton音量UP.Name = "toolStripButton音量UP";
             this.toolStripButton音量UP.Click += new System.EventHandler(this.toolStripButton音量UP_Click);
@@ -1057,28 +1049,24 @@
             // 
             // toolStripMenuItem選択チップの切り取り
             // 
-            this.toolStripMenuItem選択チップの切り取り.Image = global::SSTFEditor.Properties.Resources.CutHS;
             this.toolStripMenuItem選択チップの切り取り.Name = "toolStripMenuItem選択チップの切り取り";
             resources.ApplyResources(this.toolStripMenuItem選択チップの切り取り, "toolStripMenuItem選択チップの切り取り");
             this.toolStripMenuItem選択チップの切り取り.Click += new System.EventHandler(this.toolStripMenuItem選択チップの切り取り_Click);
             // 
             // toolStripMenuItem選択チップのコピー
             // 
-            this.toolStripMenuItem選択チップのコピー.Image = global::SSTFEditor.Properties.Resources.CopyHS;
             this.toolStripMenuItem選択チップのコピー.Name = "toolStripMenuItem選択チップのコピー";
             resources.ApplyResources(this.toolStripMenuItem選択チップのコピー, "toolStripMenuItem選択チップのコピー");
             this.toolStripMenuItem選択チップのコピー.Click += new System.EventHandler(this.toolStripMenuItem選択チップのコピー_Click);
             // 
             // toolStripMenuItem選択チップの貼り付け
             // 
-            this.toolStripMenuItem選択チップの貼り付け.Image = global::SSTFEditor.Properties.Resources.PasteHS;
             this.toolStripMenuItem選択チップの貼り付け.Name = "toolStripMenuItem選択チップの貼り付け";
             resources.ApplyResources(this.toolStripMenuItem選択チップの貼り付け, "toolStripMenuItem選択チップの貼り付け");
             this.toolStripMenuItem選択チップの貼り付け.Click += new System.EventHandler(this.toolStripMenuItem選択チップの貼り付け_Click);
             // 
             // toolStripMenuItem選択チップの削除
             // 
-            this.toolStripMenuItem選択チップの削除.Image = global::SSTFEditor.Properties.Resources.DeleteHS;
             this.toolStripMenuItem選択チップの削除.Name = "toolStripMenuItem選択チップの削除";
             resources.ApplyResources(this.toolStripMenuItem選択チップの削除, "toolStripMenuItem選択チップの削除");
             this.toolStripMenuItem選択チップの削除.Click += new System.EventHandler(this.toolStripMenuItem選択チップの削除_Click);
@@ -1159,10 +1147,9 @@
             this.PerformLayout();
 
 		}
+        #endregion
 
-		#endregion
-
-		private System.Windows.Forms.StatusStrip statusStripステータスバー;
+        private System.Windows.Forms.StatusStrip statusStripステータスバー;
 		private System.Windows.Forms.MenuStrip menuStripメニューバー;
 		private System.Windows.Forms.ToolStrip toolStripツールバー;
 		private System.Windows.Forms.VScrollBar vScrollBar譜面用垂直スクロールバー;
@@ -1286,6 +1273,7 @@
         private System.Windows.Forms.Button buttonプレビュー画像参照;
         private System.Windows.Forms.TextBox textBoxプレビュー画像;
         private System.Windows.Forms.PictureBox pictureBoxプレビュー画像;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBox再生速度;
     }
 }
 

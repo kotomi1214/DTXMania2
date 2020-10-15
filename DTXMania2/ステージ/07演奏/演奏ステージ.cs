@@ -926,7 +926,7 @@ namespace DTXMania2.演奏
                 }
                 if( keyboard.キーが押された( 0, Keys.PageUp ) && 0 <= this._描画開始チップ番号 )
                 {
-                    #region " PageUp → 1小節先に進む "
+                    #region " PageUp → 早送り；1小節先に進む "
                     //----------------
                     // 現在時刻における小節番号を取得する。
                     int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
@@ -942,6 +942,7 @@ namespace DTXMania2.演奏
                     // 取得した小節の1つ次の小節へ移動する。
                     this._指定小節へ移動する( 現在の小節番号 + 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
                     Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+                    this._クリアメーター.カウントマップをクリアする();
 
                     this._早送りアイコン.早送りする();
 
@@ -951,7 +952,7 @@ namespace DTXMania2.演奏
                 }
                 if( keyboard.キーが押された( 0, Keys.PageDown ) && 1 <= this._描画開始チップ番号 )
                 {
-                    #region " PageDown → 1小節前に戻る "
+                    #region " PageDown → 早戻し；1小節前に戻る "
                     //----------------
                     // こちらは描画開始チップの小節番号を基点とする。
                     int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
@@ -960,6 +961,7 @@ namespace DTXMania2.演奏
                     this._指定小節へ移動する( 現在の小節番号 - 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
                     Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
 
+                    this._クリアメーター.カウントマップをクリアする();
                     this._早送りアイコン.早戻しする();
 
                     this.成績.無効 = true;
@@ -1658,23 +1660,24 @@ namespace DTXMania2.演奏
             //----------------
             if( Global.App.ログオン中のユーザ.演奏中に動画を表示する )
             {
-                // todo: AVI動画の途中再生
+                var ヒット済みの動画チップリスト =
+                    from chip in score.チップリスト
+                    where chip.チップ種別 == SSTF.チップ種別.背景動画 //&& this._チップの演奏状態[ chip ].ヒット済みである    --> 未ヒットも再構築する
+                    select chip;
 
-                //var ヒット済みの動画チップリスト =
-                //    from chip in score.チップリスト
-                //    where chip.チップ種別 == SSTF.チップ種別.背景動画 && this._チップの演奏状態[ chip ].ヒット済みである
-                //    select chip;
+                foreach( var aviChip in ヒット済みの動画チップリスト )
+                {
+                    int avi番号 = aviChip.チップサブID;
 
-                //foreach( var aviChip in ヒット済みの動画チップリスト )
-                //{
-                //    if( Global.App.AVI管理.動画リスト.TryGetValue( aviChip.チップサブID, out Video? video ) )
-                //    {
-                //        double 再生開始時刻sec = 演奏開始時刻sec - aviChip.発声時刻sec;
+                    if( Global.App.AVI管理.動画リスト.ContainsKey( avi番号 ) )
+                    {
+                        Global.App.AVI管理.再構築する( avi番号 );
 
-                //        if( 0 <= 再生開始時刻sec )    // 念のため。
-                //            video?.再生を開始する( 再生開始時刻sec );
-                //    }
-                //}
+                        double 再生開始時刻sec = 演奏開始時刻sec - aviChip.発声時刻sec;
+                        if( 0 <= 再生開始時刻sec )    // 念のため。
+                            Global.App.AVI管理.動画リスト[ avi番号 ]?.再生を開始する( 再生開始時刻sec );
+                    }
+                }
             }
             //----------------
             #endregion

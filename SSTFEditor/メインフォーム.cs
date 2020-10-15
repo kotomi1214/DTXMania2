@@ -387,6 +387,7 @@ namespace SSTFEditor
 
             this._新規作成する();
             this._ガイド間隔を変更する( 16 ); // 初期は 1/16 間隔。
+            this.toolStripComboBox再生速度.SelectedIndex = 7;   // 初期は x1.0。
 
 
             // 完了。
@@ -507,6 +508,10 @@ namespace SSTFEditor
                 // 選択モードだったら、全チップの選択を解除する。
                 if( this.選択モードである )
                     this.選択モード.全チップの選択を解除する();
+
+                // 一時ファイルじゃなければ再生速度を x1.0 に固定。
+                if( !一時ファイルである )
+                    this.譜面.スコア.Viewerでの再生速度 = 1.0;
 
                 // ファイルを出力する。
                 string ヘッダ行 = $"# Created by SSTFEditor {this.メジャーバージョン番号}.{this.マイナーバージョン番号}.{this.リビジョン番号}.{this.ビルド番号}";
@@ -2277,6 +2282,13 @@ namespace SSTFEditor
         protected void toolStripButton再生停止_Click( object sender, EventArgs e )
         {
             this._再生を停止する();
+        }
+
+        protected void toolStripComboBox再生速度_SelectedIndexChanged( object sender, EventArgs e )
+        {
+            // 誤差回避のため、10倍したものを10で割る。
+            int v = 17 - this.toolStripComboBox再生速度.SelectedIndex;
+            this.譜面.スコア.Viewerでの再生速度 = v / 10.0;
         }
 
         protected void toolStripButton音量Down_Click( object sender, EventArgs e )

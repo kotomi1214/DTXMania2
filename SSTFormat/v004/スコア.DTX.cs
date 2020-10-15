@@ -654,6 +654,17 @@ namespace SSTFormat.v004
             {
                 現在の.スコア.背景画像ファイル名 = 現在の.パラメータ;
             }
+            internal static void _コマンド_DTXVPLAYSPEED()
+            {
+                if( double.TryParse( 現在の.パラメータ, out double 再生速度 ) )
+                {
+                    現在の.スコア.Viewerでの再生速度 = 再生速度;
+                }
+                else
+                {
+                    Trace.TraceError( $"#DTXVPLAYSPEED の値の取得に失敗しました。[{現在の.行番号}行]" );
+                }
+            }
             internal static void _コマンド_オブジェクト記述()
             {
                 var commandSpan = 現在の.コマンド.AsSpan();
@@ -1037,6 +1048,7 @@ namespace SSTFormat.v004
                 [ "bgmwav" ] = (true, _コマンド_BGMWAV),
                 [ "background" ] = (true, _コマンド_BACKGROUND),
                 [ "wall" ] = (true, _コマンド_BACKGROUND),
+                [ "dtxvplayspeed" ] = (true, _コマンド_DTXVPLAYSPEED),
                 //----------------
                 #endregion
             };

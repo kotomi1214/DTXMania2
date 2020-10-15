@@ -524,6 +524,9 @@
   <data name="toolStripMenuItem再生.Text" xml:space="preserve">
     <value>再生(&amp;P)</value>
   </data>
+  <data name="toolStripComboBox再生速度.ToolTipText" xml:space="preserve">
+    <value>DTXViewerでの再生速度を指定します。 (#DTXVPLAYSPEED)</value>
+  </data>
   <data name="toolStripMenuItemオプション.Size" type="System.Drawing.Size, System.Drawing">
     <value>135, 22</value>
   </data>
