@@ -135,6 +135,7 @@
             this.toolStripButton現在位置から再生 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton現在位置からBGMのみ再生 = new System.Windows.Forms.ToolStripButton();
             this.toolStripButton再生停止 = new System.Windows.Forms.ToolStripButton();
+            this.toolStripComboBox再生速度 = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButton音量Down = new System.Windows.Forms.ToolStripButton();
             this.toolStripLabel音量 = new System.Windows.Forms.ToolStripLabel();
@@ -793,6 +794,7 @@
             this.toolStripButton現在位置から再生,
             this.toolStripButton現在位置からBGMのみ再生,
             this.toolStripButton再生停止,
+            this.toolStripComboBox再生速度,
             this.toolStripSeparator11,
             this.toolStripButton音量Down,
             this.toolStripLabel音量,
@@ -969,6 +971,30 @@
             this.toolStripButton再生停止.Name = "toolStripButton再生停止";
             this.toolStripButton再生停止.Click += new System.EventHandler(this.toolStripButton再生停止_Click);
             // 
+            // toolStripComboBox再生速度
+            // 
+            this.toolStripComboBox再生速度.DropDownHeight = 150;
+            this.toolStripComboBox再生速度.DropDownWidth = 35;
+            resources.ApplyResources(this.toolStripComboBox再生速度, "toolStripComboBox再生速度");
+            this.toolStripComboBox再生速度.Items.AddRange(new object[] {
+            resources.GetString("toolStripComboBox再生速度.Items"),
+            resources.GetString("toolStripComboBox再生速度.Items1"),
+            resources.GetString("toolStripComboBox再生速度.Items2"),
+            resources.GetString("toolStripComboBox再生速度.Items3"),
+            resources.GetString("toolStripComboBox再生速度.Items4"),
+            resources.GetString("toolStripComboBox再生速度.Items5"),
+            resources.GetString("toolStripComboBox再生速度.Items6"),
+            resources.GetString("toolStripComboBox再生速度.Items7"),
+            resources.GetString("toolStripComboBox再生速度.Items8"),
+            resources.GetString("toolStripComboBox再生速度.Items9"),
+            resources.GetString("toolStripComboBox再生速度.Items10"),
+            resources.GetString("toolStripComboBox再生速度.Items11"),
+            resources.GetString("toolStripComboBox再生速度.Items12"),
+            resources.GetString("toolStripComboBox再生速度.Items13"),
+            resources.GetString("toolStripComboBox再生速度.Items14")});
+            this.toolStripComboBox再生速度.Name = "toolStripComboBox再生速度";
+            this.toolStripComboBox再生速度.SelectedIndexChanged += new System.EventHandler(this.toolStripComboBox再生速度_SelectedIndexChanged);
+            // 
             // toolStripSeparator11
             // 
             this.toolStripSeparator11.Name = "toolStripSeparator11";
@@ -1121,10 +1147,9 @@
             this.PerformLayout();
 
 		}
+        #endregion
 
-		#endregion
-
-		private System.Windows.Forms.StatusStrip statusStripステータスバー;
+        private System.Windows.Forms.StatusStrip statusStripステータスバー;
 		private System.Windows.Forms.MenuStrip menuStripメニューバー;
 		private System.Windows.Forms.ToolStrip toolStripツールバー;
 		private System.Windows.Forms.VScrollBar vScrollBar譜面用垂直スクロールバー;
@@ -1248,6 +1273,7 @@
         private System.Windows.Forms.Button buttonプレビュー画像参照;
         private System.Windows.Forms.TextBox textBoxプレビュー画像;
         private System.Windows.Forms.PictureBox pictureBoxプレビュー画像;
+        private System.Windows.Forms.ToolStripComboBox toolStripComboBox再生速度;
     }
 }
 

@@ -7,6 +7,7 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 using SSTF=SSTFormat.v004;
+using System.Runtime.CompilerServices;
 
 namespace DTXMania2.曲読み込み
 {
@@ -219,6 +220,13 @@ namespace DTXMania2.曲読み込み
 
             Global.App.WAVキャッシュ.世代を進める();
 
+            // ビュアーモードで再生速度が異なっている場合は、さらに世代を進めてキャッシュを無効にする。
+            if( _ビュアーモードでの前回の再生速度 != Global.App.演奏スコア.Viewerでの再生速度 )
+            {
+                Global.App.WAVキャッシュ.世代を進める();
+                _ビュアーモードでの前回の再生速度 = Global.App.演奏スコア.Viewerでの再生速度;
+            }
+
             Global.App.WAV管理?.Dispose();
             Global.App.WAV管理 = new WAV管理();
 
@@ -273,6 +281,8 @@ namespace DTXMania2.曲読み込み
         private readonly プレビュー画像 _プレビュー画像;
 
         private readonly 難易度 _難易度;
+
+        private static double _ビュアーモードでの前回の再生速度 = 1.0;
 
         private void _曲名を描画する( DeviceContext dc )
         {
