@@ -203,8 +203,13 @@ namespace DTXMania2.曲読み込み
 
             foreach( var chip in Global.App.演奏スコア.チップリスト )
             {
-                chip.発声時刻sec /= Global.App.ログオン中のユーザ.再生速度;
-                chip.描画時刻sec /= Global.App.ログオン中のユーザ.再生速度;
+                // Viewerでの再生速度は、ビュアーモード時のみ反映する。
+                double 再生速度 = Global.Options.ビュアーモードである ?
+                    Global.App.ログオン中のユーザ.再生速度 * Global.App.演奏スコア.Viewerでの再生速度 :
+                    Global.App.ログオン中のユーザ.再生速度;
+
+                chip.発声時刻sec /= 再生速度;
+                chip.描画時刻sec /= 再生速度;
 
                 chip.発声時刻sec -= Global.App.サウンドデバイス.再生遅延sec;
             }
@@ -236,7 +241,13 @@ namespace DTXMania2.曲読み込み
                 foreach( var kvp in Global.App.演奏スコア.AVIリスト )
                 {
                     var path = Path.Combine( Global.App.演奏スコア.PATH_WAV, kvp.Value );
-                    Global.App.AVI管理.登録する( kvp.Key, path, Global.App.ログオン中のユーザ.再生速度 );
+
+                    // Viewerでの再生速度は、ビュアーモード時のみ反映する。
+                    double 再生速度 = Global.Options.ビュアーモードである ?
+                        Global.App.ログオン中のユーザ.再生速度 * Global.App.演奏スコア.Viewerでの再生速度 :
+                        Global.App.ログオン中のユーザ.再生速度;
+
+                    Global.App.AVI管理.登録する( kvp.Key, path, 再生速度 );
                 }
             }
 

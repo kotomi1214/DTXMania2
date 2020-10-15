@@ -313,7 +313,13 @@ namespace DTXMania2
                 this.ドラムサウンド = new ドラムサウンド();      // 　　　　　　〃
 
                 this.WAVキャッシュ = new CacheStore<CSCore.ISampleSource>() {
-                    ファイルからデータを生成する = ( path ) => SampleSourceFactory.Create( this.サウンドデバイス, path, this.ログオン中のユーザ.再生速度 ),
+                    ファイルからデータを生成する = ( path ) => {
+                        // Viewerでの再生速度は、ビュアーモード時のみ反映する。
+                        double 再生速度 = Global.Options.ビュアーモードである ?
+                            this.ログオン中のユーザ.再生速度 * Global.App.演奏スコア.Viewerでの再生速度 :
+                            this.ログオン中のユーザ.再生速度;
+                        return SampleSourceFactory.Create( this.サウンドデバイス, path, 再生速度 );
+                    }
                 };
 
                 this._ユーザリストにユーザを登録する();

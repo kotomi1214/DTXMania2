@@ -19,6 +19,12 @@ namespace FDK
         // プロパティ
 
 
+        /// <summary>
+        ///     ビデオの長さ[秒]。再生速度考慮済み。
+        /// </summary>
+        /// <remarks>
+        ///     再生速度は考慮済みなので、例えば再生速度が x0.5 である場合、総演奏時間はオリジナルの2倍になる。
+        /// </remarks>
         public double 総演奏時間sec { get; protected set; }
 
         public Size2F フレームサイズ { get; protected set; }
@@ -71,7 +77,7 @@ namespace FDK
             //----------------
             #endregion
 
-            #region " ビデオの長さを取得する。"
+            #region " ビデオの長さ（総演奏時間）を取得する。"
             //----------------
             {
                 var mediaSourceDuration = this._SourceReaderEx.GetPresentationAttribute( SourceReaderIndex.MediaSource, PresentationDescriptionAttributeKeys.Duration );
@@ -131,6 +137,7 @@ namespace FDK
         /// <summary>
         ///     指定した時刻からデコードを開始する。
         /// </summary>
+        /// <param name="再生開始時刻sec">再生開始時刻[秒]。再生速度を考慮済みであること。</param>
         public void Start( double 再生開始時刻sec )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
@@ -144,7 +151,7 @@ namespace FDK
             // (1) デコードタスク起動、デコード開始。
             this._デコードタスク = Task.Factory.StartNew(  // Task.Factory.StartNew は常に MTAThread
                 this._デコードタスクエントリ,
-                (再生開始時刻sec, this.再生速度),
+                再生開始時刻sec,
                 this._デコードキャンセル.Token );
 
             // (2) デコードから起動完了通知がくるまでブロック。
@@ -288,10 +295,7 @@ namespace FDK
                 Log.ERROR( "引数が指定されていません。" );
                 return;
             }
-            var 引数 = ((double 再生開始時刻sec, double 再生速度)) obj引数;
-
-            double 再生速度 = Math.Clamp( 引数.再生速度, min: 0.01, max: 10.0 );
-            double 再生開始時刻sec = Math.Max( 0.0, 引数.再生開始時刻sec ) / 再生速度;
+            double 再生開始時刻sec = Math.Max( 0.0, (double)obj引数 );  // 再生速度考慮済み
             long 再生開始時刻100ns = (long) ( 再生開始時刻sec * 10_000_000 + 0.5 );
 
             #region " 再生開始時刻までシーク(1)。"
@@ -304,8 +308,9 @@ namespace FDK
                     return;
                 }
 
-                // 再生開始時刻 が 0 なら、これを呼び出さないこと（ガタつきの原因になるため）。
-                this._SourceReaderEx.SetCurrentPosition( 再生開始時刻100ns );
+                // SourceReader には、再生速度を考慮しない時刻に戻して指定する必要がある。
+                // なお、再生開始時刻 が 0 ならこれを呼び出さないこと（ガタつきの原因になるため）。
+                this._SourceReaderEx.SetCurrentPosition( (long)( 再生開始時刻100ns * this.再生速度 ) );
             }
             //----------------
             #endregion

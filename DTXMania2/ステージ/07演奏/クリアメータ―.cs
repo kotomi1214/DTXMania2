@@ -47,8 +47,7 @@ namespace DTXMania2.演奏
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this.カウントマップ = new int[ カウントマップの最大要素数 ];
-            for( int i = 0; i < this.カウントマップ.Length; i++ )
-                this.カウントマップ[ i ] = 0;
+            this.カウントマップをクリアする();
 
             this._前回の設定位置 = 0f;
             this._前回設定したときの成績 = new Dictionary<判定種別, int>();
@@ -137,6 +136,12 @@ namespace DTXMania2.演奏
                 sb.Append( this._カウントマップ文字列[ this.カウントマップ[ i ] ] );
 
             return sb.ToString();
+        }
+
+        public void カウントマップをクリアする()
+        {
+            for( int i = 0; i < this.カウントマップ.Length; i++ )
+                this.カウントマップ[ i ] = 0;
         }
 
 
