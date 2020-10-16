@@ -2175,15 +2175,15 @@
   <data name="toolStripButton切り取り.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHSSURBVDhPYyAG/P//nwXKJAxWbNjXPXvpuidQLsO/f//0
-        b958+q66ddIGqBB+MHnOapP6jqn/qlpmSIL4X79/b527ZN2/5JzKGLACYkDL7JW/Js9ZtRjodP5HL968
-        TMuv+SfOz68IlSYMlm3c9alr8pSfx09fbDh47Nxvj8DYv0JCnNJQacJg/sptm+vbpvzrnbpwf3l9wz8f
-        v+hXUCniQOfEBY4lQI3JeXX/3P2j/7p5B62CShEPEvLq34UlFP53S6v/4xffGgEVJgyi2t/qRrS/3uzW
-        /OCnd8mJtT6ZZ3/75Z//7l16er5L1i4vqDLsIKL9lWFk17vP/g3nv1sGTvti6td11y1v3xv/6qv/XbN3
-        /reKmT8BqhQ7CG19tiGs7el/x7QN/02DGn6YBPVu8S7Z88ur5IqEU/rGBBOfxl9QpdiBT/2jX8FN9w3t
-        U7YYqPrU/7II6RXyqb76y6vqvIFZxLRseYf431Cl2IFP/b1f/iVXDOySVicpAw0AiXkWHT9rl7Tqv6ZN
-        8n8ZeaUvYIW4gHflxXP2Sav/Gwd0/Vc3CnsMFGK2T1kdqWqS8E7dPPy9sV9bBkQlDuCUsTnCKGTSY1WT
-        2HcGXlV5UGFaAgYGAG00ymP0t6BEAAAAAElFTkSuQmCC
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHPSURBVDhPYyAG/P//nwXKJAxWbNjXPXvpuidQLsO/f//0
+        b958+q66ddIGqBB+MHnOapP6+q5/VS0zJEH8r9+/t06aufhfck5lDFgBMaB+9spfk+esWgx0Ov+jF29e
+        puXX/BPn51eEShMGyzbu+tQ1ecrP46cvNhw8du63vVvQXyEhTmmoNGEwf+W2zfX1nf96py7cX15f/8/H
+        L/oVVIo40DlxgWMJUGNyXt0/e5eAv27eQaugUsSDhLz6d2EJhf+t0+r/+MW3RkCFCYOo9re6Ee2vN9s3
+        P/jpXXJirU/82d9++ee/e5eenu+StcsLqgw7iGh/ZRjZ9e6zf8P575aB076Y+nXddcvb98a/+up/1+yd
+        /61i5k+AKsUOQlufbQhre/rfMW3Df9Og+h8mQb1bvEs2/fIquSLhlL4xwcSn/hdUKXbgU//oV3DTfUP7
+        lC0GUkDFFiG9Qj7VV395VZ03MIuYli3vEP8bqhQ78Km/98u/5IqBXdLqJEmobZ5Fx8/aJa36r2mT/F9G
+        XukLWCEu4F158Zx90ur/xgFd/9WNwh4DhZjtU1ZHqpokvFM3D39v7NeWAVGJAzhlbI4wCpn0WNUk9p2B
+        V1UeVJiWgIEBAG94yZrR/OCkAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="toolStripButton切り取り.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2256,12 +2256,12 @@
   <data name="toolStripButton削除.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEfSURBVDhPYxhm4G9Z2PZf5cFP/1WG6UCFSAN/y8LXfCwP
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAEgSURBVDhPYxhm4G9Z2PZf5cFP/1WG6UCFSAN/y8LXPCsP
         /wfEf/6VhVlAhcHgX1lE3v/y8ANQLm7wrzw8H2QAyKB/ZaHx/0NDmX+XBt/8mh3w6V+Guy1UGX7wrzws
-        +GNm+G+gIT9+FwTc/5pi//F/rLUcVJo48C/P1/V/hvv//3E2//+FGzpDhYkD/7O8DD7GWn/76Kz396O9
-        /N8/Pjr//1nIcEKl8QOQU8EaneT//bWXaf1nIRb4QYX5/8dwu/9QJfjBRxf5bx+NBf5+lGD6+c9MiA8k
-        9luZofGIKMP/t/IMU8CKcIF/HiqiH+WZfn9Q5/h/JcARxcY7UgwHZwkw/INycYN/umz+N5S5/v9TZjCC
-        CsHBWwWGcChz+AAGBgDs93nU8QDqOQAAAABJRU5ErkJggg==
+        +Fl8+O835eE/fhcE3P+aYv/xf6y1HFSaOPAvz9f1f4b7//9xNv//hRs6Q4WJA/+zvAw+xFp/e2av9/eZ
+        vfzfPz46//9ZyHBCpfEDkFPBGp3k//21l2n9ZyEW+EGF+f/HcLv/UCX4wQcX+W/PjAX+vhRl+vnPTIgP
+        JPZbmaHxiCjD/7fyDFPAinCBfx4qos/kmX5/UOf4fyXAEcXGO1IMB/sFGP5BubjBP102/xvKXP//KTMY
+        QYXg4K0CQziUOXwAAwMAlu15LJSGIvkAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="toolStripButton削除.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2283,14 +2283,14 @@
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHnSURBVDhPY6ApmLTlW8zEjV93zNz98dGyA1+OrNj/Zcqy
-        I1+loNL4Qe+GrzsaNjz/073u6/PGFR8f1y/+cmfuzo+Pl+36+gmrId2rXv1fcvKLAYjdtfbLsv7FL36n
-        9Lx645J04rdu6vY/+gnrv9uX3f04c+vXN6v2f7kJ1gQDK4/942xc8vL/vP1fr9Yv/9rQtOnFn7j6m/9c
-        C47/t8vY9MskdtVx+/ytD7XjZ/4J63j5c/GBz/ehWhGgeObz/1mzPv8vnPPlf2TXuxdWoVv+mkUv/mES
-        vTIfJO9bv0PFMHjBC9fy6+/rl37ZA9aEDJL6nv33bnrzP7r38/+yOW/+a3hNWm0UtcIRKs3AEBrKbBB/
-        6Ldr2Z3X9Su/HIKKIkBQ89P/ZsX3/3s2vQK7JLHn0f/ahW8todIMxsZprHbR+/+61T371rTi8xaoMAI4
-        VTz+71B07b9V5vH/JvHb/htGrf2v4TP1P1SawSRxjZJt5uZ/Ti13/+ZPe1QKFcYNQAELZYKBuvdkd/Oy
-        K3/SWh/+q1/1nw0qTDywSNl3MaT+0b+wurO5UCHiQGLfByX7vPMx/kDNbpVXvjEw/GeEShEHPCqfOPvU
-        P/1ln3X4p3HkCi+oMPEgoudzpHPJ1UaDxJWiUKFBBRgYAGMx9K0i+iSpAAAAAElFTkSuQmCC
+        I1+loNL4Qe+GrzvqN9z5073u6/PGFR8f1y/+cmfuzo+Pl+36+gmrId2rXv1fcvKLAYjdtfbLsv7593+n
+        9Lx64xJ/4rdW6vY/+gnrv9uX3f04c+vXN6v2f7kJ1gQDK4/942xc8vL/vP1fr9Yv/9pQv+nun7j6c/9c
+        C47/t8vY9MskdtVx+/ytD7Xi+/6Edbz8ufjA5/tQrQhQPPP5/6xZn/8XzvnyP7Lr3Qsrry1/zaIX/zCJ
+        XpkPkvet36FiGLzghWv59ff1S7/sAWtCBkl9z/57N735H937+X/ZnDf/NbwmrTaKWuEIlWZgCA1lVo0/
+        9Nu17M7r+pVfDkFFESCo+el/s+L7/z2bXoFdktjz6H/twreWUGkGY+M0VruA/X/d6p59a1rxeQtUGAGc
+        Kh7/dyi69t8q8/h/k/ht/w2j1v7X8Jn6HyrNYJK4Rsk2c8U/+5ZLf/OnPSqFCuMGoICFMsFA3Xuyu07Z
+        lT9p9df+1a/6zwYVJh5YpOy7GFJ//V9Y3dlcqBBxILHvg5J93vkYf6Bmt8or3xgY/jNCpYgDHpVPnH3q
+        n/6yz9r/0zhyhRdUmHgQ0fM50rnkaqNB4kpRqNCgAgwMAMm48/nVnj2wAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="toolStripButton元に戻す.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2310,13 +2310,13 @@
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAHPSURBVDhPY6AaWHbkq9SK/V+mLDvw5cjM3R8f9az/klK4
         8h8nVBo/AGletuvrp7k7Pz6uX/zlTuOKj49bV325UzL/y+fKhV9Socpwg1X7v9ycufXrG/fyB+/1E9Z/
-        10nZ9sc+d//XlMnvXhTO+fKiYO7nMJC6JSe/GDgUXfsP1oQMFh/4fD+s4+VPjej5v13y1t80jl5zzDR2
-        zReN+KW/Qyc//Zs++f2zrLmfI+ft/3rVOvP4/5XH0LxWv/TLHtfy6+9VPXpu+dbvUAGJmUSvzFeLXPpV
-        zmf2L/+W98+BLvmfNevzf5P4rZguqF/55ZBT8b1XKp59hxlCQ5mhwgxGUSscNbwmrS6b8+Z/dO/n/95N
-        b/7rhS7GNKBpxect9kUvvqp4T7hpbJzGChVmmLz1s+6UrV/BNns2vfpvVnz/v4bPVEwD8qc9KnVuvfdX
-        xWfNL3HXYm6oMAMowKyAfjaJ3/ZfL2QJWLOqWxcWL6z6z5bW+vCfedmVP+rek92hwmCAEWC4QFjd2dyQ
-        +kf/LFL2XYQKkQr+M3pXXnvp2PLor33e+ZjEvg9KUAnigYrHYj6vypunAlo/ffWofOIMFSYdeDe+Co3o
-        +RwJ5Q5qwMAAAIKF6fOVfr3yAAAAAElFTkSuQmCC
+        10rZ9sc+d//XlMnvXhTO+fKiYO7nMJC6JSe/GDgUXfsP1oQMFh/4fD+s4+VP+ej5v13y1t80jl5zzDR2
+        zRf5+Pm/vSbf+ps++f2zrLmfI+ft/3rVOvP4/5XH0LxWv/TLHtfy6+9VPXpu+dbvUAGJmUSvzFeLXPpV
+        0mf2L/+W98+BLvmfNevzf5P4rZguqF/55ZBT8b1XKp59hxlCQ5mhwgxGUSscNbwmrS6b8+Z/dO/n/95N
+        b/7rhS7GNKBpxect9kUvvqp4T7hpbJzGChVmmLz1s+6UrV/BNns2vfpvVnz/v4bPVEwD8qc9KrVvvfxX
+        0mfNL3HXYm6oMAMowKyAfjaJ3/ZfL2QJWLOqWxcWL6z6z5ZWf+2fTtmVP+rek92hwmCAEWC4QFjd2dyQ
+        +uv/LFL2XYQKkQr+M3pXXntp33L9r33e+ZjEvg9KUAnigYrHYj6vypunAlo/ffWofOIMFSYdeDe+Co3o
+        +RwJ5Q5qwMAAAGPd6XAH/bCPAAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="toolStripButtonやり直す.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2474,11 +2474,11 @@
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
         YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF0SURBVDhPY8AHQuuvsEGZ5IGE7kem9fX/WaBcwqBw1vP/
         9fOe/grvuPsGxo+d+M6eaENyZz77v+rI+//h7Q/+w/gJ3ff+x0545UWUdzKmPP2/cN+H/8EN18AGgPjz
-        9v/+79Jw+m98z5NsgoYk9Dz5P23L+//+1RfABoD4s/f9+t+59e9/t9LL/+O7H+fhNSSy69H/3tUf/nuV
+        9v/+b99w4G98z5NsgoYk9Dz5P23L+//+1RfABoD4s/f9+t+59e9/t9LL/+O7H+fhNSSy69H/3tUf/nuV
         ngAbAOJP2fbrf8nSv/8Tpv/9b5N7FmwIWDE2ENj88H/d/Hf/XfIPgA0A8VvXvgdrNi758l86+tp/48hl
         uA3xqLr/P3/am//2GdvBBoD4JXPfwTUruvT8l/JZ1QFWjA3Yl979nz359X+LhPVgA0D8wJZnSJpX1IMV
         4gIWeXf+p/a/BjsTxrcpuALTnAVWhA8YZt3+H9by8r9u8DywASA+SLOk1/JysAJCQCftxn+/6of/NXyn
-        gQ0A8aW9VzeDJYkBdlmXf6l4TPgPwiC+pPfaFq3QVZRlKBoDBgYAmtLjhppidrkAAAAASUVORK5CYII=
+        gQ0A8aW9VzeDJYkBdlmXf6l4TPgPwiC+pPfaFq3QVZRlKBoDBgYAbHjjdolL22kAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="toolStripButton先頭から再生.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2512,14 +2512,14 @@
   <data name="toolStripButton現在位置からBGMのみ再生.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF9SURBVDhPYxgcoGDWU9v6+v9MUC7pIKzsxP/4Sa81Qlf9
-        Z4YKkQYypjz9H9Rw83VC51NbdENurNNY+v6045S/ryp23F4g//vvs7zdX694ttxap1EHVcLAkNj79H/n
-        1r//3Uov/0/sfWSPbMivm/5Vl1YZ/vv/sef/40MR//9/nPD/4gq9f58vebRClTAwRHU//l+75u//1Nl/
-        /9vknkUxBGTz/8/T/v//ffz/56drgfTh/yA+SBysGQSCWx79z1sIdEHTt/8yMdf+G0cu++9QcDoeJHdz
-        vvzvh/uD/395sf7/3/8f/n97veU/iP9kk8ovsGYQ8Kp58N+n/ft/6ehr/xVdev7LeK8MhEpBXPBx8v//
-        P/aDDQG5BMRHcYFD2b3/etl3wZqlvVd4QYXB4NetgIqLKw3+/X1Z+//Zsdj//z9MxgwDi7w7YM0Sfiu1
-        oEJwcHO9xjRwLDzN2PN8v9lPkM0gzSixYJB1e5OU1xIDKJd0oJlyVRvKHHmAgQEAI47xgzlDZ+oAAAAA
-        SUVORK5CYII=
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAF8SURBVDhPYxgcoGDWU9v6+v9MUC7pIKzsxP/4Sa81Qlf9
+        Z4YKkQYypjz9H9Rw83VC51NbdENurNNY+v6045S/ryp23J4v//vvs7zdX694ttxap1EHVcLAkNj79H/n
+        1r//3Uov/0/sfWSPbMivm/5Vx+cb/vv/sef/40MR//9/nPD/2Fy9f58vebRClTAwRHU//l+75u//1Nl/
+        /9vknkUxBGTz/8/T/v//ffz/56drgfTh/yA+SBysGQSCWx79z1sIdEHTt/8yMdf+G0cu++9QcDoeJHcT
+        6OyH+4P/f3mx/v/f/x/+f3u95T+I/2ST5C+wZhDwqnnw36f9+3/p6Gv/FV16/st4rwyESkFc8HHy//8/
+        9oMNAbkExEdxgUPZvf962XfBmqW9V3hBhcHg162AimPzDP79fVn7/9mx2P//P0zGDAOLvDtgzRJ+K7Wg
+        QnBwc73GNHAsPM3Y83y/2U+QzSDNKLFgkHV7k5TXEgMol3SgmXJVG8oceYCBAQBQk/EfwxiLXwAAAABJ
+        RU5ErkJggg==
 </value>
   </data>
   <data name="toolStripButton現在位置からBGMのみ再生.ImageTransparentColor" type="System.Drawing.Color, System.Drawing.Primitives">
@@ -2776,8 +2776,89 @@
   <data name="toolStripMenuItem小節の削除.Text" xml:space="preserve">
     <value>D&amp;elete part</value>
   </data>
+  <data name="toolStripSeparator16.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>189, 6</value>
+  </data>
+  <data name="toolStripMenuItem音量1.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量1.Text" xml:space="preserve">
+    <value>+1</value>
+  </data>
+  <data name="toolStripMenuItem音量1.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to +1.</value>
+  </data>
+  <data name="toolStripMenuItem音量2.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量2.Text" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="toolStripMenuItem音量2.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to 0.</value>
+  </data>
+  <data name="toolStripMenuItem音量3.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量3.Text" xml:space="preserve">
+    <value>-1</value>
+  </data>
+  <data name="toolStripMenuItem音量3.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -1.</value>
+  </data>
+  <data name="toolStripMenuItem音量4.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量4.Text" xml:space="preserve">
+    <value>-2</value>
+  </data>
+  <data name="toolStripMenuItem音量4.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -2.</value>
+  </data>
+  <data name="toolStripMenuItem音量5.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量5.Text" xml:space="preserve">
+    <value>-3</value>
+  </data>
+  <data name="toolStripMenuItem音量5.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -3.</value>
+  </data>
+  <data name="toolStripMenuItem音量6.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量6.Text" xml:space="preserve">
+    <value>-4</value>
+  </data>
+  <data name="toolStripMenuItem音量6.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -4.</value>
+  </data>
+  <data name="toolStripMenuItem音量7.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量7.Text" xml:space="preserve">
+    <value>-5</value>
+  </data>
+  <data name="toolStripMenuItem音量7.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -5.</value>
+  </data>
+  <data name="toolStripMenuItem音量8.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>88, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量8.Text" xml:space="preserve">
+    <value>-6</value>
+  </data>
+  <data name="toolStripMenuItem音量8.ToolTipText" xml:space="preserve">
+    <value>Changes the volume of all selected chips to -6.</value>
+  </data>
+  <data name="toolStripMenuItem音量指定.Size" type="System.Drawing.Size, System.Drawing.Primitives">
+    <value>192, 22</value>
+  </data>
+  <data name="toolStripMenuItem音量指定.Text" xml:space="preserve">
+    <value>&amp;Volume</value>
+  </data>
   <data name="contextMenuStrip譜面右メニュー.Size" type="System.Drawing.Size, System.Drawing.Primitives">
-    <value>193, 198</value>
+    <value>193, 226</value>
   </data>
   <data name="&gt;&gt;contextMenuStrip譜面右メニュー.Name" xml:space="preserve">
     <value>contextMenuStrip譜面右メニュー</value>
@@ -3326,6 +3407,66 @@
     <value>toolStripMenuItem小節の削除</value>
   </data>
   <data name="&gt;&gt;toolStripMenuItem小節の削除.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator16.Name" xml:space="preserve">
+    <value>toolStripSeparator16</value>
+  </data>
+  <data name="&gt;&gt;toolStripSeparator16.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripSeparator, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量指定.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量指定</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量指定.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量1.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量1</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量2.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量2</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量3.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量3</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量3.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量4.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量4</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量4.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量5.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量5</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量5.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量6.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量6</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量6.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量7.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量7</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量7.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量8.Name" xml:space="preserve">
+    <value>toolStripMenuItem音量8</value>
+  </data>
+  <data name="&gt;&gt;toolStripMenuItem音量8.Type" xml:space="preserve">
     <value>System.Windows.Forms.ToolStripMenuItem, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;$this.Name" xml:space="preserve">

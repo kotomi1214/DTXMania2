@@ -710,6 +710,33 @@
   <data name="toolStripMenuItem小節の削除.Text" xml:space="preserve">
     <value>小節の削除(&amp;E)</value>
   </data>
+  <data name="toolStripMenuItem音量指定.Text" xml:space="preserve">
+    <value>音量設定(&amp;V)</value>
+  </data>
+  <data name="toolStripMenuItem音量1.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて +1 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量2.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて 0 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量3.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -1 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量4.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -2 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量5.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -3 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量6.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -4 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量7.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -5 に設定します。</value>
+  </data>
+  <data name="toolStripMenuItem音量8.ToolTipText" xml:space="preserve">
+    <value>選択中のチップの音量をすべて -6 に設定します。</value>
+  </data>
   <data name="contextMenuStrip譜面右メニュー.Size" type="System.Drawing.Size, System.Drawing">
     <value>191, 198</value>
   </data>

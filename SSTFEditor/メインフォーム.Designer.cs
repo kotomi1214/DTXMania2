@@ -155,6 +155,16 @@
             this.toolStripSeparator14 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem小節の挿入 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem小節の削除 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator16 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripMenuItem音量指定 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量3 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量4 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量5 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量6 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量7 = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripMenuItem音量8 = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer分割パネルコンテナ)).BeginInit();
             this.splitContainer分割パネルコンテナ.Panel1.SuspendLayout();
             this.splitContainer分割パネルコンテナ.Panel2.SuspendLayout();
@@ -1043,7 +1053,9 @@
             this.toolStripMenuItem小節長変更,
             this.toolStripSeparator14,
             this.toolStripMenuItem小節の挿入,
-            this.toolStripMenuItem小節の削除});
+            this.toolStripMenuItem小節の削除,
+            this.toolStripSeparator16,
+            this.toolStripMenuItem音量指定});
             this.contextMenuStrip譜面右メニュー.Name = "contextMenuStrip譜面右メニュー";
             resources.ApplyResources(this.contextMenuStrip譜面右メニュー, "contextMenuStrip譜面右メニュー");
             // 
@@ -1110,6 +1122,73 @@
             resources.ApplyResources(this.toolStripMenuItem小節の削除, "toolStripMenuItem小節の削除");
             this.toolStripMenuItem小節の削除.Click += new System.EventHandler(this.toolStripMenuItem小節の削除_Click);
             // 
+            // toolStripSeparator16
+            // 
+            this.toolStripSeparator16.Name = "toolStripSeparator16";
+            resources.ApplyResources(this.toolStripSeparator16, "toolStripSeparator16");
+            // 
+            // toolStripMenuItem音量指定
+            // 
+            this.toolStripMenuItem音量指定.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripMenuItem音量1,
+            this.toolStripMenuItem音量2,
+            this.toolStripMenuItem音量3,
+            this.toolStripMenuItem音量4,
+            this.toolStripMenuItem音量5,
+            this.toolStripMenuItem音量6,
+            this.toolStripMenuItem音量7,
+            this.toolStripMenuItem音量8});
+            this.toolStripMenuItem音量指定.Name = "toolStripMenuItem音量指定";
+            resources.ApplyResources(this.toolStripMenuItem音量指定, "toolStripMenuItem音量指定");
+            // 
+            // toolStripMenuItem音量1
+            // 
+            this.toolStripMenuItem音量1.Name = "toolStripMenuItem音量1";
+            resources.ApplyResources(this.toolStripMenuItem音量1, "toolStripMenuItem音量1");
+            this.toolStripMenuItem音量1.Click += new System.EventHandler( this.toolStripMenuItem音量1_Click );
+            // 
+            // toolStripMenuItem音量2
+            // 
+            this.toolStripMenuItem音量2.Name = "toolStripMenuItem音量2";
+            resources.ApplyResources(this.toolStripMenuItem音量2, "toolStripMenuItem音量2");
+            this.toolStripMenuItem音量2.Click += new System.EventHandler( this.toolStripMenuItem音量2_Click );
+            // 
+            // toolStripMenuItem音量3
+            // 
+            this.toolStripMenuItem音量3.Name = "toolStripMenuItem音量3";
+            resources.ApplyResources(this.toolStripMenuItem音量3, "toolStripMenuItem音量3");
+            this.toolStripMenuItem音量3.Click += new System.EventHandler( this.toolStripMenuItem音量3_Click );
+            // 
+            // toolStripMenuItem音量4
+            // 
+            this.toolStripMenuItem音量4.Name = "toolStripMenuItem音量4";
+            resources.ApplyResources(this.toolStripMenuItem音量4, "toolStripMenuItem音量4");
+            this.toolStripMenuItem音量4.Click += new System.EventHandler( this.toolStripMenuItem音量4_Click );
+            // 
+            // toolStripMenuItem音量5
+            // 
+            this.toolStripMenuItem音量5.Name = "toolStripMenuItem音量5";
+            resources.ApplyResources(this.toolStripMenuItem音量5, "toolStripMenuItem音量5");
+            this.toolStripMenuItem音量5.Click += new System.EventHandler( this.toolStripMenuItem音量5_Click );
+            // 
+            // toolStripMenuItem音量6
+            // 
+            this.toolStripMenuItem音量6.Name = "toolStripMenuItem音量6";
+            resources.ApplyResources(this.toolStripMenuItem音量6, "toolStripMenuItem音量6");
+            this.toolStripMenuItem音量6.Click += new System.EventHandler( this.toolStripMenuItem音量6_Click );
+            // 
+            // toolStripMenuItem音量7
+            // 
+            this.toolStripMenuItem音量7.Name = "toolStripMenuItem音量7";
+            resources.ApplyResources(this.toolStripMenuItem音量7, "toolStripMenuItem音量7");
+            this.toolStripMenuItem音量7.Click += new System.EventHandler( this.toolStripMenuItem音量7_Click );
+            // 
+            // toolStripMenuItem音量8
+            // 
+            this.toolStripMenuItem音量8.Name = "toolStripMenuItem音量8";
+            resources.ApplyResources(this.toolStripMenuItem音量8, "toolStripMenuItem音量8");
+            this.toolStripMenuItem音量8.Click += new System.EventHandler( this.toolStripMenuItem音量8_Click );
+            // 
             // メインフォーム
             // 
             this.AllowDrop = true;
@@ -1147,6 +1226,7 @@
             this.PerformLayout();
 
 		}
+
         #endregion
 
         private System.Windows.Forms.StatusStrip statusStripステータスバー;
@@ -1274,6 +1354,16 @@
         private System.Windows.Forms.TextBox textBoxプレビュー画像;
         private System.Windows.Forms.PictureBox pictureBoxプレビュー画像;
         private System.Windows.Forms.ToolStripComboBox toolStripComboBox再生速度;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator16;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量指定;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量1;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量2;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量3;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量4;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量5;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量6;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量7;
+        private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem音量8;
     }
 }
 

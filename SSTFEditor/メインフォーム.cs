@@ -166,6 +166,7 @@ namespace SSTFEditor
             this.toolStripMenuItem選択チップの切り取り.Enabled = 譜面上に選択チップがある;
             this.toolStripMenuItem選択チップの貼り付け.Enabled = クリップボードに選択チップがある;
             this.toolStripMenuItem選択チップの削除.Enabled = 譜面上に選択チップがある;
+            this.toolStripMenuItem音量指定.Enabled = 譜面上に選択チップがある;
         }
 
         public void 譜面をリフレッシュする()
@@ -1414,6 +1415,64 @@ namespace SSTFEditor
             // 垂直スクロールバーを移動させると、画面も自動的に移動する。
             var bar = this.vScrollBar譜面用垂直スクロールバー;
             bar.Value = ( ( bar.Maximum + 1 ) - bar.LargeChange ) - this.譜面.小節先頭の譜面内絶対位置gridを返す( 小節番号 );
+        }
+
+        /// <summary>
+        ///     選択中のチップの音量を一括指定する。
+        /// </summary>
+        /// <param name="音量">1～8。</param>
+        private void _音量を一括設定する( int 音量 )
+        {
+            // 譜面にフォーカスがないなら何もしない。
+            if( false == this.pictureBox譜面パネル.Focused )
+                return;
+
+            try
+            {
+                this.UndoRedo管理.トランザクション記録を開始する();
+
+                #region " 譜面が持つすべてのチップについて、選択されているチップがあればその音量を変更する。"
+                //----------------
+                for( int i = this.譜面.スコア.チップリスト.Count - 1; 0 <= i; i-- )
+                {
+                    var chip = (描画用チップ)this.譜面.スコア.チップリスト[ i ];
+
+                    if( chip.選択が確定していない )
+                        continue;
+
+                    var cell = new UndoRedo.セル<描画用チップ>(
+                        所有者ID: null,
+                        Undoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                            変更対象.音量 = (int)任意1;
+                        },
+                        Redoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                            変更対象.音量 = (int)任意2;
+                            this.未保存である = true;
+                        },
+                        変更対象: chip,
+                        変更前の値: null,
+                        変更後の値: null,
+                        任意1: chip.音量,   // 変更前の音量
+                        任意2: 音量 );      // 変更後の音量
+
+                    this.UndoRedo管理.セルを追加する( cell );
+                    cell.Redoを実行する();
+                }
+                //----------------
+                #endregion
+            }
+            finally
+            {
+                this.UndoRedo管理.トランザクション記録を終了する();
+
+                #region " GUI を再描画する。"
+                //----------------
+                this.UndoRedo用GUIのEnabledを設定する();
+                this.選択チップの有無に応じて編集用GUIのEnabledを設定する();
+                this.譜面をリフレッシュする();
+                //----------------
+                #endregion
+            }
         }
         //----------------
         #endregion
@@ -2683,6 +2742,46 @@ namespace SSTFEditor
 
             // アクションを実行。
             this._小節を削除する( this.譜面.譜面パネル内Y座標pxにおける小節番号を返す( マウスの位置.Y ) );
+        }
+
+        protected void toolStripMenuItem音量1_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 8 );
+        }
+
+        protected void toolStripMenuItem音量2_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 7 );
+        }
+
+        protected void toolStripMenuItem音量3_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 6 );
+        }
+
+        protected void toolStripMenuItem音量4_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 5 );
+        }
+
+        protected void toolStripMenuItem音量5_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 4 );
+        }
+
+        protected void toolStripMenuItem音量6_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 3 );
+        }
+
+        protected void toolStripMenuItem音量7_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 2 );
+        }
+
+        protected void toolStripMenuItem音量8_Click( object sender, System.EventArgs e )
+        {
+            this._音量を一括設定する( 1 );
         }
         //-----------------
         #endregion
