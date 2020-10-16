@@ -2689,26 +2689,21 @@ namespace SSTFEditor
             if( 0 == e.Delta )
                 return;     // 移動量なし
 
-            // e.Delta は、スクロールバーを下へ動かしたいときに負、上へ動かしたいときに正となる。
-            int 移動すべき行数 = ( -e.Delta * SystemInformation.MouseWheelScrollLines ) / 120;
-
-            // 1行＝0.125拍とする。
-            int 移動すべき数grid = 移動すべき行数 * ( this.GRID_PER_PART / 32 );
+            // 移動すべきグリッド数を計算する。
+            const int 拍の行数 = 32;    // 1行＝0.125拍とする。
+            int 移動すべき行数 = ( SystemInformation.MouseWheelScrollLines != -1 ) ?
+                // e.Delta は MouseWheelScrollDelta の倍数であり、スクロールバーを下へ動かしたいときに負、上へ動かしたいときに正となる。
+                ( -e.Delta / SystemInformation.MouseWheelScrollDelta ) * SystemInformation.MouseWheelScrollLines :
+                // MouseWheelScrollLines == -1 は「1画面単位」を意味する。
+                // ここでは、1画面＝1小節とみなす。
+                Math.Sign( -e.Delta ) * 拍の行数;
+            int 移動すべき数grid = 移動すべき行数 * ( this.GRID_PER_PART / 拍の行数 );
 
             // スクロールバーのつまみを移動する。
             int 新しい位置 = this.vScrollBar譜面用垂直スクロールバー.Value + 移動すべき数grid;
             int 最小値 = this.vScrollBar譜面用垂直スクロールバー.Minimum;
             int 最大値 = ( this.vScrollBar譜面用垂直スクロールバー.Maximum + 1 ) - this.vScrollBar譜面用垂直スクロールバー.LargeChange;
-
-            if( 新しい位置 < 最小値 )
-            {
-                新しい位置 = 最小値;
-            }
-            else if( 新しい位置 > 最大値 )
-            {
-                新しい位置 = 最大値;
-            }
-            this.vScrollBar譜面用垂直スクロールバー.Value = 新しい位置;
+            this.vScrollBar譜面用垂直スクロールバー.Value = Math.Clamp( 新しい位置, 最小値, 最大値 );
             //-----------------
             #endregion
         }
