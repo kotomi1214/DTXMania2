@@ -128,6 +128,7 @@ namespace SSTFEditor
 
             this.label現在のチップ種別.Text = "----";
 
+            this.選択チップの有無に応じて編集用GUIのEnabledを設定する();
             this.譜面をリフレッシュする();
         }
 
