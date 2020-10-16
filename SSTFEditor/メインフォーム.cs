@@ -102,7 +102,7 @@ namespace SSTFEditor
             }
         }
 
-        public int 現在のチップ音量 { get; set; } = メインフォーム.最大音量;
+        public int 現在のチップ音量 { get; set; } = メインフォーム.最大音量 - 1;
 
         public Size 譜面パネルサイズ => this.pictureBox譜面パネル.ClientSize;
 
@@ -135,6 +135,7 @@ namespace SSTFEditor
         public void 編集モードに切替えて関連GUIを設定する()
         {
             this.選択モード.全チップの選択を解除する();
+            this.選択チップの有無に応じて編集用GUIのEnabledを設定する();
             this.譜面をリフレッシュする();
 
             this.toolStripButton選択モード.CheckState = CheckState.Unchecked;
@@ -167,6 +168,16 @@ namespace SSTFEditor
             this.toolStripMenuItem選択チップの貼り付け.Enabled = クリップボードに選択チップがある;
             this.toolStripMenuItem選択チップの削除.Enabled = 譜面上に選択チップがある;
             this.toolStripMenuItem音量指定.Enabled = 譜面上に選択チップがある;
+
+            // 音量ラベル
+            if( 譜面上に選択チップがある )
+            {
+                toolStripLabel音量.Text = " -       + ";  // 選択中のチップ音量の相対操作モード
+            }
+            else
+            {
+                this._現在のチップ音量をツールバーに表示する();
+            }
         }
 
         public void 譜面をリフレッシュする()
@@ -2353,18 +2364,146 @@ namespace SSTFEditor
 
         protected void toolStripButton音量Down_Click( object sender, EventArgs e )
         {
-            int 新音量 = this.現在のチップ音量 - 1;
-            this.現在のチップ音量 = ( 新音量 < メインフォーム.最小音量 ) ? メインフォーム.最小音量 : 新音量;
+            bool 譜面上に選択チップがある = this._選択チップが１個以上ある;
 
-            this._現在のチップ音量をツールバーに表示する();
+            // 選択中のチップの有無で挙動が異なる。
+
+            if( 譜面上に選択チップがある )
+            {
+                #region " (A) 選択中のチップ音量の相対操作 "
+                //----------------
+                try
+                {
+                    this.UndoRedo管理.トランザクション記録を開始する();
+
+                    #region " 選択されているすべてのチップについて、その音量をそれぞれ1つずつ下げる。"
+                    //----------------
+                    foreach( 描画用チップ chip in this.譜面.スコア.チップリスト )
+                    {
+                        if( chip.選択が確定している )
+                        {
+                            int 新音量 = Math.Max( chip.音量 - 1, メインフォーム.最小音量 );
+
+                            var cell = new UndoRedo.セル<描画用チップ>(
+                                所有者ID: null,
+                                Undoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                                    変更対象.音量 = (int)任意1;
+                                },
+                                Redoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                                    変更対象.音量 = (int)任意2;
+                                    this.未保存である = true;
+                                },
+                                変更対象: chip,
+                                変更前の値: null,
+                                変更後の値: null,
+                                任意1: chip.音量,   // 変更前の音量
+                                任意2: 新音量 );    // 変更後の音量
+
+                            this.UndoRedo管理.セルを追加する( cell );
+                            cell.Redoを実行する();
+                        }
+                    }
+                    //----------------
+                    #endregion
+                }
+                finally
+                {
+                    this.UndoRedo管理.トランザクション記録を終了する();
+
+                    #region " GUI を再描画する。"
+                    //----------------
+                    this.UndoRedo用GUIのEnabledを設定する();
+                    this.選択チップの有無に応じて編集用GUIのEnabledを設定する();
+                    this.譜面をリフレッシュする();
+                    //----------------
+                    #endregion
+                }
+                //----------------
+                #endregion
+            }
+            else
+            {
+                #region " (B) 現在のチップ音量の操作 "
+                //----------------
+                int 新音量 = this.現在のチップ音量 - 1;
+                this.現在のチップ音量 = ( 新音量 < メインフォーム.最小音量 ) ? メインフォーム.最小音量 : 新音量;
+
+                this._現在のチップ音量をツールバーに表示する();
+                //----------------
+                #endregion
+            }
         }
 
         protected void toolStripButton音量UP_Click( object sender, EventArgs e )
         {
-            int 新音量 = this.現在のチップ音量 + 1;
-            this.現在のチップ音量 = ( 新音量 > メインフォーム.最大音量 ) ? メインフォーム.最大音量 : 新音量;
+            bool 譜面上に選択チップがある = this._選択チップが１個以上ある;
 
-            this._現在のチップ音量をツールバーに表示する();
+            // 選択中のチップの有無で挙動が異なる。
+
+            if( 譜面上に選択チップがある )
+            {
+                #region " (A) 選択中のチップ音量の相対操作 "
+                //----------------
+                try
+                {
+                    this.UndoRedo管理.トランザクション記録を開始する();
+
+                    #region " 選択されているすべてのチップについて、その音量をそれぞれ1つずつ上げる。"
+                    //----------------
+                    foreach( 描画用チップ chip in this.譜面.スコア.チップリスト )
+                    {
+                        if( chip.選択が確定している )
+                        {
+                            int 新音量 = Math.Min( chip.音量 + 1, メインフォーム.最大音量 );
+
+                            var cell = new UndoRedo.セル<描画用チップ>(
+                                所有者ID: null,
+                                Undoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                                    変更対象.音量 = (int)任意1;
+                                },
+                                Redoアクション: ( 変更対象, 変更前, 変更後, 任意1, 任意2 ) => {
+                                    変更対象.音量 = (int)任意2;
+                                    this.未保存である = true;
+                                },
+                                変更対象: chip,
+                                変更前の値: null,
+                                変更後の値: null,
+                                任意1: chip.音量,   // 変更前の音量
+                                任意2: 新音量 );    // 変更後の音量
+
+                            this.UndoRedo管理.セルを追加する( cell );
+                            cell.Redoを実行する();
+                        }
+                    }
+                    //----------------
+                    #endregion
+                }
+                finally
+                {
+                    this.UndoRedo管理.トランザクション記録を終了する();
+
+                    #region " GUI を再描画する。"
+                    //----------------
+                    this.UndoRedo用GUIのEnabledを設定する();
+                    this.選択チップの有無に応じて編集用GUIのEnabledを設定する();
+                    this.譜面をリフレッシュする();
+                    //----------------
+                    #endregion
+                }
+                //----------------
+                #endregion
+            }
+            else
+            {
+                #region " (B) 現在のチップ音量操作 "
+                //----------------
+                int 新音量 = this.現在のチップ音量 + 1;
+                this.現在のチップ音量 = ( 新音量 > メインフォーム.最大音量 ) ? メインフォーム.最大音量 : 新音量;
+
+                this._現在のチップ音量をツールバーに表示する();
+                //----------------
+                #endregion
+            }
         }
         //-----------------
         #endregion

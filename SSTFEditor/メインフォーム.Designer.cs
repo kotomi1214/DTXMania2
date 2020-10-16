@@ -1145,49 +1145,49 @@
             // 
             this.toolStripMenuItem音量1.Name = "toolStripMenuItem音量1";
             resources.ApplyResources(this.toolStripMenuItem音量1, "toolStripMenuItem音量1");
-            this.toolStripMenuItem音量1.Click += new System.EventHandler( this.toolStripMenuItem音量1_Click );
+            this.toolStripMenuItem音量1.Click += new System.EventHandler(this.toolStripMenuItem音量1_Click);
             // 
             // toolStripMenuItem音量2
             // 
             this.toolStripMenuItem音量2.Name = "toolStripMenuItem音量2";
             resources.ApplyResources(this.toolStripMenuItem音量2, "toolStripMenuItem音量2");
-            this.toolStripMenuItem音量2.Click += new System.EventHandler( this.toolStripMenuItem音量2_Click );
+            this.toolStripMenuItem音量2.Click += new System.EventHandler(this.toolStripMenuItem音量2_Click);
             // 
             // toolStripMenuItem音量3
             // 
             this.toolStripMenuItem音量3.Name = "toolStripMenuItem音量3";
             resources.ApplyResources(this.toolStripMenuItem音量3, "toolStripMenuItem音量3");
-            this.toolStripMenuItem音量3.Click += new System.EventHandler( this.toolStripMenuItem音量3_Click );
+            this.toolStripMenuItem音量3.Click += new System.EventHandler(this.toolStripMenuItem音量3_Click);
             // 
             // toolStripMenuItem音量4
             // 
             this.toolStripMenuItem音量4.Name = "toolStripMenuItem音量4";
             resources.ApplyResources(this.toolStripMenuItem音量4, "toolStripMenuItem音量4");
-            this.toolStripMenuItem音量4.Click += new System.EventHandler( this.toolStripMenuItem音量4_Click );
+            this.toolStripMenuItem音量4.Click += new System.EventHandler(this.toolStripMenuItem音量4_Click);
             // 
             // toolStripMenuItem音量5
             // 
             this.toolStripMenuItem音量5.Name = "toolStripMenuItem音量5";
             resources.ApplyResources(this.toolStripMenuItem音量5, "toolStripMenuItem音量5");
-            this.toolStripMenuItem音量5.Click += new System.EventHandler( this.toolStripMenuItem音量5_Click );
+            this.toolStripMenuItem音量5.Click += new System.EventHandler(this.toolStripMenuItem音量5_Click);
             // 
             // toolStripMenuItem音量6
             // 
             this.toolStripMenuItem音量6.Name = "toolStripMenuItem音量6";
             resources.ApplyResources(this.toolStripMenuItem音量6, "toolStripMenuItem音量6");
-            this.toolStripMenuItem音量6.Click += new System.EventHandler( this.toolStripMenuItem音量6_Click );
+            this.toolStripMenuItem音量6.Click += new System.EventHandler(this.toolStripMenuItem音量6_Click);
             // 
             // toolStripMenuItem音量7
             // 
             this.toolStripMenuItem音量7.Name = "toolStripMenuItem音量7";
             resources.ApplyResources(this.toolStripMenuItem音量7, "toolStripMenuItem音量7");
-            this.toolStripMenuItem音量7.Click += new System.EventHandler( this.toolStripMenuItem音量7_Click );
+            this.toolStripMenuItem音量7.Click += new System.EventHandler(this.toolStripMenuItem音量7_Click);
             // 
             // toolStripMenuItem音量8
             // 
             this.toolStripMenuItem音量8.Name = "toolStripMenuItem音量8";
             resources.ApplyResources(this.toolStripMenuItem音量8, "toolStripMenuItem音量8");
-            this.toolStripMenuItem音量8.Click += new System.EventHandler( this.toolStripMenuItem音量8_Click );
+            this.toolStripMenuItem音量8.Click += new System.EventHandler(this.toolStripMenuItem音量8_Click);
             // 
             // メインフォーム
             // 
