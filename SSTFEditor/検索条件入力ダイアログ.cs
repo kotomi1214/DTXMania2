@@ -184,6 +184,7 @@ namespace SSTFEditor
             "Low Tom",
             "Floor Tom",
             "Right Cymbal",
+            "BGV",
             "BGA",
             //-----------------
             #endregion
