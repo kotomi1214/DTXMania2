@@ -924,56 +924,56 @@ namespace DTXMania2.演奏
                         #endregion
                     }
                 }
-                if( keyboard.キーが押された( 0, Keys.PageUp ) && 0 <= this._描画開始チップ番号 )
-                {
-                    #region " PageUp → 早送り；1小節先に進む "
-                    //----------------
-                    // 現在時刻における小節番号を取得する。
-                    int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
-                    double 現在時刻sec = Global.App.サウンドタイマ.現在時刻sec;
-                    for( int i = this._描画開始チップ番号; i < Global.App.演奏スコア.チップリスト.Count; i++ )
-                    {
-                        var chip = Global.App.演奏スコア.チップリスト[ i ];
-                        if( chip.チップ種別 == SSTF.チップ種別.小節線 && 現在時刻sec <= chip.描画時刻sec )
-                            break;
-                        現在の小節番号 = chip.小節番号;
-                    }
-
-                    // 取得した小節の1つ次の小節へ移動する。
-                    this._指定小節へ移動する( 現在の小節番号 + 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
-                    Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
-                    this._クリアメーター.カウントマップをクリアする();
-
-                    this._早送りアイコン.早送りする();
-
-                    this.成績.無効 = true;
-                    //----------------
-                    #endregion
-                }
-                if( keyboard.キーが押された( 0, Keys.PageDown ) && 1 <= this._描画開始チップ番号 )
-                {
-                    #region " PageDown → 早戻し；1小節前に戻る "
-                    //----------------
-                    // こちらは描画開始チップの小節番号を基点とする。
-                    int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
-
-                    // 取得した小節の1つ前の小節へ移動する。
-                    this._指定小節へ移動する( 現在の小節番号 - 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
-                    Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
-
-                    this._クリアメーター.カウントマップをクリアする();
-                    this._早送りアイコン.早戻しする();
-
-                    this.成績.無効 = true;
-                    //----------------
-                    #endregion
-                }
             }
             if( Global.App.ドラム入力.ドラムが入力された( ドラム入力種別.Pause_Resume ) )
             {
                 #region " Pause/Resume → 演奏の一時停止・再開 "
                 //----------------
                 this._演奏を一時停止または再開する();
+                //----------------
+                #endregion
+            }
+            if( Global.App.ドラム入力.ドラムが入力された( ドラム入力種別.PlaySpeed_Up ) && 0 <= this._描画開始チップ番号 )
+            {
+                #region " PageUp → 早送り；1小節先に進む "
+                //----------------
+                // 現在時刻における小節番号を取得する。
+                int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
+                double 現在時刻sec = Global.App.サウンドタイマ.現在時刻sec;
+                for( int i = this._描画開始チップ番号; i < Global.App.演奏スコア.チップリスト.Count; i++ )
+                {
+                    var chip = Global.App.演奏スコア.チップリスト[ i ];
+                    if( chip.チップ種別 == SSTF.チップ種別.小節線 && 現在時刻sec <= chip.描画時刻sec )
+                        break;
+                    現在の小節番号 = chip.小節番号;
+                }
+
+                // 取得した小節の1つ次の小節へ移動する。
+                this._指定小節へ移動する( 現在の小節番号 + 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
+                Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+                this._クリアメーター.カウントマップをクリアする();
+
+                this._早送りアイコン.早送りする();
+
+                this.成績.無効 = true;
+                //----------------
+                #endregion
+            }
+            if( Global.App.ドラム入力.ドラムが入力された( ドラム入力種別.PlaySpeed_Down ) && 0 <= this._描画開始チップ番号 )
+            {
+                #region " PageDown → 早戻し；1小節前に戻る "
+                //----------------
+                // こちらは描画開始チップの小節番号を基点とする。
+                int 現在の小節番号 = Global.App.演奏スコア.チップリスト[ this._描画開始チップ番号 ].小節番号;
+
+                // 取得した小節の1つ前の小節へ移動する。
+                this._指定小節へ移動する( 現在の小節番号 - 1, out this._描画開始チップ番号, out double 演奏開始時刻sec );
+                Global.App.サウンドタイマ.リセットする( 演奏開始時刻sec );
+
+                this._クリアメーター.カウントマップをクリアする();
+                this._早送りアイコン.早戻しする();
+
+                this.成績.無効 = true;
                 //----------------
                 #endregion
             }
