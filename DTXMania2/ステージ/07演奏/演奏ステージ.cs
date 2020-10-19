@@ -1848,7 +1848,7 @@ namespace DTXMania2.演奏
                 }
                 this._判定文字列.表示を開始する( 対応表.表示レーン種別, judge, 入力とチップとの間隔sec );
 
-                this.成績.成績を更新する( judge, userConfig.AutoPlay[ 対応表.AutoPlay種別 ] );
+                this.成績.成績を更新する( judge );
                 //----------------
                 #endregion
             }

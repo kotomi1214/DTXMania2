@@ -143,7 +143,7 @@ namespace DTXMania2
         /// <summary>
         ///		判定に応じて成績（エキサイトゲージを除く）を更新する。
         /// </summary>
-        public void 成績を更新する( 判定種別 判定, bool autoPlay )
+        public void 成績を更新する( 判定種別 判定 )
         {
             #region " ヒット数を加算する。"
             //----------------
@@ -198,6 +198,7 @@ namespace DTXMania2
             {
                 // (A) AutoPlay がすべて ON → 補正なし(x1.0), ただしDBには保存されない。
                 オプション補正0to1 = 1.0;
+                this.無効 = true;
             }
             else
             {

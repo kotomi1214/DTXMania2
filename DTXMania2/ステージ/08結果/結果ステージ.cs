@@ -42,7 +42,7 @@ namespace DTXMania2.結果
 
             #region " 成績をDBへ反映する。"
             //----------------
-            if( Global.App.ログオン中のユーザ.AutoPlayがすべてONである || result.無効 )
+            if( result.無効 )
             {
                 // 全Autoまたは無効の場合は反映しない。
                 this._最高成績である = false;
