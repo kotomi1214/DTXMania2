@@ -121,6 +121,9 @@
   <data name="DTXMania2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DTXMania2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="TXT_AutoPlayerでのログオンに失敗しました" xml:space="preserve">
+    <value>Failed to log on as AutoPlayer.</value>
+  </data>
   <data name="TXT_Chinaの表示位置" xml:space="preserve">
     <value>China position</value>
   </data>
@@ -190,6 +193,9 @@ near {0}</value>
   </data>
   <data name="TXT_レーンの透明度" xml:space="preserve">
     <value>Lane opacity</value>
+  </data>
+  <data name="TXT_二重起動はできません" xml:space="preserve">
+    <value>It is not possible to run more than one at a time.</value>
   </data>
   <data name="TXT_入力と入力の間が500ミリ秒以上開いた場合は間に空行を表示します" xml:space="preserve">
     <value>* If there is more than 500 milliseconds between inputs, a blank line will be displayed between them.</value>

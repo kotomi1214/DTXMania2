@@ -307,7 +307,10 @@ namespace DTXMania2
                     設計画面サイズ: new SharpDX.Size2F( 1920f, 1080f ),
                     物理画面サイズ: new SharpDX.Size2F( this.ClientSize.Width, this.ClientSize.Height ) );
 
-                画像.全インスタンスで共有するリソースを作成する( Global.GraphicResources.D3D11Device1, @"$(Images)\TextureVS.cso", @"$(Images)\TexturePS.cso" );
+                画像.全インスタンスで共有するリソースを作成する(
+                    Global.GraphicResources.D3D11Device1, 
+                    @"$(Images)\TextureVS.cso", 
+                    @"$(Images)\TexturePS.cso" );
 
                 this.システムサウンド = new システムサウンド();  // 個々のサウンドの生成は後工程で。
                 this.ドラムサウンド = new ドラムサウンド();      // 　　　　　　〃
@@ -354,7 +357,7 @@ namespace DTXMania2
 
                             case TaskMessage.内容名.サイズ変更:
                             {
-                                var newSize = (System.Drawing.Size) msg.引数![ 0 ];
+                                var newSize = (Size) msg.引数![ 0 ];
                                 Global.GraphicResources.物理画面サイズを変更する( new SharpDX.Size2F( newSize.Width, newSize.Height ) );
                                 break;
                             }
@@ -371,6 +374,7 @@ namespace DTXMania2
                     //----------------
                     Global.Animation.進行する();
                     Global.Effekseer.進行する();
+
                     this.ステージ?.進行する();
 
                     if( スワップチェーン表示タスク.表示待機中 )
@@ -380,7 +384,9 @@ namespace DTXMania2
                     else
                     {
                         // 表示タスクが起動していないなら、描画して、表示タスクを起動する。
+
                         this.ステージ?.描画する();
+
                         スワップチェーン表示タスク.表示する( Global.GraphicResources.DXGISwapChain1! );
                     }
                     //----------------
@@ -407,7 +413,7 @@ namespace DTXMania2
                                     // AutoPlayer でログイン。
                                     if( !this.ログオンする( "AutoPlayer" ) )
                                     {
-                                        System.Windows.Forms.MessageBox.Show( "AutoPlayerでのログオンに失敗しました。", "DTXMania2 error" );
+                                        MessageBox.Show( Properties.Resources.TXT_AutoPlayerでのログオンに失敗しました, "DTXMania2 error" );
                                         this.ステージ = null;
                                         this._アプリを終了する();
                                     }

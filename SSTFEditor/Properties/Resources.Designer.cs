@@ -143,6 +143,15 @@ namespace SSTFEditor.Properties {
         }
         
         /// <summary>
+        ///   Failed to save the file. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string MSG_ファイルの保存に失敗しました {
+            get {
+                return ResourceManager.GetString("MSG_ファイルの保存に失敗しました", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Select Song file に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string MSG_ファイル選択ダイアログのタイトル {

@@ -103,7 +103,7 @@ namespace DTXMania2
                             var ss = new StreamStringForNamedPipe( pipeToViewer );
                             ss.WriteString( "ping" );
 
-                            var msg = "二重起動はできません。";
+                            var msg = Properties.Resources.TXT_二重起動はできません;
                             Trace.WriteLine( msg );                     // Traceと
                             MessageBox.Show( msg, "DTXMania2 error" );  // ダイアログに表示。
                             return;
@@ -214,7 +214,6 @@ namespace DTXMania2
 
                 // メインループ
 
-                CultureInfo.CurrentUICulture = new CultureInfo( "en-US" );
                 Application.SetHighDpiMode( HighDpiMode.SystemAware );
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault( false );

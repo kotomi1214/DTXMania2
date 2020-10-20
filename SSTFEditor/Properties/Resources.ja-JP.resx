@@ -132,6 +132,9 @@
   <data name="MSG_ビュアー選択ダイアログのフィルタ" xml:space="preserve">
     <value>実行ファイル (*.exe)|*.exe</value>
   </data>
+  <data name="MSG_ファイルの保存に失敗しました" xml:space="preserve">
+    <value>ファイルの保存に失敗しました。</value>
+  </data>
   <data name="MSG_ファイル選択ダイアログのタイトル" xml:space="preserve">
     <value>読み込むファイルの選択</value>
   </data>

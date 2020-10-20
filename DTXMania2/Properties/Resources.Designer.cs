@@ -71,6 +71,15 @@ namespace DTXMania2.Properties {
         }
         
         /// <summary>
+        ///   Failed to log on as AutoPlayer. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_AutoPlayerでのログオンに失敗しました {
+            get {
+                return ResourceManager.GetString("TXT_AutoPlayerでのログオンに失敗しました", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   China position に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string TXT_Chinaの表示位置 {
@@ -275,6 +284,15 @@ namespace DTXMania2.Properties {
         internal static string TXT_レーンの透明度 {
             get {
                 return ResourceManager.GetString("TXT_レーンの透明度", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   It is not possible to run more than one at a time. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_二重起動はできません {
+            get {
+                return ResourceManager.GetString("TXT_二重起動はできません", resourceCulture);
             }
         }
         

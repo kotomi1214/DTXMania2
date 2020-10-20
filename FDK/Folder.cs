@@ -88,7 +88,7 @@ namespace FDK
         ///     下記のようなファイルがあるとする。
         ///         d:\images\message.txt
         ///         d:\images\ja-JP\message.txt
-        ///         d:\images\en\/message.txt
+        ///         d:\images\en\message.txt
         ///         d:\images\en-US\message.txt
         ///     このメソッドに "d:\images\message.txt" を渡すと、現在のカルチャに従って、以下のように返される。
         ///         現在のカルチャ          戻り値

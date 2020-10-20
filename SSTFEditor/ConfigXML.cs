@@ -104,7 +104,7 @@ namespace SSTFEditor
             }
             catch( Exception e )
             {
-                MessageBox.Show( $"ファイルの保存に失敗しました。[{ファイル名}]\n--------\n{e.ToString()}" );
+                MessageBox.Show( $"{Properties.Resources.MSG_ファイルの保存に失敗しました} [{ファイル名}]\n--------\n{e.ToString()}" );
             }
         }
 
