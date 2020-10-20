@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using SharpDX;
 using FDK;
+using YamlDotNet.Core;
 
 namespace DTXMania2
 {
@@ -122,9 +123,17 @@ namespace DTXMania2
             SystemConfig config = null!;
             if( File.Exists( path.変数なしパス ) )
             {
-                var yamlText = File.ReadAllText( path.変数なしパス );
-                var deserializer = new Deserializer();
-                config = deserializer.Deserialize<SystemConfig>( yamlText );
+                try
+                {
+                    var yamlText = File.ReadAllText( path.変数なしパス );
+                    var deserializer = new Deserializer();
+                    config = deserializer.Deserialize<SystemConfig>( yamlText );
+                }
+                catch( YamlException e )
+                {
+                    Log.ERROR( $"YAMLの読み込み時に失敗しました。[{e.Message}]" );
+                    config = null!;
+                }
 
                 if( VERSION != config.Version )
                     config = null!;
