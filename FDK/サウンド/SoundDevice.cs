@@ -123,6 +123,13 @@ namespace FDK
                         throw;
                     }
                 }
+
+                // DevicePeriod をログ表示。
+                this._AudioClient.GetDevicePeriodNative( out long defaultDevicePeriod, out long minimumDevicePeriod );
+                if( this._共有モード == AudioClientShareMode.Shared )
+                    Log.Info( $"DevicePeriod: {defaultDevicePeriod / 10_000}ms (Shared)" );
+                else
+                    Log.Info( $"DevicePeriod: {minimumDevicePeriod / 10_000}ms (Exclusive)" );
                 //----------------
                 #endregion
 
