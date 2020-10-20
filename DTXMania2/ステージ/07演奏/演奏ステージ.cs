@@ -710,7 +710,7 @@ namespace DTXMania2.演奏
                     var chip = this._指定された時刻に一番近いチップを返す(
                         補正された入力時刻sec,
                         検索開始チップ番号: this._描画開始チップ番号,
-                        検索条件: ( c ) => {
+                        追加の検索条件: ( c ) => {
 
                             #region " チップ c が入力にヒットしているなら true を返す。"
                             //----------------
@@ -756,9 +756,9 @@ namespace DTXMania2.演奏
                                 // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
                                 // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
                                 var 入力のヒット判定対象となる入力グループ種別集合 =
-                                    userConfig.ドラムチッププロパティリスト.チップtoプロパティ
-                                    .Where( ( kvp ) => kvp.Value.ドラム入力種別 == 入力.Type )
-                                    .Select( ( kvp ) => kvp.Value.入力グループ種別 );
+                                    from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
+                                    where kvp.Value.ドラム入力種別 == 入力.Type
+                                    select kvp.Value.入力グループ種別;
 
                                 // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
                                 if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == chipProperty.入力グループ種別 ) ) )
@@ -803,6 +803,8 @@ namespace DTXMania2.演奏
                             入力とチップの時間差sec );
 
                         this.成績.エキサイトゲージを更新する( ヒット判定 );
+
+                        どのチップにもヒットしなかった = false;
                         //----------------
                         #endregion
                     }
@@ -820,9 +822,29 @@ namespace DTXMania2.演奏
 
                         var chip = this._指定された時刻に一番近いチップを返す(
                             補正された入力時刻sec,
-                            検索開始チップ番号: 0,
-                            検索条件: ( chip ) =>
-                                Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ].ドラム入力種別 == 入力.Type );
+                            検索開始チップ番号: 0,   // 常に先頭から
+                            追加の検索条件: ( chip ) => {
+
+                                var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
+
+                                if( prop.ドラム入力種別 == 入力.Type )
+                                    return true;
+
+                                // 入力グループ判定：
+                                // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
+                                // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
+                                var 入力のヒット判定対象となる入力グループ種別集合 =
+                                    from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
+                                    where kvp.Value.ドラム入力種別 == 入力.Type
+                                    select kvp.Value.入力グループ種別;
+
+                                // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
+                                if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == prop.入力グループ種別 ) ) )
+                                    return false;
+
+                                return true;
+
+                            } );
 
                         if( null != chip )  // あった
                         {
@@ -1936,9 +1958,9 @@ namespace DTXMania2.演奏
         /// <summary>
         ///     該当するチップが1つもなかったら null を返す。
         /// </summary>
-        private SSTF.チップ? _指定された時刻に一番近いチップを返す( double 時刻sec, int 検索開始チップ番号, Func<SSTF.チップ, bool> 検索条件 )
+        private SSTF.チップ? _指定された時刻に一番近いチップを返す( double 時刻sec, int 検索開始チップ番号, Func<SSTF.チップ, bool> 追加の検索条件 )
         {
-            if( 0 == 検索開始チップ番号 )
+            if( 0 > 検索開始チップ番号 )
                 return null;    // 演奏が完全に終わっていたらチップも返さない。
 
             var 一番近いチップ = (SSTF.チップ?)null;
@@ -1949,7 +1971,7 @@ namespace DTXMania2.演奏
             {
                 var chip = Global.App.演奏スコア.チップリスト[ i ];
 
-                if( !検索条件( chip ) )
+                if( !追加の検索条件( chip ) )
                     continue;   // 検索条件を満たさないチップは無視
 
                 var 今回の時刻差の絶対値sec = Math.Abs( chip.描画時刻sec - 時刻sec );
