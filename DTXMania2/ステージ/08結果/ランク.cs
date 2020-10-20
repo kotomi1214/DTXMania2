@@ -41,8 +41,8 @@ namespace DTXMania2.結果
                 Global.Effekseer.Manager.SetShown( this._ランクエフェクトハンドル, false );
             }
 
-            this._エフェクト開始タイマ.Dispose();
-            this._エフェクト開始イベント.Dispose();
+            this._エフェクト開始タイマ?.Dispose();
+            this._エフェクト開始イベント?.Dispose();
 
             //foreach( var rankEffect in this._ランクエフェクト.Values )
             //    rankEffect.Dispose(); --> 不要
