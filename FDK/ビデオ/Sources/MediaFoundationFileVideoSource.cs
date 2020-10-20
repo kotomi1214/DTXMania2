@@ -33,6 +33,12 @@ namespace FDK
 
         public double 再生速度 { get; protected set; } = 1.0;
 
+        /// <summary>
+        ///     ビデオが再生中（デコーダタスクが稼働中）ならtrue。
+        ///     一時停止中であってもtrue。
+        /// </summary>
+        public bool IsPlaying => ( this._デコードタスク != null && !this._デコードタスク.IsCompleted );
+
 
 
         // 生成と終了
