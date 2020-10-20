@@ -179,7 +179,11 @@ namespace DTXMania2.選曲
             if( node is RandomSelectNode )
             {
                 // RandomNode 用説明文
-                dc.DrawText( 難易度ラベル + " 付近を\nランダムに選択", this._説明文用TextFormat, new RectangleF( 基点X + 4f, 基点Y + 30f, 157f - 8f, 40f ), 文字ブラシ );
+                dc.DrawText( 
+                    string.Format( new string(Properties.Resources.TXT_ランダムに選択), 難易度ラベル ), 
+                    this._説明文用TextFormat, 
+                    new RectangleF( 基点X + 4f, 基点Y + 30f, 157f - 8f, 40f ),
+                    文字ブラシ );
             }
             else if( !string.IsNullOrEmpty( 難易度ラベル ) && 0.00 != 難易度値 )
             {

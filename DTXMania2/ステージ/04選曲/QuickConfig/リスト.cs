@@ -34,6 +34,7 @@ namespace DTXMania2.選曲.QuickConfig
             {
                 var image = new 文字列画像D2D() {
                     表示文字列 = this.選択肢リスト[ i ],
+                    フォント名 = Properties.Resources.TXT_評価記号用フォント,
                     フォントサイズpt = 34f,
                     前景色 = Color.White,
                 };

@@ -26,7 +26,7 @@ namespace DTXMania2.結果
 
             public アイコン()
             {
-                this._アイコン画像 = new 画像D2D( @"$(Images)\ResultStage\SkillIcon.png" );
+                this._アイコン画像 = new 画像D2D( @"$(Images)\ResultStage\SkillsBySongIcon.png" );
             }
 
             public void Dispose()

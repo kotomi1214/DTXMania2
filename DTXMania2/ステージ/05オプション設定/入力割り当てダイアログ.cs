@@ -51,14 +51,14 @@ namespace DTXMania2.オプション設定
             this._変更あり = false;
 
             // 初期メッセージを出力。
-            this.listView入力リスト.Items.Add( $"HID Keyboard の受付を開始しました。" );
+            this.listView入力リスト.Items.Add( Properties.Resources.TXT_HIDKeyboardの受付を開始しました );
             for( int i = 0; i < Global.App.ドラム入力.MidiIns.DeviceName.Count; i++ )
-                this.listView入力リスト.Items.Add( $"MIDI IN [{i}] '{Global.App.ドラム入力.MidiIns.DeviceName[ i ]}' の受付を開始しました。" );
+                this.listView入力リスト.Items.Add( string.Format( Properties.Resources.TXT_MidiInの受付を開始しました, i, Global.App.ドラム入力.MidiIns.DeviceName[ i ] ) );
             this.listView入力リスト.Items.Add( "" );
-            this.listView入力リスト.Items.Add( "* タイミングクロック信号、アクティブ信号は無視します。" );
-            this.listView入力リスト.Items.Add( "* 入力と入力の間が500ミリ秒以上開いた場合は、間に空行を表示します。" );
+            this.listView入力リスト.Items.Add( Properties.Resources.TXT_タイミングクロック信号_アクティブ信号は無視します );
+            this.listView入力リスト.Items.Add( Properties.Resources.TXT_入力と入力の間が500ミリ秒以上開いた場合は間に空行を表示します );
             this.listView入力リスト.Items.Add( "" );
-            this.listView入力リスト.Items.Add( "キーボードまたはMIDI信号を入力してください。" );
+            this.listView入力リスト.Items.Add( Properties.Resources.TXT_キーボードまたはMIDI信号を入力してください );
             //----------------
             #endregion
 
@@ -84,7 +84,7 @@ namespace DTXMania2.オプション設定
                             .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
                             .Select( ( kvp ) => kvp.Value );
                         if( 0 < drumType.Count() )
-                            item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+                            item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
 
                         this._一定時間が経っていれば空行を挿入する();
 
@@ -143,7 +143,7 @@ namespace DTXMania2.オプション設定
                             .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
                             .Select( ( kvp ) => kvp.Value );
                         if( 0 < drumType.Count() )
-                            item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+                            item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
 
                         this._一定時間が経っていれば空行を挿入する();
 
@@ -215,7 +215,7 @@ namespace DTXMania2.オプション設定
                     .Select( ( kvp ) => kvp.Value );
 
                 if( 0 < drumType.Count() )
-                    item.Text += $" （現在の割り当て: {drumType.ElementAt( 0 )}）";
+                    item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
 
                 this._一定時間が経っていれば空行を挿入する();
 
@@ -530,7 +530,10 @@ namespace DTXMania2.オプション設定
             // ※ウィンドウを閉じようとした時も Cancel になる。
             if( this.DialogResult == DialogResult.Cancel && this._変更あり )
             {
-                var dr = MessageBox.Show( "変更を破棄していいですか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2 );
+                var dr = MessageBox.Show(
+                    Properties.Resources.TXT_変更を破棄していいですか,
+                    Properties.Resources.TXT_確認,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2 );
 
                 if( dr == DialogResult.No )
                     e.Cancel = true;

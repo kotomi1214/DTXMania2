@@ -12,7 +12,11 @@ namespace DTXMania2
     class 画像D2D : FDK.画像D2D
     {
         public 画像D2D( VariablePath 画像ファイルパス, BitmapProperties1? bitmapProperties1 = null )
-            : base( Global.GraphicResources.WicImagingFactory2, Global.GraphicResources.既定のD2D1DeviceContext, 画像ファイルパス, bitmapProperties1 )
+            : base(
+                  Global.GraphicResources.WicImagingFactory2,
+                  Global.GraphicResources.既定のD2D1DeviceContext,
+                  Folder.カルチャを考慮した絶対パスを返す( 画像ファイルパス.変数なしパス ),
+                  bitmapProperties1 )
         {
         }
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -213,6 +214,7 @@ namespace DTXMania2
 
                 // ÉÅÉCÉìÉãÅ[Év
 
+                CultureInfo.CurrentUICulture = new CultureInfo( "en-US" );
                 Application.SetHighDpiMode( HighDpiMode.SystemAware );
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault( false );

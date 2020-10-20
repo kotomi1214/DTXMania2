@@ -51,12 +51,12 @@ namespace DTXMania2.曲
 
             // 評価BOX を追加する。
             var ratingBoxLabel = new[] {
-                "評価 なし",
-                "評価 ☆",
-                "評価 ☆☆",
-                "評価 ☆☆☆",
-                "評価 ☆☆☆☆",
-                "評価 ☆☆☆☆☆",
+                Properties.Resources.TXT_評価なし,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価1,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価2,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価3,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価4,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価5,
             };
             this._評価BOX = new BoxNode[ 6 ];   // 0～5
             for( int i = 0; i < this._評価BOX.Length; i++ )

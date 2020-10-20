@@ -19,7 +19,7 @@ namespace DTXMania2.演奏
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._数字画像 = new フォント画像D2D( @"$(Images)\ParameterFont_Large.png", @"$(Images)\ParameterFont_Large.yaml", 文字幅補正dpx: 0f );
-            this._達成率ロゴ画像 = new 画像D2D( @"$(Images)\AchivementLogo.png" );
+            this._達成率ロゴ画像 = new 画像D2D( @"$(Images)\CompletionRateIcon.png" );
         }
 
         public virtual void Dispose()
@@ -48,7 +48,7 @@ namespace DTXMania2.演奏
 
             var 変換行列2D =
                 Matrix3x2.Scaling( 0.4f, 0.5f ) *
-                Matrix3x2.Translation( 描画領域.X - 46f, 描画領域.Y - 60f );
+                Matrix3x2.Translation( 描画領域.X - 76f, 描画領域.Y - 40f );
 
             this._達成率ロゴ画像.描画する( dc, 変換行列2D );
 

@@ -99,7 +99,7 @@ namespace DTXMania2.選曲
         /// </summary>
         private readonly List<Panel> _パネルs = new List<Panel>() {
             new Panel( @"$(Images)\SelectStage\Sorting_All.png" ),
-            new Panel( @"$(Images)\SelectStage\Sorting_Evaluation.png" ),
+            new Panel( @"$(Images)\SelectStage\Sorting_by_Rating.png" ),
         };
 
         private readonly TraceValue _論理パネル番号;

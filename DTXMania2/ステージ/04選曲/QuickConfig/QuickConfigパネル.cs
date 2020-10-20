@@ -52,8 +52,14 @@ namespace DTXMania2.選曲.QuickConfig
             {
                 this._設定項目リスト.Add(
                     new リスト(
-                        名前: "この曲の評価",
-                        選択肢初期値リスト: new[] { "評価なし", "★☆☆☆☆", "★★☆☆☆", "★★★☆☆", "★★★★☆", "★★★★★" },
+                        名前: Properties.Resources.TXT_この曲の評価,
+                        選択肢初期値リスト: new[] {
+                            Properties.Resources.TXT_評価なし, 
+                            Properties.Resources.TXT_評価1,
+                            Properties.Resources.TXT_評価2,
+                            Properties.Resources.TXT_評価3,
+                            Properties.Resources.TXT_評価4,
+                            Properties.Resources.TXT_評価5 },
                         初期選択肢番号: score.譜面の属性?.Rating ?? 0,
                         値が変更された: ( list ) => {
 
@@ -131,12 +137,12 @@ namespace DTXMania2.選曲.QuickConfig
             #endregion
             #region "「オプション設定へ」"
             //----------------
-            this._設定項目リスト.Add( new ラベル( "オプション設定へ" ) );
+            this._設定項目リスト.Add( new ラベル( Properties.Resources.TXT_オプション設定へ ) );
             //----------------
             #endregion
             #region "「戻る」"
             //----------------
-            this._設定項目リスト.Add( new ラベル( "戻る" ) );
+            this._設定項目リスト.Add( new ラベル( Properties.Resources.TXT_戻る ) );
             //----------------
             #endregion
 
@@ -249,28 +255,23 @@ namespace DTXMania2.選曲.QuickConfig
                             }
                             case ラベル label:
                             {
-                                switch( label.名前 )
+                                if( label.名前 == Properties.Resources.TXT_オプション設定へ )
                                 {
-                                    case "オプション設定へ":
-                                    {
-                                        #region " 完了_オプション設定フェーズへ。"
-                                        //----------------
-                                        Global.App.システムサウンド.再生する( システムサウンド種別.決定音 );
-                                        this.現在のフェーズ = フェーズ.完了_オプション設定;
-                                        break;
-                                        //----------------
-                                        #endregion
-                                    }
-                                    case "戻る":
-                                    {
-                                        #region " 完了_戻る フェーズへ。"
-                                        //----------------
-                                        Global.App.システムサウンド.再生する( システムサウンド種別.取消音 );
-                                        this.現在のフェーズ = フェーズ.完了_戻る;
-                                        break;
-                                        //----------------
-                                        #endregion
-                                    }
+                                    #region " 完了_オプション設定フェーズへ。"
+                                    //----------------
+                                    Global.App.システムサウンド.再生する( システムサウンド種別.決定音 );
+                                    this.現在のフェーズ = フェーズ.完了_オプション設定;
+                                    //----------------
+                                    #endregion
+                                }
+                                else if( label.名前 == Properties.Resources.TXT_戻る )
+                                {
+                                    #region " 完了_戻る フェーズへ。"
+                                    //----------------
+                                    Global.App.システムサウンド.再生する( システムサウンド種別.取消音 );
+                                    this.現在のフェーズ = フェーズ.完了_戻る;
+                                    //----------------
+                                    #endregion
                                 }
                                 break;
                             }

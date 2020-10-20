@@ -29,7 +29,10 @@ namespace DTXMania2.オプション設定
 
 
         public パネル_ONOFFトグル( string パネル名, bool 初期状態はON, Action<パネル>? 値の変更処理 = null )
-            : base( パネル名, new[] { ("OFF", Color.Red), ("ON", Color4.White) }, ( 初期状態はON ) ? 1 : 0, 値の変更処理 )
+            : base( パネル名, new[] {
+                ( Properties.Resources.TXT_OFF, Color.Red ),
+                ( Properties.Resources.TXT_ON, Color4.White)
+            }, ( 初期状態はON ) ? 1 : 0, 値の変更処理 )
         {
         }
 

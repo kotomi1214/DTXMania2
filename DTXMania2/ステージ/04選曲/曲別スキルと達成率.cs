@@ -20,8 +20,8 @@ namespace DTXMania2.選曲
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._数字画像 = new フォント画像D2D( @"$(Images)\ParameterFont_LargeBoldItalic.png", @"$(Images)\ParameterFont_LargeBoldItalic.yaml", 文字幅補正dpx: 0f );
-            this._スキルアイコン = new 画像D2D( @"$(Images)\SkillIcon2.png" );
-            this._達成率アイコン = new 画像D2D( @"$(Images)\AchivementLogo.png" );
+            this._スキルアイコン = new 画像D2D( @"$(Images)\SkillIcon.png" );
+            this._達成率アイコン = new 画像D2D( @"$(Images)\CompletionRateIcon.png" );
         }
 
         public virtual void Dispose()
@@ -80,10 +80,10 @@ namespace DTXMania2.選曲
                 // 達成率アイコンを描画する。
                 this._達成率アイコン.描画する(
                     dc,
-                    達成率描画領域.X, 
-                    達成率描画領域.Y - 50f,
-                    X方向拡大率: 0.8f,
-                    Y方向拡大率: 0.8f );
+                    達成率描画領域.X + 30f, 
+                    達成率描画領域.Y - 40f,
+                    X方向拡大率: 0.6f,
+                    Y方向拡大率: 0.6f );
 
                 // 小数部と '%' を描画する。
                 var 拡大率 = new Size2F( 0.8f, 0.8f );
@@ -113,7 +113,7 @@ namespace DTXMania2.選曲
                 // スキルアイコンを描画する。
                 this._スキルアイコン.描画する( 
                     dc,
-                    スキル描画領域.X,
+                    スキル描画領域.X + 20f,
                     スキル描画領域.Y + 10f,
                     X方向拡大率: 0.5f,
                     Y方向拡大率: 0.4f );

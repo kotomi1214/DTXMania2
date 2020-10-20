@@ -67,7 +67,7 @@ namespace DTXMania2.オプション設定
                 var 自動演奏フォルダ = new パネル_フォルダ(
 
                     パネル名:
-                        "自動演奏",
+                        Properties.Resources.TXT_自動演奏,
 
                     親パネル:
                         this.パネルツリーのルートノード,
@@ -89,7 +89,7 @@ namespace DTXMania2.オプション設定
                     new パネル(
 
                         パネル名:
-                            "すべてON/OFF",
+                            Properties.Resources.TXT_すべてONOFF,
 
                         値の変更処理:
                             ( panel ) => {
@@ -138,7 +138,7 @@ namespace DTXMania2.オプション設定
                     new パネル_システムボタン(
 
                         パネル名:
-                            "設定完了（戻る）",
+                            Properties.Resources.TXT_設定完了_戻る,
 
                         値の変更処理:
                             ( panel ) => {
@@ -161,10 +161,13 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "画面モード",
+                        Properties.Resources.TXT_画面モード,
 
                     選択肢初期値リスト:
-                        new[] { "ウィンドウ", "全画面" },
+                        new[] { 
+                            Properties.Resources.TXT_ウィンドウ,
+                            Properties.Resources.TXT_全画面,
+                        },
 
                     初期選択肢番号:
                         ( systemConfig.全画面モードである ) ? 1 : 0,
@@ -190,7 +193,7 @@ namespace DTXMania2.オプション設定
                 new パネル_倍率(
 
                     パネル名:
-                        "譜面スピード",
+                        Properties.Resources.TXT_譜面スピード,
 
                     初期値:
                         userConfig.譜面スクロール速度,
@@ -218,7 +221,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "演奏中の壁紙表示",
+                        Properties.Resources.TXT_演奏中の壁紙表示,
 
                     初期状態はON:
                         userConfig.スコア指定の背景画像を表示する,
@@ -237,7 +240,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "演奏中の動画表示",
+                        Properties.Resources.TXT_演奏中の動画表示,
 
                     初期状態はON:
                         userConfig.演奏中に動画を表示する,
@@ -256,10 +259,13 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "演奏中の動画サイズ",
+                        Properties.Resources.TXT_演奏中の動画サイズ,
 
                     選択肢初期値リスト:
-                        new[] { "全画面", "中央寄せ" },
+                        new[] { 
+                            Properties.Resources.TXT_演奏中の動画サイズ_全画面, 
+                            Properties.Resources.TXT_演奏中の動画サイズ_中央寄せ,
+                        },
 
                     初期選択肢番号:
                         (int) userConfig.動画の表示サイズ,
@@ -278,7 +284,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "シンバルフリー",
+                        Properties.Resources.TXT_シンバルフリー,
 
                     初期状態はON:
                         userConfig.シンバルフリーモードである,
@@ -300,10 +306,13 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "Rideの表示位置",
+                        Properties.Resources.TXT_Rideの表示位置,
 
                     選択肢初期値リスト:
-                        new[] { "左", "右" },
+                        new[] {
+                            Properties.Resources.TXT_左,
+                            Properties.Resources.TXT_右,
+                        },
 
                     初期選択肢番号:
                         ( userConfig.表示レーンの左右.Rideは左 ) ? 0 : 1,
@@ -326,10 +335,13 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "Chinaの表示位置",
+                        Properties.Resources.TXT_Chinaの表示位置,
 
                     選択肢初期値リスト:
-                        new[] { "左", "右" },
+                        new[] { 
+                            Properties.Resources.TXT_左, 
+                            Properties.Resources.TXT_右,
+                        },
 
                     初期選択肢番号:
                         ( userConfig.表示レーンの左右.Chinaは左 ) ? 0 : 1,
@@ -352,10 +364,13 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "Splashの表示位置",
+                        Properties.Resources.TXT_Splashの表示位置,
 
                     選択肢初期値リスト:
-                        new[] { "左", "右" },
+                        new[] {
+                            Properties.Resources.TXT_左,
+                            Properties.Resources.TXT_右,
+                        },
 
                     初期選択肢番号:
                         ( userConfig.表示レーンの左右.Splashは左 ) ? 0 : 1,
@@ -378,7 +393,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "ドラムサウンド",
+                        Properties.Resources.TXT_ドラムサウンド,
 
                     初期状態はON:
                         userConfig.ドラムの音を発声する,
@@ -397,7 +412,7 @@ namespace DTXMania2.オプション設定
                 new パネル_整数(
 
                     パネル名:
-                        "レーンの透明度",
+                        Properties.Resources.TXT_レーンの透明度,
 
                     最小値:
                         0,
@@ -428,7 +443,7 @@ namespace DTXMania2.オプション設定
                 new パネル_倍率(
 
                     パネル名:
-                        "演奏スピード",
+                        Properties.Resources.TXT_演奏スピード,
 
                     初期値:
                         userConfig.再生速度,
@@ -460,7 +475,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "小節線と拍線の表示",
+                        Properties.Resources.TXT_小節線と拍線の表示,
 
                     初期状態はON:
                         userConfig.演奏中に小節線と拍線を表示する,
@@ -479,7 +494,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "小節番号の表示",
+                        Properties.Resources.TXT_小節番号の表示,
 
                     初期状態はON:
                         userConfig.演奏中に小節番号を表示する,
@@ -498,7 +513,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "判定FAST/SLOWの表示",
+                        Properties.Resources.TXT_判定FASTSLOWの表示,
 
                     初期状態はON:
                         userConfig.演奏中に判定FastSlowを表示する,
@@ -517,7 +532,7 @@ namespace DTXMania2.オプション設定
                 new パネル_ONOFFトグル(
 
                     パネル名:
-                        "音量によるサイズ変化",
+                        Properties.Resources.TXT_音量によるサイズ変化,
 
                     初期状態はON:
                         userConfig.音量に応じてチップサイズを変更する,
@@ -536,10 +551,14 @@ namespace DTXMania2.オプション設定
                 new パネル_文字列リスト(
 
                     パネル名:
-                        "ダークモード",
+                        Properties.Resources.TXT_ダークモード,
 
                     選択肢初期値リスト:
-                        new[] { ("OFF", Color.Red), ("HALF", Color4.White), ("FULL", Color4.White) },
+                        new[] {
+                            ( Properties.Resources.TXT_OFF, Color.Red ),
+                            ( Properties.Resources.TXT_ダークモード_HALF, Color4.White ),
+                            ( Properties.Resources.TXT_ダークモード_FULL, Color4.White),
+                        },
 
                     初期選択肢番号:
                         (int) userConfig.ダーク,
@@ -561,7 +580,7 @@ namespace DTXMania2.オプション設定
                 new パネル_整数(
 
                     パネル名:
-                        "判定位置調整",
+                        Properties.Resources.TXT_判定位置調整,
 
                     最小値:
                         -99,
@@ -592,7 +611,7 @@ namespace DTXMania2.オプション設定
                 new パネル(
 
                     パネル名:
-                        "入力割り当て",
+                        Properties.Resources.TXT_入力割り当て,
 
                     値の変更処理:
                         ( panel ) => {
@@ -611,7 +630,7 @@ namespace DTXMania2.オプション設定
                 new パネル(
 
                     パネル名:
-                        "曲読み込みフォルダ",
+                        Properties.Resources.TXT_曲読み込みフォルダ,
 
                     値の変更処理:
                         ( panel ) => {
@@ -630,7 +649,7 @@ namespace DTXMania2.オプション設定
                 var 初期化フォルダ = new パネル_フォルダ(
 
                     パネル名:
-                        "初期化",
+                        Properties.Resources.TXT_初期化,
 
                     親パネル:
                         this.パネルツリーのルートノード,
@@ -652,7 +671,7 @@ namespace DTXMania2.オプション設定
                     new パネル_システムボタン(
 
                         パネル名:
-                            "戻る",
+                            Properties.Resources.TXT_戻る,
 
                         値の変更処理:
                             ( panel ) => {
@@ -669,7 +688,7 @@ namespace DTXMania2.オプション設定
                     new パネル(
 
                         パネル名:
-                            "設定を初期化",
+                            Properties.Resources.TXT_設定を初期化,
 
                         値の変更処理:
                             ( panel ) => {
@@ -686,7 +705,7 @@ namespace DTXMania2.オプション設定
                     new パネル(
 
                         パネル名:
-                            "曲DBを初期化",
+                            Properties.Resources.TXT_曲DBを初期化,
 
                         値の変更処理:
                             ( panel ) => {
@@ -703,7 +722,7 @@ namespace DTXMania2.オプション設定
                     new パネル(
 
                         パネル名:
-                            "ユーザDBを初期化",
+                            Properties.Resources.TXT_ユーザDBを初期化,
 
                         値の変更処理:
                             ( panel ) => {
@@ -720,7 +739,7 @@ namespace DTXMania2.オプション設定
                     new パネル(
 
                         パネル名:
-                            "成績DBを初期化",
+                            Properties.Resources.TXT_成績DBを初期化,
 
                         値の変更処理:
                             new Action<パネル>( ( panel ) => {
@@ -743,7 +762,7 @@ namespace DTXMania2.オプション設定
                 new パネル_システムボタン(
 
                     パネル名:
-                        "設定完了",
+                        Properties.Resources.TXT_設定完了,
 
                     値の変更処理:
                         ( panel ) => {

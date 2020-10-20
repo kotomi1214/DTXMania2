@@ -72,18 +72,20 @@ namespace DTXMania2
 
                 foreach( var sound in soundList )
                 {
+                    var path = new VariablePath( Folder.カルチャを考慮した絶対パスを返す( sound.path.変数なしパス ) );
+
                     if( !File.Exists( sound.path.変数なしパス ) )
                     {
-                        Log.ERROR( $"サウンドファイルが存在しません。[{sound.path.変数付きパス}]" );
+                        Log.ERROR( $"サウンドファイルが存在しません。[{path.変数付きパス}]" );
                         continue;
                     }
 
 
                     // サウンドファイルを読み込んでデコードする。
-                    var sampleSource = SampleSourceFactory.Create( device, sound.path, 1.0 ); // ドラムサウンドは常に 1.0
+                    var sampleSource = SampleSourceFactory.Create( device, path.変数なしパス, 1.0 ); // ドラムサウンドは常に 1.0
                     if( sampleSource is null )
                     {
-                        Log.ERROR( $"サウンドの生成に失敗しました。[{sound.path.変数付きパス}]" );
+                        Log.ERROR( $"サウンドの生成に失敗しました。[{path.変数付きパス}]" );
                         continue;
                     }
 
@@ -103,7 +105,7 @@ namespace DTXMania2
                     }
                     this._チップtoコンテキスト.Add( (sound.type, 0), context );
 
-                    Log.Info( $"ドラムサウンドを生成しました。[({sound.type.ToString()},0) = {sound.path.変数付きパス}]" );
+                    Log.Info( $"ドラムサウンドを生成しました。[({sound.type},0) = {path.変数付きパス}]" );
                 }
             }
         }

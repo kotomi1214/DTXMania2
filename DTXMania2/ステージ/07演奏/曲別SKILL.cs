@@ -41,7 +41,7 @@ namespace DTXMania2.演奏
                 return;
 
             var skill = (double) スキル値;
-            var 描画領域 = new RectangleF( 108f, 780f, 275f, 98f );
+            var 描画領域 = new RectangleF( 108f, 780f-40f, 275f, 98f );
             string スキル値文字列 = skill.ToString( "0.00" ).PadLeft( 6 ).Replace( ' ', 'o' );  // 右詰め、余白は'o'。
 
             // 曲別SKILLアイコンを描画する
