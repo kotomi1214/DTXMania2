@@ -185,7 +185,7 @@ namespace SSTFEditor
             "Floor Tom",
             "Right Cymbal",
             "BGV",
-            "BGA",
+            "BGM",
             //-----------------
             #endregion
         };
@@ -216,6 +216,7 @@ namespace SSTFEditor
             { 20, SSTF.チップ種別.China },
             { 21, SSTF.チップ種別.Splash },
             { 22, SSTF.チップ種別.背景動画 },
+            { 23, SSTF.チップ種別.BGM },
             //----------------
             #endregion
         };
@@ -245,7 +246,8 @@ namespace SSTFEditor
             "Cup",
             "China Cymbal",
             "Splash Cymbal",
-            "BGA",
+            "BGV",
+            "BGM",
             //-----------------
             #endregion
         };
