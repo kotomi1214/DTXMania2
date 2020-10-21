@@ -526,7 +526,7 @@ namespace DTXMania2
                 // ドラム入力を入力履歴に追加登録する。
                 if( 入力履歴を記録する &&
                     ev.押された &&                         // 押下入力だけを記録する。
-                    ドラム入力.InputEvent.Control != 0 )   // コントロールチェンジは入力履歴の対象外とする。
+                    ドラム入力.InputEvent.Control == 0 )   // コントロールチェンジは入力履歴の対象外とする。
                 {
                     double 入力時刻sec = ev.TimeStamp;
 
