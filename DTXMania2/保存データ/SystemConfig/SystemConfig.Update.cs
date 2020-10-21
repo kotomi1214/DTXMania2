@@ -25,7 +25,7 @@ namespace DTXMania2
                 var yamlText = File.ReadAllText( path.変数なしパス );
                 var yamlStream = new YamlStream();
                 yamlStream.Load( new StringReader( yamlText ) );
-                var rootMapping = (YamlMappingNode) yamlStream.Documents[ 0 ].RootNode;
+                var rootMapping = (YamlMappingNode)yamlStream.Documents[ 0 ].RootNode;
                 var versionNode = new YamlScalarNode( "Version" );
                 if( rootMapping.Children.ContainsKey( versionNode ) )
                 {

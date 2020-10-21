@@ -120,8 +120,8 @@ namespace FDK
             DepthStencilView depthStencilView,
             RenderTargetView renderTargetView,
             DepthStencilState depthStencilState,
-            float 左位置, 
-            float 上位置, 
+            float 左位置,
+            float 上位置,
             float 不透明度0to1 = 1.0f,
             float X方向拡大率 = 1.0f,
             float Y方向拡大率 = 1.0f,
@@ -145,15 +145,15 @@ namespace FDK
         ///	</summary>
         /// <param name="ワールド行列変換">画像は原寸（<see cref="サイズ"/>）にスケーリングされており、その後にこのワールド行列が適用される。</param>
         /// <param name="転送元矩形">テクスチャ座標(値域0～1)で指定する。</param>
-        public void 描画する( 
-            DeviceContext d3dDeviceContext, 
-            Size2F 設計画面サイズdpx, 
-            RawViewportF[] viewports, 
+        public void 描画する(
+            DeviceContext d3dDeviceContext,
+            Size2F 設計画面サイズdpx,
+            RawViewportF[] viewports,
             DepthStencilView depthStencilView,
             RenderTargetView renderTargetView,
             DepthStencilState depthStencilState,
-            Matrix ワールド行列変換, 
-            float 不透明度0to1 = 1f, 
+            Matrix ワールド行列変換,
+            float 不透明度0to1 = 1f,
             RectangleF? 転送元矩形 = null )
         {
             if( this.Texture is null )
@@ -306,8 +306,8 @@ namespace FDK
                 BindFlags = bindFlags,
                 CpuAccessFlags = CpuAccessFlags.None,
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,
-                Height = (int) サイズ.Height,
-                Width = (int) サイズ.Width,
+                Height = (int)サイズ.Height,
+                Width = (int)サイズ.Width,
                 MipLevels = 1,
                 OptionFlags = ResourceOptionFlags.None,
                 SampleDescription = new SharpDX.DXGI.SampleDescription( 1, 0 ),
@@ -335,7 +335,7 @@ namespace FDK
         {
             const float 視野角deg = 45.0f;
 
-            var dz = (float) ( 設計画面サイズdpx.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
+            var dz = (float)( 設計画面サイズdpx.Height / ( 4.0 * Math.Tan( MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
 
             var カメラの位置 = new Vector3( 0f, 0f, -2f * dz );
             var カメラの注視点 = new Vector3( 0f, 0f, 0f );

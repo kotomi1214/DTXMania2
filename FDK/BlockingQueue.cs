@@ -18,7 +18,7 @@ namespace FDK
     {
         public int 最大フレーム数 { get; }
 
-        
+
         public BlockingQueue( int 最大フレーム数 )
         {
             Debug.Assert( 0 < 最大フレーム数 );
@@ -27,14 +27,14 @@ namespace FDK
             this._Queue = new ConcurrentQueue<T>();
             this._Canceled = false;
         }
-        
-        public void Dispose()
+
+        public virtual void Dispose()
         {
             lock( this._Queue排他 )
                 this._キューをクリアする();
         }
 
-        
+
         public void Add( T frame )
         {
             lock( this._Queue排他 )

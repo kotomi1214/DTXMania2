@@ -18,7 +18,7 @@ namespace DTXMania2.選曲
         public 選択曲枠ランナー()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
-            
+
             this._ランナー画像 = new 画像D2D( @"$(Images)\SelectStage\FrameRunner.png" );
         }
 
@@ -40,7 +40,7 @@ namespace DTXMania2.選曲
             this._カウンタ = new LoopCounter( 0, 2300, 1 );
         }
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             if( this._カウンタ is null )
                 return;
@@ -51,13 +51,13 @@ namespace DTXMania2.選曲
 
                 // 上
                 this._ランナー画像.描画する(
-                    dc,
+                    d2ddc,
                     1920f - 割合 * ( 1920f - 1044f ),
                     485f - this._ランナー画像.サイズ.Height / 2f );
 
                 // 下
                 this._ランナー画像.描画する(
-                    dc,
+                    d2ddc,
                     1920f - 割合 * ( 1920f - 1044f ),
                     598f - this._ランナー画像.サイズ.Height / 2f );
             }

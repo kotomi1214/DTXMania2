@@ -53,13 +53,13 @@ namespace FDK
             // サウンドデバイスには、それに合わせたサンプルレートで報告する。
             this.WaveFormat = new WaveFormat(
                 deviceFormat.SampleRate,
-                32,
+                32, // bits
                 deviceFormat.Channels,
                 AudioEncoding.IeeeFloat );
 
             // しかしサウンドデータは、指定された再生速度を乗じたサンプルレートで生成する。
             var waveFormtForResampling = new WaveFormat(
-                (int) ( this.WaveFormat.SampleRate / 再生速度 ),
+                (int)( this.WaveFormat.SampleRate / 再生速度 ),
                 this.WaveFormat.BitsPerSample,
                 this.WaveFormat.Channels,
                 AudioEncoding.IeeeFloat );
@@ -68,16 +68,16 @@ namespace FDK
             using( var resampler = new DmoResampler( waveSource, waveFormtForResampling ) )
             {
                 long サイズbyte = resampler.Length;
-                this._DecodedWaveData = new MemoryTributary( (int) サイズbyte );
+                this._DecodedWaveData = new MemoryTributary( (int)サイズbyte );
 
                 //resampler.Read( this._DecodedWaveData, 0, (int) サイズbyte );
                 //　→ 一気にReadすると、内部の Marshal.AllocCoTaskMem() に OutOfMemory例外を出されることがある。
                 // 　　よって、２秒ずつ分解しながら受け取る。
-                int sizeOf2秒 = (int) this._位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
+                int sizeOf2秒 = (int)this._位置をブロック境界単位にそろえて返す( resampler.WaveFormat.BytesPerSecond * 2, resampler.WaveFormat.BlockAlign );
                 long 変換残サイズbyte = サイズbyte;
                 while( 0 < 変換残サイズbyte )
                 {
-                    int 今回の変換サイズbyte = (int) this._位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残サイズbyte ), resampler.WaveFormat.BlockAlign );
+                    int 今回の変換サイズbyte = (int)this._位置をブロック境界単位にそろえて返す( Math.Min( sizeOf2秒, 変換残サイズbyte ), resampler.WaveFormat.BlockAlign );
 
                     var 中間バッファ = new byte[ 今回の変換サイズbyte ];
                     int 変換できたサイズbyte = resampler.Read( 中間バッファ, 0, 今回の変換サイズbyte );
@@ -94,7 +94,7 @@ namespace FDK
             this._DecodedWaveData.Position = 0;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this._DecodedWaveData.Dispose();
         }
@@ -120,7 +120,7 @@ namespace FDK
             long 読み込み可能な最大count = ( this.Length - this._Position );
 
             if( count > 読み込み可能な最大count )
-                count = (int) 読み込み可能な最大count;
+                count = (int)読み込み可能な最大count;
 
             if( 0 < count )
             {

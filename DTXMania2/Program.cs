@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
 using System.Linq;
@@ -45,7 +44,7 @@ namespace DTXMania2
 
                 #region " AppData に DTXMania2 フォルダがなければ作成する。"
                 //----------------
-                var AppDataフォルダ名 = Path.Combine( 
+                var AppDataフォルダ名 = Path.Combine(
                     Environment.GetFolderPath( Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create ),
                     "DTXMania2" ); // %USERPROFILE%/AppData/local/DTXMania2/
 
@@ -123,7 +122,7 @@ namespace DTXMania2
                 //----------------
                 Log.WriteLine( $"{Application.ProductName} Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000}" );
 
-                var copyrights = (AssemblyCopyrightAttribute[]) Assembly.GetExecutingAssembly().GetCustomAttributes( typeof( AssemblyCopyrightAttribute ), false );
+                var copyrights = (AssemblyCopyrightAttribute[])Assembly.GetExecutingAssembly().GetCustomAttributes( typeof( AssemblyCopyrightAttribute ), false );
                 Log.WriteLine( $"{copyrights[ 0 ].Copyright}" );
                 Log.WriteLine( "" );
 
@@ -220,13 +219,12 @@ namespace DTXMania2
                 App appForm;
                 do
                 {
-                    appForm = new App();
-
-                    // アプリのメインループを実行する。
-                    // アプリが終了するまでこのメソッドからは戻ってこない。
-                    Application.Run( appForm );
-
-                    appForm.Dispose();
+                    using( appForm = new App() )
+                    {
+                        // アプリのメインループを実行する。
+                        // アプリが終了するまでこのメソッドからは戻ってこない。
+                        Application.Run( appForm );
+                    }
 
                 } while( appForm.再起動が必要 );  // 戻ってきた際、再起動フラグが立っていたらここでアプリを再起動する。
 

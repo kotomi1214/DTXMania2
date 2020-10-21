@@ -12,7 +12,7 @@ namespace DTXMania2
     {
         [YamlIgnore]
         public bool ビュアーモードである => ( this.再生開始 || this.再生停止 );
-        
+
         [YamlIgnore]
         public readonly string Usage =
             $"DTXMania2 Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000}\n" +

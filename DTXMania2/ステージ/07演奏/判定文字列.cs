@@ -69,7 +69,7 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             foreach( 表示レーン種別? レーン in Enum.GetValues( typeof( 表示レーン種別 ) ) )
             {
@@ -262,19 +262,19 @@ namespace DTXMania2.演奏
                             var w = 転送元矩形!.Value.Width;
                             var h = 転送元矩形!.Value.Height;
 
-                            var sx = (float) status.光のX方向拡大率.Value;
-                            var sy = (float) status.光のY方向拡大率.Value;
+                            var sx = (float)status.光のX方向拡大率.Value;
+                            var sy = (float)status.光のY方向拡大率.Value;
 
                             var 変換行列2D =
                                 Matrix3x2.Scaling( sx, sy ) *
                                 Matrix3x2.Rotation(
-                                    angle: MathUtil.DegreesToRadians( (float) status.光の回転角.Value ),
+                                    angle: MathUtil.DegreesToRadians( (float)status.光の回転角.Value ),
                                     center: new Vector2( w / 2f, h / 2f ) ) *
-                                Matrix3x2.Translation( 
+                                Matrix3x2.Translation(
                                     status.表示中央位置dpx.X - w / 2f,
                                     status.表示中央位置dpx.Y - h / 2f );
 
-                            this._判定文字列画像.描画する( dc, 変換行列2D, 転送元矩形: 転送元矩形 );
+                            this._判定文字列画像.描画する( d2ddc, 変換行列2D, 転送元矩形: 転送元矩形 );
                         }
                         //----------------
                         #endregion
@@ -286,10 +286,10 @@ namespace DTXMania2.演奏
                             var 転送元矩形 = this._判定文字列の矩形リスト[ status.判定種別.ToString() ]!;
 
                             this._判定文字列画像.描画する(
-                                dc,
+                                d2ddc,
                                 status.表示中央位置dpx.X - 転送元矩形.Value.Width / 2f,
-                                status.表示中央位置dpx.Y - 転送元矩形.Value.Height / 2f + (float) status.文字列影の相対Y位置dpx.Value,
-                                (float) status.文字列影の不透明度.Value,
+                                status.表示中央位置dpx.Y - 転送元矩形.Value.Height / 2f + (float)status.文字列影の相対Y位置dpx.Value,
+                                (float)status.文字列影の不透明度.Value,
                                 転送元矩形: 転送元矩形 );
                         }
                         //----------------
@@ -301,16 +301,16 @@ namespace DTXMania2.演奏
                         {
                             var 転送元矩形 = this._判定文字列の矩形リスト[ status.判定種別.ToString() ]!;
 
-                            var sx = (float) status.文字列本体のX方向拡大率.Value;
-                            var sy = (float) status.文字列本体のY方向拡大率.Value;
+                            var sx = (float)status.文字列本体のX方向拡大率.Value;
+                            var sy = (float)status.文字列本体のY方向拡大率.Value;
 
                             this._判定文字列画像.描画する(
-                                dc,
+                                d2ddc,
                                 status.表示中央位置dpx.X - sx * 転送元矩形.Value.Width / 2f,
-                                status.表示中央位置dpx.Y - sy * 転送元矩形.Value.Height / 2f + (float) status.文字列本体の相対Y位置dpx.Value,
+                                status.表示中央位置dpx.Y - sy * 転送元矩形.Value.Height / 2f + (float)status.文字列本体の相対Y位置dpx.Value,
                                 X方向拡大率: sx,
                                 Y方向拡大率: sy,
-                                不透明度0to1: (float) status.文字列本体の不透明度.Value,
+                                不透明度0to1: (float)status.文字列本体の不透明度.Value,
                                 転送元矩形: 転送元矩形 );
                         }
                         //----------------
@@ -328,7 +328,7 @@ namespace DTXMania2.演奏
 
                             if( status.判定種別 != 判定種別.MISS )
                             {
-                                int FastSlow値 = (int) ( status.FastSlow値sec * 1000.0 ); // ミリ秒、小数切り捨て
+                                int FastSlow値 = (int)( status.FastSlow値sec * 1000.0 ); // ミリ秒、小数切り捨て
                                 int FastSlow値の絶対値 = Math.Abs( FastSlow値 );
                                 var 接尾詞 =
                                     ( FastSlow値の絶対値 < 10 ) ? "_yellow" :
@@ -351,7 +351,7 @@ namespace DTXMania2.演奏
                                 for( int i = 0; i < 文字数; i++ )
                                 {
                                     var 文字矩形 = this._FastSlow数字の矩形リスト[ 文字列[ i ] + 接尾詞 ]!;
-                                    this._FastSlow数字画像.描画する( dc, x, y, X方向拡大率: 拡大率, Y方向拡大率: 拡大率, 転送元矩形: 文字矩形 );
+                                    this._FastSlow数字画像.描画する( d2ddc, x, y, X方向拡大率: 拡大率, Y方向拡大率: 拡大率, 転送元矩形: 文字矩形 );
                                     x += 文字矩形.Value.Width * 拡大率;
                                 }
                             }
@@ -487,7 +487,7 @@ namespace DTXMania2.演奏
                 };
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.アニメ用メンバを解放する();
                 this.現在の状態 = 状態.非表示;

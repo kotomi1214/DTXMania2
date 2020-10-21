@@ -5,8 +5,8 @@ using System.IO;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using SharpDX;
-using FDK;
 using YamlDotNet.Core;
+using FDK;
 
 namespace DTXMania2
 {
@@ -121,6 +121,7 @@ namespace DTXMania2
             // (1) 読み込み or 新規作成
 
             SystemConfig config = null!;
+
             if( File.Exists( path.変数なしパス ) )
             {
                 try
@@ -138,6 +139,7 @@ namespace DTXMania2
                 if( VERSION != config.Version )
                     config = null!;
             }
+
             if( config is null )
             {
                 // 新規生成
@@ -166,7 +168,6 @@ namespace DTXMania2
             this.DrumSoundsFolder = new VariablePath( @"$(ResourcesRoot)\Default\DrumSounds" );
             this.SystemSoundsFolder = new VariablePath( @"$(ResourcesRoot)\Default\SystemSounds" );
             this.ImagesFolder = new VariablePath( @"$(ResourcesRoot)\Default\Images" );
-
             this.FootPedal最小値 = 0;
             this.FootPedal最大値 = 90; // VH-11 の Normal Resolution での最大値
 
@@ -270,7 +271,7 @@ namespace DTXMania2
 
         public SystemConfig Clone()
         {
-            return (SystemConfig) this.MemberwiseClone();
+            return (SystemConfig)this.MemberwiseClone();
         }
     }
 }

@@ -35,7 +35,7 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, float 達成率0to100 )
+        public void 進行描画する( DeviceContext d2ddc, float 達成率0to100 )
         {
             var 描画領域 = new RectangleF( 200f, 650f, 165f, 80f );
 
@@ -50,17 +50,17 @@ namespace DTXMania2.演奏
                 Matrix3x2.Scaling( 0.4f, 0.5f ) *
                 Matrix3x2.Translation( 描画領域.X - 76f, 描画領域.Y - 40f );
 
-            this._達成率ロゴ画像.描画する( dc, 変換行列2D );
+            this._達成率ロゴ画像.描画する( d2ddc, 変換行列2D );
 
 
             // 小数部を描画する（'%'含む）
 
-            this._数字画像.描画する( dc, 描画領域.X + 86f, 描画領域.Y + ( 描画領域.Height * 0.2f ), 達成率文字列[ 4.. ], new Size2F( 0.5f, 0.8f ) );
+            this._数字画像.描画する( d2ddc, 描画領域.X + 86f, 描画領域.Y + ( 描画領域.Height * 0.2f ), 達成率文字列[ 4.. ], new Size2F( 0.5f, 0.8f ) );
 
 
             // 整数部を描画する（'.'含む）
 
-            this._数字画像.描画する( dc, 描画領域.X, 描画領域.Y, 達成率文字列[ 0..4 ], new Size2F( 0.5f, 1.0f ) );
+            this._数字画像.描画する( d2ddc, 描画領域.X, 描画領域.Y, 達成率文字列[ 0..4 ], new Size2F( 0.5f, 1.0f ) );
         }
 
 

@@ -12,6 +12,7 @@ namespace DTXMania2.演奏
 
         // 生成と終了
 
+
         public 早送りアイコン()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );

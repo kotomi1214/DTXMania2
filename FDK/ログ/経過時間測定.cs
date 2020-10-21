@@ -29,12 +29,12 @@ namespace FDK
                 this.経過ポイント( "開始" );
             }
         }
-        
+
         public void 経過ポイント( string ポイント名 )
         {
             lock( this._lock )
             {
-                this.スタック.TryAdd( ポイント名, (float) ( this._Timer.現在のリアルタイムカウントsec ) );
+                this.スタック.TryAdd( ポイント名, (float)( this._Timer.現在のリアルタイムカウントsec ) );
             }
         }
 
@@ -42,7 +42,7 @@ namespace FDK
         {
             lock( this._lock )
             {
-                this.スタック.TryAdd( $"{this._count}", (float) ( this._Timer.現在のリアルタイムカウントsec ) );
+                this.スタック.TryAdd( $"{this._count}", (float)( this._Timer.現在のリアルタイムカウントsec ) );
                 this._count++;
             }
         }
@@ -53,7 +53,7 @@ namespace FDK
             {
                 double 直前の時刻 = 0.0;
                 var sortedDic = this.スタック.OrderBy( ( kvp ) => ( kvp.Value ) );
-                
+
                 for( int i = 0; i < sortedDic.Count(); i++ )
                 {
                     var kvp = sortedDic.ElementAt( i );
@@ -74,7 +74,7 @@ namespace FDK
 
 
         private QPCTimer _Timer = new QPCTimer();
-        
+
         private readonly object _lock = new object();
 
         private long _count = 0;

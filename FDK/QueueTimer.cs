@@ -52,7 +52,7 @@ namespace FDK
         /// <summary>
         ///     タイマーを停止する。
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             // タイマーを停止。
             DeleteTimerQueueTimer( this._hTimerQueue, this._hTimer, IntPtr.Zero );

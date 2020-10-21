@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Data;
 using System.Linq;
 using System.Windows.Forms;
@@ -80,9 +81,11 @@ namespace DTXMania2.オプション設定
                         var item = new ListViewItem入力リスト用( InputDeviceType.GameController, inputEvent );
 
                         // 既に割り当てられていたらそのドラム種別を表示。
-                        var drumType = this._変更後のシステム設定.ゲームコントローラtoドラム
-                            .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
-                            .Select( ( kvp ) => kvp.Value );
+                        var drumType =
+                            from kvp in this._変更後のシステム設定.ゲームコントローラtoドラム
+                            where ( kvp.Key.deviceId == item.inputEvent.DeviceID ) && ( kvp.Key.key == item.inputEvent.Key )
+                            select kvp.Value;
+
                         if( 0 < drumType.Count() )
                             item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
 
@@ -139,9 +142,11 @@ namespace DTXMania2.オプション設定
                         var item = new ListViewItem入力リスト用( InputDeviceType.MidiIn, inputEvent );
 
                         // 既に割り当てられていたらそのドラム種別を表示。
-                        var drumType = this._変更後のシステム設定.MIDItoドラム
-                            .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
-                            .Select( ( kvp ) => kvp.Value );
+                        var drumType =
+                            from kvp in this._変更後のシステム設定.MIDItoドラム
+                            where ( kvp.Key.deviceId == item.inputEvent.DeviceID ) && ( kvp.Key.key == item.inputEvent.Key )
+                            select kvp.Value;
+
                         if( 0 < drumType.Count() )
                             item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
 
@@ -167,7 +172,7 @@ namespace DTXMania2.オプション設定
 
                     g.FillRectangle( 背景色, 全体矩形 );
 
-                    int 最大値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._変更後のシステム設定.FootPedal最大値 / 127.0 ) );
+                    int 最大値用差分 = (int)( 全体矩形.Height * ( 1.0 - this._変更後のシステム設定.FootPedal最大値 / 127.0 ) );
                     var 最大値ゲージ矩形 = new System.Drawing.Rectangle(
                         全体矩形.X,
                         全体矩形.Y + 最大値用差分,
@@ -175,7 +180,7 @@ namespace DTXMania2.オプション設定
                         全体矩形.Height - 最大値用差分 );
                     g.FillRectangle( 最大値ゲージ色, 最大値ゲージ矩形 );
 
-                    int 現在値用差分 = (int) ( 全体矩形.Height * ( 1.0 - this._FootPedal現在値 / 127.0 ) );
+                    int 現在値用差分 = (int)( 全体矩形.Height * ( 1.0 - this._FootPedal現在値 / 127.0 ) );
                     var ゲージ矩形 = new System.Drawing.Rectangle(
                         全体矩形.X,
                         全体矩形.Y + 現在値用差分,
@@ -195,7 +200,7 @@ namespace DTXMania2.オプション設定
                 //----------------
                 var inputEvent = new InputEvent() {
                     DeviceID = 0,
-                    Key = (int) arg.KeyCode,
+                    Key = (int)arg.KeyCode,
                     TimeStamp = 0,
                     Velocity = 100,
                     押された = true,
@@ -204,15 +209,16 @@ namespace DTXMania2.オプション設定
 
                 var item = new ListViewItem入力リスト用( InputDeviceType.Keyboard, inputEvent );
 
-                if( inputEvent.Key == (int) Keys.Escape )    // 割り当てされてほしくないキーはここへ。
+                if( inputEvent.Key == (int)Keys.Escape )    // 割り当てされてほしくないキーはここへ。
                 {
                     item.割り当て可能 = false;
                 }
 
                 // 既に割り当てられていたらそのドラム種別を表示。
-                var drumType = this._変更後のシステム設定.キーボードtoドラム
-                    .Where( ( kvp ) => ( kvp.Key.deviceId == item.inputEvent.DeviceID && kvp.Key.key == item.inputEvent.Key ) )
-                    .Select( ( kvp ) => kvp.Value );
+                var drumType =
+                    from kvp in this._変更後のシステム設定.キーボードtoドラム
+                    where ( kvp.Key.deviceId == item.inputEvent.DeviceID ) && ( kvp.Key.key == item.inputEvent.Key )
+                    select kvp.Value;
 
                 if( 0 < drumType.Count() )
                     item.Text += $" （{Properties.Resources.TXT_現在の割り当て}: {drumType.ElementAt( 0 )}）";
@@ -261,7 +267,7 @@ namespace DTXMania2.オプション設定
             MidiIn,
             Unknown
         }
-        
+
         /// <summary>
         ///     <see cref="listView入力リスト"/> 用の ListViewItem 拡張クラス。
         ///     表示テキストのほかに、入力情報も持つ。
@@ -281,11 +287,11 @@ namespace DTXMania2.オプション設定
                 switch( deviceType )
                 {
                     case InputDeviceType.Keyboard:
-                        this.Text = $"Keyboard, {inputEvent.Key}, '{( (Keys) inputEvent.Key ).ToString()}'";
+                        this.Text = $"Keyboard, {inputEvent.Key}, '{(Keys)inputEvent.Key}'";
                         break;
 
                     case InputDeviceType.GameController:
-                        this.Text = $"GamePad, 0x{inputEvent.Key:X8}, '{HID.GetUsageName( (uint) inputEvent.Key )}'";
+                        this.Text = $"GamePad, 0x{inputEvent.Key:X8}, '{HID.GetUsageName( (uint)inputEvent.Key )}'";
                         break;
 
                     case InputDeviceType.MidiIn:
@@ -293,21 +299,36 @@ namespace DTXMania2.オプション設定
                         {
                             if( 255 != inputEvent.Key )
                             {
-                                this.Text = $"MidiIn[{inputEvent.DeviceID}], {inputEvent.Extra}, ノートオン, Note={inputEvent.Key}, Velocity={inputEvent.Velocity}";
+                                this.Text =
+                                    $"MidiIn[{inputEvent.DeviceID}], " +
+                                    $"{inputEvent.Extra}, " +
+                                    $"{Properties.Resources.TXT_ノートオン}, " +
+                                    $"Note={inputEvent.Key}, " +
+                                    $"Velocity={inputEvent.Velocity}";
                                 this.割り当て可能 = true;                       // 割り当て可
                                 this.ForeColor = System.Drawing.Color.Black;    // 黒
                             }
                             else
                             {
                                 // フットペダル
-                                this.Text = $"MidiIn[{inputEvent.DeviceID}], {inputEvent.Extra}, コントロールチェンジ, Control={inputEvent.Control}(0x{inputEvent.Control:X2}), Value={inputEvent.Velocity}";
+                                this.Text =
+                                    $"MidiIn[{inputEvent.DeviceID}], " +
+                                    $"{inputEvent.Extra}, " +
+                                    $"{Properties.Resources.TXT_コントロールチェンジ}, " +
+                                    $"Control={inputEvent.Control}(0x{inputEvent.Control:X2}), " +
+                                    $"Value={inputEvent.Velocity}";
                                 this.割り当て可能 = false;                      // 割り当て不可
                                 this.ForeColor = System.Drawing.Color.Green;    // 緑
                             }
                         }
                         else if( inputEvent.離された )
                         {
-                            this.Text = $"MidiIn[{inputEvent.DeviceID}], {inputEvent.Extra}, ノートオフ, Note={inputEvent.Key}, Velocity={inputEvent.Velocity}";
+                            this.Text =
+                                $"MidiIn[{inputEvent.DeviceID}], " +
+                                $"{inputEvent.Extra}, " +
+                                $"{Properties.Resources.TXT_ノートオフ}, " +
+                                $"Note={inputEvent.Key}, " +
+                                $"Velocity={inputEvent.Velocity}";
                             this.割り当て可能 = false;                          // 割り当て不可
                             this.ForeColor = System.Drawing.Color.Gray;         // 灰
                         }
@@ -338,11 +359,11 @@ namespace DTXMania2.オプション設定
                 switch( deviceType )
                 {
                     case InputDeviceType.Keyboard:
-                        this.Text = $"Keyboard, {idKey.key}, '{( (Keys) idKey.key ).ToString()}'";
+                        this.Text = $"Keyboard, {idKey.key}, '{(Keys)idKey.key}'";
                         break;
 
                     case InputDeviceType.GameController:
-                        this.Text = $"GamePad, 0x{idKey.key:X8}, '{HID.GetUsageName( (uint) idKey.key )}'";
+                        this.Text = $"GamePad, 0x{idKey.key:X8}, '{HID.GetUsageName( (uint)idKey.key )}'";
                         break;
 
                     case InputDeviceType.MidiIn:
@@ -372,32 +393,26 @@ namespace DTXMania2.オプション設定
         {
             this.listView割り当て済み入力リスト.Items.Clear();
 
+            // 現在選択されているドラム入力種別に割り当てられているキーボード入力をリストに追加。
+            this.listView割り当て済み入力リスト.Items.AddRange(
+                ( from kvp in this._変更後のシステム設定.キーボードtoドラム
+                  where kvp.Value == this._現在選択されているドラム入力種別
+                  select new ListViewItem割り当て済み入力リスト用( InputDeviceType.Keyboard, kvp.Key ) )
+                  .ToArray() );
 
-            // キーボードの反映
+            // 現在選択されているドラム入力種別に割り当てられているゲームコントローラ入力をリストに追加。
+            this.listView割り当て済み入力リスト.Items.AddRange(
+                ( from kvp in this._変更後のシステム設定.ゲームコントローラtoドラム
+                  where kvp.Value == this._現在選択されているドラム入力種別
+                  select new ListViewItem割り当て済み入力リスト用( InputDeviceType.GameController, kvp.Key ) )
+                  .ToArray() );
 
-            var 現在選択されているドラム入力種別に割り当てられているキーボード入力
-                = this._変更後のシステム設定.キーボードtoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
-
-            foreach( var key in 現在選択されているドラム入力種別に割り当てられているキーボード入力 )
-                this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.Keyboard, key.Key ) );
-
-
-            // ゲームコントローラの反映
-
-            var 現在選択されているドラム入力種別に割り当てられているゲームコントローラ入力
-                = this._変更後のシステム設定.ゲームコントローラtoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
-
-            foreach( var key in 現在選択されているドラム入力種別に割り当てられているゲームコントローラ入力 )
-                this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.GameController, key.Key ) );
-
-
-            // MIDI入力の反映
-
-            var 現在選択されているドラム入力種別に割り当てられているMIDI入力 =
-                this._変更後のシステム設定.MIDItoドラム.Where( ( kvp ) => ( kvp.Value == this._現在選択されているドラム入力種別 ) );
-
-            foreach( var note in 現在選択されているドラム入力種別に割り当てられているMIDI入力 )
-                this.listView割り当て済み入力リスト.Items.Add( new ListViewItem割り当て済み入力リスト用( InputDeviceType.MidiIn, note.Key ) );
+            // 現在選択されているドラム入力種別に割り当てられているMIDI入力をリストに追加。
+            this.listView割り当て済み入力リスト.Items.AddRange(
+                ( from kvp in this._変更後のシステム設定.MIDItoドラム
+                  where kvp.Value == this._現在選択されているドラム入力種別
+                  select new ListViewItem割り当て済み入力リスト用( InputDeviceType.MidiIn, kvp.Key ) )
+                  .ToArray() );
 
 
             // 指定された項目があればフォーカスを変更する。
@@ -427,7 +442,7 @@ namespace DTXMania2.オプション設定
             foreach( var itemobj in this.listView入力リスト.SelectedItems )
             {
                 if( ( itemobj is ListViewItem入力リスト用 item ) &&   // 選択されているのが ListViewItem入力リスト用 じゃなければ何もしない。
-                  ( item.割り当て可能 ) )                             // 割り当て可能のもののみ割り当てる。
+                  item.割り当て可能 )                                 // 割り当て可能のもののみ割り当てる。
                 {
                     var idKey = new SystemConfig.IdKey( item.inputEvent );
 
@@ -476,7 +491,7 @@ namespace DTXMania2.オプション設定
         private void comboBoxパッドリスト_SelectedIndexChanged( object sender, EventArgs e )
         {
             this._現在選択されているドラム入力種別 =
-                (ドラム入力種別) Enum.Parse( typeof( ドラム入力種別 ), (string) this.comboBoxパッドリスト.SelectedItem );
+                (ドラム入力種別)Enum.Parse( typeof( ドラム入力種別 ), (string)this.comboBoxパッドリスト.SelectedItem );
 
             this._割り当て済みリストを更新する();
         }

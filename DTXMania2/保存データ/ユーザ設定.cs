@@ -102,8 +102,8 @@ namespace DTXMania2
 
         public 演奏.動画の表示サイズ 動画の表示サイズ
         {
-            get => (演奏.動画の表示サイズ) this._UserConfig.BackgroundMovieSize;
-            set => this._UserConfig.BackgroundMovieSize = (int) value;
+            get => (演奏.動画の表示サイズ)this._UserConfig.BackgroundMovieSize;
+            set => this._UserConfig.BackgroundMovieSize = (int)value;
         }
 
         public bool 演奏中に判定FastSlowを表示する
@@ -120,8 +120,8 @@ namespace DTXMania2
 
         public 演奏.ダーク種別 ダーク
         {
-            get => (演奏.ダーク種別) this._UserConfig.Dark;
-            set => this._UserConfig.Dark = (int) value;
+            get => (演奏.ダーク種別)this._UserConfig.Dark;
+            set => this._UserConfig.Dark = (int)value;
         }
 
 
@@ -150,20 +150,21 @@ namespace DTXMania2
                 { 演奏.判定種別.OK, 0.117 },
             };
             this.ドラムチッププロパティリスト = new 演奏.ドラムチッププロパティリスト(
-                new 演奏.表示レーンの左右() { 
+                new 演奏.表示レーンの左右() {
                     Chinaは左 = false,
-                    Rideは左 = false, 
+                    Rideは左 = false,
                     Splashは左 = true,
                 },
                 演奏.入力グループプリセット種別.基本形 );
+
             this._UserConfig = new UserConfig();
             this._UserConfigから反映する();
         }
 
-        public static ユーザ設定 読み込む( string id )
+        public static ユーザ設定 読み込む( string user_id )
         {
             var config = new ユーザ設定();
-            config._UserConfig = UserConfig.読み込む( id );
+            config._UserConfig = UserConfig.読み込む( user_id );
             config._UserConfigから反映する();
             return config;
         }

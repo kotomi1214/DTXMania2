@@ -44,7 +44,7 @@ namespace DTXMania2.演奏
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._文字画像 = new フォント画像D2D( @"$(Images)\ParameterFont_Small.png", @"$(Images)\ParameterFont_Small.yaml", 文字幅補正dpx: -3f );
-            
+
             this.補間付き速度 = ユーザ設定速度;
         }
 
@@ -118,11 +118,11 @@ namespace DTXMania2.演奏
             }
         }
 
-        public void 描画する( DeviceContext dc, double ユーザ設定速度 )
+        public void 描画する( DeviceContext d2ddc, double ユーザ設定速度 )
         {
             var 表示領域 = new RectangleF( 482, 985f, 48f, 24f );
 
-            this._文字画像.描画する( dc, 表示領域.X, 表示領域.Y, ユーザ設定速度.ToString( "0.0" ) ); // 表示は 補間付き速度 ではない
+            this._文字画像.描画する( d2ddc, 表示領域.X, 表示領域.Y, ユーザ設定速度.ToString( "0.0" ) ); // 表示は 補間付き速度 ではない
         }
 
 

@@ -71,14 +71,14 @@ namespace FDK
         /// <summary>
         ///		ミキサに登録されているサウンドをすべて停止し解放する。
         /// </summary>
-        public void Dispose()
+        public virtual void Dispose()
         {
             lock( this._スレッド間同期 )
             {
                 //foreach( var sound in this._Sounds )
                 //	sound.Dispose();	--> Dispose()する ＝ Stop()する ＝ this._SoundsからRemoveするということなので、foreachは使えない。
 
-                var sound = (Sound?) null;
+                var sound = (Sound?)null;
                 while( null != ( sound = this._Sounds.Last?.Value ) )
                     sound.Dispose();
 
@@ -199,8 +199,8 @@ namespace FDK
                             for( int i = 出力バッファの出力開始位置, n = 0; n < 受け取ったサンプル数; i++, n++ )
                             {
                                 float data = this._中間バッファ[ n ] // 原音
-                                    * sound.Volume                  // 個別音量（Sound）
-                                    * this._Volume;                 // マスタ音量（ミキサ）
+                                    * sound.Volume                   // 個別音量（Sound）
+                                    * this._Volume;                  // マスタ音量（ミキサ）
 
                                 // 先に無音を出力済みなので、上書きかどうかを気にしないで常に加算。
 
@@ -215,7 +215,7 @@ namespace FDK
                         }
                     }
 
-                    
+
                     // 再生が終了したSoundをサウンドリストから削除する。
 
                     foreach( var sound in 再生終了したSound一覧 )

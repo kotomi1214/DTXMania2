@@ -17,7 +17,7 @@ namespace DTXMania2
         ///     指定した画像ファイルから描画可能画像を作成する。
         /// </summary>
         public 描画可能画像( VariablePath 画像ファイルパス, BindFlags bindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget )
-            : base( 
+            : base(
                   Global.GraphicResources.D3D11Device1,
                   Global.GraphicResources.既定のD2D1DeviceContext,
                   Folder.カルチャを考慮した絶対パスを返す( 画像ファイルパス.変数なしパス ),
@@ -28,8 +28,12 @@ namespace DTXMania2
         /// <summary>
         ///     指定したサイズの、空の描画可能画像を作成する。
         /// </summary>
-        public 描画可能画像( Size2F サイズ, BindFlags bindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget)
-            : base( Global.GraphicResources.D3D11Device1, Global.GraphicResources.既定のD2D1DeviceContext, サイズ, bindFlags )
+        public 描画可能画像( Size2F サイズ, BindFlags bindFlags = BindFlags.ShaderResource | BindFlags.RenderTarget )
+            : base(
+                  Global.GraphicResources.D3D11Device1,
+                  Global.GraphicResources.既定のD2D1DeviceContext,
+                  サイズ,
+                  bindFlags )
         {
         }
 

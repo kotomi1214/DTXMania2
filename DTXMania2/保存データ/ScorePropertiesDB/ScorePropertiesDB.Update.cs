@@ -9,13 +9,13 @@ namespace DTXMania2
 {
     partial class ScorePropertiesDB
     {
-		public static void 最新版にバージョンアップする()
+        public static void 最新版にバージョンアップする()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             // DBのバージョンを取得。
             using var db = new ScorePropertiesDB();
-            int version = (int) db.UserVersion;
+            int version = (int)db.UserVersion;
 
             while( version < ScorePropertiesDBRecord.VERSION )
             {
@@ -32,10 +32,12 @@ namespace DTXMania2
 
                         version = ScorePropertiesDBRecord.VERSION;
                         db.UserVersion = version;
+
                         Log.Info( $"ScorePropertiesDB バージョン {version} を生成しました。" );
-                        break;
                         //----------------
                         #endregion
+
+                        break;
                     }
                 }
             }

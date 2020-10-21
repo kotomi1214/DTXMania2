@@ -51,7 +51,7 @@ namespace FDK
                 this.サウンドリスト[ i ] = new Sound( device, sampleSource );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             foreach( var sound in this.サウンドリスト )
                 sound.Dispose();

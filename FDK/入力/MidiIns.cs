@@ -198,10 +198,10 @@ namespace FDK
             if( 0 > deviceID )
                 return;
 
-            byte ch = (byte) ( dwParam1 & 0xFF );
-            byte ev = (byte) ( dwParam1 & 0xF0 );
-            byte p1 = (byte) ( ( dwParam1 >> 8 ) & 0xFF );
-            byte p2 = (byte) ( ( dwParam1 >> 16 ) & 0xFF );
+            byte ch = (byte)( dwParam1 & 0xFF );
+            byte ev = (byte)( dwParam1 & 0xF0 );
+            byte p1 = (byte)( ( dwParam1 >> 8 ) & 0xFF );
+            byte p2 = (byte)( ( dwParam1 >> 16 ) & 0xFF );
 
             if( ( 0x90 == ev ) && ( 0 != p2 ) )  // Velocity(p2)==0 を NoteOFF 扱いとする機器があるのでそれに倣う
             {

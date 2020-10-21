@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using SharpDX;
 
 namespace DTXMania2
@@ -8,7 +8,12 @@ namespace DTXMania2
     class 文字列画像 : FDK.文字列画像
     {
         public 文字列画像()
-            : base( Global.GraphicResources.D3D11Device1, Global.GraphicResources.DWriteFactory, Global.GraphicResources.D2D1Factory1, Global.GraphicResources.既定のD2D1DeviceContext, Global.GraphicResources.設計画面サイズ )
+            : base(
+                  Global.GraphicResources.D3D11Device1,
+                  Global.GraphicResources.DWriteFactory,
+                  Global.GraphicResources.D2D1Factory1,
+                  Global.GraphicResources.既定のD2D1DeviceContext,
+                  Global.GraphicResources.設計画面サイズ )
         {
         }
 

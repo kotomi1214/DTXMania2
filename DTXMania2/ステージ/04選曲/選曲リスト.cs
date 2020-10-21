@@ -71,7 +71,7 @@ namespace DTXMania2.選曲
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             var フォーカスノード = Global.App.曲ツリーリスト.SelectedItem!.フォーカスノード;
 
@@ -138,8 +138,8 @@ namespace DTXMania2.選曲
             //----------------
             if( this._現在のフォーカスノード != フォーカスノード )
             {
-                // (A) 別のノードがフォーカスされた
-
+                #region " (A) 別のノードがフォーカスされた場合 "
+                //----------------
                 this._現在のフォーカスノード = フォーカスノード;
                 this._プレビュー音声.停止する();
 
@@ -166,11 +166,13 @@ namespace DTXMania2.選曲
                 {
                     // (A-b) 新しくフォーカスされたのは SongNode ではない
                 }
+                //----------------
+                #endregion
             }
             else if( フォーカスノード is SongNode snode && null != snode.曲.フォーカス譜面 )
             {
-                // (B) フォーカスノードは変更されておらず、同一の SongNode のままである
-
+                #region " (B) フォーカスノードは変更されておらず、同一の SongNode のままである場合 "
+                //----------------
                 if( this._現在のフォーカス譜面 != snode.曲.フォーカス譜面 )
                 {
                     // (B-a) 同じ SongNode の別の譜面がフォーカスされた
@@ -196,10 +198,12 @@ namespace DTXMania2.選曲
                 {
                     // (B-b) 同じ SongNode の同じ譜面をフォーカスしたまま変わっていない
                 }
+                //----------------
+                #endregion
             }
             else
             {
-                // (C) フォーカスノードは変更されておらず、それは SongNode でもない
+                // (C) フォーカスノードは変更されておらず、それは SongNode でもない場合 → 何もしない
             }
             //----------------
             #endregion
@@ -219,7 +223,7 @@ namespace DTXMania2.選曲
                 // 10行描画する。
                 for( int i = 0; i < 10; i++ )
                 {
-                    this._リストを1行描画する( dc, i, node );
+                    this._リストを1行描画する( d2ddc, i, node );
                     node = node.次のノード;
                 }
             }
@@ -255,6 +259,7 @@ namespace DTXMania2.選曲
         public void BOXに入る()
         {
             var boxNode = Global.App.曲ツリーリスト.SelectedItem!.フォーカスノード as BoxNode;
+
             if( boxNode is null )
                 return;
 
@@ -269,6 +274,7 @@ namespace DTXMania2.選曲
         public void BOXから出る()
         {
             var node = Global.App.曲ツリーリスト.SelectedItem!.フォーカスノード;
+
             if( node is null || node.親ノード is null )
                 return;
 
@@ -282,20 +288,16 @@ namespace DTXMania2.選曲
 
         public async void フォーカスリストを優先して現行化する()
         {
-            if( Global.App.曲ツリーリスト.SelectedItem!.フォーカスリスト.Any( ( node ) => !node.現行化済み ) )
+            var focusList = Global.App.曲ツリーリスト.SelectedItem!.フォーカスリスト;
+
+            if( focusList.Any( ( node ) => !node.現行化済み ) )
             {
                 // 現行化スタックは FIFO なので、このスタックに Push するだけで他より優先して現行化されるようになる。
                 // このスタックには、すでに Push 済みのノードを重ねて Push しても構わない。（現行化済みのノードは単に無視されるため。）
-                await Global.App.現行化.追加するAsync( Global.App.曲ツリーリスト.SelectedItem!.フォーカスリスト );
+                await Global.App.現行化.追加するAsync( focusList );
 
                 // さらに、SongNode 以外（BOX名や「戻る」など）を優先する。
-                var nodes = new List<Node>();
-                foreach( var node in Global.App.曲ツリーリスト.SelectedItem!.フォーカスリスト )
-                {
-                    if( !( node is SongNode ) )
-                        nodes.Add( node );
-                }
-                await Global.App.現行化.追加するAsync( nodes );
+                await Global.App.現行化.追加するAsync( focusList.Where( ( node ) => !( node is SongNode ) ).ToArray() );
             }
         }
 
@@ -311,6 +313,7 @@ namespace DTXMania2.選曲
                 await Global.App.現行化.追加するAsync( new Node[] { node } );
             }
         }
+
 
 
         // ローカル
@@ -379,45 +382,45 @@ namespace DTXMania2.選曲
         ///		一番上:0 ～ 9:一番下。
         ///		「静止時の」可視範囲は 1～8。4 がフォーカスノード。
         ///	</param>
-        private void _リストを1行描画する( DeviceContext dc, int 行番号, Node node )
+        private void _リストを1行描画する( DeviceContext d2ddc, int 行番号, Node node )
         {
             bool 選択ノードである = ( 4 == 行番号 );
 
             float 実数行番号 = 行番号 + this._曲リスト全体のY軸移動オフセット / 100.0f;
 
             var ノード左上dpx = new Vector2(
-                this._曲リストの基準左上隅座標dpx.X + ( 選択ノードである ? (float) ( this._選択ノードの表示オフセットdpx?.Value ?? 0f ) : 0f ),
+                this._曲リストの基準左上隅座標dpx.X + ( 選択ノードである ? (float)( this._選択ノードの表示オフセットdpx?.Value ?? 0f ) : 0f ),
                 this._曲リストの基準左上隅座標dpx.Y + ( 実数行番号 * _ノードの高さdpx ) );
 
-            var preBlend = dc.PrimitiveBlend;
+            var preBlend = d2ddc.PrimitiveBlend;
 
             #region " 背景 "
             //----------------
-            dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+            d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
             if( node is BoxNode )
             {
                 #region " BOXノードの背景 "
                 //----------------
-                using var brush = new SolidColorBrush( dc, new Color4( 0xffa3647c ) );
+                using var brush = new SolidColorBrush( d2ddc, new Color4( 0xffa3647c ) );
                 using var pathGeometry = new PathGeometry( Global.GraphicResources.D2D1Factory1 );
                 using( var sink = pathGeometry.Open() )
                 {
                     sink.SetFillMode( FillMode.Winding );
-                    sink.BeginFigure( new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ), FigureBegin.Filled );             // 点1
+                    sink.BeginFigure( new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ), FigureBegin.Filled );         // 点1
                     var points = new SharpDX.Mathematics.Interop.RawVector2[] {
-                            new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	                                  // → 点2
-                            new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),                                     // → 点3
-                            new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	              // → 点4
-                            new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),  // → 点5
-                            new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	                              // → 点6
-                            new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	                                          // → 点1
-                        };
+                        new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	                                  // → 点2
+                        new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),                                     // → 点3
+                        new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),	              // → 点4
+                        new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),  // → 点5
+                        new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	                              // → 点6
+                        new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	                                          // → 点1
+                    };
                     sink.AddLines( points );
                     sink.EndFigure( FigureEnd.Closed );
                     sink.Close();
                 }
-                dc.FillGeometry( pathGeometry, brush );
+                d2ddc.FillGeometry( pathGeometry, brush );
                 //----------------
                 #endregion
             }
@@ -425,25 +428,25 @@ namespace DTXMania2.選曲
             {
                 #region " BACK, RandomSelectノードの背景 "
                 //----------------
-                using var brush = new SolidColorBrush( dc, Color4.Black );
+                using var brush = new SolidColorBrush( d2ddc, Color4.Black );
                 using var pathGeometry = new PathGeometry( Global.GraphicResources.D2D1Factory1 );
                 using( var sink = pathGeometry.Open() )
                 {
                     sink.SetFillMode( FillMode.Winding );
-                    sink.BeginFigure( new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ), FigureBegin.Filled ); // 点1
+                    sink.BeginFigure( new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ), FigureBegin.Filled );       // 点1
                     var points = new SharpDX.Mathematics.Interop.RawVector2[] {
-                            new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	                          // → 点2
-							new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),	                          // → 点3
-							new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),               // → 点4
-							new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),  // → 点5
-							new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	                      // → 点6
-							new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	                                  // → 点1
-						};
+                        new Vector2( ノード左上dpx.X + 150f, ノード左上dpx.Y + 8f ),	                                // → 点2
+						new Vector2( ノード左上dpx.X + 170f, ノード左上dpx.Y + 18f ),	                                // → 点3
+						new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + 18f ),             // → 点4
+						new Vector2( Global.GraphicResources.設計画面サイズ.Width, ノード左上dpx.Y + _ノードの高さdpx ),// → 点5
+						new Vector2( ノード左上dpx.X, ノード左上dpx.Y + _ノードの高さdpx ),	                            // → 点6
+						new Vector2( ノード左上dpx.X, ノード左上dpx.Y + 8f ),	                                        // → 点1
+					};
                     sink.AddLines( points );
                     sink.EndFigure( FigureEnd.Closed );
                     sink.Close();
                 }
-                dc.FillGeometry( pathGeometry, brush );
+                d2ddc.FillGeometry( pathGeometry, brush );
                 //----------------
                 #endregion
             }
@@ -451,13 +454,13 @@ namespace DTXMania2.選曲
             {
                 #region " 既定の背景 "
                 //----------------
-                using var brush = new SolidColorBrush( dc, new Color4( 0f, 0f, 0f, 0.25f ) );   // 半透明の黒
-                dc.FillRectangle( new RectangleF( ノード左上dpx.X, ノード左上dpx.Y, Global.GraphicResources.設計画面サイズ.Width - ノード左上dpx.X, _ノードの高さdpx ), brush );
+                using var brush = new SolidColorBrush( d2ddc, new Color4( 0f, 0f, 0f, 0.25f ) );   // 半透明の黒
+                d2ddc.FillRectangle( new RectangleF( ノード左上dpx.X, ノード左上dpx.Y, Global.GraphicResources.設計画面サイズ.Width - ノード左上dpx.X, _ノードの高さdpx ), brush );
                 //----------------
                 #endregion
             }
 
-            dc.PrimitiveBlend = preBlend;
+            d2ddc.PrimitiveBlend = preBlend;
             //----------------
             #endregion
 
@@ -465,7 +468,9 @@ namespace DTXMania2.選曲
             //----------------
             {
                 // ノード画像を縮小して表示する。
-                var ノード画像 = node.現行化済み ? ( node.ノード画像 ?? this._既定のノード画像 ) : this._現行化前のノード画像;
+                var ノード画像 = node.現行化済み ?
+                    ( node.ノード画像 ?? this._既定のノード画像 ) :
+                    this._現行化前のノード画像;
 
                 var ノード内サムネイルオフセットdpx = new Vector3( 58f, 4f, 0f );
                 var サムネイル表示左上dpx = new Vector2(
@@ -484,7 +489,7 @@ namespace DTXMania2.選曲
                         Matrix3x2.Translation( サムネイル表示左上dpx ) *
                         Matrix3x2.Translation( 0f, +12f );   // ちょっと下へ
 
-                    ノード画像.描画する( dc, 変換行列2D );
+                    ノード画像.描画する( d2ddc, 変換行列2D );
                     //----------------
                     #endregion
                 }
@@ -502,7 +507,7 @@ namespace DTXMania2.選曲
                             this._サムネイル表示サイズdpx.Y / ノード画像.サイズ.Height ) *
                         Matrix3x2.Translation( サムネイル表示左上dpx );
 
-                    ノード画像.描画する( dc, 変換行列2D );
+                    ノード画像.描画する( d2ddc, 変換行列2D );
                     //----------------
                     #endregion
                 }
@@ -515,6 +520,7 @@ namespace DTXMania2.選曲
             if( node is SongNode snode )
             {
                 var score = snode.曲.フォーカス譜面;
+
                 if( null != score )
                 {
                     if( score.最高記録を現行化済み && ( null != score.最高記録 ) )
@@ -525,7 +531,7 @@ namespace DTXMania2.選曲
                         #region " 成績アイコン "
                         //----------------
                         this._成績アイコン.描画する(
-                            dc,
+                            d2ddc,
                             ノード左上dpx.X + 6f,
                             ノード左上dpx.Y + 57f,
                             転送元矩形: this._成績アイコンの矩形リスト[ 最高ランク.ToString()! ] );
@@ -535,22 +541,22 @@ namespace DTXMania2.選曲
                         #region " 達成率ゲージ "
                         //----------------
                         this._達成率ゲージアイコン.描画する(
-                            dc,
+                            d2ddc,
                             ノード左上dpx.X + 160f,
                             ノード左上dpx.Y - 27f,
                             X方向拡大率: 0.4f,
                             Y方向拡大率: 0.4f );
 
                         this._達成率数字画像.描画する(
-                            dc,
+                            d2ddc,
                             ノード左上dpx.X + 204f,
                             ノード左上dpx.Y + 4,
                             score.最高記録.Achievement.ToString( "0.00" ).PadLeft( 6 ) + '%',
                             拡大率: new Size2F( 0.3f, 0.3f ) );
 
-                        using var ゲージ色 = new SolidColorBrush( dc, new Color( 184, 156, 231, 255 ) );
-                        using var ゲージ枠色 = new SolidColorBrush( dc, Color.White );
-                        using var ゲージ背景色 = new SolidColorBrush( dc, new Color( 0.25f, 0.25f, 0.25f, 1f ) );
+                        using var ゲージ色 = new SolidColorBrush( d2ddc, new Color( 184, 156, 231, 255 ) );
+                        using var ゲージ枠色 = new SolidColorBrush( d2ddc, Color.White );
+                        using var ゲージ背景色 = new SolidColorBrush( d2ddc, new Color( 0.25f, 0.25f, 0.25f, 1f ) );
                         using var ゲージ枠ジオメトリ = new PathGeometry( Global.GraphicResources.D2D1Factory1 );
                         using var ゲージジオメトリ = new PathGeometry( Global.GraphicResources.D2D1Factory1 );
 
@@ -559,7 +565,7 @@ namespace DTXMania2.選曲
 
                         using( var sink = ゲージジオメトリ.Open() )
                         {
-                            var 割合0to1 = (float) ( 達成率 / 100.0 );
+                            var 割合0to1 = (float)( 達成率 / 100.0 );
                             var p = new Vector2[] {
                                 new Vector2( ゲージ位置.X, ゲージ位置.Y ),                                                                    // 左上
                                 new Vector2( ゲージ位置.X + ゲージサイズdpx.Width * 割合0to1, ゲージ位置.Y ),                                 // 右上
@@ -591,10 +597,10 @@ namespace DTXMania2.選曲
                             sink.Close();
                         }
 
-                        dc.FillGeometry( ゲージ枠ジオメトリ, ゲージ背景色 );
-                        dc.FillGeometry( ゲージジオメトリ, ゲージ色 );
-                        dc.DrawGeometry( ゲージジオメトリ, ゲージ枠色, 1f );
-                        dc.DrawGeometry( ゲージ枠ジオメトリ, ゲージ枠色, 2f );
+                        d2ddc.FillGeometry( ゲージ枠ジオメトリ, ゲージ背景色 );
+                        d2ddc.FillGeometry( ゲージジオメトリ, ゲージ色 );
+                        d2ddc.DrawGeometry( ゲージジオメトリ, ゲージ枠色, 1f );
+                        d2ddc.DrawGeometry( ゲージ枠ジオメトリ, ゲージ枠色, 2f );
                         //----------------
                         #endregion
                     }
@@ -608,7 +614,7 @@ namespace DTXMania2.選曲
                         if( 0 < 評価 )
                         {
                             this._評価アイコン.描画する(
-                                dc,
+                                d2ddc,
                                 ノード左上dpx.X + 6f,
                                 ノード左上dpx.Y + 0f,
                                 転送元矩形: this._評価アイコンの矩形リスト[ 評価.ToString() ] );
@@ -632,8 +638,8 @@ namespace DTXMania2.選曲
 
                 if( null != image )
                 {
-                    image.描画する( 
-                        dc,
+                    image.描画する(
+                        d2ddc,
                         ノード左上dpx.X + 170f,
                         ノード左上dpx.Y + 20f,
                         X方向拡大率: ( image.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / image.画像サイズdpx.Width );
@@ -654,7 +660,7 @@ namespace DTXMania2.選曲
                 if( null != image )
                 {
                     image.描画する(
-                        dc,
+                        d2ddc,
                         ノード左上dpx.X + 190f,
                         ノード左上dpx.Y + 70f,
                         X方向拡大率: ( image.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / image.画像サイズdpx.Width );

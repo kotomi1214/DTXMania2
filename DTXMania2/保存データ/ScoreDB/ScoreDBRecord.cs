@@ -253,17 +253,17 @@ namespace DTXMania2
                 ", @MinBPM" +
                 ", @MaxBPM" +
                 ", @TotalNotes_LeftCymbal" +
-                ", @TotalNotes_HiHat"+
-                ", @TotalNotes_LeftPedal"+
-                ", @TotalNotes_Snare"+
-                ", @TotalNotes_Bass"+
-                ", @TotalNotes_HighTom"+
-                ", @TotalNotes_LowTom"+
-                ", @TotalNotes_FloorTom"+
-                ", @TotalNotes_RightCymbal"+
-                ", @PreImage"+
-                ", @Artist"+
-                ", @PreSound"+
+                ", @TotalNotes_HiHat" +
+                ", @TotalNotes_LeftPedal" +
+                ", @TotalNotes_Snare" +
+                ", @TotalNotes_Bass" +
+                ", @TotalNotes_HighTom" +
+                ", @TotalNotes_LowTom" +
+                ", @TotalNotes_FloorTom" +
+                ", @TotalNotes_RightCymbal" +
+                ", @PreImage" +
+                ", @Artist" +
+                ", @PreSound" +
                 ", @BGMAdjust" +
                 ")", scoredb.Connection );
 
@@ -336,21 +336,21 @@ namespace DTXMania2
             // 譜面内のすべてのチップについて……
             foreach( var chip in score.チップリスト )
             {
-                var ドラムチッププロパティ = userConfig.ドラムチッププロパティリスト[ chip.チップ種別 ];
+                var prop = userConfig.ドラムチッププロパティリスト[ chip.チップ種別 ];
 
                 // 1. AutoPlay ON のチップは、すべてが ON である場合を除いて、カウントしない。
-                if( userConfig.AutoPlay[ ドラムチッププロパティ.AutoPlay種別 ] )
+                if( userConfig.AutoPlay[ prop.AutoPlay種別 ] )
                 {
                     if( !( userConfig.AutoPlayがすべてONである ) )
                         continue;
                 }
 
                 // 2. AutoPlay OFF 時でも、ユーザヒットの対象にならないチップはカウントしない。
-                if( !( ドラムチッププロパティ.AutoPlayOFF_ユーザヒット ) )
+                if( !( prop.AutoPlayOFF_ユーザヒット ) )
                     continue;
 
                 // カウント。
-                ノーツ数マップ[ ドラムチッププロパティ.表示レーン種別 ]++;
+                ノーツ数マップ[ prop.表示レーン種別 ]++;
             }
 
             return ノーツ数マップ;
@@ -360,15 +360,15 @@ namespace DTXMania2
         {
             var result = (最小BPM: double.MaxValue, 最大BPM: double.MinValue);
 
-            var BPMchips = score.チップリスト.Where( ( c ) => ( c.チップ種別 == SSTF.チップ種別.BPM ) );
-            foreach( var chip in BPMchips )
+            foreach( var chip in score.チップリスト.Where( ( c ) => ( c.チップ種別 == SSTF.チップ種別.BPM ) ) )
             {
                 result.最小BPM = Math.Min( result.最小BPM, chip.BPM );
                 result.最大BPM = Math.Max( result.最大BPM, chip.BPM );
             }
 
-            if( result.最小BPM == double.MaxValue || result.最大BPM == double.MinValue )    // BPMチップがひとつもなかった
+            if( result.最小BPM == double.MaxValue || result.最大BPM == double.MinValue )
             {
+                // BPMチップがひとつもなかった
                 double 初期BPM = SSTF.スコア.初期BPM;
                 result = (初期BPM, 初期BPM);
             }

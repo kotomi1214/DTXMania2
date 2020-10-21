@@ -4,9 +4,6 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using System.Threading;
-using Windows.ApplicationModel.Background;
-using System.Globalization;
 
 namespace DTXMania2.タイトル
 {
@@ -54,7 +51,7 @@ namespace DTXMania2.タイトル
             this.現在のフェーズ = フェーズ.表示;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -139,8 +136,8 @@ namespace DTXMania2.タイトル
             this._システム情報.VPSをカウントする();
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
-            
+            dc.Transform = Matrix3x2.Identity;
+
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示:
@@ -196,22 +193,23 @@ namespace DTXMania2.タイトル
 
         private readonly 文字列画像D2D _パッドを叩いてください;
 
-        private void _タイトルロゴを描画する( DeviceContext dc )
+        private void _タイトルロゴを描画する( DeviceContext d2ddc )
         {
-            this._タイトルロゴ.描画する( dc,
+            this._タイトルロゴ.描画する( d2ddc,
                 ( Global.GraphicResources.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
                 ( Global.GraphicResources.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
         }
 
-        private void _メッセージを描画する( DeviceContext dc )
+        private void _メッセージを描画する( DeviceContext d2ddc )
         {
-            dc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
+            d2ddc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
+
             if( this._パッドを叩いてください.画像サイズdpx.Width == 0 )
             {
                 // 画像が未生成なら先に生成する。描画時に画像サイズが必要なため。
-                this._パッドを叩いてください.ビットマップを生成または更新する( dc );
+                this._パッドを叩いてください.ビットマップを生成または更新する( d2ddc );
             }
-            this._パッドを叩いてください.描画する( dc, Global.GraphicResources.設計画面サイズ.Width / 2f - this._パッドを叩いてください.画像サイズdpx.Width / 2f, 810f );
+            this._パッドを叩いてください.描画する( d2ddc, Global.GraphicResources.設計画面サイズ.Width / 2f - this._パッドを叩いてください.画像サイズdpx.Width / 2f, 810f );
         }
     }
 }

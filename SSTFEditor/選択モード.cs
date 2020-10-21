@@ -14,7 +14,7 @@ namespace SSTFEditor
             this.Form = form;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.選択領域用のブラシ?.Dispose();
             this.選択領域用のブラシ = null;

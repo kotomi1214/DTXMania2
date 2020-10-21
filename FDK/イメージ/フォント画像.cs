@@ -63,17 +63,17 @@ namespace FDK
         /// <param name="基点のX位置">左揃えなら左端位置、右揃えなら右端位置のX座標。</param>
         /// <param name="拡大率">文字列の拡大率。null なら等倍。</param>
         /// <param name="右揃え">trueなら右揃え、falseなら左揃え。</param>
-        public void 描画する( 
+        public void 描画する(
             DeviceContext d3dDeviceContext,
             Size2F 設計画面サイズdpx,
             RawViewportF[] viewports,
             DepthStencilView depthStencilView,
             RenderTargetView renderTargetView,
             DepthStencilState depthStencilState,
-            float 基点のX位置, 
-            float 上位置, 
-            string 表示文字列, 
-            Size2F? 拡大率 = null, 
+            float 基点のX位置,
+            float 上位置,
+            string 表示文字列,
+            Size2F? 拡大率 = null,
             bool 右揃え = false )
         {
             if( string.IsNullOrEmpty( 表示文字列 ) )
@@ -125,7 +125,7 @@ namespace FDK
         private bool _有効文字の矩形と文字数を抽出し文字列全体のサイズを返す( string 表示文字列, Size2F 拡大率, out Size2F 文字列全体のサイズ, out int 有効文字数, out IEnumerable<RectangleF?> 有効文字矩形リスト )
         {
             文字列全体のサイズ = Size2F.Empty;
-            
+
             有効文字矩形リスト =
                 from 文字 in 表示文字列
                 where ( null != this._矩形リスト[ 文字.ToString() ] )

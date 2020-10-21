@@ -14,12 +14,12 @@ namespace DTXMania2
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             using var db = new ScoreDB();
-            int version = (int) db.UserVersion;
+            int version = (int)db.UserVersion;
 
-            // v007 から、SognDB.sqlite3 が ScoreDB.sqlire3 に改名された。
+            // v007 から、SongDB.sqlite3 が ScoreDB.sqlire3 に改名された。
             var songdbPath = new VariablePath( @"$(AppData)\SongDB.sqlite3" );
             using var songdb = File.Exists( songdbPath.変数なしパス ) ? new SQLiteDB( songdbPath.変数なしパス ) : null; // なければ null
-            int songdb_version = (int) ( songdb?.UserVersion ?? -1 );    // なければ負数
+            int songdb_version = (int)( songdb?.UserVersion ?? -1 );    // なければ負数
 
             while( version < ScoreDBRecord.VERSION )
             {
@@ -60,9 +60,10 @@ namespace DTXMania2
                                 break;
 
                             case 6:
-                            #region " 6 → 最新版 "
-                            //----------------
                             {
+                                #region " 6 → 最新版 "
+                                //----------------
+
                                 // ScoreDB 側に、最新バージョンのテーブルを作成する。
 
                                 foreach( var query in new[] {
@@ -117,11 +118,13 @@ namespace DTXMania2
 
                                 version = ScoreDBRecord.VERSION;
                                 db.UserVersion = version;
+
                                 Log.Info( $"ScoreDB をバージョン {version} に更新しました。" );
+                                //----------------
+                                #endregion
+
+                                break;
                             }
-                            //----------------
-                            #endregion
-                            break;
                         }
 
                         break;
@@ -149,10 +152,12 @@ namespace DTXMania2
                         }
                         version = old.SongDBRecord.v006_SongDBRecord.VERSION;
                         db.UserVersion = version;
+
                         Log.Info( $"SongDB をバージョン {version} に更新しました。" );
-                        break;
                         //----------------
                         #endregion
+
+                        break;
                     }
                 }
             }

@@ -164,7 +164,7 @@ namespace FDK
 
             var renderTarget =
                 drawingEffect.renderTarget ??    // 指定されたレンダーターゲットを使う。
-                this._D2DDeviceContext;          // 指定がなければ既定のDC。
+                this._D2DDeviceContext;          // 指定がなければ既定のDCを使う。
 
             this._現在の変換行列 = renderTarget.Transform;
             this._現在のDPI = renderTarget.DotsPerInch.Width;
@@ -304,7 +304,7 @@ namespace FDK
         /// </summary>
         /// <param name="clientDrawingContext"></param>
         /// <returns></returns>
-        public override float GetPixelsPerDip( object clientDrawingContext ) 
+        public override float GetPixelsPerDip( object clientDrawingContext )
             => this._現在のDPI;
 
 

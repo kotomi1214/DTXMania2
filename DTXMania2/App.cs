@@ -16,7 +16,7 @@ using SSTF=SSTFormat.v004;
 
 namespace DTXMania2
 {
-    [DebuggerDisplay("Form")]   // Form.ToString() の評価タイムアウト回避用。
+    [DebuggerDisplay( "Form" )]   // Form.ToString() の評価タイムアウト回避用。
     public partial class App : Form
     {
 
@@ -133,15 +133,15 @@ namespace DTXMania2
             Log.Header( "アプリケーション起動" );
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            
+
             // フォームを設定する。
-            
+
             this.Text = $"DTXMania2 Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000}";
             this.ClientSize = new Size( 1024, 576 );
             this.Icon = Properties.Resources.DTXMania2;
-            
+
             this.ScreenMode = new ScreenMode( this );
-            
+
             Global.App = this;
             Global.Handle = this.Handle;
 
@@ -173,14 +173,14 @@ namespace DTXMania2
             if( !this._進行描画タスクを起動する().WaitOne( 5000 ) )
                 throw new TimeoutException( "進行描画タスクの起動処理がタイムアウトしました。" );
 
-            
+
             // 初期化完了。（進行描画タスクの起動後に）
-            
+
             this._未初期化 = false;
 
-            
+
             // 全画面モードが設定されているならここで全画面に切り替える。
-            
+
             if( this.システム設定.全画面モードである )
                 this.ScreenMode.ToFullscreenMode();
 
@@ -254,7 +254,7 @@ namespace DTXMania2
 
                 Log.現在のスレッドに名前をつける( "進行描画" );
                 Log.Info( "進行描画タスクを起動しました。" );
-                
+
                 this._進行描画タスクのNETスレッドID = Thread.CurrentThread.ManagedThreadId;
                 Thread.CurrentThread.Priority = ThreadPriority.AboveNormal;
 
@@ -308,8 +308,8 @@ namespace DTXMania2
                     物理画面サイズ: new SharpDX.Size2F( this.ClientSize.Width, this.ClientSize.Height ) );
 
                 画像.全インスタンスで共有するリソースを作成する(
-                    Global.GraphicResources.D3D11Device1, 
-                    @"$(Images)\TextureVS.cso", 
+                    Global.GraphicResources.D3D11Device1,
+                    @"$(Images)\TextureVS.cso",
                     @"$(Images)\TexturePS.cso" );
 
                 this.システムサウンド = new システムサウンド();  // 個々のサウンドの生成は後工程で。
@@ -357,7 +357,7 @@ namespace DTXMania2
 
                             case TaskMessage.内容名.サイズ変更:
                             {
-                                var newSize = (Size) msg.引数![ 0 ];
+                                var newSize = (Size)msg.引数![ 0 ];
                                 Global.GraphicResources.物理画面サイズを変更する( new SharpDX.Size2F( newSize.Width, newSize.Height ) );
                                 break;
                             }
@@ -571,7 +571,7 @@ namespace DTXMania2
                                 this.ステージ = new 演奏.演奏ステージ();
 
                                 // 曲読み込みステージ画面をキャプチャする（演奏ステージのクロスフェードで使う）
-                                ( (演奏.演奏ステージ) this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
+                                ( (演奏.演奏ステージ)this.ステージ ).キャプチャ画面 = 画面キャプチャ.取得する(
                                     Global.GraphicResources.D3D11Device1,
                                     Global.GraphicResources.DXGISwapChain1,
                                     Global.GraphicResources.既定のD3D11RenderTargetView,
@@ -731,7 +731,7 @@ namespace DTXMania2
 
             this.ログオフする();
 
-            
+
             // 新しいユーザを選択する。
 
             if( !this.ユーザリスト.SelectItem( ( user ) => user.ID == ユーザID ) )
@@ -753,11 +753,11 @@ namespace DTXMania2
 
             if( !Global.Options.ビュアーモードである )
             {
-                var ratingTree = (曲ツリー_評価順) this.曲ツリーリスト[ 1 ];  // [1]評価順
+                var ratingTree = (曲ツリー_評価順)this.曲ツリーリスト[ 1 ];  // [1]評価順
                 ratingTree.再構築する();
             }
 
-            
+
             // すべての曲ツリーの現行化を開始する。
 
             this.現行化.開始する( roots, this.ログオン中のユーザ );
@@ -784,6 +784,7 @@ namespace DTXMania2
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             var userConfig = this.ユーザリスト.SelectedItem;
+
             if( null != userConfig )
             {
                 this.現行化.終了する();
@@ -1058,6 +1059,7 @@ namespace DTXMania2
 
         private int _進行描画タスクのNETスレッドID;
 
+        
         private void _システム設定をもとにリソース関連のフォルダ変数を更新する()
         {
             // DrumSounds

@@ -38,8 +38,8 @@ namespace DTXMania2.演奏
 
             this._百ごとのアニメ.Dispose();
 
-            for( int i = 0; i < this._各桁のアニメ.Length; i++ )
-                this._各桁のアニメ[ i ].Dispose();
+            foreach( var anim in this._各桁のアニメ )
+                anim.Dispose();
 
             this._コンボ文字画像.Dispose();
         }
@@ -52,7 +52,7 @@ namespace DTXMania2.演奏
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext dc, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext d2ddc, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             int Combo値 = Math.Clamp( 現在の成績.Combo, min: 0, max: 9999 );  // 表示は9999でカンスト。
 
@@ -65,13 +65,13 @@ namespace DTXMania2.演奏
                 this._百ごとのアニメ.開始( Global.Animation );
             }
 
-
             var 数字 = Combo値.ToString().PadLeft( 4 ).Replace( ' ', 'o' ); // 右詰め4桁、余白は 'o'。
             var 画像矩形から表示矩形への拡大率 = new Vector2( 264f / ( 142f * 4f ), 140f / 188f );
             var 文字間隔補正 = -10f;
-            var 全体の拡大率 = new Vector2( (float) ( this._百ごとのアニメ.拡大率?.Value ?? 1.0 ) );
+            var 全体の拡大率 = new Vector2( (float)( this._百ごとのアニメ.拡大率?.Value ?? 1.0 ) );
 
             // 全体のサイズを算出。
+
             var 全体のサイズ = new Vector2( 0f, 0f );
             for( int i = 0; i < 数字.Length; i++ )
             {
@@ -82,8 +82,9 @@ namespace DTXMania2.演奏
             全体のサイズ *= 画像矩形から表示矩形への拡大率;
 
             // 全体の位置を修正。
+
             全体の中央位置.Y -= 全体のサイズ.Y / 2f;
-            var 振動幅 = (float) ( this._百ごとのアニメ.振動幅?.Value ?? 0.0f );
+            var 振動幅 = (float)( this._百ごとのアニメ.振動幅?.Value ?? 0.0f );
             if( 0.0f < 振動幅 )
             {
                 全体の中央位置.X += Global.App.乱数.NextFloat( -振動幅, +振動幅 );
@@ -93,7 +94,7 @@ namespace DTXMania2.演奏
 
             // １桁ずつ描画。
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             #region " 数字を描画。"
             //----------------
@@ -117,19 +118,23 @@ namespace DTXMania2.演奏
 
                     var 転送元矩形 = ( this._コンボ文字の矩形リスト[ 数字[ i ].ToString() ] )!;
 
-                    dc.Transform =
+                    d2ddc.Transform =
                         Matrix3x2.Scaling( 画像矩形から表示矩形への拡大率 ) *
-                        Matrix3x2.Translation( 文字の位置.X, 文字の位置.Y + (float) ( this._各桁のアニメ[ i ].Yオフセット?.Value ?? 0.0f ) ) *
+                        Matrix3x2.Translation( 文字の位置.X, 文字の位置.Y + (float)( this._各桁のアニメ[ i ].Yオフセット?.Value ?? 0.0f ) ) *
                         Matrix3x2.Scaling( 全体の拡大率.X, 全体の拡大率.Y, center: new Vector2( 0f, 全体のサイズ.Y / 2f ) ) *
                         Matrix3x2.Translation( 全体の中央位置 ) *
                         preTrans;
 
-                    dc.DrawBitmap( this._コンボ文字画像.Bitmap, (float) ( this._各桁のアニメ[ i ].不透明度?.Value ?? 1.0f ), BitmapInterpolationMode.Linear, 転送元矩形.Value );
+                    d2ddc.DrawBitmap(
+                        this._コンボ文字画像.Bitmap,
+                        (float)( this._各桁のアニメ[ i ].不透明度?.Value ?? 1.0f ),
+                        BitmapInterpolationMode.Linear,
+                        転送元矩形.Value );
 
                     文字の位置.X += ( 転送元矩形.Value.Width + 文字間隔補正 ) * 画像矩形から表示矩形への拡大率.X;
                 }
 
-                dc.Transform = preTrans;
+                d2ddc.Transform = preTrans;
             }
             //----------------
             #endregion
@@ -140,16 +145,20 @@ namespace DTXMania2.演奏
                 var 転送元矩形 = this._コンボ文字の矩形リスト[ "Combo" ]!;
                 var 文字の位置 = new Vector2( 0f, 130f );
 
-                dc.Transform =
+                d2ddc.Transform =
                     Matrix3x2.Scaling( 画像矩形から表示矩形への拡大率 ) *
                     Matrix3x2.Translation( 文字の位置 ) *
                     Matrix3x2.Scaling( 全体の拡大率 ) *
                     Matrix3x2.Translation( 全体の中央位置 ) *
                     preTrans;
 
-                dc.DrawBitmap( this._コンボ文字画像.Bitmap, 1.0f, BitmapInterpolationMode.Linear, 転送元矩形.Value );
+                d2ddc.DrawBitmap(
+                    this._コンボ文字画像.Bitmap,
+                    1.0f,
+                    BitmapInterpolationMode.Linear,
+                    転送元矩形.Value );
 
-                dc.Transform = preTrans;
+                d2ddc.Transform = preTrans;
             }
             //----------------
             #endregion
@@ -186,7 +195,7 @@ namespace DTXMania2.演奏
             public 各桁のアニメ()
             {
             }
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.Yオフセット?.Dispose();
@@ -249,7 +258,7 @@ namespace DTXMania2.演奏
             public 百ごとのアニメ()
             {
             }
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.拡大率?.Dispose();

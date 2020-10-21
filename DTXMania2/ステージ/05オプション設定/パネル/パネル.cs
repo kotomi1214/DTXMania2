@@ -61,7 +61,7 @@ namespace DTXMania2.オプション設定
             this._パネル名画像.Dispose();
         }
 
-        public override string ToString() => $"{this.パネル名}";
+        public override string ToString() => this.パネル名;
 
 
 
@@ -117,14 +117,14 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public virtual void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
+        public virtual void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置, bool 選択中 )
         {
-            float 拡大率Y = (float) this._パネルの高さ割合.Value;
+            float 拡大率Y = (float)this._パネルの高さ割合.Value;
             float パネルとヘッダの上下マージン = サイズ.Height * ( 1f - 拡大率Y ) / 2f;
             float テキストの上下マージン = 76f * ( 1f - 拡大率Y ) / 2f;
-            var パネル矩形 = new RectangleF( left, top + パネルとヘッダの上下マージン, サイズ.Width, サイズ.Height * 拡大率Y );
-            var ヘッダ矩形 = new RectangleF( left, top + パネルとヘッダの上下マージン, 40f, サイズ.Height * 拡大率Y );
-            var テキスト矩形 = new RectangleF( left + 20f, top + 10f + テキストの上下マージン, 280f, 76f * 拡大率Y );
+            var パネル矩形 = new RectangleF( 左位置, 上位置 + パネルとヘッダの上下マージン, サイズ.Width, サイズ.Height * 拡大率Y );
+            var ヘッダ矩形 = new RectangleF( 左位置, 上位置 + パネルとヘッダの上下マージン, 40f, サイズ.Height * 拡大率Y );
+            var テキスト矩形 = new RectangleF( 左位置 + 20f, 上位置 + 10f + テキストの上下マージン, 280f, 76f * 拡大率Y );
 
             if( 選択中 )
             {
@@ -136,23 +136,23 @@ namespace DTXMania2.オプション設定
 
             // (1) パネルの下地部分の描画。
 
-            using( var パネル背景色 = new SolidColorBrush( dc, new Color4( Color3.Black, 0.5f ) ) )
-            using( var ヘッダ背景色 = new SolidColorBrush( dc, this.ヘッダ色 ) )
-            using( var テキスト背景色 = new SolidColorBrush( dc, Color4.Black ) )
+            using( var パネル背景色 = new SolidColorBrush( d2ddc, new Color4( Color3.Black, 0.5f ) ) )
+            using( var ヘッダ背景色 = new SolidColorBrush( d2ddc, this.ヘッダ色 ) )
+            using( var テキスト背景色 = new SolidColorBrush( d2ddc, Color4.Black ) )
             {
-                dc.FillRectangle( パネル矩形, パネル背景色 );
-                dc.FillRectangle( ヘッダ矩形, ヘッダ背景色 );
-                dc.FillRectangle( テキスト矩形, テキスト背景色 );
+                d2ddc.FillRectangle( パネル矩形, パネル背景色 );
+                d2ddc.FillRectangle( ヘッダ矩形, ヘッダ背景色 );
+                d2ddc.FillRectangle( テキスト矩形, テキスト背景色 );
             }
 
 
             // (2) パネル名の描画。
 
-            this._パネル名画像.ビットマップを生成または更新する( dc );    // 先に画像を更新する。↓で画像サイズを取得するため。
+            this._パネル名画像.ビットマップを生成または更新する( d2ddc );    // 先に画像を更新する。↓で画像サイズを取得するため。
             float 拡大率X = Math.Min( 1f, ( テキスト矩形.Width - 20f ) / this._パネル名画像.画像サイズdpx.Width );    // -20 は左右マージンの最低値[dpx]
 
             this._パネル名画像.描画する(
-                dc,
+                d2ddc,
                 テキスト矩形.Left + ( テキスト矩形.Width - this._パネル名画像.画像サイズdpx.Width * 拡大率X ) / 2f,
                 テキスト矩形.Top + ( テキスト矩形.Height - this._パネル名画像.画像サイズdpx.Height * 拡大率Y ) / 2f,
                 X方向拡大率: 拡大率X,
@@ -212,8 +212,7 @@ namespace DTXMania2.オプション設定
         // ローカル
 
 
-        // パネル名は画像で保持。
-        protected readonly 文字列画像D2D _パネル名画像;
+        protected readonly 文字列画像D2D _パネル名画像;    // パネル名は画像で保持。
 
         protected Action<パネル>? _値の変更処理 = null;
 

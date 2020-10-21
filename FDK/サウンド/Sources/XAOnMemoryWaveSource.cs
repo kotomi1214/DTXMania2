@@ -53,9 +53,9 @@ namespace FDK
 
             // WaveFormat プロパティを構築する。
             this.WaveFormat = new WaveFormat(
-                (int) format.SamplesRate,
-                (int) format.SampleBits,
-                (int) format.Channels,
+                (int)format.SamplesRate,
+                (int)format.SampleBits,
+                (int)format.Channels,
                 AudioEncoding.Pcm );
 
             // デコードする。
@@ -75,7 +75,7 @@ namespace FDK
             Buffer.BlockCopy( pcmbuf, 0, this._DecodedWaveData, 0, this._DecodedWaveData.Length );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
         }
 
@@ -100,13 +100,13 @@ namespace FDK
             long 読み込み可能な最大count = ( this.Length - this._Position );
 
             if( count > 読み込み可能な最大count )
-                count = (int) 読み込み可能な最大count;
+                count = (int)読み込み可能な最大count;
 
             if( 0 < count )
             {
                 Buffer.BlockCopy(
                     src: this._DecodedWaveData,
-                    srcOffset: (int) this._Position,
+                    srcOffset: (int)this._Position,
                     dst: buffer,
                     dstOffset: offset,
                     count: count );

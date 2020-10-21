@@ -69,7 +69,7 @@ namespace FDK
 
             this.WaveFormat = new CSCore.WaveFormat(
                 deviceFormat.SampleRate,
-                32,
+                32, // bits
                 deviceFormat.Channels,
                 CSCore.AudioEncoding.IeeeFloat );
 
@@ -95,7 +95,7 @@ namespace FDK
 
             this.WaveFormat = new CSCore.WaveFormat(
                 deviceFormat.SampleRate,
-                32,
+                32, // bits
                 deviceFormat.Channels,
                 CSCore.AudioEncoding.IeeeFloat );
 
@@ -103,7 +103,7 @@ namespace FDK
 
             this._SourceReaderの取得後の初期化();
         }
-        
+
         private void _SourceReaderの取得後の初期化()
         {
             // 最初のオーディオストリームを選択する。
@@ -138,7 +138,7 @@ namespace FDK
             this._デコードタスク = Task.Factory.StartNew( this._デコードタスクエントリ, this._デコードキャンセル.Token );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             if( !this._Disposed )
             {
@@ -179,7 +179,10 @@ namespace FDK
         public virtual int Read( byte[] buffer, int offset, int count )
         {
             // 前提条件チェック。音がめちゃくちゃになるとうざいので、このメソッド内では例外を出さないこと。
-            if( this._Disposed || ( null == this._SourceReaderEx ) || ( null == this._DecodedWaveDataQueue ) || ( null == buffer ) )
+            if( this._Disposed ||
+                null == this._SourceReaderEx ||
+                null == this._DecodedWaveDataQueue ||
+                null == buffer )
                 return 0;
 
             // ストリームから読み出す。データが不足していてもブロックせずすぐ戻る。

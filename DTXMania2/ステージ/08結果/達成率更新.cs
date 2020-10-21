@@ -169,7 +169,7 @@ namespace DTXMania2.結果
 
                 // シーン1. 待つ
                 {
-                    double シーン期間 = 秒( 達成率更新._最初の待機時間sec /2 );
+                    double シーン期間 = 秒( 達成率更新._最初の待機時間sec / 2 );
                     using( var 中心位置Xの遷移 = Global.Animation.TrasitionLibrary.Constant( duration: シーン期間 ) )
                     using( var 中心位置Yの遷移 = Global.Animation.TrasitionLibrary.Constant( duration: シーン期間 ) )
                     using( var 回転角radの遷移 = Global.Animation.TrasitionLibrary.Constant( duration: シーン期間 ) )
@@ -384,7 +384,7 @@ namespace DTXMania2.結果
             this._数値.アニメを完了する();
         }
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, double 達成率0to100 )
+        public override void 進行描画する( DeviceContext d2ddc, float x, float y, double 達成率0to100 )
         {
             if( this._初めての進行描画 )
             {
@@ -392,33 +392,34 @@ namespace DTXMania2.結果
                 this._アイコン.開始する();
                 this._下線.開始する();
                 this._数値.開始する( 達成率0to100 );
+
                 var start = Global.Animation.Timer.Time;
                 foreach( var anim in this._黒帯アニメーション )
                     anim.ストーリーボード?.Schedule( start );
             }
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             // 黒帯
             foreach( var 黒帯 in this._黒帯アニメーション )
             {
-                dc.Transform =
-                    Matrix3x2.Rotation( (float) 黒帯.回転角rad.Value ) *
-                    Matrix3x2.Translation( (float) 黒帯.中心位置X.Value, (float) 黒帯.中心位置Y.Value ) *
+                d2ddc.Transform =
+                    Matrix3x2.Rotation( (float)黒帯.回転角rad.Value ) *
+                    Matrix3x2.Translation( (float)黒帯.中心位置X.Value, (float)黒帯.中心位置Y.Value ) *
                     preTrans;
 
-                using var brush = new SolidColorBrush( dc, new Color4( 0f, 0f, 0f, (float) 黒帯.不透明度.Value ) );
-                float w = (float) 黒帯.太さ.Value;
+                using var brush = new SolidColorBrush( d2ddc, new Color4( 0f, 0f, 0f, (float)黒帯.不透明度.Value ) );
+                float w = (float)黒帯.太さ.Value;
                 float h = 1600.0f;
                 var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
-                dc.FillRectangle( rc, brush );
+                d2ddc.FillRectangle( rc, brush );
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
 
-            this._アイコン.進行描画する( dc, left, top );
-            this._数値.進行描画する( dc, left + 150f, top + 48f );
-            this._下線.進行描画する( dc, left + 33f, top + 198f );
+            this._アイコン.進行描画する( d2ddc, x, y );
+            this._数値.進行描画する( d2ddc, x + 150f, y + 48f );
+            this._下線.進行描画する( d2ddc, x + 33f, y + 198f );
         }
 
 
@@ -445,7 +446,7 @@ namespace DTXMania2.結果
             public Variable 不透明度 = null!;
             public Storyboard ストーリーボード = null!;
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.不透明度?.Dispose();

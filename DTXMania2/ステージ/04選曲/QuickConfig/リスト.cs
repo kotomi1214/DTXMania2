@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 
@@ -25,11 +25,14 @@ namespace DTXMania2.選曲.QuickConfig
             : base( 名前 )
         {
             this.現在の選択肢番号 = 初期選択肢番号;
+
             if( null != 選択肢初期値リスト )
                 this.選択肢リスト.AddRange( 選択肢初期値リスト );
+
             this._値が変更された = 値が変更された;
 
             this._選択肢文字列画像リスト = new Dictionary<string, 文字列画像D2D>();
+
             for( int i = 0; i < this.選択肢リスト.Count; i++ )
             {
                 var image = new 文字列画像D2D() {
@@ -62,6 +65,7 @@ namespace DTXMania2.選曲.QuickConfig
             {
                 // 前がなければ末尾に戻る。
                 this.現在の選択肢番号 = ( this.現在の選択肢番号 - 1 + this.選択肢リスト.Count ) % this.選択肢リスト.Count;
+
                 this._値が変更された?.Invoke( this );
             }
             else
@@ -69,6 +73,7 @@ namespace DTXMania2.選曲.QuickConfig
                 if( this.現在の選択肢番号 > 0 )
                 {
                     this.現在の選択肢番号--;
+
                     this._値が変更された?.Invoke( this );
                 }
             }
@@ -80,6 +85,7 @@ namespace DTXMania2.選曲.QuickConfig
             {
                 // 次がなければ先頭に戻る。
                 this.現在の選択肢番号 = ( this.現在の選択肢番号 + 1 ) % this.選択肢リスト.Count;
+
                 this._値が変更された?.Invoke( this );
             }
             else
@@ -87,16 +93,17 @@ namespace DTXMania2.選曲.QuickConfig
                 if( this.現在の選択肢番号 < this.選択肢リスト.Count - 1 )
                 {
                     this.現在の選択肢番号++;
+
                     this._値が変更された?.Invoke( this );
                 }
             }
         }
 
-        public override void 進行描画する( DeviceContext dc, float 左位置, float 上位置 )
+        public override void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置 )
         {
             // ラベル
 
-            base.進行描画する( dc, 左位置, 上位置 );
+            base.進行描画する( d2ddc, 左位置, 上位置 );
 
             // 項目
 
@@ -104,7 +111,7 @@ namespace DTXMania2.選曲.QuickConfig
             var 項目名 = this.選択肢リスト[ 項目番号 ];
             var 項目画像 = this._選択肢文字列画像リスト[ 項目名 ];
 
-            項目画像.描画する( dc, 左位置 + 400f, 上位置 );
+            項目画像.描画する( d2ddc, 左位置 + 400f, 上位置 );
         }
 
 

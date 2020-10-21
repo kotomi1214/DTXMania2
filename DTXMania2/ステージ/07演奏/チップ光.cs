@@ -58,9 +58,7 @@ namespace DTXMania2.演奏
 
         public void 表示を開始する( 表示レーン種別 lane )
         {
-            var status = this._レーンtoステータス[ lane ];
-
-            status.現在の状態 = 表示レーンステータス.状態.表示開始;  // 描画スレッドへ通知。
+            this._レーンtoステータス[ lane ].現在の状態 = 表示レーンステータス.状態.表示開始;
         }
 
 
@@ -68,7 +66,7 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             foreach( 表示レーン種別? レーン in Enum.GetValues( typeof( 表示レーン種別 ) ) )
             {
@@ -160,12 +158,12 @@ namespace DTXMania2.演奏
                             var w = 転送元矩形dpx!.Value.Width;
                             var h = 転送元矩形dpx!.Value.Height;
 
-                            var sx = (float) status.放射光の拡大率.Value;
-                            var sy = (float) status.放射光の拡大率.Value;
+                            var sx = (float)status.放射光の拡大率.Value;
+                            var sy = (float)status.放射光の拡大率.Value;
 
                             var 変換行列2D =
                                 Matrix3x2.Rotation(
-                                    angle: MathUtil.DegreesToRadians( (float) status.放射光の回転角.Value ),
+                                    angle: MathUtil.DegreesToRadians( (float)status.放射光の回転角.Value ),
                                     center: new Vector2( w / 2f, h / 2f ) ) *
                                 Matrix3x2.Scaling( sx, sy ) *
                                 Matrix3x2.Translation(
@@ -174,7 +172,7 @@ namespace DTXMania2.演奏
 
                             const float 不透明度 = 0.5f;    // 眩しいので減光
 
-                            this._放射光.描画する( dc, 変換行列2D, 転送元矩形: 転送元矩形dpx, 不透明度0to1: 不透明度 );
+                            this._放射光.描画する( d2ddc, 変換行列2D, 転送元矩形: 転送元矩形dpx, 不透明度0to1: 不透明度 );
                         }
                         //----------------
                         #endregion
@@ -187,8 +185,8 @@ namespace DTXMania2.演奏
                             var w = 転送元矩形dpx!.Value.Width;
                             var h = 転送元矩形dpx!.Value.Height;
 
-                            var sx = (float) status.光輪の拡大率.Value;
-                            var sy = (float) status.光輪の拡大率.Value;
+                            var sx = (float)status.光輪の拡大率.Value;
+                            var sy = (float)status.光輪の拡大率.Value;
 
                             var 変換行列2D =
                                 Matrix3x2.Scaling( sx, sy ) *
@@ -196,7 +194,7 @@ namespace DTXMania2.演奏
                                     status.表示中央位置dpx.X - w * sx / 2f,
                                     status.表示中央位置dpx.Y - h * sy / 2f );
 
-                        this._光輪.描画する( dc, 変換行列2D, 転送元矩形: 転送元矩形dpx, 不透明度0to1: (float) status.光輪の不透明度.Value );
+                            this._光輪.描画する( d2ddc, 変換行列2D, 転送元矩形: 転送元矩形dpx, 不透明度0to1: (float)status.光輪の不透明度.Value );
                         }
                         //----------------
                         #endregion
@@ -254,7 +252,7 @@ namespace DTXMania2.演奏
                 // 表示中央位置は、レーンごとに固定。
                 this.表示中央位置dpx = new Vector2( レーンフレーム.レーン中央位置X[ lane ], 演奏ステージ.ヒット判定位置Ydpx );
             }
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.アニメ用メンバを解放する();
                 this.現在の状態 = 状態.非表示;

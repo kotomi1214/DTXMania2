@@ -32,7 +32,7 @@ namespace DTXMania2.結果
         // 進行と描画
 
 
-        public abstract void 進行描画する( DeviceContext dc, float left, float top, double 達成率0to100 );
+        public abstract void 進行描画する( DeviceContext d2ddc, float x, float y, double 達成率0to100 );
 
         public abstract void アニメを完了する();
     }

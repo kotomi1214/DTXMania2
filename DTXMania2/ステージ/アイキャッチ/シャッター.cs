@@ -20,13 +20,13 @@ namespace DTXMania2
 
             this._ロゴ = new 画像D2D( @"$(Images)\TitleLogo.png" );
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
 
-            this._明るいブラシ = new SolidColorBrush( dc, new Color4( 83f / 255f, 210f / 255f, 255f / 255f, 1f ) );
-            this._ふつうのブラシ = new SolidColorBrush( dc, new Color4( 46f / 255f, 117f / 255f, 182f / 255f, 1f ) );
-            this._濃いブラシ = new SolidColorBrush( dc, new Color4( 0f / 255f, 32f / 255f, 96f / 255f, 1f ) );
-            this._黒ブラシ = new SolidColorBrush( dc, Color4.Black );
-            this._白ブラシ = new SolidColorBrush( dc, Color4.White );
+            this._明るいブラシ = new SolidColorBrush( d2ddc, new Color4( 83f / 255f, 210f / 255f, 255f / 255f, 1f ) );
+            this._ふつうのブラシ = new SolidColorBrush( d2ddc, new Color4( 46f / 255f, 117f / 255f, 182f / 255f, 1f ) );
+            this._濃いブラシ = new SolidColorBrush( d2ddc, new Color4( 0f / 255f, 32f / 255f, 96f / 255f, 1f ) );
+            this._黒ブラシ = new SolidColorBrush( d2ddc, Color4.Black );
+            this._白ブラシ = new SolidColorBrush( d2ddc, Color4.White );
 
             this._シャッターアニメーション = new シャッター情報[ シャッター枚数 ] {
 				#region " *** "
@@ -277,11 +277,11 @@ namespace DTXMania2
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
-        protected override void 進行描画する( DeviceContext dc, StoryboardStatus 描画しないStatus )
+        protected override void 進行描画する( DeviceContext d2ddc, StoryboardStatus 描画しないStatus )
         {
             bool すべて完了 = true;
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             #region " シャッター "
             //----------------
@@ -295,18 +295,19 @@ namespace DTXMania2
                 if( context.ストーリーボード.Status == 描画しないStatus )
                     continue;
 
-                dc.Transform =
+                d2ddc.Transform =
                     Matrix3x2.Rotation( context.角度rad ) *
-                    Matrix3x2.Translation( context.開き中心位置 + ( context.閉じ中心位置 - context.開き中心位置 ) * new Vector2( (float) context.開to閉割合.Value ) ) *
+                    Matrix3x2.Translation( context.開き中心位置 + ( context.閉じ中心位置 - context.開き中心位置 ) * new Vector2( (float)context.開to閉割合.Value ) ) *
                     preTrans;
+
                 float w = context.矩形サイズ.Width;
                 float h = context.矩形サイズ.Height;
                 var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
-                dc.FillRectangle( rc, context.ブラシ );
-                dc.DrawRectangle( rc, this._白ブラシ, 3.0f );
+                d2ddc.FillRectangle( rc, context.ブラシ );
+                d2ddc.DrawRectangle( rc, this._白ブラシ, 3.0f );
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
             //----------------
             #endregion
 
@@ -318,11 +319,12 @@ namespace DTXMania2
                     すべて完了 = false;
 
                 float 倍率 = this._ロゴ表示幅 / this._ロゴ.サイズ.Width;
+
                 this._ロゴ.描画する(
-                    dc,
+                    d2ddc,
                     this._ロゴ表示位置.Width,
                     this._ロゴ表示位置.Height,
-                    不透明度0to1: (float) this._ロゴ不透明度.Value,
+                    不透明度0to1: (float)this._ロゴ不透明度.Value,
                     X方向拡大率: 倍率,
                     Y方向拡大率: 倍率 );
                 //----------------
@@ -369,7 +371,7 @@ namespace DTXMania2
             {
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.開to閉割合?.Dispose();

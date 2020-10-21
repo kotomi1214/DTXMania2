@@ -27,7 +27,7 @@ namespace DTXMania2
             クローズ完了,
             オープン完了,
         }
-        
+
         public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.未定;
 
 
@@ -80,7 +80,7 @@ namespace DTXMania2
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
         /// <returns>現在のフェーズ。</returns>
-        public フェーズ 進行描画する( DeviceContext dc )
+        public フェーズ 進行描画する( DeviceContext d2ddc )
         {
             switch( this.現在のフェーズ )
             {
@@ -89,12 +89,12 @@ namespace DTXMania2
 
                 case フェーズ.クローズ:
                 case フェーズ.クローズ完了:
-                    this.進行描画する( dc, StoryboardStatus.Scheduled );
+                    this.進行描画する( d2ddc, StoryboardStatus.Scheduled );
                     break;
 
                 case フェーズ.オープン:
                 case フェーズ.オープン完了:
-                    this.進行描画する( dc, StoryboardStatus.Ready );
+                    this.進行描画する( d2ddc, StoryboardStatus.Ready );
                     break;
             }
 
@@ -104,7 +104,7 @@ namespace DTXMania2
         /// <summary>
         ///     派生クラスでこのメソッドをオーバーライドし、アイキャッチ画面の描画を行う。
         /// </summary>
-        protected virtual void 進行描画する( DeviceContext dc, StoryboardStatus 描画しないStatus )
+        protected virtual void 進行描画する( DeviceContext d2ddc, StoryboardStatus 描画しないStatus )
         {
             bool すべて完了 = true;
 

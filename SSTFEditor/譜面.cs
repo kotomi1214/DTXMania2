@@ -128,7 +128,7 @@ namespace SSTFEditor
                 } );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.スコア = null;
 

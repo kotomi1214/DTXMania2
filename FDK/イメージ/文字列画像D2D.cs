@@ -302,16 +302,16 @@ namespace FDK
         public virtual void Dispose()
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
-            
+
             this._TextRenderer.Dispose();
             this._TextLayout?.Dispose();
             this._TextFormat?.Dispose();
             this._Bitmap?.Dispose();
         }
 
-        public void ビットマップを生成または更新する( DeviceContext dc )
+        public void ビットマップを生成または更新する( DeviceContext d2ddc )
         {
-            float pt2px( float dpi, float pt ) => dpi * pt / 72f;
+            static float pt2px( float dpi, float pt ) => dpi * pt / 72f;
 
             if( this._TextFormatを更新せよ )
             {
@@ -332,7 +332,7 @@ namespace FDK
                 };
 
                 // 行間は、プロパティではなくメソッドで設定する。
-                this.LineSpacing = pt2px( dc.DotsPerInch.Width, this.フォントサイズpt );
+                this.LineSpacing = pt2px( d2ddc.DotsPerInch.Width, this.フォントサイズpt );
 
                 // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.Baseline = this.LineSpacing * 0.8f;
@@ -356,7 +356,6 @@ namespace FDK
                     this.レイアウトサイズdpx.Height );
 
                 // レイアウトが変わったのでサイズも更新する。
-
                 this._表示文字列のサイズdpx = new Size2F(
                     this._TextLayout.Metrics.WidthIncludingTrailingWhitespace,
                     this._TextLayout.Metrics.Height );
@@ -387,7 +386,7 @@ namespace FDK
                 }
 
                 this._Bitmap?.Dispose();
-                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget( dc, CompatibleRenderTargetOptions.None, this.画像サイズdpx );
+                this._Bitmap = new SharpDX.Direct2D1.BitmapRenderTarget( d2ddc, CompatibleRenderTargetOptions.None, this.画像サイズdpx );
                 //----------------
                 #endregion
 
@@ -444,16 +443,16 @@ namespace FDK
         // 進行と描画
 
 
-        public void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
+        public void 描画する( DeviceContext d2ddc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, Matrix? 変換行列3D = null )
         {
             var 変換行列2D =
                 Matrix3x2.Scaling( X方向拡大率, Y方向拡大率 ) *   // 拡大縮小
                 Matrix3x2.Translation( 左位置, 上位置 );          // 移動
 
-            this.描画する( dc, 変換行列2D, 変換行列3D, 不透明度0to1 );
+            this.描画する( d2ddc, 変換行列2D, 変換行列3D, 不透明度0to1 );
         }
 
-        public void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext d2ddc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f )
         {
             if( string.IsNullOrEmpty( this.表示文字列 ) )
                 return;
@@ -462,21 +461,21 @@ namespace FDK
                 this._TextFormatを更新せよ ||
                 this._TextLayoutを更新せよ )
             {
-                this.ビットマップを生成または更新する( dc );
+                this.ビットマップを生成または更新する( d2ddc );
             }
 
             if( null == this._Bitmap )
                 return;
 
-            var preTrans = dc.Transform;
-            var preBlend = dc.PrimitiveBlend;
+            var preTrans = d2ddc.Transform;
+            var preBlend = d2ddc.PrimitiveBlend;
 
-            dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * preTrans;
-            dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+            d2ddc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * preTrans;
+            d2ddc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
 
             using var bmp = this._Bitmap.Bitmap;
 
-            dc.DrawBitmap(
+            d2ddc.DrawBitmap(
                 bitmap: bmp,
                 destinationRectangle: null,
                 opacity: 不透明度0to1,
@@ -484,8 +483,8 @@ namespace FDK
                 sourceRectangle: this.転送元矩形,
                 erspectiveTransformRef: 変換行列3D );
 
-            dc.PrimitiveBlend = preBlend;
-            dc.Transform = preTrans;
+            d2ddc.PrimitiveBlend = preBlend;
+            d2ddc.Transform = preTrans;
         }
 
 
@@ -497,7 +496,7 @@ namespace FDK
 
         private string _表示文字列 = "";
 
-        private string _フォント名 = "メイリオ";
+        private string _フォント名 = "Meiryo";
 
         private float _フォントサイズpt = 20f;
 
@@ -519,7 +518,7 @@ namespace FDK
 
         private TextAlignment _TextAlignment = TextAlignment.Leading;
 
-            
+
         private TextFormat _TextFormat = null!;
 
         private TextLayout _TextLayout = null!;

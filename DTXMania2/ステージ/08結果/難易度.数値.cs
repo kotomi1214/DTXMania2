@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
@@ -29,12 +27,12 @@ namespace DTXMania2.結果
                 this._数字画像 = new フォント画像D2D( @"$(Images)\ParameterFont_Large.png", @"$(Images)\ParameterFont_Large.yaml", 文字幅補正dpx: 0f );
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this._不透明度?.Dispose();
                 this._左位置dpx?.Dispose();
                 this._ストーリーボード?.Dispose();
-                this._数字画像?.Dispose();
+                this._数字画像.Dispose();
             }
 
 
@@ -92,17 +90,20 @@ namespace DTXMania2.結果
                 this._ストーリーボード?.Finish( 0.1 );
             }
 
-            public void 進行描画する( DeviceContext dc, float left, float top )
+            public void 進行描画する( DeviceContext d2ddc, float x, float y )
             {
-                this._数字画像.不透明度 = (float) this._不透明度.Value;
+                if( this._左位置dpx is null ||
+                    this._不透明度 is null )
+                    return;
 
-                float 左位置dpx = left + (float) this._左位置dpx.Value;
+                this._数字画像.不透明度 = (float)this._不透明度.Value;
+                float 左位置dpx = x + (float)this._左位置dpx.Value;
 
                 // 整数部を描画する（'.'含む）
-                this._数字画像.描画する( dc, 左位置dpx, top, this._難易度値文字列_整数部, new Size2F( 1.0f, 1.2f ) );
+                this._数字画像.描画する( d2ddc, 左位置dpx, y, this._難易度値文字列_整数部, new Size2F( 1.0f, 1.2f ) );
 
                 // 小数部を描画する
-                this._数字画像.描画する( dc, 左位置dpx + 127f, top + 17f, this._難易度値文字列_小数部, new Size2F( 1.0f, 1.0f ) );
+                this._数字画像.描画する( d2ddc, 左位置dpx + 127f, y + 17f, this._難易度値文字列_小数部, new Size2F( 1.0f, 1.0f ) );
             }
 
 
@@ -116,11 +117,11 @@ namespace DTXMania2.結果
 
             private string _難易度値文字列_整数部 = "";    // '.' 含む
 
-            private Storyboard _ストーリーボード = null!;
+            private Storyboard? _ストーリーボード = null;
 
-            private Variable _左位置dpx = null!;
+            private Variable? _左位置dpx = null;
 
-            private Variable _不透明度 = null!;
+            private Variable? _不透明度 = null;
         }
     }
 }

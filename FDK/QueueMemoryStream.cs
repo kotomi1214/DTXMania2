@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Threading;
 
 namespace FDK
@@ -113,7 +112,7 @@ namespace FDK
                 if( this.読み出し可能サイズ < count )
                 {
                     // データが足りないなら、あるだけ全部読みだす。
-                    count = (int) this.読み出し可能サイズ;
+                    count = (int)this.読み出し可能サイズ;
                 }
 
                 this.Position = this.読み出し位置;

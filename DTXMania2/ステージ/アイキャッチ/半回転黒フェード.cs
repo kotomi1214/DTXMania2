@@ -193,7 +193,7 @@ namespace DTXMania2
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
-        protected override void 進行描画する( DeviceContext dc, StoryboardStatus 描画しないStatus )
+        protected override void 進行描画する( DeviceContext d2ddc, StoryboardStatus 描画しないStatus )
         {
             bool すべて完了 = true;
 
@@ -206,13 +206,13 @@ namespace DTXMania2
 
                     if( this._アニメーション.ストーリーボード.Status != 描画しないStatus )
                     {
-                        var preTrans = dc.Transform;
+                        var preTrans = d2ddc.Transform;
 
                         #region " 背景マスク "
                         //----------------
-                        using( var ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, (float) this._アニメーション.背景_不透明度.Value ) ) )
+                        using( var ブラシ = new SolidColorBrush( d2ddc, new Color4( Color3.Black, (float)this._アニメーション.背景_不透明度.Value ) ) )
                         {
-                            dc.FillRectangle( new RectangleF( 0f, 0f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Width ), ブラシ );
+                            d2ddc.FillRectangle( new RectangleF( 0f, 0f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Width ), ブラシ );
                         }
                         //----------------
                         #endregion
@@ -224,18 +224,18 @@ namespace DTXMania2
                             float h = Global.GraphicResources.設計画面サイズ.Height;
                             var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
 
-                            dc.Transform =
+                            d2ddc.Transform =
                                 Matrix3x2.Rotation( // 上辺中央を中心として回転
-                                    angle: (float) this._アニメーション.黒幕1左下_回転角rad.Value,
+                                    angle: (float)this._アニメーション.黒幕1左下_回転角rad.Value,
                                     center: new Vector2( 0f, -rc.Height / 2f ) ) *
                                 Matrix3x2.Translation(  // (基点X, H×3/4) へ移動
-                                    x: (float) this._アニメーション.黒幕1左下_基点位置X.Value,
+                                    x: (float)this._アニメーション.黒幕1左下_基点位置X.Value,
                                     y: Global.GraphicResources.設計画面サイズ.Height ) *
                                 preTrans;
 
-                            dc.FillRectangle( rc, this._黒ブラシ );
+                            d2ddc.FillRectangle( rc, this._黒ブラシ );
 
-                            dc.Transform = preTrans;
+                            d2ddc.Transform = preTrans;
                         }
                         //----------------
                         #endregion
@@ -247,32 +247,32 @@ namespace DTXMania2
                             float h = Global.GraphicResources.設計画面サイズ.Height;
                             var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
 
-                            dc.Transform =
+                            d2ddc.Transform =
                                 Matrix3x2.Rotation( // 下辺中央を中心として回転
-                                    angle: (float) this._アニメーション.黒幕2右上_回転角rad.Value,
+                                    angle: (float)this._アニメーション.黒幕2右上_回転角rad.Value,
                                     center: new Vector2( 0f, rc.Height / 2f ) ) *
                                 Matrix3x2.Translation(  // (基点X, H×1/4) へ移動
-                                    x: (float) this._アニメーション.黒幕2右上_基点位置X.Value,
+                                    x: (float)this._アニメーション.黒幕2右上_基点位置X.Value,
                                     y: 0f ) *
                                 preTrans;
 
-                            dc.FillRectangle( rc, this._黒ブラシ );
+                            d2ddc.FillRectangle( rc, this._黒ブラシ );
 
-                            dc.Transform = preTrans;
+                            d2ddc.Transform = preTrans;
                         }
                         //----------------
                         #endregion
 
                         #region " (4) ロゴ "
                         //----------------
-                        dc.Transform =
+                        d2ddc.Transform =
                             Matrix3x2.Scaling( 640f / this._ロゴ画像.サイズ.Width, 156f / this._ロゴ画像.サイズ.Height ) *
-                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 800f ) *
+                            Matrix3x2.Translation( (float)this._アニメーション.ロゴ_位置X.Value, 800f ) *
                             preTrans;
 
-                        dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
+                        d2ddc.DrawBitmap( this._ロゴ画像.Bitmap, (float)this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
 
-                        dc.Transform = preTrans;
+                        d2ddc.Transform = preTrans;
                         //----------------
                         #endregion
                     }
@@ -289,13 +289,13 @@ namespace DTXMania2
 
                     if( this._アニメーション.ストーリーボード.Status != 描画しないStatus )
                     {
-                        var preTrans = dc.Transform;
+                        var preTrans = d2ddc.Transform;
 
                         #region " (1) 背景マスク "
                         //----------------
-                        using( var ブラシ = new SolidColorBrush( dc, new Color4( Color3.Black, (float) this._アニメーション.背景_不透明度.Value ) ) )
+                        using( var ブラシ = new SolidColorBrush( d2ddc, new Color4( Color3.Black, (float)this._アニメーション.背景_不透明度.Value ) ) )
                         {
-                            dc.FillRectangle( new RectangleF( 0f, 0f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Width ), ブラシ );
+                            d2ddc.FillRectangle( new RectangleF( 0f, 0f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Width ), ブラシ );
                         }
                         //----------------
                         #endregion
@@ -307,18 +307,18 @@ namespace DTXMania2
                             float h = Global.GraphicResources.設計画面サイズ.Height;
                             var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
 
-                            dc.Transform =
+                            d2ddc.Transform =
                                 Matrix3x2.Rotation( // 上辺中央を中心として回転
-                                    angle: (float) this._アニメーション.黒幕1左下_回転角rad.Value,
+                                    angle: (float)this._アニメーション.黒幕1左下_回転角rad.Value,
                                     center: new Vector2( 0f, -rc.Height / 2f ) ) *
                                 Matrix3x2.Translation(  // (基点X, H×3/4) へ移動
-                                    x: (float) this._アニメーション.黒幕1左下_基点位置X.Value,
+                                    x: (float)this._アニメーション.黒幕1左下_基点位置X.Value,
                                     y: Global.GraphicResources.設計画面サイズ.Height ) *
                                 preTrans;
 
-                            dc.FillRectangle( rc, this._黒ブラシ );
+                            d2ddc.FillRectangle( rc, this._黒ブラシ );
 
-                            dc.Transform = preTrans;
+                            d2ddc.Transform = preTrans;
                         }
                         //----------------
                         #endregion
@@ -330,32 +330,32 @@ namespace DTXMania2
                             float h = Global.GraphicResources.設計画面サイズ.Height;
                             var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
 
-                            dc.Transform =
+                            d2ddc.Transform =
                                 Matrix3x2.Rotation( // 下辺中央を中心として回転
-                                    angle: (float) this._アニメーション.黒幕2右上_回転角rad.Value,
+                                    angle: (float)this._アニメーション.黒幕2右上_回転角rad.Value,
                                     center: new Vector2( 0f, rc.Height / 2f ) ) *
                                 Matrix3x2.Translation(  // (基点X, H×1/4) へ移動
-                                    x: (float) this._アニメーション.黒幕2右上_基点位置X.Value,
+                                    x: (float)this._アニメーション.黒幕2右上_基点位置X.Value,
                                     y: 0f ) *
                                 preTrans;
 
-                            dc.FillRectangle( rc, this._黒ブラシ );
+                            d2ddc.FillRectangle( rc, this._黒ブラシ );
 
-                            dc.Transform = preTrans;
+                            d2ddc.Transform = preTrans;
                         }
                         //----------------
                         #endregion
 
                         #region " (4) ロゴ "
                         //----------------
-                        dc.Transform =
+                        d2ddc.Transform =
                             Matrix3x2.Scaling( 640f / this._ロゴ画像.サイズ.Width, 156f / this._ロゴ画像.サイズ.Height ) *
-                            Matrix3x2.Translation( (float) this._アニメーション.ロゴ_位置X.Value, 800f ) *
+                            Matrix3x2.Translation( (float)this._アニメーション.ロゴ_位置X.Value, 800f ) *
                             preTrans;
 
-                        dc.DrawBitmap( this._ロゴ画像.Bitmap, (float) this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
+                        d2ddc.DrawBitmap( this._ロゴ画像.Bitmap, (float)this._アニメーション.ロゴ_不透明度.Value, BitmapInterpolationMode.Linear );
 
-                        dc.Transform = preTrans;
+                        d2ddc.Transform = preTrans;
                         //----------------
                         #endregion
                     }
@@ -401,7 +401,7 @@ namespace DTXMania2
                 this.ストーリーボード = new Storyboard( am );
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.背景_不透明度?.Dispose();

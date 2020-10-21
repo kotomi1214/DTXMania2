@@ -294,7 +294,7 @@ namespace FDK
                 {
                     fixed( RawInput.RawInputData* pData = &rawInputData )
                     {
-                        byte* pRawHidData = ( (byte*) ( &pData->Data.Hid ) ) +
+                        byte* pRawHidData = ( (byte*)( &pData->Data.Hid ) ) +
                             sizeof( int ) + // sizeof( RawHid.SizeHid )
                             sizeof( int );  // sizeof( RawHid.Count )
 
@@ -332,7 +332,7 @@ namespace FDK
                         ref usageLength,
                         deviceProperty.PreparseData ?? IntPtr.Zero,
                         rawHidReports[ nReport ],
-                        (uint) rawHidReports[ nReport ].Length );
+                        (uint)rawHidReports[ nReport ].Length );
 
                     if( status == HID.Status.Success )
                     {
@@ -355,7 +355,7 @@ namespace FDK
                             if( prevButtonState[ usageIndex ] != currentButtonState[ usageIndex ] )
                             {
                                 ushort usagePage = buttonCap.UsagePage;
-                                ushort usage = (ushort) ( usageIndex + buttonCap.UsageMin );
+                                ushort usage = (ushort)( usageIndex + buttonCap.UsageMin );
 
                                 var inputEvent = new InputEvent() {
                                     DeviceID = deviceProperty.DeviceID,

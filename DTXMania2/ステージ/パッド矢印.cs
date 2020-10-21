@@ -13,8 +13,9 @@ namespace DTXMania2
         // プロパティ
 
 
-        public enum 種類 { 
-            上_Tom1, 
+        public enum 種類
+        {
+            上_Tom1,
             下_Tom2,
             左_Snare,
             右_Tom3,

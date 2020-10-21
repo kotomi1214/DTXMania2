@@ -29,13 +29,13 @@ namespace DTXMania2
                 this.deviceId = deviceId;
                 this.key = key;
             }
-            
+
             public IdKey( InputEvent ie )
             {
                 this.deviceId = ie.DeviceID;
                 this.key = ie.Key;
             }
-            
+
             public IdKey( string 文字列 )
             {
                 // 変なの食わせたらそのまま例外発出する。
@@ -47,7 +47,7 @@ namespace DTXMania2
 
             void IYamlConvertible.Read( IParser parser, Type expectedType, ObjectDeserializer nestedObjectDeserializer )
             {
-                var devkey = (string?) nestedObjectDeserializer( typeof( string ) ) ?? "";
+                var devkey = (string?)nestedObjectDeserializer( typeof( string ) ) ?? "";
 
                 string 正規表現パターン = $@"^(\d+),(\d+)$";  // \d は10進数数字
                 var m = Regex.Match( devkey, 正規表現パターン, RegexOptions.IgnoreCase );
@@ -58,7 +58,7 @@ namespace DTXMania2
                     this.key = int.Parse( m.Groups[ 2 ].Value );
                 }
             }
-            
+
             void IYamlConvertible.Write( IEmitter emitter, ObjectSerializer nestedObjectSerializer )
             {
                 nestedObjectSerializer( $"{this.deviceId},{this.key}" );

@@ -22,7 +22,7 @@ namespace DTXMania2
                 #region " (A) RecordDB.sqlite3 が存在している → 最新版にバージョンアップ。"
                 //----------------
                 using var recorddb = new RecordDB();
-                int version = (int) recorddb.UserVersion;
+                int version = (int)recorddb.UserVersion;
                 while( version < RecordDBRecord.VERSION )
                 {
                     // RecordDB は v007 から。

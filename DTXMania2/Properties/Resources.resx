@@ -160,6 +160,9 @@
   <data name="TXT_キーボードまたはMIDI信号を入力してください" xml:space="preserve">
     <value>Enter a keyboard or MIDI signal.</value>
   </data>
+  <data name="TXT_コントロールチェンジ" xml:space="preserve">
+    <value>Control Change</value>
+  </data>
   <data name="TXT_シンバルフリー" xml:space="preserve">
     <value>Free cymbal</value>
   </data>
@@ -177,6 +180,12 @@
   </data>
   <data name="TXT_ドラムサウンド" xml:space="preserve">
     <value>Drums sound</value>
+  </data>
+  <data name="TXT_ノートオフ" xml:space="preserve">
+    <value>Note Off</value>
+  </data>
+  <data name="TXT_ノートオン" xml:space="preserve">
+    <value>Note On</value>
   </data>
   <data name="TXT_パッドを叩いてください" xml:space="preserve">
     <value>Hit the pad</value>
@@ -238,6 +247,10 @@ near {0}</value>
   </data>
   <data name="TXT_曲DBを初期化" xml:space="preserve">
     <value>Initialize song DB</value>
+  </data>
+  <data name="TXT_曲が見つかりません" xml:space="preserve">
+    <value>Song not found...
+Hit BDx2 (in default SPACEx2) to select song folders.</value>
   </data>
   <data name="TXT_曲読み込みフォルダ" xml:space="preserve">
     <value>Song folders</value>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using SharpDX.Animation;
 
 namespace FDK
@@ -41,14 +41,14 @@ namespace FDK
             this._Animation = animation;
 
             this._目標値 = 初期値;
-            this._現在値 = new Variable( this._Animation.Manager, (double) 初期値 );
+            this._現在値 = new Variable( this._Animation.Manager, (double)初期値 );
             this.切替時間sec = 切替時間sec;
             this.速度係数 = 速度係数;
 
             this._ストーリーボード = null!;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this._ストーリーボード?.Dispose();
             this._現在値?.Dispose();
@@ -73,7 +73,7 @@ namespace FDK
             this._ストーリーボード?.Dispose();
             this._ストーリーボード = new Storyboard( this._Animation.Manager );
 
-            using( var 遷移 = this._Animation.TrasitionLibrary.Linear( this.切替時間sec, finalValue: (double) this._目標値 ) )
+            using( var 遷移 = this._Animation.TrasitionLibrary.Linear( this.切替時間sec, finalValue: (double)this._目標値 ) )
                 this._ストーリーボード.AddTransition( this._現在値, 遷移 );
 
             this._ストーリーボード.Schedule( this._Animation.Timer.Time );

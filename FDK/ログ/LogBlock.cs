@@ -17,7 +17,7 @@ namespace FDK
         }
 
         // "<-- 終了"
-        public void Dispose()
+        public virtual void Dispose()
         {
             Log.EndInfo( this._ブロック名 );
         }

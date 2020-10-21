@@ -34,7 +34,7 @@ namespace DTXMania2
             this._線グラ頂点集合 = new GradientStopCollection(
                 Global.GraphicResources.既定のD2D1DeviceContext,
                 new GradientStop[] {
-                    new GradientStop() { Position = 0.00f, Color = new Color4( new Color3( 青色 ), 0f ) },		// 完全透明
+                    new GradientStop() { Position = 0.00f, Color = new Color4( new Color3( 青色 ), 0f ) },        // 完全透明
 					new GradientStop() { Position = 0.35f, Color = new Color4( new Color3( 水色 ), 1f ) },
                     new GradientStop() { Position = 0.42f, Color = new Color4( new Color3( 青色 ), 0.7f ) },
 
@@ -68,59 +68,59 @@ namespace DTXMania2
         /// </summary>
         /// <param name="幅dpx">横方向（左→右）の長さ。<paramref name="高さdpx"/>と同時に指定してはならない。</param>
         /// <param name="高さdpx">縦方向（上→下）の長さ。<paramref name="幅dpx"/>と同時に指定してはならない。</param>
-        public void 描画する( DeviceContext dc, Vector2 開始位置dpx, float 幅dpx = -1f, float 高さdpx = -1f )
+        public void 描画する( DeviceContext d2ddc, Vector2 開始位置dpx, float 幅dpx = -1f, float 高さdpx = -1f )
         {
             var check = ( 幅dpx * 高さdpx );
             Debug.Assert( 0f >= check, "幅か高さが両方指定されていないか、両方指定されています。どちらか一方だけを指定してください。" );
+
             if( 0f == check )
                 return; // 面積ゼロ
 
-            var preBlend = dc.PrimitiveBlend;
-
-            dc.PrimitiveBlend = PrimitiveBlend.Add; // 加算合成
+            var preBlend = d2ddc.PrimitiveBlend;
+            d2ddc.PrimitiveBlend = PrimitiveBlend.Add; // 加算合成
 
             if( 0f < 幅dpx )
             {
                 // (A) 横方向（左→右）の枠
                 var 矩形 = new RectangleF(
-                    開始位置dpx.X,
-                    開始位置dpx.Y - this.太さdpx / 2f,
-                    幅dpx,
-                    this.太さdpx );
+                    x: 開始位置dpx.X,
+                    y: 開始位置dpx.Y - this.太さdpx / 2f,
+                    width: 幅dpx,
+                    height: this.太さdpx );
 
                 this._線グラブラシ?.Dispose();
                 this._線グラブラシ = new LinearGradientBrush(
-                    dc,
+                    d2ddc,
                     new LinearGradientBrushProperties() {
                         StartPoint = new Vector2( 矩形.Left, 矩形.Top ),
                         EndPoint = new Vector2( 矩形.Left, 矩形.Bottom ),
                     },
                     this._線グラ頂点集合 );
 
-                dc.FillRectangle( 矩形, this._線グラブラシ );
+                d2ddc.FillRectangle( 矩形, this._線グラブラシ );
             }
             else
             {
                 // (B) 縦方向（上→下）の枠
                 var 矩形 = new RectangleF(
-                    開始位置dpx.X - this.太さdpx / 2f,
-                    開始位置dpx.Y,
-                    this.太さdpx,
-                    高さdpx );
+                    x: 開始位置dpx.X - this.太さdpx / 2f,
+                    y: 開始位置dpx.Y,
+                    width: this.太さdpx,
+                    height: 高さdpx );
 
                 this._線グラブラシ?.Dispose();
                 this._線グラブラシ = new LinearGradientBrush(
-                    dc,
+                    d2ddc,
                     new LinearGradientBrushProperties() {
                         StartPoint = new Vector2( 矩形.Left, 矩形.Top ),
                         EndPoint = new Vector2( 矩形.Right, 矩形.Top ),
                     },
                     this._線グラ頂点集合 );
 
-                dc.FillRectangle( 矩形, this._線グラブラシ );
+                d2ddc.FillRectangle( 矩形, this._線グラブラシ );
             }
 
-            dc.PrimitiveBlend = preBlend;
+            d2ddc.PrimitiveBlend = preBlend;
         }
 
 

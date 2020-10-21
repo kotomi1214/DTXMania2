@@ -35,27 +35,26 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, double? スキル値 )
+        public void 進行描画する( DeviceContext d2ddc, double? スキル値 )
         {
-            if( スキル値 is null )
+            if( !スキル値.HasValue )
                 return;
 
-            var skill = (double) スキル値;
-            var 描画領域 = new RectangleF( 108f, 780f-40f, 275f, 98f );
-            string スキル値文字列 = skill.ToString( "0.00" ).PadLeft( 6 ).Replace( ' ', 'o' );  // 右詰め、余白は'o'。
+            var 描画領域 = new RectangleF( 108f, 780f - 40f, 275f, 98f );
+            string スキル値文字列 = スキル値.Value.ToString( "0.00" ).PadLeft( 6 ).Replace( ' ', 'o' );  // 右詰め、余白は'o'。
 
             // 曲別SKILLアイコンを描画する
             var 変換行列2D =
                 Matrix3x2.Scaling( 0.375f, 0.5f ) *
                 Matrix3x2.Translation( 描画領域.X, 描画領域.Y );
 
-            this._ロゴ画像.描画する( dc, 変換行列2D );
+            this._ロゴ画像.描画する( d2ddc, 変換行列2D );
 
             // 小数部を描画する
-            this._数字画像.描画する( dc, 描画領域.X + 90f + 105f, 描画領域.Y + ( 描画領域.Height * 0.2f ), スキル値文字列[ 4.. ], new Size2F( 0.65f, 0.8f ) );
+            this._数字画像.描画する( d2ddc, 描画領域.X + 90f + 105f, 描画領域.Y + ( 描画領域.Height * 0.2f ), スキル値文字列[ 4.. ], new Size2F( 0.65f, 0.8f ) );
 
             // 整数部を描画する（'.'含む）
-            this._数字画像.描画する( dc, 描画領域.X + 90f, 描画領域.Y, スキル値文字列[ 0..4 ], new Size2F( 0.65f, 1.0f ) );
+            this._数字画像.描画する( d2ddc, 描画領域.X + 90f, 描画領域.Y, スキル値文字列[ 0..4 ], new Size2F( 0.65f, 1.0f ) );
         }
 
 

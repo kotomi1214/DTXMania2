@@ -16,7 +16,7 @@ namespace FDK
     /// </remarks>
     public class Folder
     {
-        
+
         // フォルダ変数関連
 
 
@@ -39,7 +39,7 @@ namespace FDK
 
         public static string フォルダ変数の内容を返す( string 変数名 )
         {
-            return ( Folder._フォルダ変数toパス.ContainsKey( 変数名 ) ) ? 
+            return ( Folder._フォルダ変数toパス.ContainsKey( 変数名 ) ) ?
                 Folder._フォルダ変数toパス[ 変数名 ] :
                 "";
         }

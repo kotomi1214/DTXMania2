@@ -461,11 +461,11 @@ namespace DTXMania2
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
-        protected override void 進行描画する( DeviceContext dc, StoryboardStatus 描画しないStatus )
+        protected override void 進行描画する( DeviceContext d2ddc, StoryboardStatus 描画しないStatus )
         {
             bool すべて完了 = true;
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             #region " 背景の画像 "
             //----------------
@@ -493,13 +493,13 @@ namespace DTXMania2
                             #region " シーン1. 画面Aを下絵に、上下端から画面Bの描画領域が増えていく。（上下の黒帯の移動に伴って）"
                             //----------------
                             Size2F 画面Bサイズ = this._画面BC_アイキャッチ遷移画面1_回転中.サイズ;
-                            float 画面B表示縦幅 = (float) ( 画面Bサイズ.Height * 割合 / 2.0 );    // 0 → height/2
+                            float 画面B表示縦幅 = (float)( 画面Bサイズ.Height * 割合 / 2.0 );    // 0 → height/2
 
                             // 上から
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, false, new Vector4( 0f, 0f, 画面Bサイズ.Width, 画面B表示縦幅 ) );
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc, false, new Vector4( 0f, 0f, 画面Bサイズ.Width, 画面B表示縦幅 ) );
 
                             // 下から
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, false, new Vector4( 0f, 画面Bサイズ.Height - 画面B表示縦幅, 画面Bサイズ.Width, 画面Bサイズ.Height ) );
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc, false, new Vector4( 0f, 画面Bサイズ.Height - 画面B表示縦幅, 画面Bサイズ.Width, 画面Bサイズ.Height ) );
                             //----------------
                             #endregion
 
@@ -509,7 +509,7 @@ namespace DTXMania2
                         {
                             #region " シーン2. 画面Bを全表示。（黒帯は回転中）"
                             //----------------
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc );
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc );
                             //----------------
                             #endregion
 
@@ -519,24 +519,24 @@ namespace DTXMania2
                         {
                             #region " シーン3. 画面Bを下絵に、中央から左右に向かって（黒帯の移動に従って）、画面Cの描画領域が広くなっていく。"
                             //----------------
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc );    // 下絵の画面B、全表示。
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc );    // 下絵の画面B、全表示。
 
                             // 以下、画面Cを上に重ねて描画。
 
                             割合 = 割合 - 2.0;  // 0 → 1.0
 
                             this._斜めレイヤーパラメータ.MaskTransform =
-                                Matrix3x2.Scaling( (float) ( 割合 * 0.5 ), 1.0f ) *    // x:0 → 0.5
+                                Matrix3x2.Scaling( (float)( 割合 * 0.5 ), 1.0f ) *    // x:0 → 0.5
                                 ( ( 割合 < 0.5 ) ?
-                                    Matrix3x2.Rotation( (float) ( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
-                                    Matrix3x2.Rotation( (float) ( Math.PI / 4.0 ) ) // 45°
+                                    Matrix3x2.Rotation( (float)( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
+                                    Matrix3x2.Rotation( (float)( Math.PI / 4.0 ) ) // 45°
                                 ) *
                                 Matrix3x2.Translation(
-                                    Global.GraphicResources.設計画面サイズ.Width / 2.0f, 
+                                    Global.GraphicResources.設計画面サイズ.Width / 2.0f,
                                     Global.GraphicResources.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
 
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, layerParameters1: this._斜めレイヤーパラメータ );
-                            this._ロゴを描画する( dc );
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc, layerParameters1: this._斜めレイヤーパラメータ );
+                            this._ロゴを描画する( d2ddc );
                             //----------------
                             #endregion
 
@@ -550,8 +550,8 @@ namespace DTXMania2
                 case フェーズ.クローズ完了:
                 {
                     // 画面C（アイキャッチ画面（背景＋ロゴ））
-                    this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc );
-                    this._ロゴを描画する( dc );
+                    this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc );
+                    this._ロゴを描画する( d2ddc );
 
                     break;
                 }
@@ -578,34 +578,34 @@ namespace DTXMania2
                         {
                             #region " シーン3. 画面Cを下絵に、左右から中央に向かって（黒帯の移動に従って）、画面Dの描画領域が広くなっていく。"
                             //----------------
-                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( dc );    // 画面D、全表示。（画面Cじゃないので注意）
+                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( d2ddc );    // 画面D、全表示。（画面Cじゃないので注意）
 
                             // 以下、画面C（画面Dじゃないので注意）を左右の黒帯の間に描画。
 
                             割合 = 割合 - 2.0;  // 1.0 → 0
 
                             this._斜めレイヤーパラメータ.MaskTransform =
-                                Matrix3x2.Scaling( (float) ( 割合 * 0.5 ), 1.0f ) *    // x:0.5 → 0
+                                Matrix3x2.Scaling( (float)( 割合 * 0.5 ), 1.0f ) *    // x:0.5 → 0
                                 ( ( 割合 < 0.5 ) ?
-                                    Matrix3x2.Rotation( (float) ( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
-                                    Matrix3x2.Rotation( (float) ( Math.PI / 4.0 ) ) // 45°
+                                    Matrix3x2.Rotation( (float)( Math.PI / ( 5.85 - 1.85 * ( 割合 * 2 ) ) ) ) :
+                                    Matrix3x2.Rotation( (float)( Math.PI / 4.0 ) ) // 45°
                                 ) *
-                                Matrix3x2.Translation( 
-                                    Global.GraphicResources.設計画面サイズ.Width / 2.0f, 
+                                Matrix3x2.Translation(
+                                    Global.GraphicResources.設計画面サイズ.Width / 2.0f,
                                     Global.GraphicResources.設計画面サイズ.Height / 2.0f ); // 画面中央固定。
 
-                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( dc, layerParameters1: this._斜めレイヤーパラメータ );
-                            this._ロゴを描画する( dc );
+                            this._画面BC_アイキャッチ遷移画面1_回転中.進行描画する( d2ddc, layerParameters1: this._斜めレイヤーパラメータ );
+                            this._ロゴを描画する( d2ddc );
                             //----------------
                             #endregion
-                         
+
                             break;
                         }
                         case double 割合 when( 1.0 < 割合 ):
                         {
                             #region " シーン2. 画面Dを全表示。（黒帯は逆回転中）"
                             //----------------
-                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( dc );
+                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( d2ddc );
                             //----------------
                             #endregion
 
@@ -616,16 +616,16 @@ namespace DTXMania2
                             #region " シーン1. 画面Dを下絵に、中央から上下端に向かって（黒帯の移動に従って）、画面Eの描画領域が減っていく。"
                             //----------------
                             Size2F 画面Dサイズ = this._画面D_アイキャッチ遷移画面2_逆回転中.サイズ;
-                            float 画面D表示縦幅 = (float) ( 画面Dサイズ.Height * 割合 / 2.0 );    // height/2 → 0
+                            float 画面D表示縦幅 = (float)( 画面Dサイズ.Height * 割合 / 2.0 );    // height/2 → 0
 
                             // 上から
-                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( dc, false, new Vector4( 0f, 0f, 画面Dサイズ.Width, 画面D表示縦幅 ) );
+                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( d2ddc, false, new Vector4( 0f, 0f, 画面Dサイズ.Width, 画面D表示縦幅 ) );
 
                             // 下から
-                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( dc, false, new Vector4( 0f, 画面Dサイズ.Height - 画面D表示縦幅, 画面Dサイズ.Width, 画面Dサイズ.Height ) );
+                            this._画面D_アイキャッチ遷移画面2_逆回転中.進行描画する( d2ddc, false, new Vector4( 0f, 画面Dサイズ.Height - 画面D表示縦幅, 画面Dサイズ.Width, 画面Dサイズ.Height ) );
                             //----------------
                             #endregion
-                            
+
                             break;
                         }
                     }
@@ -653,21 +653,21 @@ namespace DTXMania2
                 if( context.ストーリーボード.Status == 描画しないStatus )
                     continue;
 
-                dc.Transform =
-                    Matrix3x2.Rotation( (float) context.回転角rad.Value ) *
-                    Matrix3x2.Translation( (float) context.中心位置X.Value, (float) context.中心位置Y.Value ) *
+                d2ddc.Transform =
+                    Matrix3x2.Rotation( (float)context.回転角rad.Value ) *
+                    Matrix3x2.Translation( (float)context.中心位置X.Value, (float)context.中心位置Y.Value ) *
                     preTrans;
 
-                using( var brush = new SolidColorBrush( dc, new Color4( 0f, 0f, 0f, (float) context.不透明度.Value ) ) )
+                using( var brush = new SolidColorBrush( d2ddc, new Color4( 0f, 0f, 0f, (float)context.不透明度.Value ) ) )
                 {
                     float w = 2800.0f;
-                    float h = (float) context.太さ.Value;
+                    float h = (float)context.太さ.Value;
                     var rc = new RectangleF( -w / 2f, -h / 2f, w, h );
-                    dc.FillRectangle( rc, brush );
+                    d2ddc.FillRectangle( rc, brush );
                 }
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
             //----------------
             #endregion
 
@@ -701,7 +701,7 @@ namespace DTXMania2
             public Variable 不透明度 = null!;
             public Storyboard ストーリーボード = null!;
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.不透明度?.Dispose();
@@ -730,10 +730,10 @@ namespace DTXMania2
         private const double _シーン2期間 = 0.4;
         private const double _シーン3期間 = 0.2;
 
-        private void _ロゴを描画する( DeviceContext dc )
+        private void _ロゴを描画する( DeviceContext d2ddc )
         {
             this._ロゴ.描画する(
-                dc,
+                d2ddc,
                 this._ロゴ表示領域.Left,
                 this._ロゴ表示領域.Top,
                 1.0f,

@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using FDK;
 
 namespace DTXMania2
 {
+    /// <summary>
+    ///     Effekseer.NET を使ってエフェクトを再生する。
+    /// </summary>
     class Effekseer : IDisposable
     {
 
@@ -12,7 +15,7 @@ namespace DTXMania2
 
 
         public EffekseerNET.Manager Manager { get; private set; } = null!;
-        
+
         public EffekseerRendererDX11NET.Renderer Renderer { get; private set; } = null!;
 
 
@@ -67,15 +70,15 @@ namespace DTXMania2
             double 経過時間sec = QPCTimer.生カウント相対値を秒へ変換して返す( 現在時刻 - this._前回の更新時刻 );
             this._前回の更新時刻 = 現在時刻;
 
-            this.Manager.Update( (float) ( 経過時間sec * 60.0 ) );   // Effekseerは毎秒60フレームで固定
+            this.Manager.Update( (float)( 経過時間sec * 60.0 ) );   // Effekseerは毎秒60フレームで固定
         }
 
         public void 描画する()
         {
-            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( 
-                Global.GraphicResources.既定のD3D11DepthStencilView, 
+            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets(
+                Global.GraphicResources.既定のD3D11DepthStencilView,
                 Global.GraphicResources.既定のD3D11RenderTargetView );
-            
+
             Global.GraphicResources.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.GraphicResources.既定のD3D11ViewPort );
 
             this.Renderer.BeginRendering();
@@ -85,10 +88,10 @@ namespace DTXMania2
 
         public void 描画する( int effectHandle )
         {
-            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets( 
-                Global.GraphicResources.既定のD3D11DepthStencilView, 
+            Global.GraphicResources.既定のD3D11DeviceContext.OutputMerger.SetRenderTargets(
+                Global.GraphicResources.既定のD3D11DepthStencilView,
                 Global.GraphicResources.既定のD3D11RenderTargetView );
-            
+
             Global.GraphicResources.既定のD3D11DeviceContext.Rasterizer.SetViewports( Global.GraphicResources.既定のD3D11ViewPort );
 
             this.Renderer.BeginRendering();

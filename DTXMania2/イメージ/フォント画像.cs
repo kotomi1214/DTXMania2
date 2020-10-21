@@ -18,9 +18,9 @@ namespace DTXMania2
         public フォント画像( VariablePath 文字盤の画像ファイルパス, VariablePath 文字盤設定ファイルパス, float 文字幅補正dpx = 0f, float 不透明度 = 1f )
             : base(
                 Global.GraphicResources.D3D11Device1,
-                Folder.カルチャを考慮した絶対パスを返す( 文字盤の画像ファイルパス.変数なしパス ), 
-                Folder.カルチャを考慮した絶対パスを返す( 文字盤設定ファイルパス.変数なしパス ), 
-                文字幅補正dpx, 
+                Folder.カルチャを考慮した絶対パスを返す( 文字盤の画像ファイルパス.変数なしパス ),
+                Folder.カルチャを考慮した絶対パスを返す( 文字盤設定ファイルパス.変数なしパス ),
+                文字幅補正dpx,
                 不透明度 )
         {
         }

@@ -179,6 +179,15 @@ namespace DTXMania2.Properties {
         }
         
         /// <summary>
+        ///   Control Change に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_コントロールチェンジ {
+            get {
+                return ResourceManager.GetString("TXT_コントロールチェンジ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Free cymbal に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string TXT_シンバルフリー {
@@ -238,6 +247,24 @@ namespace DTXMania2.Properties {
         internal static string TXT_ドラムサウンド {
             get {
                 return ResourceManager.GetString("TXT_ドラムサウンド", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Note Off に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_ノートオフ {
+            get {
+                return ResourceManager.GetString("TXT_ノートオフ", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Note On に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_ノートオン {
+            get {
+                return ResourceManager.GetString("TXT_ノートオン", resourceCulture);
             }
         }
         
@@ -419,6 +446,16 @@ namespace DTXMania2.Properties {
         internal static string TXT_曲DBを初期化 {
             get {
                 return ResourceManager.GetString("TXT_曲DBを初期化", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Song not found...
+        ///Hit BDx2 (in default SPACEx2) to select song folders. に類似しているローカライズされた文字列を検索します。
+        /// </summary>
+        internal static string TXT_曲が見つかりません {
+            get {
+                return ResourceManager.GetString("TXT_曲が見つかりません", resourceCulture);
             }
         }
         

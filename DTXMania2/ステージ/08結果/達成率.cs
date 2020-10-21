@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
@@ -13,6 +12,9 @@ namespace DTXMania2.結果
         // プロパティ
 
 
+        /// <summary>
+        ///     アニメがすべて終わったら true。
+        /// </summary>
         public override bool アニメ完了 => this._アイコン.アニメ完了 && this._下線.アニメ完了 && this._数値.アニメ完了;
 
 
@@ -52,7 +54,7 @@ namespace DTXMania2.結果
             this._数値.アニメを完了する();
         }
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, double 達成率0to100 )
+        public override void 進行描画する( DeviceContext d2ddc, float x, float y, double 達成率0to100 )
         {
             if( this._初めての進行描画 )
             {
@@ -64,9 +66,9 @@ namespace DTXMania2.結果
                 this._初めての進行描画 = false;
             }
 
-            this._アイコン.進行描画する( dc, left, top );
-            this._数値.進行描画する( dc, left + 150f, top + 48f );
-            this._下線.進行描画する( dc, left + 33f, top + 198f );
+            this._アイコン.進行描画する( d2ddc, x, y );
+            this._数値.進行描画する( d2ddc, x + 150f, y + 48f );
+            this._下線.進行描画する( d2ddc, x + 33f, y + 198f );
         }
 
 

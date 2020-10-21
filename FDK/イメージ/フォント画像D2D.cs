@@ -63,7 +63,7 @@ namespace FDK
         /// <param name="基点のX位置">左揃えなら左端位置、右揃えなら右端位置のX座標。</param>
         /// <param name="拡大率">文字列の拡大率。null なら等倍。</param>
         /// <param name="右揃え">trueなら右揃え、falseなら左揃え。</param>
-        public void 描画する( DeviceContext dc, float 基点のX位置, float 上位置, string 表示文字列, Size2F? 拡大率 = null, bool 右揃え = false )
+        public void 描画する( DeviceContext d2ddc, float 基点のX位置, float 上位置, string 表示文字列, Size2F? 拡大率 = null, bool 右揃え = false )
         {
             if( string.IsNullOrEmpty( 表示文字列 ) )
                 return;
@@ -81,7 +81,7 @@ namespace FDK
                 var 文字矩形 = 有効文字矩形リスト.ElementAt( i );
 
                 this._文字盤.描画する(
-                    dc,
+                    d2ddc,
                     基点のX位置,
                     上位置 + ( 文字列全体のサイズ.Height - 文字矩形!.Value.Height * 拡大率.Value.Height ),
                     転送元矩形: 文字矩形,
@@ -98,9 +98,9 @@ namespace FDK
         // ローカル
 
 
-        private 画像D2D _文字盤;
+        private readonly 画像D2D _文字盤;
 
-        private 矩形リスト _矩形リスト;
+        private readonly 矩形リスト _矩形リスト;
 
 
         private bool _有効文字の矩形と文字数を抽出し文字列全体のサイズを返す( string 表示文字列, Size2F 拡大率, out Size2F 文字列全体のサイズ, out int 有効文字数, out IEnumerable<RectangleF?> 有効文字矩形リスト )

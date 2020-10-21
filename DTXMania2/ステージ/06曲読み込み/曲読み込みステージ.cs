@@ -7,7 +7,6 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 using SSTF=SSTFormat.v004;
-using System.Runtime.CompilerServices;
 
 namespace DTXMania2.曲読み込み
 {
@@ -75,11 +74,11 @@ namespace DTXMania2.曲読み込み
             this.現在のフェーズ = フェーズ.フェードイン;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            //Global.App.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_開始音 ); --> なりっぱなしでいい
+            //Global.App.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_開始音 ); --> 鳴りっぱなしでいい
             Global.App.システムサウンド.停止する( システムサウンド種別.曲読み込みステージ_ループBGM );
 
             this._難易度.Dispose();
@@ -138,8 +137,8 @@ namespace DTXMania2.曲読み込み
 
         public void 描画する()
         {
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+            d2ddc.Transform = Matrix3x2.Identity;
 
             switch( this.現在のフェーズ )
             {
@@ -147,10 +146,12 @@ namespace DTXMania2.曲読み込み
                 {
                     #region " 背景画面＆アイキャッチフェードインを描画する。"
                     //----------------
-                    dc.BeginDraw();
-                    this._背景画面を描画する( dc );
-                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
-                    dc.EndDraw();
+                    d2ddc.BeginDraw();
+
+                    this._背景画面を描画する( d2ddc );
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( d2ddc );
+
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -160,9 +161,11 @@ namespace DTXMania2.曲読み込み
                 {
                     #region " スコアを読み込んで完了フェーズへ。"
                     //----------------
-                    dc.BeginDraw();
-                    this._背景画面を描画する( dc );
-                    dc.EndDraw();
+                    d2ddc.BeginDraw();
+
+                    this._背景画面を描画する( d2ddc );
+
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -172,9 +175,11 @@ namespace DTXMania2.曲読み込み
                 {
                     #region " 遷移終了。Appによるステージ遷移待ち。"
                     //----------------
-                    dc.BeginDraw();
-                    this._背景画面を描画する( dc );
-                    dc.EndDraw();
+                    d2ddc.BeginDraw();
+
+                    this._背景画面を描画する( d2ddc );
+
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -284,34 +289,35 @@ namespace DTXMania2.曲読み込み
 
         private static double _ビュアーモードでの前回の再生速度 = 1.0;
 
-        private void _曲名を描画する( DeviceContext dc )
+
+        private void _曲名を描画する( DeviceContext d2ddc )
         {
             var 表示位置dpx = new Vector2( 782f, 409f );
 
             // 拡大率を計算して描画する。            
             float 最大幅dpx = Global.GraphicResources.設計画面サイズ.Width - 表示位置dpx.X - 20f;  // -20f はマージン
             float X方向拡大率 = ( this._曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._曲名画像.画像サイズdpx.Width;
-            this._曲名画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
+            this._曲名画像.描画する( d2ddc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
 
-        private void _サブタイトルを描画する( DeviceContext dc )
+        private void _サブタイトルを描画する( DeviceContext d2ddc )
         {
             var 表示位置dpx = new Vector2( 782f, 520f );
 
             // 拡大率を計算して描画する。
             float 最大幅dpx = Global.GraphicResources.設計画面サイズ.Width - 表示位置dpx.X;
             float X方向拡大率 = ( this._サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._サブタイトル画像.画像サイズdpx.Width;
-            this._サブタイトル画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
+            this._サブタイトル画像.描画する( d2ddc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
 
-        private void _背景画面を描画する( DeviceContext dc )
+        private void _背景画面を描画する( DeviceContext d2ddc )
         {
-            this._舞台画像.進行描画する( dc );
-            this._注意文.描画する( dc, 0f, 760f );
-            this._プレビュー画像.進行描画する( dc );
-            this._難易度.進行描画する( dc );
-            this._曲名を描画する( dc );
-            this._サブタイトルを描画する( dc );
+            this._舞台画像.進行描画する( d2ddc );
+            this._注意文.描画する( d2ddc, 0f, 760f );
+            this._プレビュー画像.進行描画する( d2ddc );
+            this._難易度.進行描画する( d2ddc );
+            this._曲名を描画する( d2ddc );
+            this._サブタイトルを描画する( d2ddc );
         }
     }
 }

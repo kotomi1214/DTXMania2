@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using CSCore;
 using FDK;
-using SSTF=SSTFormat.v004;
 
 namespace DTXMania2
 {
@@ -34,7 +33,7 @@ namespace DTXMania2
             this._一時停止中の音声のリスト = new List<Sound>();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -78,9 +77,9 @@ namespace DTXMania2
 
             // 先に ISampleSource を生成する。
 
-            var サンプルソース = Global.App.WAVキャッシュ.作成する( サウンドファイル );
+            var sampleSource = Global.App.WAVキャッシュ.作成する( サウンドファイル );
 
-            if( サンプルソース is null )
+            if( sampleSource is null )
             {
                 Log.WARNING( $"サウンドのデコードに失敗しました。[{サウンドファイル.変数付きパス}" );
                 return;
@@ -95,7 +94,7 @@ namespace DTXMania2
             int 多重度 = ( 多重再生する ) ? this._既定の多重度 : 1;
 
             this._WAV情報リスト[ wav番号 ] = new WAV情報( wav番号, 多重度, BGMである );
-            this._WAV情報リスト[ wav番号 ].サウンドを生成する( Global.App.サウンドデバイス, サンプルソース );
+            this._WAV情報リスト[ wav番号 ].サウンドを生成する( Global.App.サウンドデバイス, sampleSource );
 
             Log.Info( $"サウンドを読み込みました。[{サウンドファイル.変数付きパス}]" );
         }
@@ -106,9 +105,11 @@ namespace DTXMania2
         /// <param name="音量">0:無音～1:原音</param>
         public void 発声する( int WAV番号, bool 発声前に消音する, 消音グループ種別 muteGroupType, bool BGM以外も再生する, float 音量 = 1f, double 再生開始時刻sec = 0.0 )
         {
-            if( !( this._WAV情報リスト.ContainsKey( WAV番号 ) ) ||
-                ( !( BGM以外も再生する ) && !( this._WAV情報リスト[ WAV番号 ].BGMである ) ) )
-                return;
+            if( !( this._WAV情報リスト.ContainsKey( WAV番号 ) ) )
+                return; // 未使用のWAV番号は無視。
+
+            if( !( BGM以外も再生する ) && !( this._WAV情報リスト[ WAV番号 ].BGMである ) )
+                return; // BGM以外を再生しない場合、BGM以外のWAV番号は無視。
 
 
             // 指定があれば消音する。
@@ -116,7 +117,8 @@ namespace DTXMania2
             if( 発声前に消音する && muteGroupType != 消音グループ種別.Unknown )
             {
                 // 発声時に指定された消音グループ種別に属するWAVサウンドをすべて停止する。
-                var 停止するWavContexts = this._WAV情報リスト.Where( ( kvp ) => ( kvp.Value.最後に発声したときの消音グループ種別 == muteGroupType ) );
+                var 停止するWavContexts = this._WAV情報リスト
+                    .Where( ( kvp ) => ( kvp.Value.最後に発声したときの消音グループ種別 == muteGroupType ) );
 
                 foreach( var kvp in 停止するWavContexts )
                     kvp.Value.発声を停止する();
@@ -125,8 +127,9 @@ namespace DTXMania2
 
             // 発声する。
 
-            if( this._WAV情報リスト[ WAV番号 ].BGMである )        // BGM なら BGMAdjust を適用する
+            if( this._WAV情報リスト[ WAV番号 ].BGMである )
             {
+                // BGM なら BGMAdjust を適用する。
                 再生開始時刻sec += Global.App.演奏譜面.譜面.BGMAdjust / 1000.0;
                 再生開始時刻sec = Math.Max( 0.0, 再生開始時刻sec );
             }
@@ -148,9 +151,7 @@ namespace DTXMania2
 
         public void すべてのBGMの再生位置を移動する( double 移動量sec )
         {
-            var BGMs = this._WAV情報リスト.Where( ( kvp ) => kvp.Value.BGMである );
-
-            foreach( var kvp in BGMs )
+            foreach( var kvp in this._WAV情報リスト.Where( ( kvp ) => kvp.Value.BGMである ) )
                 kvp.Value.再生位置を移動する( 移動量sec );
         }
 
@@ -160,13 +161,10 @@ namespace DTXMania2
 
             foreach( var kvp in this._WAV情報リスト )
             {
-                foreach( var sound in kvp.Value.Sounds )
+                foreach( var sound in kvp.Value.Sounds.Where( ( sd ) => sd.再生中である ) )
                 {
-                    if( sound.再生中である )
-                    {
-                        sound.Pause();
-                        this._一時停止中の音声のリスト.Add( sound );
-                    }
+                    sound.Pause();
+                    this._一時停止中の音声のリスト.Add( sound );
                 }
             }
         }
@@ -224,7 +222,7 @@ namespace DTXMania2
                 this.BGMである = BGMである;
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 foreach( var sd in this.Sounds )
                     sd.Dispose();

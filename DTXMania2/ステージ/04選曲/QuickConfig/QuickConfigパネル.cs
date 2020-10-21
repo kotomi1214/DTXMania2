@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using System.Linq;
 using Microsoft.Data.Sqlite;
-using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 using DTXMania2.曲;
-using System.Linq;
 
 namespace DTXMania2.選曲.QuickConfig
 {
@@ -42,19 +40,19 @@ namespace DTXMania2.選曲.QuickConfig
 
             this._パネル = new 画像D2D( @"$(Images)\SelectStage\QuickConfigPanel.png" );
 
-            // 設定項目リストを構築する。
             this._設定項目リスト = new SelectableList<ラベル>();
 
             #region "「この曲の評価」"
             //----------------
             var score = song?.譜面リスト?.FirstOrDefault( ( s ) => s != null );
+
             if( null != score )
             {
                 this._設定項目リスト.Add(
                     new リスト(
                         名前: Properties.Resources.TXT_この曲の評価,
                         選択肢初期値リスト: new[] {
-                            Properties.Resources.TXT_評価なし, 
+                            Properties.Resources.TXT_評価なし,
                             Properties.Resources.TXT_評価1,
                             Properties.Resources.TXT_評価2,
                             Properties.Resources.TXT_評価3,
@@ -149,7 +147,7 @@ namespace DTXMania2.選曲.QuickConfig
             this._設定項目リスト.SelectItem( 0 );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -176,34 +174,37 @@ namespace DTXMania2.選曲.QuickConfig
                     //----------------
                     if( 入力.キャンセルキーが入力された() )
                     {
-                        #region " 完了_戻る フェーズへ。"
+                        #region " キャンセル → 完了_戻る フェーズへ。"
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.取消音 );
+
                         this.現在のフェーズ = フェーズ.完了_戻る;
                         //----------------
                         #endregion
                     }
                     else if( 入力.上移動キーが入力された() )
                     {
-                        #region " １つ前の項目へカーソルを移動する。"
+                        #region " 上 → １つ前の項目へカーソルを移動する。"
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
+
                         this._設定項目リスト.SelectPrev( Loop: true );
                         //----------------
                         #endregion
                     }
                     else if( 入力.下移動キーが入力された() )
                     {
-                        #region " １つ後の項目へカーソルを移動する。"
+                        #region " 下 → １つ後の項目へカーソルを移動する。"
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
+
                         this._設定項目リスト.SelectNext( Loop: true );
                         //----------------
                         #endregion
                     }
                     else if( 入力.左移動キーが入力された() )
                     {
-                        #region " 項目の種類に応じて処理分岐。"
+                        #region " 左 → 項目の種類に応じて処理分岐。"
                         //----------------
                         var item = this._設定項目リスト.SelectedItem;
 
@@ -222,7 +223,7 @@ namespace DTXMania2.選曲.QuickConfig
                     }
                     else if( 入力.右移動キーが入力された() )
                     {
-                        #region " 項目の種類に応じて処理分岐。"
+                        #region " 右 → 項目の種類に応じて処理分岐。"
                         //----------------
                         var item = this._設定項目リスト.SelectedItem;
 
@@ -241,7 +242,7 @@ namespace DTXMania2.選曲.QuickConfig
                     }
                     else if( 入力.確定キーが入力された() )
                     {
-                        #region " 項目の種類や名前に応じて処理分岐。"
+                        #region " 確定 → 項目の種類や名前に応じて処理分岐。"
                         //----------------
                         var item = this._設定項目リスト.SelectedItem;
 
@@ -260,6 +261,7 @@ namespace DTXMania2.選曲.QuickConfig
                                     #region " 完了_オプション設定フェーズへ。"
                                     //----------------
                                     Global.App.システムサウンド.再生する( システムサウンド種別.決定音 );
+
                                     this.現在のフェーズ = フェーズ.完了_オプション設定;
                                     //----------------
                                     #endregion
@@ -269,6 +271,7 @@ namespace DTXMania2.選曲.QuickConfig
                                     #region " 完了_戻る フェーズへ。"
                                     //----------------
                                     Global.App.システムサウンド.再生する( システムサウンド種別.取消音 );
+
                                     this.現在のフェーズ = フェーズ.完了_戻る;
                                     //----------------
                                     #endregion
@@ -297,9 +300,9 @@ namespace DTXMania2.選曲.QuickConfig
             }
         }
 
-        public void 描画する( DeviceContext dc, float 左位置, float 上位置 )
+        public void 描画する( DeviceContext d2ddc, float 左位置, float 上位置 )
         {
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             switch( this.現在のフェーズ )
             {
@@ -307,7 +310,7 @@ namespace DTXMania2.選曲.QuickConfig
                 {
                     #region " QuickConfig パネルを描画する。"
                     //----------------
-                    this._パネル.描画する( dc, 左位置, 上位置 );
+                    this._パネル.描画する( d2ddc, 左位置, 上位置 );
 
                     for( int i = 0; i < this._設定項目リスト.Count; i++ )
                     {
@@ -319,11 +322,11 @@ namespace DTXMania2.選曲.QuickConfig
                         // 選択カーソルを描画する。
                         if( this._設定項目リスト.SelectedIndex == i )
                         {
-                            dc.Transform = SharpDX.Matrix3x2.Identity;
+                            d2ddc.Transform = SharpDX.Matrix3x2.Identity;
 
-                            using var brush = new SolidColorBrush( dc, new SharpDX.Color( 0.6f, 0.6f, 1f, 0.4f ) );
+                            using var brush = new SolidColorBrush( d2ddc, new SharpDX.Color( 0.6f, 0.6f, 1f, 0.4f ) );
 
-                            dc.FillRectangle(
+                            d2ddc.FillRectangle(
                                 new SharpDX.RectangleF(
                                     左位置 + 左右マージン,
                                     上位置 + 見出し行間 + 項目行間 * i,
@@ -331,11 +334,11 @@ namespace DTXMania2.選曲.QuickConfig
                                     項目行間 ),
                                 brush );
 
-                            dc.Transform = preTrans;
+                            d2ddc.Transform = preTrans;
                         }
 
                         // 選択肢項目を描画する。
-                        this._設定項目リスト[ i ].進行描画する( dc, 左位置 + 左右マージン * 2, 上位置 + 見出し行間 + i * 項目行間 + 項目ラベル上マージン );
+                        this._設定項目リスト[ i ].進行描画する( d2ddc, 左位置 + 左右マージン * 2, 上位置 + 見出し行間 + i * 項目行間 + 項目ラベル上マージン );
                     }
                     //----------------
                     #endregion

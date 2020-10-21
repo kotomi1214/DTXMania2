@@ -34,7 +34,7 @@ namespace FDK
             this._スレッドID = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.TrasitionLibrary.Dispose();
             this.Timer.Dispose();

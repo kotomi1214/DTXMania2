@@ -156,6 +156,9 @@
   <data name="TXT_キーボードまたはMIDI信号を入力してください" xml:space="preserve">
     <value>キーボードまたはMIDI信号を入力してください。</value>
   </data>
+  <data name="TXT_コントロールチェンジ" xml:space="preserve">
+    <value>コントロールチェンジ</value>
+  </data>
   <data name="TXT_シンバルフリー" xml:space="preserve">
     <value>シンバルフリー</value>
   </data>
@@ -173,6 +176,12 @@
   </data>
   <data name="TXT_ドラムサウンド" xml:space="preserve">
     <value>ドラムサウンド</value>
+  </data>
+  <data name="TXT_ノートオフ" xml:space="preserve">
+    <value>ノートオフ</value>
+  </data>
+  <data name="TXT_ノートオン" xml:space="preserve">
+    <value>ノートオン</value>
   </data>
   <data name="TXT_パッドを叩いてください" xml:space="preserve">
     <value>パッドを叩いてください</value>
@@ -234,6 +243,10 @@
   </data>
   <data name="TXT_曲DBを初期化" xml:space="preserve">
     <value>曲DBを初期化</value>
+  </data>
+  <data name="TXT_曲が見つかりません" xml:space="preserve">
+    <value>曲がありません……
+BDx2 (既定では SPACEx2) で、曲読み込みフォルダを設定してください。</value>
   </data>
   <data name="TXT_曲読み込みフォルダ" xml:space="preserve">
     <value>曲読み込みフォルダ</value>

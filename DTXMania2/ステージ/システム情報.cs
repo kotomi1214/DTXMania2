@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
@@ -53,27 +52,30 @@ namespace DTXMania2
         // 進行と描画
 
 
-        public void 描画する( DeviceContext dc, string 追加文字列 = "" )
+        public void 描画する( DeviceContext d2ddc, string 追加文字列 = "" )
         {
             double FPSの周期ms = ( 0 < this._FPS.現在のFPS ) ? ( 1000.0 / this._FPS.現在のFPS ) : -1.0;
-            
+
             this._文字列画像.表示文字列 =
-                $"VPS: {this._FPS.現在のVPS.ToString()} / FPS: {this._FPS.現在のFPS.ToString()} (" + FPSの周期ms.ToString( "0.000" ) + "ms)" + Environment.NewLine +
-                $"GameMode: {ONOFF[ GameMode.ゲームモードである ]}" + Environment.NewLine +
+                $"VPS: {this._FPS.現在のVPS} / FPS: {this._FPS.現在のFPS} (" + FPSの周期ms.ToString( "0.000" ) + "ms)" + Environment.NewLine +
+                $"GameMode: {_ONOFF[ GameMode.ゲームモードである ]}" + Environment.NewLine +
                 追加文字列;
-            
-            this._文字列画像.描画する( dc, 0f, 0f );
+
+            this._文字列画像.描画する( d2ddc, 0f, 0f );
         }
 
 
 
-        // プライベート
+        // ローカル
 
 
         private FPS _FPS;
 
-        private 文字列画像D2D _文字列画像;
+        private readonly 文字列画像D2D _文字列画像;
 
-        private readonly Dictionary<bool, string> ONOFF = new Dictionary<bool, string> { { false, "OFF" }, { true, "ON" } };
+        private readonly Dictionary<bool, string> _ONOFF = new Dictionary<bool, string> {
+            { false, Properties.Resources.TXT_OFF },
+            { true,  Properties.Resources.TXT_ON  },
+        };
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Xml.Serialization;
@@ -31,7 +32,7 @@ namespace FDK
                 new FileStream( XMLファイル名.変数なしパス, FileMode.Open, FileAccess.Read, FileShare.ReadWrite ),
                 Encoding.UTF8 ) )
             {
-                return (T) new XmlSerializer( typeof( T ) ).Deserialize( sr );
+                return (T)new XmlSerializer( typeof( T ) ).Deserialize( sr );
             }
         }
     }

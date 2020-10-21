@@ -89,31 +89,31 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
+        public override void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置, bool 選択中 )
         {
             // (1) パネルの下地と名前を描画。
 
-            base.進行描画する( dc, left, top, 選択中 );
+            base.進行描画する( d2ddc, 左位置, 上位置, 選択中 );
 
 
             // (2) 値を描画。
 
             this._項目画像.表示文字列 = "x " + this.現在値.ToString( "0.0#" );  // 小数第2位は、ゼロなら非表示。
-            this._項目画像.ビットマップを生成または更新する( dc );      // このあと画像のサイズが必要になるので、先に生成/更新する。
+            this._項目画像.ビットマップを生成または更新する( d2ddc );      // このあと画像のサイズが必要になるので、先に生成/更新する。
 
-            float 拡大率Y = (float) this._パネルの高さ割合.Value;
+            float 拡大率Y = (float)this._パネルの高さ割合.Value;
             float 項目の上下マージン = this.項目領域.Height * ( 1f - 拡大率Y ) / 2f;
 
             var 項目矩形 = new RectangleF(
-                x: this.項目領域.X + left,
-                y: this.項目領域.Y + top + 項目の上下マージン,
+                x: this.項目領域.X + 左位置,
+                y: this.項目領域.Y + 上位置 + 項目の上下マージン,
                 width: this.項目領域.Width,
                 height: this.項目領域.Height * 拡大率Y );
 
             float 拡大率X = Math.Min( 1f, ( 項目矩形.Width - 20f ) / this._項目画像.画像サイズdpx.Width );    // -20 は左右マージンの最低値[dpx]
 
             this._項目画像.描画する(
-                dc,
+                d2ddc,
                 項目矩形.Left + ( 項目矩形.Width - this._項目画像.画像サイズdpx.Width * 拡大率X ) / 2f,
                 項目矩形.Top + ( 項目矩形.Height - this._項目画像.画像サイズdpx.Height * 拡大率Y ) / 2f,
                 X方向拡大率: 拡大率X,

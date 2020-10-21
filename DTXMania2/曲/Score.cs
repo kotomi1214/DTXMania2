@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using FDK;
 using DTXMania2.演奏;
 
 namespace DTXMania2.曲
@@ -115,7 +114,9 @@ namespace DTXMania2.曲
             {
                 lock( this._排他 )
                 {
-                    return ( null != this.最高記録 ) ? 成績.ランクを算出する( this.最高記録.Achievement ) : (結果.ランク種別?) null;
+                    return ( null != this.最高記録 ) ?
+                        成績.ランクを算出する( this.最高記録.Achievement ) :
+                        (結果.ランク種別?)null;
                 }
             }
         }

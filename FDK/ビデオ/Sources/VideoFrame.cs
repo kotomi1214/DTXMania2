@@ -30,11 +30,10 @@ namespace FDK
         public Bitmap Bitmap { get; set; } = null!;
 
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Bitmap?.Dispose();
             this.Sample?.Dispose();
         }
     }
-
 }

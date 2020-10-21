@@ -46,8 +46,8 @@ namespace DTXMania2.演奏
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            for( int i = 0; i < this._各桁のアニメ.Length; i++ )
-                this._各桁のアニメ[ i ].Dispose();
+            foreach( var anim in this._各桁のアニメ )
+                anim.Dispose();
 
             this._スコア数字画像.Dispose();
         }
@@ -60,14 +60,14 @@ namespace DTXMania2.演奏
         /// <param name="全体の中央位置">
         ///		パネル(dc)の左上を原点とする座標。
         /// </param>
-        public void 進行描画する( DeviceContext dc, Animation am, Vector2 全体の中央位置, 成績 現在の成績 )
+        public void 進行描画する( DeviceContext d2ddc, Animation am, Vector2 全体の中央位置, 成績 現在の成績 )
         {
             // 進行。
 
             if( this._現在表示中のスコア < 現在の成績.Score )
             {
                 int 増分 = 現在の成績.Score - this._現在表示中のスコア;
-                int 追っかけ分 = Math.Max( (int) ( 増分 * 0.75 ), 1 ); // VPS に依存するけどまあいい
+                int 追っかけ分 = Math.Max( (int)( 増分 * 0.75 ), 1 ); // VPS に依存するけどまあいい
                 this._現在表示中のスコア = Math.Min( this._現在表示中のスコア + 追っかけ分, 現在の成績.Score );
             }
 
@@ -82,7 +82,7 @@ namespace DTXMania2.演奏
             var 文字間隔補正 = -10f;
             var 文字の位置 = new Vector2( -( 全体のサイズ.X / 2f ), 0f );
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             for( int i = 0; i < 数字.Length; i++ )
             {
@@ -92,18 +92,18 @@ namespace DTXMania2.演奏
 
                 var 転送元矩形 = this._スコア数字の矩形リスト[ 数字[ i ].ToString() ]!;
 
-                dc.Transform =
-                    Matrix3x2.Translation( 文字の位置.X, 文字の位置.Y + (float) ( this._各桁のアニメ[ i ].Yオフセット?.Value ?? 0.0f ) ) *
+                d2ddc.Transform =
+                    Matrix3x2.Translation( 文字の位置.X, 文字の位置.Y + (float)( this._各桁のアニメ[ i ].Yオフセット?.Value ?? 0.0f ) ) *
                     Matrix3x2.Translation( 全体の中央位置 ) *
                     preTrans;
 
                 // todo: フォント画像D2D に置き換える？
-                dc.DrawBitmap( this._スコア数字画像.Bitmap, 1f, BitmapInterpolationMode.Linear, 転送元矩形.Value );
+                d2ddc.DrawBitmap( this._スコア数字画像.Bitmap, 1f, BitmapInterpolationMode.Linear, 転送元矩形.Value );
 
                 文字の位置.X += ( 転送元矩形.Value.Width + 文字間隔補正 ) * 1f;// 画像矩形から表示矩形への拡大率.X;
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
 
 
             // 更新。
@@ -140,7 +140,7 @@ namespace DTXMania2.演奏
             public 各桁のアニメ()
             {
             }
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.Yオフセット?.Dispose();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
@@ -80,6 +79,7 @@ namespace DTXMania2.オプション設定
 
                 this.パネルツリーのルートノード.子パネルリスト.Add( 自動演奏フォルダ );
 
+
                 // 子フォルダツリーの構築
 
                 #region "「すべてON/OFF」パネル "
@@ -121,7 +121,7 @@ namespace DTXMania2.オプション設定
 
                         値の変更処理:
                             ( panel ) => {
-                                userConfig.AutoPlay[ autoPlayType.Value ] = ( (パネル_ONOFFトグル) panel ).ONである;
+                                userConfig.AutoPlay[ autoPlayType.Value ] = ( (パネル_ONOFFトグル)panel ).ONである;
                             }
                     );
 
@@ -164,7 +164,7 @@ namespace DTXMania2.オプション設定
                         Properties.Resources.TXT_画面モード,
 
                     選択肢初期値リスト:
-                        new[] { 
+                        new[] {
                             Properties.Resources.TXT_ウィンドウ,
                             Properties.Resources.TXT_全画面,
                         },
@@ -174,7 +174,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            bool 全画面モードにする = ( 1 == ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 );
+                            bool 全画面モードにする = ( 1 == ( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号 );
 
                             if( 全画面モードにする )
                                 Global.App.ScreenMode.ToFullscreenMode();
@@ -209,7 +209,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.譜面スクロール速度 = ( (パネル_倍率) panel ).現在値;
+                            userConfig.譜面スクロール速度 = ( (パネル_倍率)panel ).現在値;
                         }
                     ) );
             //----------------
@@ -228,7 +228,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.スコア指定の背景画像を表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.スコア指定の背景画像を表示する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -247,7 +247,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.演奏中に動画を表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.演奏中に動画を表示する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -262,17 +262,17 @@ namespace DTXMania2.オプション設定
                         Properties.Resources.TXT_演奏中の動画サイズ,
 
                     選択肢初期値リスト:
-                        new[] { 
-                            Properties.Resources.TXT_演奏中の動画サイズ_全画面, 
+                        new[] {
+                            Properties.Resources.TXT_演奏中の動画サイズ_全画面,
                             Properties.Resources.TXT_演奏中の動画サイズ_中央寄せ,
                         },
 
                     初期選択肢番号:
-                        (int) userConfig.動画の表示サイズ,
+                        (int)userConfig.動画の表示サイズ,
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.動画の表示サイズ = (動画の表示サイズ) ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号;
+                            userConfig.動画の表示サイズ = (動画の表示サイズ)( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号;
                         }
                 ) );
             //----------------
@@ -291,7 +291,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.シンバルフリーモードである = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.シンバルフリーモードである = ( (パネル_ONOFFトグル)panel ).ONである;
                             userConfig.ドラムチッププロパティリスト.反映する( ( userConfig.シンバルフリーモードである ) ?
                                 入力グループプリセット種別.シンバルフリー :
                                 入力グループプリセット種別.基本形 );
@@ -320,7 +320,7 @@ namespace DTXMania2.オプション設定
                     値の変更処理:
                         ( panel ) => {
                             userConfig.表示レーンの左右 = new 表示レーンの左右() {
-                                Rideは左 = ( ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 == 0 ),
+                                Rideは左 = ( ( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号 == 0 ),
                                 Chinaは左 = userConfig.表示レーンの左右.Chinaは左,
                                 Splashは左 = userConfig.表示レーンの左右.Splashは左,
                             };
@@ -338,8 +338,8 @@ namespace DTXMania2.オプション設定
                         Properties.Resources.TXT_Chinaの表示位置,
 
                     選択肢初期値リスト:
-                        new[] { 
-                            Properties.Resources.TXT_左, 
+                        new[] {
+                            Properties.Resources.TXT_左,
                             Properties.Resources.TXT_右,
                         },
 
@@ -350,7 +350,7 @@ namespace DTXMania2.オプション設定
                         ( panel ) => {
                             userConfig.表示レーンの左右 = new 表示レーンの左右() {
                                 Rideは左 = userConfig.表示レーンの左右.Rideは左,
-                                Chinaは左 = ( ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 == 0 ),
+                                Chinaは左 = ( ( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号 == 0 ),
                                 Splashは左 = userConfig.表示レーンの左右.Splashは左,
                             };
                         }
@@ -380,7 +380,7 @@ namespace DTXMania2.オプション設定
                             userConfig.表示レーンの左右 = new 表示レーンの左右() {
                                 Rideは左 = userConfig.表示レーンの左右.Rideは左,
                                 Chinaは左 = userConfig.表示レーンの左右.Splashは左,
-                                Splashは左 = ( ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号 == 0 ),
+                                Splashは左 = ( ( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号 == 0 ),
                             };
                         }
                 ) );
@@ -400,7 +400,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.ドラムの音を発声する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.ドラムの音を発声する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -431,7 +431,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.レーンの透明度 = ( (パネル_整数) panel ).現在の値;
+                            userConfig.レーンの透明度 = ( (パネル_整数)panel ).現在の値;
                         }
                 ) );
             //----------------
@@ -459,7 +459,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.再生速度 = ( (パネル_倍率) panel ).現在値;
+                            userConfig.再生速度 = ( (パネル_倍率)panel ).現在値;
 
                             // WAVキャッシュをすべて削除するために、世代を２つ進める。
                             Global.App.WAVキャッシュ.世代を進める();
@@ -482,7 +482,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.演奏中に小節線と拍線を表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.演奏中に小節線と拍線を表示する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -501,7 +501,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.演奏中に小節番号を表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.演奏中に小節番号を表示する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -520,7 +520,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.演奏中に判定FastSlowを表示する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.演奏中に判定FastSlowを表示する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -539,7 +539,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.音量に応じてチップサイズを変更する = ( (パネル_ONOFFトグル) panel ).ONである;
+                            userConfig.音量に応じてチップサイズを変更する = ( (パネル_ONOFFトグル)panel ).ONである;
                         }
                 ) );
             //----------------
@@ -561,11 +561,11 @@ namespace DTXMania2.オプション設定
                         },
 
                     初期選択肢番号:
-                        (int) userConfig.ダーク,
+                        (int)userConfig.ダーク,
 
                     値の変更処理:
                         ( panel ) => {
-                            userConfig.ダーク = (ダーク種別) ( (パネル_文字列リスト) panel ).現在選択されている選択肢の番号;
+                            userConfig.ダーク = (ダーク種別)( (パネル_文字列リスト)panel ).現在選択されている選択肢の番号;
                         }
                 ) );
             //----------------
@@ -599,7 +599,7 @@ namespace DTXMania2.オプション設定
 
                     値の変更処理:
                         ( panel ) => {
-                            systemConfig.判定位置調整ms = ( (パネル_整数) panel ).現在の値;
+                            systemConfig.判定位置調整ms = ( (パネル_整数)panel ).現在の値;
                         }
                 ) );
             //----------------
@@ -858,7 +858,7 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, float left, float top )
+        public void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置 )
         {
             const float パネルの下マージン = 4f;
             float パネルの高さ = パネル.サイズ.Height + パネルの下マージン;
@@ -866,7 +866,7 @@ namespace DTXMania2.オプション設定
 
             // (1) フレーム１（たて線）を描画。
 
-            this._青い線.描画する( dc, new Vector2( left, 0f ), 高さdpx: Global.GraphicResources.設計画面サイズ.Height );
+            this._青い線.描画する( d2ddc, new Vector2( 左位置, 0f ), 高さdpx: Global.GraphicResources.設計画面サイズ.Height );
 
 
             // (2) パネルを描画。（選択中のパネルの3つ上から7つ下までの計11枚。）
@@ -882,9 +882,9 @@ namespace DTXMania2.オプション設定
                 var 描画パネル = panels[ 描画パネル番号 ];
 
                 描画パネル.進行描画する(
-                    dc,
-                    left + 22f,
-                    top + i * パネルの高さ,
+                    d2ddc,
+                    左位置 + 22f,
+                    上位置 + i * パネルの高さ,
                     選択中: ( i == 3 ) );
             }
 
@@ -893,15 +893,15 @@ namespace DTXMania2.オプション設定
 
             float 幅 = パネル.サイズ.Width + 22f * 2f;
 
-            this._青い線.描画する( dc, new Vector2( left, パネルの高さ * 3f ), 幅dpx: 幅 );
-            this._青い線.描画する( dc, new Vector2( left, パネルの高さ * 4f ), 幅dpx: 幅 );
-            this._青い線.描画する( dc, new Vector2( left + 幅, パネルの高さ * 3f ), 高さdpx: パネルの高さ );
+            this._青い線.描画する( d2ddc, new Vector2( 左位置, パネルの高さ * 3f ), 幅dpx: 幅 );
+            this._青い線.描画する( d2ddc, new Vector2( 左位置, パネルの高さ * 4f ), 幅dpx: 幅 );
+            this._青い線.描画する( d2ddc, new Vector2( 左位置 + 幅, パネルの高さ * 3f ), 高さdpx: パネルの高さ );
 
 
             // (4) パッド矢印（上＆下）を描画。
 
-            this._パッド矢印.描画する( dc, パッド矢印.種類.上_Tom1, new Vector2( left, パネルの高さ * 3f ) );
-            this._パッド矢印.描画する( dc, パッド矢印.種類.下_Tom2, new Vector2( left, パネルの高さ * 4f ) );
+            this._パッド矢印.描画する( d2ddc, パッド矢印.種類.上_Tom1, new Vector2( 左位置, パネルの高さ * 3f ) );
+            this._パッド矢印.描画する( d2ddc, パッド矢印.種類.下_Tom2, new Vector2( 左位置, パネルの高さ * 4f ) );
         }
 
 
@@ -909,12 +909,15 @@ namespace DTXMania2.オプション設定
         // ローカル
 
 
-        // コード内で参照が必要になるパネルのホルダ。
+        /// <summary>
+        ///     コード内で参照が必要になるパネルのホルダ。
+        /// </summary>
         private readonly List<パネル_ONOFFトグル> _パネル_自動演奏_ONOFFトグルリスト;
 
         private readonly 青い線 _青い線;
 
         private readonly パッド矢印 _パッド矢印;
+
 
         private void _システム設定を初期化する()
         {
@@ -968,7 +971,7 @@ namespace DTXMania2.オプション設定
             // ファイルを削除する。
 
             var path = new VariablePath( @$"$(AppData)\User_{Global.App.ログオン中のユーザ.ID}.yaml" );
-            
+
             try
             {
                 File.Delete( path.変数なしパス );  // ファイルがない場合には例外は出ない
