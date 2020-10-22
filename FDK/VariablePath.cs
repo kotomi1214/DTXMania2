@@ -91,7 +91,7 @@ namespace FDK
         // Yaml から変換する
         void IYamlConvertible.Read( YamlDotNet.Core.IParser parser, Type expectedType, ObjectDeserializer nestedObjectDeserializer )
         {
-            var vpath = ( (string?) nestedObjectDeserializer( typeof( string ) ) ) ?? "";
+            var vpath = ( (string?)nestedObjectDeserializer( typeof( string ) ) ) ?? "";
 
             this._初期化( vpath );
         }

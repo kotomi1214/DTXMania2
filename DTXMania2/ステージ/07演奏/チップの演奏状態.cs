@@ -61,7 +61,7 @@ namespace DTXMania2.演奏
 
         public チップの演奏状態 Clone()
         {
-            return (チップの演奏状態) this.MemberwiseClone();
+            return (チップの演奏状態)this.MemberwiseClone();
         }
 
         object ICloneable.Clone()

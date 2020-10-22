@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using SharpDX.Animation;
-using FDK;
 
 namespace DTXMania2.結果
 {
@@ -27,7 +27,7 @@ namespace DTXMania2.結果
             {
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this._長さdpx?.Dispose();
                 this._ストーリーボード?.Dispose();
@@ -82,11 +82,14 @@ namespace DTXMania2.結果
                 this._ストーリーボード?.Finish( 0.0 );
             }
 
-            public void 進行描画する( DeviceContext dc, float left, float top )
+            public void 進行描画する( DeviceContext d2ddc, float x, float y )
             {
-                float 長さdpx = (float) this._長さdpx.Value;
-                using var brush = new SolidColorBrush( dc, Color4.White );
-                dc.FillRectangle( new RectangleF( left + ( _全長dpx - 長さdpx ) / 2f, top, 長さdpx, 3f ), brush );
+                if( this._長さdpx is null )
+                    return;
+
+                float 長さdpx = (float)this._長さdpx.Value;
+                using var brush = new SolidColorBrush( d2ddc, Color4.White );
+                d2ddc.FillRectangle( new RectangleF( x + ( _全長dpx - 長さdpx ) / 2f, y, 長さdpx, 3f ), brush );
             }
 
 
@@ -95,9 +98,9 @@ namespace DTXMania2.結果
 
             private const float _全長dpx = 553f;
 
-            private Storyboard _ストーリーボード = null!;
+            private Storyboard? _ストーリーボード = null;
 
-            private Variable _長さdpx = null!;
+            private Variable? _長さdpx = null;
         }
     }
 }

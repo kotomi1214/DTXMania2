@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Text;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -76,7 +75,8 @@ namespace DTXMania2.演奏
             Debug.Assert( カウントマップの最大要素数 == カウントマップ.Length, "カウントマップの要素数が不正です。" );
 
             this._最高成績のカウントマップ = new int[ カウントマップ.Length ];
-            カウントマップ.CopyTo( this._最高成績のカウントマップ, 0 );    // コピー
+
+            カウントマップ.CopyTo( this._最高成績のカウントマップ, 0 );
         }
 
         /// <summary>
@@ -105,15 +105,17 @@ namespace DTXMania2.演奏
 
             // 前回の設定位置 から 現在位置 までの期間に対応するすべてのカウント値に反映する。
 
-            int 前回の位置 = (int) ( this._前回の設定位置 * カウントマップの最大要素数 );
-            int 今回の位置 = (int) ( 現在位置 * カウントマップの最大要素数 );
+            int 前回の位置 = (int)( this._前回の設定位置 * カウントマップの最大要素数 );
+            int 今回の位置 = (int)( 現在位置 * カウントマップの最大要素数 );
 
             if( 1.0f > 現在位置 )
             {
                 for( int i = 前回の位置; i <= 今回の位置; i++ )
                 {
                     // 同一区間では、成績の悪いほう（カウント値の小さいほう）を優先する。
-                    this.カウントマップ[ i ] = ( 0 < this.カウントマップ[ i ] ) ? Math.Min( カウント値, this.カウントマップ[ i ] ) : カウント値;
+                    this.カウントマップ[ i ] = ( 0 < this.カウントマップ[ i ] ) ?
+                        Math.Min( カウント値, this.カウントマップ[ i ] ) :
+                        カウント値;
                 }
             }
 
@@ -132,6 +134,7 @@ namespace DTXMania2.演奏
             // 現在のカウントマップを生成して返す。
 
             var sb = new StringBuilder( カウントマップ.Length );
+
             for( int i = 0; i < this.カウントマップ.Length; i++ )
                 sb.Append( this._カウントマップ文字列[ this.カウントマップ[ i ] ] );
 
@@ -149,10 +152,10 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
-            using var 水色ブラシ = new SolidColorBrush( dc, new Color4( 0xffdd8e69 ) );
-            using var 黄色ブラシ = new SolidColorBrush( dc, new Color4( 0xff17fffe ) );
+            using var 水色ブラシ = new SolidColorBrush( d2ddc, new Color4( 0xffdd8e69 ) );
+            using var 黄色ブラシ = new SolidColorBrush( d2ddc, new Color4( 0xff17fffe ) );
 
             const float 単位幅 = 12f;
             var 今回のライン全体の矩形 = new RectangleF( 1357f, 108f, 10f, 768f );
@@ -166,7 +169,7 @@ namespace DTXMania2.演奏
                 if( 0 == this.カウントマップ[ i ] )
                     continue;
 
-                dc.FillRectangle(
+                d2ddc.FillRectangle(
                     new RectangleF( 今回のライン全体の矩形.Left, 今回のライン全体の矩形.Bottom - 単位幅 * ( i + 1 ), 今回のライン全体の矩形.Width, 単位幅 ),
                     ( 2 <= this.カウントマップ[ i ] ) ? 黄色ブラシ : 水色ブラシ );
             }
@@ -181,7 +184,7 @@ namespace DTXMania2.演奏
                     if( 0 == this._最高成績のカウントマップ[ i ] )
                         continue;
 
-                    dc.FillRectangle(
+                    d2ddc.FillRectangle(
                         new RectangleF( 過去最高のライン全体の矩形.Left, 過去最高のライン全体の矩形.Bottom - 単位幅 * ( i + 1 ), 過去最高のライン全体の矩形.Width, 単位幅 ),
                         ( 2 <= this._最高成績のカウントマップ[ i ] ) ? 黄色ブラシ : 水色ブラシ );
                 }
@@ -199,6 +202,6 @@ namespace DTXMania2.演奏
 
         private readonly Dictionary<判定種別, int> _前回設定したときの成績;
 
-        private readonly char[] _カウントマップ文字列 = new char[] { '0','1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
+        private readonly char[] _カウントマップ文字列 = new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C' };
     }
 }

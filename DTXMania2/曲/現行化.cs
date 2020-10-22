@@ -65,7 +65,7 @@ namespace DTXMania2.曲
         public async Task 追加するAsync( ICollection<Node> nodeList )
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
-            
+
             await Task.Run( () => {
 
                 if( nodeList is Node[] nodeArray )
@@ -112,23 +112,28 @@ namespace DTXMania2.曲
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             if( this._現行化タスク is null )
-                return;
-
-            if( this._現行化タスク.IsCompleted )
             {
+                // タスクは走っていない。
+            }
+            else if( this._現行化タスク.IsCompleted )
+            {
+                // タスクはすでに終了済みである。
                 this._現行化タスク.Dispose();
                 this._現行化タスク = null;
-                return;
             }
+            else
+            {
+                // タスクが実行中である。
 
-            this._タスク再開通知.Set();    // 終了通知より先に再開を通知する。
-            this._タスク終了通知.Set();
+                this._タスク再開通知.Set();    // 終了通知より先に再開を通知する。
+                this._タスク終了通知.Set();
 
-            if( !this._現行化タスク.Wait( 5000 ) )
-                throw new Exception( "現行化タスク終了待ちがタイムアウトしました。" );
+                if( !this._現行化タスク.Wait( 5000 ) )
+                    throw new Exception( "現行化タスク終了待ちがタイムアウトしました。" );
 
-            this._現行化タスク.Dispose();
-            this._現行化タスク = null;
+                this._現行化タスク.Dispose();
+                this._現行化タスク = null;
+            }
         }
 
         /// <summary>
@@ -148,6 +153,7 @@ namespace DTXMania2.曲
                         {
                             if( score is null )
                                 continue;
+
                             //score.譜面と画像を現行化済み = false;    --> ユーザに依存しないので現状維持
                             score.最高記録 = null;
                             score.最高記録を現行化済み = false;
@@ -163,6 +169,7 @@ namespace DTXMania2.曲
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
+            // 指定されたユーザIDでDBに登録されているすべての譜面属性を取得する。
             int 属性取得数 = 0;
             using var scorepropdb = new ScorePropertiesDB();
             using var cmd = new SqliteCommand( "SELECT * FROM ScoreProperties WHERE UserId = @UserId", scorepropdb.Connection );
@@ -173,16 +180,18 @@ namespace DTXMania2.曲
             while( result.Read() )
             {
                 var prop = new ScorePropertiesDBRecord( result );
-                var scores = Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == prop.ScorePath );
-                foreach( var score in scores )
+
+                foreach( var score in Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == prop.ScorePath ) )
                 {
                     score.譜面の属性 = prop;
                     score.譜面の属性を現行化済み = true;
                     属性取得数++;
                 }
             }
+
             Log.Info( $"{属性取得数} 件の属性を更新しました。" );
         }
+
 
 
         // 生成(static)
@@ -194,7 +203,7 @@ namespace DTXMania2.曲
             {
                 var image = new 文字列画像D2D() {
                     表示文字列 = タイトル文字列,
-                    フォント名 = "HGMaruGothicMPRO", // "メイリオ",
+                    フォント名 = "HGMaruGothicMPRO", // "Meiryo",
                     フォントの太さ = FontWeight.Regular,
                     フォントスタイル = FontStyle.Normal,
                     フォントサイズpt = 40f,
@@ -223,7 +232,7 @@ namespace DTXMania2.曲
             {
                 var image = new 文字列画像D2D() {
                     表示文字列 = サブタイトル文字列,
-                    フォント名 = "HGMaruGothicMPRO", // "メイリオ",
+                    フォント名 = "HGMaruGothicMPRO", // "Meiryo",
                     フォントの太さ = FontWeight.Regular,
                     フォントスタイル = FontStyle.Normal,
                     フォントサイズpt = 20f,
@@ -279,6 +288,7 @@ namespace DTXMania2.曲
 
         private ManualResetEventSlim _現行化中 = new ManualResetEventSlim( false );
 
+
         private void _現行化を開始する( ユーザ設定 userConfig )
         {
             this._タスク終了通知.Reset();
@@ -290,9 +300,11 @@ namespace DTXMania2.曲
 
                 while( !this._タスク終了通知.IsSet )
                 {
+                    // 一時停止通知が来ていたら、再開通知が来るまでブロックする。
                     if( this._タスク一時停止通知.IsSet )
                         this._タスク再開通知.Wait();
 
+                    // スタックからノードを1つ取り出して現行化する。
                     if( this._現行化待ちスタック.TryPop( out var node ) )
                     {
                         this._現行化中.Set();
@@ -300,7 +312,7 @@ namespace DTXMania2.曲
                     }
                     else
                     {
-                        // スタックが空だったら少し待機。
+                        // スタックが空だったら、少し待機してから繰り返し。
                         this._現行化中.Reset();
                         Thread.Sleep( 100 );
                     }
@@ -313,7 +325,7 @@ namespace DTXMania2.曲
 
         private void _ノードを現行化する( Node node, ユーザ設定 userConfig )
         {
-            #region " 1. ノードが持つ譜面の現行化 "
+            #region " (1) ノードが持つすべての譜面の現行化 "
             //----------------
             if( node is SongNode snode )
             {
@@ -327,18 +339,19 @@ namespace DTXMania2.曲
                 for( int i = 0; i < 5; i++ )
                 {
                     var score = snode.曲.譜面リスト[ i ];
+
                     if( score is null )
-                        continue;
+                        continue;   // 譜面がないなら無視
 
                     if( !File.Exists( score.譜面.ScorePath ) )
                     {
                         Log.ERROR( $"ファイルが存在しません。[{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( score.譜面.ScorePath )}]" );
                         snode.曲.譜面リスト[ i ]!.Dispose();
                         snode.曲.譜面リスト[ i ] = null;
-                        continue;
+                        continue;   // 譜面のファイルがないなら無視
                     }
 
-                    // 1.1. 譜面と画像 の現行化
+                    // (1-1) 譜面と画像 の現行化
 
                     if( !score.譜面と画像を現行化済み )
                     {
@@ -355,13 +368,13 @@ namespace DTXMania2.曲
 
                                 #region " ScoreDBの レコードを新規追加し score を更新する。"
                                 //----------------
-                                var レコード = new ScoreDBRecord( score.譜面.ScorePath, userConfig );
+                                var record = new ScoreDBRecord( score.譜面.ScorePath, userConfig );
 
                                 // レコードを ScoreDB に新規追加する。
-                                レコード.ReplaceTo( scoredb );
+                                record.ReplaceTo( scoredb );
 
                                 // score にも反映する。
-                                score.譜面.UpdateFrom( レコード );
+                                score.譜面.UpdateFrom( record );
 
                                 // 完了。
                                 Log.Info( $"ScoreDBに曲を追加しました。{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( score.譜面.ScorePath )}" );
@@ -372,20 +385,20 @@ namespace DTXMania2.曲
                             {
                                 // (B) ScoreDB に既存のレコードがある場合
 
-                                var レコード = new ScoreDBRecord( result );
+                                var record = new ScoreDBRecord( result );
                                 string 譜面ファイルの最終更新日時 = File.GetLastWriteTime( score.譜面.ScorePath ).ToString( "G" );
 
-                                if( レコード.LastWriteTime != 譜面ファイルの最終更新日時 )
+                                if( record.LastWriteTime != 譜面ファイルの最終更新日時 )
                                 {
                                     #region " (B-a) 譜面ファイルの最終更新日時が更新されている → ScoreDB のレコードと score を更新する。"
                                     //----------------
-                                    レコード = new ScoreDBRecord( score.譜面.ScorePath, userConfig );
+                                    record = new ScoreDBRecord( score.譜面.ScorePath, userConfig );
 
                                     // ScoreDB のレコードを置換する。
-                                    レコード.ReplaceTo( scoredb );
+                                    record.ReplaceTo( scoredb );
 
                                     // score にも反映する。
-                                    score.譜面.UpdateFrom( レコード );
+                                    score.譜面.UpdateFrom( record );
 
                                     // 完了。
                                     Log.Info( $"最終更新日時が変更されているため、曲の情報を更新しました。{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( score.譜面.ScorePath )}" );
@@ -413,25 +426,29 @@ namespace DTXMania2.曲
                         //----------------
                         try
                         {
+                            // タイトル文字列画像
                             if( score.タイトル文字列画像 is null || score.タイトル文字列画像.表示文字列 != score.譜面.Title )
                             {
                                 score.タイトル文字列画像?.Dispose();
                                 score.タイトル文字列画像 = タイトル文字列画像を生成する( score.譜面.Title );
                             }
+
+                            // サブタイトル文字列画像
                             if( score.サブタイトル文字列画像 is null || score.サブタイトル文字列画像.表示文字列 != score.譜面.Artist )
                             {
                                 score.サブタイトル文字列画像?.Dispose();
                                 score.サブタイトル文字列画像 = サブタイトル文字列画像を生成する( string.IsNullOrEmpty( score.譜面.Artist ) ? null : score.譜面.Artist );
                             }
+
+                            // プレビュー画像
                             score.プレビュー画像?.Dispose();
-                            score.プレビュー画像 = ノード画像を生成する(
-                                string.IsNullOrEmpty( score.譜面.PreImage ) ?
+                            score.プレビュー画像 = ノード画像を生成する( string.IsNullOrEmpty( score.譜面.PreImage ) ?
                                 null :
                                 new VariablePath( Path.Combine( Path.GetDirectoryName( score.譜面.ScorePath ) ?? @"\", score.譜面.PreImage ) ) );
                         }
                         catch( Exception e )
                         {
-                            Log.ERROR( $"譜面画像の現行化に失敗しました。[{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す(score.譜面.ScorePath)}]" );
+                            Log.ERROR( $"譜面画像の現行化に失敗しました。[{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( score.譜面.ScorePath )}]" );
                             // 続行
                         }
                         //----------------
@@ -441,7 +458,7 @@ namespace DTXMania2.曲
                         score.譜面と画像を現行化済み = true;
                     }
 
-                    // 1.2. 属性 の現行化
+                    // (1-2) 属性 の現行化
 
                     if( !score.譜面の属性を現行化済み )
                     {
@@ -475,7 +492,7 @@ namespace DTXMania2.曲
                         #endregion
                     }
 
-                    // 1.3. 最高記録 の現行化
+                    // (1-3) 最高記録 の現行化
 
                     if( !score.最高記録を現行化済み )
                     {
@@ -516,7 +533,7 @@ namespace DTXMania2.曲
             //----------------
             #endregion
 
-            #region " 2. ノードの現行化 "
+            #region " (2) ノード自身の現行化 "
             //----------------
             if( !node.現行化済み )
             {
@@ -527,7 +544,7 @@ namespace DTXMania2.曲
                 }
                 else
                 {
-                    // SongNode 以外は生成する。
+                    // SongNode 以外は今生成する。
                     node.タイトル文字列画像 = タイトル文字列画像を生成する( node.タイトル );
                     node.サブタイトル文字列画像 = サブタイトル文字列画像を生成する( node.サブタイトル );
                     node.ノード画像 = ノード画像を生成する( node.ノード画像ファイルの絶対パス );

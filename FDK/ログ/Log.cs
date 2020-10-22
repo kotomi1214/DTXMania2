@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Text;
-using System.Runtime.CompilerServices;
+using System.Threading;
 
 namespace FDK
 {
@@ -14,7 +13,7 @@ namespace FDK
     /// </summary>
     public static class Log
     {
-        
+
         // プロパティ
 
 
@@ -183,7 +182,7 @@ namespace FDK
                 var 経過時間ms = ( DateTime.Now - Log._Info開始時刻.Pop() ).TotalMilliseconds;
 
                 var NETスレッドID = Thread.CurrentThread.ManagedThreadId;
-                Log._深さ[NETスレッドID] = Math.Max( ( Log._深さ[NETスレッドID] - 1 ), 0 );
+                Log._深さ[ NETスレッドID ] = Math.Max( ( Log._深さ[ NETスレッドID ] - 1 ), 0 );
 
                 Log._一定時間が経過していたら区切り線を表示する();
                 Trace.WriteLine( $"{tagINFO} {Log._日時とスレッドID} {Log._インデックスを返す( Log._スレッドの深さを返す() )}{終了ブロック名} <-- 終了 ({経過時間ms}ms)" );
@@ -206,8 +205,6 @@ namespace FDK
                 return $"{DateTime.Now.ToString( "HH:mm:ss.fffffff" )} [" + ( string.IsNullOrEmpty( NETスレッド名 ) ? $"{NETスレッドID:00}" : NETスレッド名 ) + "]";
             }
         }
-
-        private static readonly Dictionary<uint, string> _IDto名前 = new Dictionary<uint, string>();
 
         private static Dictionary<string, DateTime> _識別キー別最終表示時刻 = new Dictionary<string, DateTime>();
 
@@ -237,6 +234,7 @@ namespace FDK
         private static readonly string tagINTERVAL = "[ INTERVAL  ]";
 
         private static Dictionary<int, int> _深さ = new Dictionary<int, int>();
+
 
         private static int _スレッドの深さを返す()
         {
@@ -282,7 +280,7 @@ namespace FDK
                     @"(ノ-_-)ノ~┻━┻",
                     @"_(ˇωˇ」∠)_ ",
                 };
-                int faceNow = ( (int) ( span * 1000.0 ) ) % faces.Length;
+                int faceNow = ( (int)( span * 1000.0 ) ) % faces.Length;
                 //----------------
                 #endregion
 

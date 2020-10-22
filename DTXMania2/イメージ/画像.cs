@@ -16,7 +16,10 @@ namespace DTXMania2
         ///     指定した画像ファイルから画像を作成する。
         /// </summary>
         public 画像( VariablePath 画像ファイルパス, BindFlags bindFlags = BindFlags.ShaderResource )
-            : base( Global.GraphicResources.D3D11Device1, 画像ファイルパス, bindFlags )
+            : base(
+                  Global.GraphicResources.D3D11Device1,
+                  Folder.カルチャを考慮した絶対パスを返す( 画像ファイルパス.変数なしパス ),
+                  bindFlags )
         {
         }
 

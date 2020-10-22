@@ -1,7 +1,6 @@
-﻿using SharpDX.DirectComposition;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 
 namespace FDK
 {
@@ -32,10 +31,14 @@ namespace FDK
         /// </remarks>
         public SharpDX.Size2F 設計画面サイズ { get; private set; }
 
+        /// <summary>
+        ///     実際の画面サイズ（ウィンドウのクライアントサイズ）。
+        /// </summary>
         public SharpDX.Size2F 物理画面サイズ { get; private set; }
 
         /// <summary>
         ///     等倍3D平面での画面左上の3D座標。
+        ///     D2D描画では使用しないこと。
         /// </summary>
         /// <remarks>
         ///     等倍3D平面については <see cref="等倍3D平面描画用の変換行列を取得する"/> を参照。
@@ -66,7 +69,7 @@ namespace FDK
 
         public event EventHandler スワップチェーンに依存しないグラフィックリソースの作成;
         public event EventHandler スワップチェーンに依存しないグラフィックリソースの解放;
-        
+
         public event EventHandler スワップチェーンに依存するグラフィックリソースの作成;
         public event EventHandler スワップチェーンに依存するグラフィックリソースの解放;
 
@@ -107,6 +110,7 @@ namespace FDK
             //----------------
             #endregion
 
+
             #region " D3Dデバイスを作成する。"
             //----------------
             using( var d3dDevice = new SharpDX.Direct3D11.Device(
@@ -127,7 +131,7 @@ namespace FDK
             // （DXVAを使った動画の再生で必須。Windows8 以降のPCで実装されている。）
             using( var videoDevice = D3D11Device1.QueryInterfaceOrNull<SharpDX.Direct3D11.VideoDevice>() )
             {
-                // ↓以下のコメントを外すと、グラフィックデバッグでは例外が発生する。
+                // ↓以下のコメントを外すと、グラフィックデバッグで例外が発生する。
                 //if( videoDevice is null )
                 //    throw new Exception( "Direct3D11デバイスが、ID3D11VideoDevice をサポートしていません。" );
             }
@@ -218,7 +222,7 @@ namespace FDK
             #region " スワップチェーン用のVisualを作成する。"
             //----------------
             DCompVisual2ForSwapChain = new SharpDX.DirectComposition.Visual2( DCompDevice2 );
-            DCompVisual2ForSwapChain.BitmapInterpolationMode = BitmapInterpolationMode.Linear;
+            DCompVisual2ForSwapChain.BitmapInterpolationMode = SharpDX.DirectComposition.BitmapInterpolationMode.Linear;
             //----------------
             #endregion
 
@@ -331,6 +335,7 @@ namespace FDK
             //----------------
             #endregion
 
+
             #region " MediaFoundation をシャットダウンする。"
             //----------------
             SharpDX.MediaFoundation.MediaManager.Shutdown();
@@ -352,8 +357,8 @@ namespace FDK
             // DirectComposition用スワップチェーンを作成する。
             var swapChainDesc = new SharpDX.DXGI.SwapChainDescription1() {
                 BufferCount = 2,
-                Width = (int) 設計画面サイズ.Width,
-                Height = (int) 設計画面サイズ.Height,
+                Width = (int)設計画面サイズ.Width,     // スワップチェーンのサイズは、物理画面サイズによらず、常に設計画面サイズと同じ。
+                Height = (int)設計画面サイズ.Height,   //
                 Format = SharpDX.DXGI.Format.B8G8R8A8_UNorm,    // D2D をサポートするなら B8G8R8A8 を指定する必要がある。
                 AlphaMode = SharpDX.DXGI.AlphaMode.Ignore,      // Premultiplied にすると、ウィンドウの背景（デスクトップ画像）と加算合成される。（意味ない）
                 Stereo = false,
@@ -362,7 +367,6 @@ namespace FDK
                 Scaling = SharpDX.DXGI.Scaling.Stretch,                 // SwapChainForComposition での必須条件。
                 Usage = SharpDX.DXGI.Usage.RenderTargetOutput,
                 Flags = SharpDX.DXGI.SwapChainFlags.None,
-
                 // https://msdn.microsoft.com/en-us/library/windows/desktop/bb174579.aspx
                 // > You cannot call SetFullscreenState on a swap chain that you created with IDXGIFactory2::CreateSwapChainForComposition.
                 // よって、以下のフラグは使用禁止。
@@ -384,16 +388,16 @@ namespace FDK
                 //SharpDX.DXGI.WindowAssociationFlags.IgnoreAltEnter
                 );
 
-            // Visual のコンテンツに指定してコミット。
+            // スワップチェーンの DXGIサーフェスを Visual のコンテンツに指定してコミット。
             DCompVisual2ForSwapChain.Content = DXGISwapChain1;
-            this._D2D用Visualのスケールをバックバッファに合せる();
+            this._D2D用Visualのスケールをバックバッファに合わせる();
             DCompDevice2.Commit();
         }
         private void _スワップチェーンを解放する()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
-            // Visual のコンテンツから解除してコミット。
+            // スワップチェーンの DXGIサーフェスを Visual のコンテンツから解除してコミット。
             DCompVisual2ForSwapChain.Content = null;
             DCompDevice2.Commit();
 
@@ -600,7 +604,9 @@ namespace FDK
             this.物理画面サイズ = 物理画面サイズ;
 
             this.スワップチェーンに依存しないグラフィックリソースの作成( this, new EventArgs() );
+
             this._スワップチェーンを作成する();
+
             this.スワップチェーンに依存するグラフィックリソースの作成( this, new EventArgs() );
         }
 
@@ -609,7 +615,9 @@ namespace FDK
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this.スワップチェーンに依存するグラフィックリソースの解放( this, new EventArgs() );
+            
             this._スワップチェーンを解放する();
+            
             this.スワップチェーンに依存しないグラフィックリソースの解放( this, new EventArgs() );
         }
 
@@ -619,18 +627,20 @@ namespace FDK
 
 
         /// <summary>
-        ///		物理画面サイズ（スワップチェーンのバックバッファのサイズ）を変更する。
+        ///		物理画面サイズを変更する。
         /// </summary>
         /// <param name="newSize">新しいサイズ。</param>
+        /// <remarks>
+        ///     スワップチェーンのサイズは変更せず、レンダーターゲット（DirectComposition の Visual）の拡大率のみ変更する。
+        ///     Direct3D については、何もしなくても自動的に拡大縮小される。
+        /// </remarks>
         public void 物理画面サイズを変更する( SharpDX.Size2F newSize )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this.物理画面サイズ = newSize;
 
-            // スワップチェーンのサイズは変更せず、レンダーターゲット（DirectComposition の Visual）の拡大率のみ変更する。
-            // Direct3D については、何もしなくても自動的に拡大縮小される。
-            this._D2D用Visualのスケールをバックバッファに合せる();
+            this._D2D用Visualのスケールをバックバッファに合わせる();
             DCompDevice2.Commit();
         }
 
@@ -645,7 +655,7 @@ namespace FDK
         /// </remarks>
         public void 等倍3D平面描画用の変換行列を取得する( out SharpDX.Matrix ビュー行列, out SharpDX.Matrix 射影行列, float 視野角deg = 10f )
         {
-            var dz = (float) ( this.設計画面サイズ.Height / ( 4.0 * System.Math.Tan( SharpDX.MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) ) );
+            var dz = this.設計画面サイズ.Height / ( 4.0f * MathF.Tan( SharpDX.MathUtil.DegreesToRadians( 視野角deg / 2.0f ) ) );
 
             var カメラの位置 = new SharpDX.Vector3( 0f, 0f, -2f * dz );
             var カメラの注視点 = new SharpDX.Vector3( 0f, 0f, 0f );
@@ -661,11 +671,13 @@ namespace FDK
         }
 
 
-        private void _D2D用Visualのスケールをバックバッファに合せる()
+        private void _D2D用Visualのスケールをバックバッファに合わせる()
         {
             using var trans = new SharpDX.DirectComposition.ScaleTransform( DCompDevice2 );
+            
             trans.SetScaleX( this.物理画面サイズ.Width / 設計画面サイズ.Width );
             trans.SetScaleY( this.物理画面サイズ.Height / 設計画面サイズ.Height );
+            
             DCompVisual2ForSwapChain.SetTransform( trans );
         }
     }

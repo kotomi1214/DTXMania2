@@ -11,12 +11,14 @@ namespace DTXMania2
         public static readonly VariablePath ScorePropertiesDBPath = new VariablePath( @"$(AppData)\ScorePropertiesDB.sqlite3" );
 
 
-        public ScorePropertiesDB()
+        public ScorePropertiesDB( VariablePath? path = null )
             : base()
         {
+            path ??= ScorePropertiesDBPath;
+
             try
             {
-                this.Open( ScorePropertiesDBPath );
+                this.Open( path );
             }
             catch( Exception e )
             {
@@ -26,18 +28,18 @@ namespace DTXMania2
                 //----------------
                 try
                 {
-                    File.Delete( ScorePropertiesDBPath.変数なしパス );  // ファイルがない場合には例外は出ない
+                    File.Delete( path.変数なしパス );  // ファイルがない場合には例外は出ない
                 }
                 catch( Exception e2 )
                 {
-                    var msg = $"曲属性データベースファイルの削除に失敗しました。[{ScorePropertiesDBPath.変数付きパス}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
+                    var msg = $"曲属性データベースファイルの削除に失敗しました。[{path.変数付きパス}][{Folder.絶対パスをフォルダ変数付き絶対パスに変換して返す( e.Message )}]";
                     Log.ERROR( msg );
                     throw new Exception( msg, e2 );  // どうしようもないので例外発出
                 }
                 //----------------
                 #endregion
 
-                this.Open( ScorePropertiesDBPath );
+                this.Open( path );
             }
         }
     }

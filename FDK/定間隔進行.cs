@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using FDK;
+using System.Diagnostics;
 
 namespace FDK
 {
@@ -51,7 +51,7 @@ namespace FDK
                 this._タイマ.一時停止する();
             }
         }
-        
+
         public void 経過時間の計測を再開する()
         {
             lock( this._スレッド間同期 )
@@ -59,7 +59,7 @@ namespace FDK
                 this._タイマ.再開する();
             }
         }
-        
+
         public void 経過時間の分だけ進行する( long 間隔ms, Action 定間隔処理 )
         {
             lock( this._スレッド間同期 )
@@ -85,11 +85,11 @@ namespace FDK
             }
         }
 
-        
+
         private long _前回の進行時刻ms = QPCTimer.未使用;
-        
+
         private readonly QPCTimer _タイマ = new QPCTimer();
-        
+
         private readonly object _スレッド間同期 = new object();
     }
 }

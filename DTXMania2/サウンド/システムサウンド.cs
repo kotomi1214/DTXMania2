@@ -57,6 +57,7 @@ namespace DTXMania2
 
             // ファイル名は、<Alias>.ogg とする。
             var path = new VariablePath( $@"$(SystemSounds)\{type.GetAlias()}.ogg" );
+            path = Folder.カルチャを考慮した絶対パスを返す( path.変数なしパス );
 
             // ファイルがないなら無視。
             if( !File.Exists( path.変数なしパス ) )

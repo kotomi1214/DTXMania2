@@ -45,7 +45,7 @@ namespace FDK
             this._WaveFileReader = new WaveFileReader( ファイルパス.変数なしパス );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this._WaveFileReader.Dispose();
         }

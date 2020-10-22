@@ -121,4 +121,207 @@
   <data name="DTXMania2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DTXMania2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="TXT_AutoPlayerでのログオンに失敗しました" xml:space="preserve">
+    <value>Failed to log on as AutoPlayer.</value>
+  </data>
+  <data name="TXT_Chinaの表示位置" xml:space="preserve">
+    <value>China position</value>
+  </data>
+  <data name="TXT_HIDKeyboardの受付を開始しました" xml:space="preserve">
+    <value>Now accepting inputs for the HID Keyboard.</value>
+  </data>
+  <data name="TXT_MidiInの受付を開始しました" xml:space="preserve">
+    <value>MIDI IN [{0}] '{1}' started.</value>
+  </data>
+  <data name="TXT_OFF" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="TXT_ON" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="TXT_Rideの表示位置" xml:space="preserve">
+    <value>Ride position</value>
+  </data>
+  <data name="TXT_Splashの表示位置" xml:space="preserve">
+    <value>Splash position</value>
+  </data>
+  <data name="TXT_この曲の評価" xml:space="preserve">
+    <value>Rating this song</value>
+  </data>
+  <data name="TXT_すべてONOFF" xml:space="preserve">
+    <value>Toggle all</value>
+  </data>
+  <data name="TXT_ウィンドウ" xml:space="preserve">
+    <value>Window</value>
+  </data>
+  <data name="TXT_オプション設定へ" xml:space="preserve">
+    <value>Options</value>
+  </data>
+  <data name="TXT_キーボードまたはMIDI信号を入力してください" xml:space="preserve">
+    <value>Enter a keyboard or MIDI signal.</value>
+  </data>
+  <data name="TXT_コントロールチェンジ" xml:space="preserve">
+    <value>Control Change</value>
+  </data>
+  <data name="TXT_シンバルフリー" xml:space="preserve">
+    <value>Free cymbal</value>
+  </data>
+  <data name="TXT_タイミングクロック信号_アクティブ信号は無視します" xml:space="preserve">
+    <value>* The timing clock signal and the active signal are ignored.</value>
+  </data>
+  <data name="TXT_ダークモード" xml:space="preserve">
+    <value>Dark mode</value>
+  </data>
+  <data name="TXT_ダークモード_FULL" xml:space="preserve">
+    <value>Full</value>
+  </data>
+  <data name="TXT_ダークモード_HALF" xml:space="preserve">
+    <value>Half</value>
+  </data>
+  <data name="TXT_ドラムサウンド" xml:space="preserve">
+    <value>Drums sound</value>
+  </data>
+  <data name="TXT_ノートオフ" xml:space="preserve">
+    <value>Note Off</value>
+  </data>
+  <data name="TXT_ノートオン" xml:space="preserve">
+    <value>Note On</value>
+  </data>
+  <data name="TXT_パッドを叩いてください" xml:space="preserve">
+    <value>Hit any cymbal or Enter key</value>
+  </data>
+  <data name="TXT_プレイヤーを選択してください" xml:space="preserve">
+    <value>Select a player.</value>
+  </data>
+  <data name="TXT_ユーザDBを初期化" xml:space="preserve">
+    <value>Initialize user DB</value>
+  </data>
+  <data name="TXT_ランダムに選択" xml:space="preserve">
+    <value>Select a song
+near {0}</value>
+  </data>
+  <data name="TXT_レーンの透明度" xml:space="preserve">
+    <value>Lane opacity</value>
+  </data>
+  <data name="TXT_二重起動はできません" xml:space="preserve">
+    <value>It is not possible to run more than one at a time.</value>
+  </data>
+  <data name="TXT_入力と入力の間が500ミリ秒以上開いた場合は間に空行を表示します" xml:space="preserve">
+    <value>* If there is more than 500 milliseconds between inputs, a blank line will be displayed between them.</value>
+  </data>
+  <data name="TXT_入力割り当て" xml:space="preserve">
+    <value>Input assignment</value>
+  </data>
+  <data name="TXT_全画面" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="TXT_初期化" xml:space="preserve">
+    <value>Initialize</value>
+  </data>
+  <data name="TXT_判定FASTSLOWの表示" xml:space="preserve">
+    <value>Show fast/slow</value>
+  </data>
+  <data name="TXT_判定位置調整" xml:space="preserve">
+    <value>Judge position adjust</value>
+  </data>
+  <data name="TXT_右" xml:space="preserve">
+    <value>Right</value>
+  </data>
+  <data name="TXT_変更を破棄していいですか" xml:space="preserve">
+    <value>Discard the changes?</value>
+  </data>
+  <data name="TXT_小節番号の表示" xml:space="preserve">
+    <value>Show bar number</value>
+  </data>
+  <data name="TXT_小節線と拍線の表示" xml:space="preserve">
+    <value>Show bar/beat lines</value>
+  </data>
+  <data name="TXT_左" xml:space="preserve">
+    <value>Left</value>
+  </data>
+  <data name="TXT_成績DBを初期化" xml:space="preserve">
+    <value>Initialize record DB</value>
+  </data>
+  <data name="TXT_戻る" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="TXT_曲DBを初期化" xml:space="preserve">
+    <value>Initialize song DB</value>
+  </data>
+  <data name="TXT_曲が見つかりません" xml:space="preserve">
+    <value>Song not found...
+Hit BDx2 (in default SPACEx2) to select song folders.</value>
+  </data>
+  <data name="TXT_曲読み込みフォルダ" xml:space="preserve">
+    <value>Song folders</value>
+  </data>
+  <data name="TXT_演奏スピード" xml:space="preserve">
+    <value>Song speed</value>
+  </data>
+  <data name="TXT_演奏中の動画サイズ" xml:space="preserve">
+    <value>Movie size</value>
+  </data>
+  <data name="TXT_演奏中の動画サイズ_中央寄せ" xml:space="preserve">
+    <value>Shrink to center</value>
+  </data>
+  <data name="TXT_演奏中の動画サイズ_全画面" xml:space="preserve">
+    <value>Fullscreen</value>
+  </data>
+  <data name="TXT_演奏中の動画表示" xml:space="preserve">
+    <value>Show movie</value>
+  </data>
+  <data name="TXT_演奏中の壁紙表示" xml:space="preserve">
+    <value>Show wallpaper</value>
+  </data>
+  <data name="TXT_現在の割り当て" xml:space="preserve">
+    <value>Current assign to</value>
+  </data>
+  <data name="TXT_画面モード" xml:space="preserve">
+    <value>Screen mode</value>
+  </data>
+  <data name="TXT_確認" xml:space="preserve">
+    <value>Confirmation</value>
+  </data>
+  <data name="TXT_自動演奏" xml:space="preserve">
+    <value>Auto play</value>
+  </data>
+  <data name="TXT_設定を初期化" xml:space="preserve">
+    <value>Initialize settings</value>
+  </data>
+  <data name="TXT_設定完了" xml:space="preserve">
+    <value>Exit</value>
+  </data>
+  <data name="TXT_設定完了_戻る" xml:space="preserve">
+    <value>Back</value>
+  </data>
+  <data name="TXT_評価" xml:space="preserve">
+    <value>Rating</value>
+  </data>
+  <data name="TXT_評価1" xml:space="preserve">
+    <value>❤</value>
+  </data>
+  <data name="TXT_評価2" xml:space="preserve">
+    <value>❤❤</value>
+  </data>
+  <data name="TXT_評価3" xml:space="preserve">
+    <value>❤❤❤</value>
+  </data>
+  <data name="TXT_評価4" xml:space="preserve">
+    <value>❤❤❤❤</value>
+  </data>
+  <data name="TXT_評価5" xml:space="preserve">
+    <value>❤❤❤❤❤</value>
+  </data>
+  <data name="TXT_評価なし" xml:space="preserve">
+    <value>No rating</value>
+  </data>
+  <data name="TXT_評価記号用フォント" xml:space="preserve">
+    <value>Segoe UI emoji</value>
+  </data>
+  <data name="TXT_譜面スピード" xml:space="preserve">
+    <value>Scroll speed</value>
+  </data>
+  <data name="TXT_音量によるサイズ変化" xml:space="preserve">
+    <value>Size follows volume</value>
+  </data>
 </root>

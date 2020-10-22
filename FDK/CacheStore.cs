@@ -62,7 +62,7 @@ namespace FDK
             this._キャッシュデータリスト = new Dictionary<string, キャッシュ情報<T>>();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -204,7 +204,7 @@ namespace FDK
             /// <summary>
             ///     生成データを破棄する。
             /// </summary>
-            public void Dispose()
+            public virtual void Dispose()
             {
                 ( this.生成データ as IDisposable )?.Dispose();
                 this.生成データ = null;

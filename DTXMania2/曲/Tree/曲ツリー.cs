@@ -54,13 +54,13 @@ namespace DTXMania2.曲
                 return false;   // 同一
 
             // ホルダを変更。
-            this.フォーカスホルダ = focusNode.親ノード ?? 
+            this.フォーカスホルダ = focusNode.親ノード ??
                 throw new Exception( "ルートノードをフォーカスすることはできません。" );
 
             // チェック。
             if( !this.フォーカスホルダ.子ノードリスト.SelectItem( focusNode ) ||
                 this.フォーカスホルダ.子ノードリスト.SelectedItem is null )
-                    throw new Exception( "フォーカスノードの選択に失敗しました。" );
+                throw new Exception( "フォーカスノードの選択に失敗しました。" );
 
             return true;
         }
@@ -132,16 +132,16 @@ namespace DTXMania2.曲
 
         public int フォーカス難易度レベル => this.フォーカスノード switch
         {
-            // 未選択
+            // (A) 未選択の場合
             null => this.ユーザ希望難易度レベル,
 
-            // 曲ノード
+            // (B) 曲ノードの場合
             SongNode snode => snode.曲.ユーザ希望難易度に最も近い難易度レベルを返す( this.ユーザ希望難易度レベル ),
 
-            // その他のノード
+            // (C) その他のノードの場合
             _ => this.ユーザ希望難易度レベル,
         };
-       
+
         public void ユーザ希望難易度をひとつ増やす()
         {
             // ユーザ希望難易度を1つ増やす。（4を越えたら0に戻る。）

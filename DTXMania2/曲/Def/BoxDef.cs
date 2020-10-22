@@ -258,10 +258,10 @@ namespace DTXMania2.曲
             using var sw = new StreamWriter( boxDefファイルパス.変数なしパス );
 
             sw.WriteLine( $"#TITLE: {this.TITLE}" );
-            
-            if( !string.IsNullOrEmpty( this.ARTIST ) ) 
+
+            if( !string.IsNullOrEmpty( this.ARTIST ) )
                 sw.WriteLine( $"#ARTIST: {this.ARTIST}" );
-            
+
             if( !string.IsNullOrEmpty( this.COMMENT ) )
                 sw.WriteLine( $"#COMMENT: {this.COMMENT}" );
 
@@ -275,16 +275,16 @@ namespace DTXMania2.曲
                 sw.WriteLine( $"#FONTCOLOR: #{this.FONTCOLOR.Value.R:X2}{this.FONTCOLOR.Value.G:X2}{this.FONTCOLOR.Value.B:X2}" );
 
             if( null != this.PERFECTRANGE )
-                sw.WriteLine( $"#PERFECTRANGE: {(int) ( this.PERFECTRANGE * 1000 )}" );
+                sw.WriteLine( $"#PERFECTRANGE: {(int)( this.PERFECTRANGE * 1000 )}" );
 
             if( null != this.GREATRANGE )
-                sw.WriteLine( $"#GREATRANGE: {(int) ( this.GREATRANGE * 1000 )}" );
+                sw.WriteLine( $"#GREATRANGE: {(int)( this.GREATRANGE * 1000 )}" );
 
             if( null != this.GOODRANGE )
-                sw.WriteLine( $"#GOODRANGE: {(int) ( this.GOODRANGE * 1000 )}" );
+                sw.WriteLine( $"#GOODRANGE: {(int)( this.GOODRANGE * 1000 )}" );
 
             if( null != this.OKRANGE )
-                sw.WriteLine( $"#OKRANGE: {(int) ( this.OKRANGE * 1000 )}" );
+                sw.WriteLine( $"#OKRANGE: {(int)( this.OKRANGE * 1000 )}" );
 
             if( !string.IsNullOrEmpty( this.SKINPATH ) )
                 sw.WriteLine( $"#SKINPATH: {this.SKINPATH}" );

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -39,7 +38,7 @@ namespace DTXMania2.演奏
 
         public 演奏結果 進行描画する( DeviceContext d2ddc, ref int 描画開始チップ番号, チップの演奏状態 state, SSTF.チップ chip, int index, double ヒット判定バーとの距離dpx )
         {
-            float たて中央位置dpx = (float) ( 演奏ステージ.ヒット判定位置Ydpx + ヒット判定バーとの距離dpx );
+            float たて中央位置dpx = (float)( 演奏ステージ.ヒット判定位置Ydpx + ヒット判定バーとの距離dpx );
             float 消滅割合 = 0f;
             const double チップが隠れるであろう適切なマージン = 40.0;
 
@@ -51,7 +50,7 @@ namespace DTXMania2.演奏
             if( 消滅を開始するヒット判定バーからの距離dpx < ヒット判定バーとの距離dpx )   // 通過した
             {
                 // 通過距離に応じて 0→1の消滅割合を付与する。0で完全表示、1で完全消滅、通過してなければ 0。
-                消滅割合 = Math.Min( 1f, (float) ( ( ヒット判定バーとの距離dpx - 消滅を開始するヒット判定バーからの距離dpx ) / 消滅開始から完全消滅するまでの距離dpx ) );
+                消滅割合 = Math.Min( 1f, (float)( ( ヒット判定バーとの距離dpx - 消滅を開始するヒット判定バーからの距離dpx ) / 消滅開始から完全消滅するまでの距離dpx ) );
             }
             //----------------
             #endregion
@@ -83,8 +82,7 @@ namespace DTXMania2.演奏
                 // 音量からチップの大きさを計算する。
                 var 大きさ0to1 = new Size2F( 1f, 1f ); // 音量を反映した大きさ（縦横の倍率）。
                 var 等倍 = new Size2F( 1f, 1f );       // 音量を反映しない場合はこっちを使う。
-                if( userConfig.音量に応じてチップサイズを変更する &&
-                    chip.チップ種別 != SSTF.チップ種別.Snare_Ghost )   // Snare Ghost は対象外
+                if( userConfig.音量に応じてチップサイズを変更する && chip.チップ種別 != SSTF.チップ種別.Snare_Ghost )   // Snare Ghost は対象外
                 {
                     // 既定音量未満は大きさを小さくするが、既定音量以上は大きさ1.0のままとする。最小は 0.3。
                     大きさ0to1 = new Size2F( 1f, MathUtil.Clamp( chip.音量 / (float)SSTF.チップ.既定音量, 0.3f, 1.0f ) );   // 現状、音量は縦方向にのみ影響する。
@@ -93,8 +91,7 @@ namespace DTXMania2.演奏
                 var 表示レーン種別 = userConfig.ドラムチッププロパティリスト[ chip.チップ種別 ].表示レーン種別;
                 var 表示チップ種別 = userConfig.ドラムチッププロパティリスト[ chip.チップ種別 ].表示チップ種別;
 
-                if( 表示レーン種別 != 表示レーン種別.Unknown &&   // Unknwon ならチップを表示しない。
-                    表示チップ種別 != 表示チップ種別.Unknown )    //
+                if( 表示レーン種別 != 表示レーン種別.Unknown && 表示チップ種別 != 表示チップ種別.Unknown ) // Unknwon ならチップを表示しない。
                 {
                     // チップを描画する。
                     switch( chip.チップ種別 )
@@ -232,14 +229,15 @@ namespace DTXMania2.演奏
 
         private const float _チップの最終調整倍率 = 1.2f; // 見た感じで決めた主観的な値。
 
-        private void _単画チップを１つ描画する( DeviceContext dc, 表示レーン種別 lane, RectangleF 転送元矩形, float 上位置, Size2F 大きさ0to1, float 消滅割合 )
+
+        private void _単画チップを１つ描画する( DeviceContext d2ddc, 表示レーン種別 lane, RectangleF 転送元矩形, float 上位置, Size2F 大きさ0to1, float 消滅割合 )
         {
             float X倍率 = 大きさ0to1.Width;
             float Y倍率 = 大きさ0to1.Height;
 
+            // シンバルレーンは大きさの変化をより少なく、さらにX倍率もY倍率と同じにする。
             if( lane == 表示レーン種別.LeftCymbal || lane == 表示レーン種別.RightCymbal )
             {
-                // シンバルレーンは大きさの変化をより少なく、さらにX倍率もY倍率と同じにする。
                 X倍率 = MathUtil.Clamp( 大きさ0to1.Width * 2f, min: 0f, max: 1f );
                 Y倍率 = MathUtil.Clamp( 大きさ0to1.Height * 2f, min: 0f, max: 1f );
             }
@@ -248,7 +246,7 @@ namespace DTXMania2.演奏
             Y倍率 *= ( 1f - 消滅割合 ) * _チップの最終調整倍率;
 
             this._ドラムチップ画像.描画する(
-                dc,
+                d2ddc,
                 左位置: レーンフレーム.レーン中央位置X[ lane ] - ( 転送元矩形.Width * X倍率 / 2f ),
                 上位置: 上位置 - ( 転送元矩形.Height * Y倍率 / 2f ),
                 転送元矩形: 転送元矩形,
@@ -256,15 +254,14 @@ namespace DTXMania2.演奏
                 Y方向拡大率: Y倍率 );
         }
 
-        private void _アニメチップを１つ描画する( DeviceContext dc, 表示レーン種別 lane, RectangleF 転送元矩形, float Y, Size2F 大きさ0to1, float 消滅割合 )
+        private void _アニメチップを１つ描画する( DeviceContext d2ddc, 表示レーン種別 lane, RectangleF 転送元矩形, float Y, Size2F 大きさ0to1, float 消滅割合 )
         {
             float X倍率 = 大きさ0to1.Width;
             float Y倍率 = 大きさ0to1.Height;
 
+            // Bass は縦方向に少し大きめに。
             if( lane == 表示レーン種別.Bass )
-            {
-                Y倍率 *= 1.2f;    // Bass は縦方向に少し大きめに。
-            }
+                Y倍率 *= 1.2f;
 
             X倍率 *= ( 1f - 消滅割合 ) * _チップの最終調整倍率;
             Y倍率 *= ( 1f - 消滅割合 ) * _チップの最終調整倍率;
@@ -275,7 +272,7 @@ namespace DTXMania2.演奏
             転送元矩形.Height = チップ1枚の高さ;
 
             this._ドラムチップ画像.描画する(
-                dc,
+                d2ddc,
                 左位置: レーンフレーム.レーン中央位置X[ lane ] - ( 転送元矩形.Width * X倍率 / 2f ),
                 上位置: Y - ( チップ1枚の高さ * Y倍率 / 2f ),
                 転送元矩形: 転送元矩形,

@@ -134,7 +134,7 @@ namespace FDK
         /// <param name="deviceID">無効。常に 0 を指定。</param>
         /// <param name="key">キーコード。</param>
         public bool キーが押された( int deviceID, System.Windows.Forms.Keys key )
-            => this.キーが押された( deviceID, (int) key, out _ );
+            => this.キーが押された( deviceID, (int)key, out _ );
 
         /// <summary>
         ///     最後のポーリングでキーが押されたならtrueを返す。
@@ -143,7 +143,7 @@ namespace FDK
         /// <param name="key">キーコード。</param>
         /// <param name="ev">対応する入力イベント。押されていないなら null 。</param>
         public bool キーが押された( int deviceID, System.Windows.Forms.Keys key, out InputEvent? ev )
-            => this.キーが押された( deviceID, (int) key, out ev );
+            => this.キーが押された( deviceID, (int)key, out ev );
 
         /// <summary>
         ///     現在キーが押下状態ならtrueを返す。
@@ -164,7 +164,7 @@ namespace FDK
         /// <param name="deviceID">無効。常に 0 を指定。</param>
         /// <param name="key">キーコード。</param>
         public bool キーが押されている( int deviceID, System.Windows.Forms.Keys key )
-            => this.キーが押されている( deviceID, (int) key );
+            => this.キーが押されている( deviceID, (int)key );
 
         /// <summary>
         ///     最後のポーリングでキーが離されたならtrueを返す。
@@ -196,7 +196,7 @@ namespace FDK
         /// <param name="deviceID">無効。常に 0 を指定。</param>
         /// <param name="key">キーコード。</param>
         public bool キーが離された( int deviceID, System.Windows.Forms.Keys key )
-            => this.キーが離された( deviceID, (int) key, out _ );
+            => this.キーが離された( deviceID, (int)key, out _ );
 
         /// <summary>
         ///     最後のポーリングでキーが離されたならtrueを返す。
@@ -205,7 +205,7 @@ namespace FDK
         /// <param name="key">キーコード。</param>
         /// <param name="ev">対応する入力イベント。押されていないなら null 。</param>
         public bool キーが離された( int deviceID, System.Windows.Forms.Keys key, out InputEvent? ev )
-            => this.キーが離された( deviceID, (int) key, out ev );
+            => this.キーが離された( deviceID, (int)key, out ev );
 
         /// <summary>
         ///     現在キーが非押下状態ならtrueを返す。
@@ -226,7 +226,7 @@ namespace FDK
         /// <param name="deviceID">無効。常に 0 を指定。</param>
         /// <param name="key">キーコード。</param>
         public bool キーが離されている( int deviceID, System.Windows.Forms.Keys key )
-            => this.キーが離されている( deviceID, (int) key );
+            => this.キーが離されている( deviceID, (int)key );
 
 
 

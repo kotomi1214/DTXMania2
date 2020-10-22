@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using CSCore;
 
@@ -82,7 +81,7 @@ namespace FDK
             this._DeviceRef = new WeakReference<SoundDevice>( device );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Stop();
             //this._BaseSampleSource?.Dispose();	Dispose は行わない。（SampleSource は複数の Sound で共有されている可能性があるため。）
@@ -209,7 +208,7 @@ namespace FDK
             if( this._BaseSampleSource is null )
                 return 0;
 
-            return (long) ( 時間sec * this._BaseSampleSource.WaveFormat.SampleRate + 0.5 ); // +0.5 で四捨五入ができる
+            return (long)( 時間sec * this._BaseSampleSource.WaveFormat.SampleRate + 0.5 ); // +0.5 で四捨五入ができる
         }
 
         public double FrameTo秒( long 時間frame )
@@ -217,7 +216,7 @@ namespace FDK
             if( this._BaseSampleSource is null )
                 return 0;
 
-            return (double) 時間frame / this._BaseSampleSource.WaveFormat.SampleRate;
+            return (double)時間frame / this._BaseSampleSource.WaveFormat.SampleRate;
         }
 
 

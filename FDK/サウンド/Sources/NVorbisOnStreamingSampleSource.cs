@@ -34,7 +34,9 @@ namespace FDK
         }
 
         public long Length
-            => ( this.CanSeek ) ? this._vorbisReader.TotalSamples * this.WaveFormat.Channels : 0;   // TotalSamples はフレーム数を返す。
+        {
+            get => ( this.CanSeek ) ? this._vorbisReader.TotalSamples * this.WaveFormat.Channels : 0;   // TotalSamples はフレーム数を返す。
+        }
 
 
 
@@ -57,7 +59,7 @@ namespace FDK
                 AudioEncoding.IeeeFloat );      // IeeeFloat 固定
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this._vorbisReader.Dispose();
         }

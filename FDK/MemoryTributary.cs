@@ -88,7 +88,7 @@ namespace FDK
             {
                 while( blocks.Count <= blockId )
                     blocks.Add( new byte[ blockSize ] );
-                return blocks[ (int) blockId ];
+                return blocks[ (int)blockId ];
             }
         }
         /// <summary>
@@ -116,7 +116,7 @@ namespace FDK
 
         public override int Read( byte[] buffer, int offset, int count )
         {
-            long lcount = (long) count;
+            long lcount = (long)count;
 
             if( lcount < 0 )
             {
@@ -141,11 +141,11 @@ namespace FDK
             do
             {
                 copysize = Math.Min( lcount, ( blockSize - blockOffset ) );
-                Buffer.BlockCopy( block, (int) blockOffset, buffer, offset, (int) copysize );
+                Buffer.BlockCopy( block, (int)blockOffset, buffer, offset, (int)copysize );
                 lcount -= copysize;
-                offset += (int) copysize;
+                offset += (int)copysize;
 
-                read += (int) copysize;
+                read += (int)copysize;
                 Position += copysize;
 
             } while( lcount > 0 );
@@ -184,11 +184,11 @@ namespace FDK
             {
                 do
                 {
-                    copysize = Math.Min( count, (int) ( blockSize - blockOffset ) );
+                    copysize = Math.Min( count, (int)( blockSize - blockOffset ) );
 
                     EnsureCapacity( Position + copysize );
 
-                    Buffer.BlockCopy( buffer, (int) offset, block, (int) blockOffset, copysize );
+                    Buffer.BlockCopy( buffer, (int)offset, block, (int)blockOffset, copysize );
                     count -= copysize;
                     offset += copysize;
 
@@ -252,7 +252,7 @@ namespace FDK
             long firstposition = Position;
             Position = 0;
             byte[] destination = new byte[ Length ];
-            Read( destination, 0, (int) Length );
+            Read( destination, 0, (int)Length );
             Position = firstposition;
             return destination;
         }
@@ -268,7 +268,7 @@ namespace FDK
             int read;
             do
             {
-                read = source.Read( buffer, 0, (int) Math.Min( 4096, length ) );
+                read = source.Read( buffer, 0, (int)Math.Min( 4096, length ) );
                 length -= read;
                 this.Write( buffer, 0, read );
 

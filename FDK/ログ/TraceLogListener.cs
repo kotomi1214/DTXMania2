@@ -39,7 +39,7 @@ namespace FDK
         private StreamWriter _streamWriter;
 
         /// <summary>
-        ///		もしユーザー名の情報が出力に存在する場合は、伏字にする。
+        ///		ユーザ名が出力に存在する場合は、伏字にする。
         /// </summary>
         private string SanitizeUsername( string message )
         {
@@ -49,7 +49,7 @@ namespace FDK
             {
                 char delimiter = Path.DirectorySeparatorChar;
                 string[] u = userprofile.Split( delimiter );
-                int c = u[ u.Length - 1 ].Length;     // ユーザー名の文字数
+                int c = u[ u.Length - 1 ].Length;     // ユーザ名の文字数
                 u[ u.Length - 1 ] = "*".PadRight( c, '*' );
                 string sanitizedusername = string.Join( delimiter.ToString(), u );
                 message = message.Replace( userprofile, sanitizedusername );

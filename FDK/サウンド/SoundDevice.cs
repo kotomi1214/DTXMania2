@@ -86,9 +86,9 @@ namespace FDK
                 this.WaveFormat = this._適切なフォーマットを調べて返す( 希望フォーマット ) ??
                     throw new NotSupportedException( "サポート可能な WaveFormat が見つかりませんでした。" );
 
-                Log.Info( $"WaveFormat: Channels={this.WaveFormat.Channels}, "+
+                Log.Info( $"WaveFormat: Channels={this.WaveFormat.Channels}, " +
                     $"SampleRate={this.WaveFormat.SampleRate}, " +
-                    $"BytesPerSecond={this.WaveFormat.BytesPerSecond}, BlockAlign={this.WaveFormat.BlockAlign}, "+
+                    $"BytesPerSecond={this.WaveFormat.BytesPerSecond}, BlockAlign={this.WaveFormat.BlockAlign}, " +
                     $"BitsPerSample={this.WaveFormat.BitsPerSample}" );
                 //----------------
                 #endregion
@@ -111,8 +111,8 @@ namespace FDK
                         // 排他モードかつイベント駆動 の場合、このエラーコードが返されることがある。
                         // この場合、バッファサイズを調整して再度初期化する。
                         int サイズframe = this._AudioClient.GetBufferSize();   // アライメント済みサイズが取得できる。
-                        this.再生遅延sec = (double) サイズframe / this.WaveFormat.SampleRate;
-                        long 期間100ns = (long) ( this.再生遅延sec * 10_000_000 + 0.5 );
+                        this.再生遅延sec = (double)サイズframe / this.WaveFormat.SampleRate;
+                        long 期間100ns = (long)( this.再生遅延sec * 10_000_000 + 0.5 );
 
                         // 再度初期化。
                         this._AudioClient.Initialize( this._共有モード, AudioClientStreamFlags.StreamFlagsEventCallback, 期間100ns, 期間100ns, this.WaveFormat, Guid.Empty );
@@ -123,6 +123,13 @@ namespace FDK
                         throw;
                     }
                 }
+
+                // DevicePeriod をログ表示。
+                this._AudioClient.GetDevicePeriodNative( out long defaultDevicePeriod, out long minimumDevicePeriod );
+                if( this._共有モード == AudioClientShareMode.Shared )
+                    Log.Info( $"DevicePeriod: {defaultDevicePeriod / 10_000}ms (Shared)" );
+                else
+                    Log.Info( $"DevicePeriod: {minimumDevicePeriod / 10_000}ms (Exclusive)" );
                 //----------------
                 #endregion
 
@@ -152,7 +159,7 @@ namespace FDK
             this.レンダリングを開始する();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -241,7 +248,7 @@ namespace FDK
             lock( this._スレッド間同期 )
             {
                 using var _ = new LogBlock( Log.現在のメソッド名 );
-             
+
                 if( this._レンダリング状態 == PlaybackState.Paused )
                     this._レンダリング状態 = PlaybackState.Playing;
             }
@@ -299,7 +306,7 @@ namespace FDK
                         mmcssType = "Audio";
                         break;
                 }
-                
+
                 元のMMCSS特性 = AvSetMmThreadCharacteristics( mmcssType, out int taskIndex );
 
                 this._AudioClient.Start();
@@ -321,7 +328,7 @@ namespace FDK
 
                     if( WaitHandle.WaitAny(
                         waitHandles: イベントs,
-                        millisecondsTimeout: (int) ( 3000.0 * this.再生遅延sec ), // 適正値は レイテンシ×3 [ms] (MSDNより)
+                        millisecondsTimeout: (int)( 3000.0 * this.再生遅延sec ), // 適正値は レイテンシ×3 [ms] (MSDNより)
                         exitContext: false ) == WaitHandle.WaitTimeout )
                     {
                         continue;   // タイムアウトした＝まだどのイベントもきてない。
@@ -351,7 +358,7 @@ namespace FDK
 
                         // 今回の読み込みサイズ（サンプル単位）を計算する。
 
-                        int 読み込むサイズsample = (int) this._位置をブロック境界単位にそろえて返す(
+                        int 読み込むサイズsample = (int)this._位置をブロック境界単位にそろえて返す(
                             空きframe * this.WaveFormat.Channels,       // 前提・レンダリング先.WaveFormat と this.WaveFormat は同一。
                             this.WaveFormat.BlockAlign / this.WaveFormat.BytesPerSample );
 
@@ -372,49 +379,51 @@ namespace FDK
                             switch( encoding )
                             {
                                 case AudioEncoding.IeeeFloat:
+                                {
                                     #region " FLOAT32 → FLOAT32 "
                                     //----------------
                                     Marshal.Copy( バッファ, 0, bufferPtr, 読み込んだサイズsample );
+                                    break;
                                     //----------------
                                     #endregion
-                                    break;
-
+                                }
                                 case AudioEncoding.Pcm:
+                                {
                                     switch( this.WaveFormat.BitsPerSample )
                                     {
                                         case 24:
+                                        {
                                             #region " FLOAT32 → PCM24 "
                                             //----------------
+                                            // ※ 以下のコードでは、まだ、まともに再生できない。おそらくザーッという大きいノイズだらけの音になる。
+                                            unsafe
                                             {
-                                                // ※ 以下のコードでは、まだ、まともに再生できない。おそらくザーッという大きいノイズだらけの音になる。
-                                                unsafe
+                                                byte* ptr = (byte*)bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
+
+                                                for( int i = 0; i < 読み込んだサイズsample; i++ )
                                                 {
-                                                    byte* ptr = (byte*) bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
+                                                    float data = バッファ[ i ];
+                                                    if( -1.0f > data ) data = -1.0f;
+                                                    if( +1.0f < data ) data = +1.0f;
 
-                                                    for( int i = 0; i < 読み込んだサイズsample; i++ )
-                                                    {
-                                                        float data = バッファ[ i ];
-                                                        if( -1.0f > data ) data = -1.0f;
-                                                        if( +1.0f < data ) data = +1.0f;
-
-                                                        uint sample32 = (uint) ( data * 8388608f - 1f );    // 24bit PCM の値域は -8388608～+8388607
-                                                        byte* psample32 = (byte*) &sample32;
-                                                        *ptr++ = *psample32++;
-                                                        *ptr++ = *psample32++;
-                                                        *ptr++ = *psample32++;
-                                                    }
+                                                    uint sample32 = (uint)( data * 8388608f - 1f );    // 24bit PCM の値域は -8388608～+8388607
+                                                    byte* psample32 = (byte*)&sample32;
+                                                    *ptr++ = *psample32++;
+                                                    *ptr++ = *psample32++;
+                                                    *ptr++ = *psample32++;
                                                 }
                                             }
+                                            break;
                                             //----------------
                                             #endregion
-                                            break;
-
+                                        }
                                         case 16:
+                                        {
                                             #region " FLOAT32 → PCM16 "
                                             //----------------
                                             unsafe
                                             {
-                                                byte* ptr = (byte*) bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
+                                                byte* ptr = (byte*)bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
 
                                                 for( int i = 0; i < 読み込んだサイズsample; i++ )
                                                 {
@@ -422,22 +431,23 @@ namespace FDK
                                                     if( -1.0f > data ) data = -1.0f;
                                                     if( +1.0f < data ) data = +1.0f;
 
-                                                    short sample16 = (short) ( data * short.MaxValue );
-                                                    byte* psample16 = (byte*) &sample16;
+                                                    short sample16 = (short)( data * short.MaxValue );
+                                                    byte* psample16 = (byte*)&sample16;
                                                     *ptr++ = *psample16++;
                                                     *ptr++ = *psample16++;
                                                 }
                                             }
+                                            break;
                                             //----------------
                                             #endregion
-                                            break;
-
+                                        }
                                         case 8:
+                                        {
                                             #region " FLOAT32 → PCM8 "
                                             //----------------
                                             unsafe
                                             {
-                                                byte* ptr = (byte*) bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
+                                                byte* ptr = (byte*)bufferPtr.ToPointer();  // AudioRenderClient のバッファは GC 対象外なのでピン止め不要。
 
                                                 for( int i = 0; i < 読み込んだサイズsample; i++ )
                                                 {
@@ -445,15 +455,17 @@ namespace FDK
                                                     if( -1.0f > data ) data = -1.0f;
                                                     if( +1.0f < data ) data = +1.0f;
 
-                                                    byte value = (byte) ( ( data + 1 ) * 128f );
+                                                    byte value = (byte)( ( data + 1 ) * 128f );
                                                     *ptr++ = unchecked(value);
                                                 }
                                             }
+                                            break;
                                             //----------------
                                             #endregion
-                                            break;
+                                        }
                                     }
                                     break;
+                                }
                             }
                         }
                         finally
@@ -480,7 +492,7 @@ namespace FDK
                 this._AudioClient.Reset();
 
                 // ハードウェアの再生が終わるくらいまで、少し待つ。
-                Thread.Sleep( (int) ( this.再生遅延sec * 1000 / 2 ) );
+                Thread.Sleep( (int)( this.再生遅延sec * 1000 / 2 ) );
 
                 gchバッファ.Free();
                 //----------------
@@ -525,7 +537,7 @@ namespace FDK
             // qpcPosition ... デバイス位置を取得した時刻 [100ns単位; パフォーマンスカウンタの生値ではないので注意]
 
             // デバイス位置÷デバイス周波数 で、秒単位に換算できる。
-            double デバイス位置sec = (double) position / frequency;
+            double デバイス位置sec = (double)position / frequency;
 
             // デバイス位置の精度が荒い（階段状のとびとびの値になる）場合には、パフォーマンスカウンタで補間する。
             if( position == this._最後のデバイス位置.position )
@@ -591,8 +603,8 @@ namespace FDK
         /// <returns>適切なフォーマット。見つからなかったら null。</returns>
         private WaveFormat? _適切なフォーマットを調べて返す( WaveFormat? waveFormat )
         {
-            var 最も近いフォーマット = (WaveFormat?) null;
-            var 最終的に決定されたフォーマット = (WaveFormat?) null;
+            var 最も近いフォーマット = (WaveFormat?)null;
+            var 最終的に決定されたフォーマット = (WaveFormat?)null;
 
             if( ( null != waveFormat ) && this._AudioClient!.IsFormatSupported( this._共有モード, waveFormat, out 最も近いフォーマット ) )
             {
@@ -681,11 +693,11 @@ namespace FDK
                     // 　これは、WASAPI排他モードにおいて、GetPosition 時に優先度の高いイベントが発生しており
                     // 　規定時間内にデバイス位置を取得できなかった場合に返される。(MSDNより)
 
-                    if( ( (int) HResult.S_OK ) == hr )
+                    if( ( (int)HResult.S_OK ) == hr )
                     {
                         break;      // OK
                     }
-                    else if( ( (int) HResult.S_FALSE ) == hr )
+                    else if( ( (int)HResult.S_FALSE ) == hr )
                     {
                         continue;   // リトライ
                     }
@@ -710,11 +722,11 @@ namespace FDK
         // Win32
 
 
-        private const int AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED = unchecked((int) 0x88890019);
-        
-        private const int AUDCLNT_E_INVALID_DEVICE_PERIOD = unchecked((int) 0x88890020);
-        
-        private const int AUDCLNT_E_NOT_INITIALIZED = unchecked((int) 0x88890001);
+        private const int AUDCLNT_E_BUFFER_SIZE_NOT_ALIGNED = unchecked((int)0x88890019);
+
+        private const int AUDCLNT_E_INVALID_DEVICE_PERIOD = unchecked((int)0x88890020);
+
+        private const int AUDCLNT_E_NOT_INITIALIZED = unchecked((int)0x88890001);
 
 
         [DllImport( "Avrt.dll", CharSet = CharSet.Unicode )]

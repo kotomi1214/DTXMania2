@@ -105,16 +105,16 @@ namespace DTXMania2
             #region " 「G」のアニメーション構築 "
             //----------------
             {
-                this._文字アニメーション[ (int) 文字名.G ]?.Dispose();
-                this._文字アニメーション[ (int) 文字名.G ] = new 文字() {
-                    画像 = this.文字画像[ (int) 文字名.G ],
+                this._文字アニメーション[ (int)文字名.G ]?.Dispose();
+                this._文字アニメーション[ (int)文字名.G ] = new 文字() {
+                    画像 = this.文字画像[ (int)文字名.G ],
                     中心位置X = new Variable( animation.Manager, 0.0 - 400.0 ),
                     中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 170.0 ),
                     拡大率 = new Variable( animation.Manager, 1.0 ),
                     ストーリーボード = new Storyboard( animation.Manager ),
                 };
 
-                var 文字 = this._文字アニメーション[ (int) 文字名.G ];
+                var 文字 = this._文字アニメーション[ (int)文字名.G ];
 
                 using( var 中心位置Xの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.23 ), finalValue: 1920.0 / 2.0 - 260.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                     文字.ストーリーボード!.AddTransition( 文字!.中心位置X, 中心位置Xの遷移 );
@@ -132,16 +132,16 @@ namespace DTXMania2
             #region " 「O」のアニメーション構築 "
             //----------------
             {
-                this._文字アニメーション[ (int) 文字名.O ]?.Dispose();
-                this._文字アニメーション[ (int) 文字名.O ] = new 文字() {
-                    画像 = this.文字画像[ (int) 文字名.O ],
+                this._文字アニメーション[ (int)文字名.O ]?.Dispose();
+                this._文字アニメーション[ (int)文字名.O ] = new 文字() {
+                    画像 = this.文字画像[ (int)文字名.O ],
                     中心位置X = new Variable( animation.Manager, 1920.0 + 200.0 ),
                     中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 - 80.0 ),
                     拡大率 = new Variable( animation.Manager, 1.0 ),
                     ストーリーボード = new Storyboard( animation.Manager ),
                 };
 
-                var 文字 = this._文字アニメーション[ (int) 文字名.O ];
+                var 文字 = this._文字アニメーション[ (int)文字名.O ];
 
                 using( var 中心位置Xの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.23 ), finalValue: 1920.0 / 2.0 - 20.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                     文字.ストーリーボード!.AddTransition( 文字.中心位置X, 中心位置Xの遷移 );
@@ -159,16 +159,16 @@ namespace DTXMania2
             #region " 「!」のアニメーション構築 "
             //----------------
             {
-                this._文字アニメーション[ (int) 文字名.Exc ]?.Dispose();
-                this._文字アニメーション[ (int) 文字名.Exc ] = new 文字() {
-                    画像 = this.文字画像[ (int) 文字名.Exc ],
+                this._文字アニメーション[ (int)文字名.Exc ]?.Dispose();
+                this._文字アニメーション[ (int)文字名.Exc ] = new 文字() {
+                    画像 = this.文字画像[ (int)文字名.Exc ],
                     中心位置X = new Variable( animation.Manager, 1920.0 / 2.0 + 140.0 ),
                     中心位置Y = new Variable( animation.Manager, 1080.0 / 2.0 + 100.0 ),
                     拡大率 = new Variable( animation.Manager, 0.1 ),
                     ストーリーボード = new Storyboard( animation.Manager ),
                 };
 
-                var 文字 = this._文字アニメーション[ (int) 文字名.Exc ];
+                var 文字 = this._文字アニメーション[ (int)文字名.Exc ];
 
                 using( var 中心位置Yの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.14 ), finalValue: 1080.0 / 2.0 - 340.0, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
                 using( var 拡大率の遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.14 ), finalValue: 1.5, accelerationRatio: 0.5, decelerationRatio: 0.5 ) )
@@ -512,7 +512,7 @@ namespace DTXMania2
                 };
 
                 var bar = this._ぐるぐる棒アニメーション[ 8 ];
-                
+
                 using( var 太さの遷移 = animation.TrasitionLibrary.AccelerateDecelerate( duration: 秒( 0.1765 ), finalValue: 800.0, accelerationRatio: 0.0, decelerationRatio: 1.0 ) )
                 using( var 回転の遷移 = animation.TrasitionLibrary.Constant( duration: 秒( 0.088 ) ) )
                 {
@@ -859,11 +859,11 @@ namespace DTXMania2
         /// <summary>
         ///     アイキャッチのアニメーションを進行し、アイキャッチ画像を描画する。
         /// </summary>
-        protected override void 進行描画する( DeviceContext dc, StoryboardStatus 描画しないStatus )
+        protected override void 進行描画する( DeviceContext d2ddc, StoryboardStatus 描画しないStatus )
         {
             bool すべて完了 = true;
 
-            var preTrans = dc.Transform;
+            var preTrans = d2ddc.Transform;
 
             #region " ぐるぐる棒 "
             //----------------
@@ -880,22 +880,22 @@ namespace DTXMania2
                 if( context.ストーリーボード!.Status == 描画しないStatus )
                     continue;
 
-                dc.Transform =
-                    Matrix3x2.Rotation( (float) context.回転角rad.Value ) *
-                    Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
+                d2ddc.Transform =
+                    Matrix3x2.Rotation( (float)context.回転角rad.Value ) *
+                    Matrix3x2.Translation( (float)context.中心位置X, (float)context.中心位置Y ) *
                     preTrans;
 
                 float contextの幅 = 2800.0f;
-                float contextの高さ = (float) context.太さ.Value;
+                float contextの高さ = (float)context.太さ.Value;
 
                 var rc = ( context.辺の種類 == 辺の種類.上辺 ) ?
-                    new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float) context.棒の太さ ) / 2f, contextの幅, (float) context.棒の太さ ) :   // 上辺
-                    new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float) context.棒の太さ ) / 2f, contextの幅, (float) context.棒の太さ );    // 下辺
+                    new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float)context.棒の太さ ) / 2f, contextの幅, (float)context.棒の太さ ) :   // 上辺
+                    new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float)context.棒の太さ ) / 2f, contextの幅, (float)context.棒の太さ );    // 下辺
 
-                dc.FillRectangle( rc, context.ブラシ );
+                d2ddc.FillRectangle( rc, context.ブラシ );
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
             //----------------
             #endregion
 
@@ -914,22 +914,22 @@ namespace DTXMania2
                 if( context.ストーリーボード!.Status == 描画しないStatus )
                     continue;
 
-                dc.Transform =
-                    Matrix3x2.Rotation( (float) context.回転角rad ) *
-                    Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
+                d2ddc.Transform =
+                    Matrix3x2.Rotation( (float)context.回転角rad ) *
+                    Matrix3x2.Translation( (float)context.中心位置X, (float)context.中心位置Y ) *
                     preTrans;
 
                 float contextの幅 = 2800.0f;
-                float contextの高さ = (float) context.太さ.Value;
+                float contextの高さ = (float)context.太さ.Value;
 
                 var rc = ( context.辺の種類 == 辺の種類.上辺 ) ?
-                    new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float) context.棒の太さ.Value ) / 2f, contextの幅, (float) context.棒の太さ.Value ) :   // 上辺
-                    new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float) context.棒の太さ.Value ) / 2f, contextの幅, (float) context.棒の太さ.Value );    // 下辺
+                    new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float)context.棒の太さ.Value ) / 2f, contextの幅, (float)context.棒の太さ.Value ) :   // 上辺
+                    new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float)context.棒の太さ.Value ) / 2f, contextの幅, (float)context.棒の太さ.Value );    // 下辺
 
-                dc.FillRectangle( rc, context.ブラシ );
+                d2ddc.FillRectangle( rc, context.ブラシ );
             }
 
-            dc.Transform = preTrans;
+            d2ddc.Transform = preTrans;
             //----------------
             #endregion
 
@@ -939,7 +939,7 @@ namespace DTXMania2
             {
                 if( context.ストーリーボード is null )
                     continue;
-                
+
                 if( context.ストーリーボード.Status != StoryboardStatus.Ready )
                     すべて完了 = false;
 
@@ -947,10 +947,10 @@ namespace DTXMania2
                     continue;
 
                 var 変換行列2D =
-                    Matrix3x2.Scaling( (float) context.拡大率.Value ) *
-                    Matrix3x2.Translation( (float) context.中心位置X.Value, (float) context.中心位置Y.Value );
+                    Matrix3x2.Scaling( (float)context.拡大率.Value ) *
+                    Matrix3x2.Translation( (float)context.中心位置X.Value, (float)context.中心位置Y.Value );
 
-                context.画像.描画する( dc, 変換行列2D );
+                context.画像.描画する( d2ddc, 変換行列2D );
             }
             //----------------
             #endregion
@@ -967,21 +967,21 @@ namespace DTXMania2
 
                     if( context.ストーリーボード.Status != 描画しないStatus )
                     {
-                        dc.Transform =
-                            Matrix3x2.Rotation( (float) context.回転角rad ) *
-                            Matrix3x2.Translation( (float) context.中心位置X, (float) context.中心位置Y ) *
+                        d2ddc.Transform =
+                            Matrix3x2.Rotation( (float)context.回転角rad ) *
+                            Matrix3x2.Translation( (float)context.中心位置X, (float)context.中心位置Y ) *
                             preTrans;
 
                         float contextの幅 = 2800.0f;
-                        float contextの高さ = (float) context.太さ.Value;
+                        float contextの高さ = (float)context.太さ.Value;
 
                         var rc = ( context.辺の種類 == 辺の種類.上辺 ) ?
-                            new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float) context.棒の太さ.Value ) / 2f, contextの幅, (float) context.棒の太さ.Value ) :   // 上辺
-                            new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float) context.棒の太さ.Value ) / 2f, contextの幅, (float) context.棒の太さ.Value );    // 下辺
+                            new RectangleF( -contextの幅 / 2f, -( contextの高さ + (float)context.棒の太さ.Value ) / 2f, contextの幅, (float)context.棒の太さ.Value ) :   // 上辺
+                            new RectangleF( -contextの幅 / 2f, +( contextの高さ - (float)context.棒の太さ.Value ) / 2f, contextの幅, (float)context.棒の太さ.Value );    // 下辺
 
-                        dc.FillRectangle( rc, context.ブラシ );
+                        d2ddc.FillRectangle( rc, context.ブラシ );
 
-                        dc.Transform = preTrans;
+                        d2ddc.Transform = preTrans;
                     }
                 }
             }
@@ -1000,8 +1000,8 @@ namespace DTXMania2
 
                     if( context.ストーリーボード.Status != 描画しないStatus )
                     {
-                        using( var ブラシ = new SolidColorBrush( dc, new Color4( 0.5f, 0.5f, 1f, (float) context.不透明度.Value ) ) )
-                            dc.FillRectangle( new RectangleF( 0f, 0f, 1920f, 1080f ), ブラシ );
+                        using( var ブラシ = new SolidColorBrush( d2ddc, new Color4( 0.5f, 0.5f, 1f, (float)context.不透明度.Value ) ) )
+                            d2ddc.FillRectangle( new RectangleF( 0f, 0f, 1920f, 1080f ), ブラシ );
                     }
                 }
             }
@@ -1040,7 +1040,7 @@ namespace DTXMania2
             public Variable 拡大率 = null!;
             public Storyboard? ストーリーボード = null; // null ならこの文字は使用しない
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.画像 = null!; // Disposeしない
 
@@ -1067,7 +1067,7 @@ namespace DTXMania2
             public 辺の種類 辺の種類;
             public Brush ブラシ = null!;
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ブラシ?.Dispose();
                 this.ストーリーボード?.Dispose();
@@ -1092,7 +1092,7 @@ namespace DTXMania2
             public 辺の種類 辺の種類;
             public Brush ブラシ = null!;
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ブラシ?.Dispose();
                 this.ストーリーボード?.Dispose();
@@ -1110,7 +1110,7 @@ namespace DTXMania2
             public Variable 不透明度 = null!;
             public Storyboard? ストーリーボード = null; // null ならフェードインは使用しない
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.ストーリーボード?.Dispose();
                 this.不透明度?.Dispose();

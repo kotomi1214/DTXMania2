@@ -50,9 +50,9 @@ namespace FDK
 
         protected void Bitmapを生成する( ImagingFactory2 imagingFactory2, DeviceContext d2dDeviceContext, VariablePath 画像ファイルパス, BitmapProperties1? bitmapProperties1 = null )
         {
-            var decoder = (BitmapDecoder?) null;
-            var sourceFrame = (BitmapFrameDecode?) null;
-            var converter = (FormatConverter?) null;
+            var decoder = (BitmapDecoder?)null;
+            var sourceFrame = (BitmapFrameDecode?)null;
+            var converter = (FormatConverter?)null;
 
             try
             {
@@ -167,7 +167,7 @@ namespace FDK
         /// <summary>
         ///		画像を描画する。
         /// </summary>
-        /// <param name="dc">描画に使うデバイスコンテキスト。</param>
+        /// <param name="d2ddc">描画に使うデバイスコンテキスト。</param>
         /// <param name="左位置">画像の描画先範囲の左上隅X座標。</param>
         /// <param name="上位置">画像の描画先範囲の左上隅Y座標。</param>
         /// <param name="不透明度0to1">不透明度。(0:透明～1:不透明)</param>
@@ -183,14 +183,14 @@ namespace FDK
         ///		それが困る場合には、「描画先矩形を整数境界に合わせる」に true を指定すること。
         ///		ただし、これを true にした場合、タイルのように並べて描画した場合に1pxずれる場合がある。この場合は false にすること。
         /// </remarks>
-        public virtual void 描画する( DeviceContext dc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, RectangleF? 転送元矩形 = null, bool 描画先矩形を整数境界に合わせる = false, Matrix? 変換行列3D = null, LayerParameters1? レイヤーパラメータ = null )
+        public virtual void 描画する( DeviceContext d2ddc, float 左位置, float 上位置, float 不透明度0to1 = 1.0f, float X方向拡大率 = 1.0f, float Y方向拡大率 = 1.0f, RectangleF? 転送元矩形 = null, bool 描画先矩形を整数境界に合わせる = false, Matrix? 変換行列3D = null, LayerParameters1? レイヤーパラメータ = null )
         {
             if( this.Bitmap is null )
                 return;
 
-            var preBlend = dc.PrimitiveBlend;
+            var preBlend = d2ddc.PrimitiveBlend;
 
-            dc.PrimitiveBlend = ( this.加算合成する ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+            d2ddc.PrimitiveBlend = ( this.加算合成する ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
 
             // 転送元・転送先矩形を算出する。
             転送元矩形 ??= new RectangleF( 0f, 0f, this.サイズ.Width, this.サイズ.Height );
@@ -201,22 +201,22 @@ namespace FDK
                 height: 転送元矩形.Value.Height * Y方向拡大率 );
             if( 描画先矩形を整数境界に合わせる )
             {
-                転送先矩形.X = (float) Math.Round( 転送先矩形.X );
-                転送先矩形.Y = (float) Math.Round( 転送先矩形.Y );
-                転送先矩形.Width = (float) Math.Round( 転送先矩形.Width );
-                転送先矩形.Height = (float) Math.Round( 転送先矩形.Height );
+                転送先矩形.X = (float)Math.Round( 転送先矩形.X );
+                転送先矩形.Y = (float)Math.Round( 転送先矩形.Y );
+                転送先矩形.Width = (float)Math.Round( 転送先矩形.Width );
+                転送先矩形.Height = (float)Math.Round( 転送先矩形.Height );
             }
 
             // レイヤーパラメータの指定があれば、描画前に Layer を作成して、Push する。
-            var layer = (Layer?) null;
+            var layer = (Layer?)null;
             if( レイヤーパラメータ.HasValue )
             {
-                layer = new Layer( dc );    // 因果関係は分からないが、同じBOX内の曲が増えるとこの行の負荷が増大するので、必要時にしか生成しないこと。
-                dc.PushLayer( レイヤーパラメータ.Value, layer );
+                layer = new Layer( d2ddc );    // 因果関係は分からないが、同じBOX内の曲が増えるとこの行の負荷が増大するので、必要時にしか生成しないこと。
+                d2ddc.PushLayer( レイヤーパラメータ.Value, layer );
             }
 
             // D2Dレンダーターゲットに Bitmap を描画する。
-            dc.DrawBitmap(
+            d2ddc.DrawBitmap(
                 bitmap: this.Bitmap,
                 destinationRectangle: 転送先矩形,
                 opacity: 不透明度0to1,
@@ -227,11 +227,11 @@ namespace FDK
             // レイヤーパラメータの指定があれば、描画後に Pop する。
             if( null != layer )
             {
-                dc.PopLayer();
+                d2ddc.PopLayer();
                 layer.Dispose();
             }
 
-            dc.PrimitiveBlend = preBlend;
+            d2ddc.PrimitiveBlend = preBlend;
         }
 
         /// <summary>
@@ -241,27 +241,27 @@ namespace FDK
         /// <param name="変換行列3D">射影行列。</param>
         /// <param name="不透明度0to1">不透明度。(0:透明～1:不透明)</param>
         /// <param name="転送元矩形">描画する画像範囲。</param>
-        public virtual void 描画する( DeviceContext dc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f, RectangleF? 転送元矩形 = null, LayerParameters1? レイヤーパラメータ = null )
+        public virtual void 描画する( DeviceContext d2ddc, Matrix3x2? 変換行列2D = null, Matrix? 変換行列3D = null, float 不透明度0to1 = 1.0f, RectangleF? 転送元矩形 = null, LayerParameters1? レイヤーパラメータ = null )
         {
             if( this.Bitmap is null )
                 return; // 画像の生成に失敗していたら何も描画しない。
 
-            var preBlend = dc.PrimitiveBlend;
-            var preTrans = dc.Transform;
+            var preBlend = d2ddc.PrimitiveBlend;
+            var preTrans = d2ddc.Transform;
 
-            dc.PrimitiveBlend = ( this.加算合成する ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-            dc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * preTrans;
+            d2ddc.PrimitiveBlend = ( this.加算合成する ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+            d2ddc.Transform = ( 変換行列2D ?? Matrix3x2.Identity ) * preTrans;
 
             // レイヤーパラメータの指定があれば、描画前に Layer を作成して、Push する。
-            var layer = (Layer?) null;
+            var layer = (Layer?)null;
             if( レイヤーパラメータ.HasValue )
             {
-                layer = new Layer( dc );    // 因果関係は分からないが、同じBOX内の曲が増えるとこの行の負荷が増大するので、必要時にしか生成しないこと。
-                dc.PushLayer( (LayerParameters1) レイヤーパラメータ, layer );
+                layer = new Layer( d2ddc );    // 因果関係は分からないが、同じBOX内の曲が増えるとこの行の負荷が増大するので、必要時にしか生成しないこと。
+                d2ddc.PushLayer( (LayerParameters1)レイヤーパラメータ, layer );
             }
 
             // D2Dレンダーターゲットに this.Bitmap を描画する。
-            dc.DrawBitmap(
+            d2ddc.DrawBitmap(
                 bitmap: this.Bitmap,
                 destinationRectangle: null,
                 opacity: 不透明度0to1,
@@ -272,12 +272,12 @@ namespace FDK
             // layer を作成したなら、描画後に Pop する。
             if( null != layer )
             {
-                dc.PopLayer();
+                d2ddc.PopLayer();
                 layer.Dispose();
             }
 
-            dc.PrimitiveBlend = preBlend;
-            dc.Transform = preTrans;
+            d2ddc.PrimitiveBlend = preBlend;
+            d2ddc.Transform = preTrans;
         }
     }
 }

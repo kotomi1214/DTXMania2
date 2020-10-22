@@ -277,10 +277,10 @@ namespace FDK
 
 
         public 文字列画像(
-            SharpDX.Direct3D11.Device1 d3dDevice1, 
-            SharpDX.DirectWrite.Factory dwFactory, 
-            SharpDX.Direct2D1.Factory1 d2dFactory1, 
-            SharpDX.Direct2D1.DeviceContext d2dDeviceContext, 
+            SharpDX.Direct3D11.Device1 d3dDevice1,
+            SharpDX.DirectWrite.Factory dwFactory,
+            SharpDX.Direct2D1.Factory1 d2dFactory1,
+            SharpDX.Direct2D1.DeviceContext d2dDeviceContext,
             Size2F 設計画面サイズdpx )
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
@@ -310,10 +310,10 @@ namespace FDK
             this._画像?.Dispose();
         }
 
-        public void ビットマップを生成または更新する( 
+        public void ビットマップを生成または更新する(
             SharpDX.DirectWrite.Factory dwFactory,
             SharpDX.Direct2D1.Factory1 d2dFactory1,
-            SharpDX.Direct2D1.DeviceContext dc,
+            SharpDX.Direct2D1.DeviceContext d2dDeviceContext,
             SharpDX.Direct3D11.Device1 d3dDevice1 )
         {
             float pt2px( float dpi, float pt ) => dpi * pt / 72f;
@@ -337,7 +337,7 @@ namespace FDK
                 };
 
                 // 行間は、プロパティではなくメソッドで設定する。
-                this.LineSpacing = pt2px( dc.DotsPerInch.Width, this.フォントサイズpt );
+                this.LineSpacing = pt2px( d2dDeviceContext.DotsPerInch.Width, this.フォントサイズpt );
 
                 // baseline の適切な比率は、lineSpacing の 80 %。（MSDNより）
                 this.Baseline = this.LineSpacing * 0.8f;
@@ -392,7 +392,7 @@ namespace FDK
                 }
 
                 this._画像?.Dispose();
-                this._画像 = new 描画可能画像( d3dDevice1, dc, this.画像サイズdpx, BindFlags.ShaderResource | BindFlags.RenderTarget );
+                this._画像 = new 描画可能画像( d3dDevice1, d2dDeviceContext, this.画像サイズdpx, BindFlags.ShaderResource | BindFlags.RenderTarget );
                 //----------------
                 #endregion
 
@@ -400,7 +400,7 @@ namespace FDK
                 //----------------
                 var surface = this._画像.Bitmap.Surface;  // 要Release
                 using var rt = new RenderTarget( d2dFactory1, surface, new RenderTargetProperties( new PixelFormat( Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied ) ) );
-                ( (IUnknown) surface ).Release();
+                ( (IUnknown)surface ).Release();
 
                 rt.Transform = Matrix3x2.Identity;  // 等倍
                 rt.AntialiasMode = AntialiasMode.PerPrimitive;
@@ -451,18 +451,18 @@ namespace FDK
         // 進行と描画
 
 
-        public void 描画する( 
-            SharpDX.DirectWrite.Factory dwFactory, 
-            SharpDX.Direct2D1.Factory1 d2dFactory1, 
-            SharpDX.Direct2D1.DeviceContext dc, 
-            SharpDX.Direct3D11.Device1 d3dDevice1, 
+        public void 描画する(
+            SharpDX.DirectWrite.Factory dwFactory,
+            SharpDX.Direct2D1.Factory1 d2dFactory1,
+            SharpDX.Direct2D1.DeviceContext d2dDeviceContext,
+            SharpDX.Direct3D11.Device1 d3dDevice1,
             SharpDX.Direct3D11.DeviceContext d3dDeviceContext,
             Size2F 設計画面サイズdpx,
             RawViewportF[] viewports,
             DepthStencilView depthStencilView,
             RenderTargetView renderTargetView,
             DepthStencilState depthStencilState,
-            float 左位置, 
+            float 左位置,
             float 上位置,
             float 不透明度0to1 = 1.0f,
             float X方向拡大率 = 1.0f,
@@ -475,7 +475,7 @@ namespace FDK
                 this._TextFormatを更新せよ ||
                 this._TextLayoutを更新せよ )
             {
-                this.ビットマップを生成または更新する( dwFactory, d2dFactory1, dc, d3dDevice1 );
+                this.ビットマップを生成または更新する( dwFactory, d2dFactory1, d2dDeviceContext, d3dDevice1 );
             }
 
             var 画面左上dpx = new Vector3( -設計画面サイズdpx.Width / 2f, +設計画面サイズdpx.Height / 2f, 0f );
@@ -485,14 +485,14 @@ namespace FDK
                     画面左上dpx.X + ( 左位置 + X方向拡大率 * this._画像.サイズ.Width / 2f ),
                     画面左上dpx.Y - ( 上位置 + Y方向拡大率 * this._画像.サイズ.Height / 2f ),
                     0f );
-            
+
             this._画像.描画する( d3dDeviceContext, 設計画面サイズdpx, viewports, depthStencilView, renderTargetView, depthStencilState, 変換行列, 不透明度0to1 );
         }
 
-        public void 描画する( 
-            SharpDX.DirectWrite.Factory dwFactory, 
+        public void 描画する(
+            SharpDX.DirectWrite.Factory dwFactory,
             SharpDX.Direct2D1.Factory1 d2dFactory1,
-            SharpDX.Direct2D1.DeviceContext dc, 
+            SharpDX.Direct2D1.DeviceContext d2dDeviceContext,
             SharpDX.Direct3D11.Device1 d3dDevice1,
             SharpDX.Direct3D11.DeviceContext d3dDeviceContext,
             Size2F 設計画面サイズdpx,
@@ -510,7 +510,7 @@ namespace FDK
                 this._TextFormatを更新せよ ||
                 this._TextLayoutを更新せよ )
             {
-                this.ビットマップを生成または更新する( dwFactory, d2dFactory1, dc, d3dDevice1 );
+                this.ビットマップを生成または更新する( dwFactory, d2dFactory1, d2dDeviceContext, d3dDevice1 );
             }
 
             this._画像.描画する(
@@ -531,7 +531,7 @@ namespace FDK
 
         private string _表示文字列 = "";
 
-        private string _フォント名 = "メイリオ";
+        private string _フォント名 = "Meiryo";
 
         private float _フォントサイズpt = 20f;
 

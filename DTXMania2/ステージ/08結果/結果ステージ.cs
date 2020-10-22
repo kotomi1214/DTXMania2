@@ -42,7 +42,7 @@ namespace DTXMania2.結果
 
             #region " 成績をDBへ反映する。"
             //----------------
-            if( Global.App.ログオン中のユーザ.AutoPlayがすべてONである || result.無効 )
+            if( result.無効 )
             {
                 // 全Autoまたは無効の場合は反映しない。
                 this._最高成績である = false;
@@ -82,7 +82,7 @@ namespace DTXMania2.結果
             this._ランク = new ランク();
             this._難易度 = new 難易度();
             this._曲別SKILL = new 曲別SKILL();
-            this._達成率 = ( this._最高成績である ) ? (達成率Base) new 達成率更新() : new 達成率();
+            this._達成率 = ( this._最高成績である ) ? (達成率Base)new 達成率更新() : new 達成率();
 
             this._システム情報 = new システム情報();
             this._黒マスクブラシ = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, new Color4( Color3.Black, 0.75f ) );
@@ -144,7 +144,7 @@ namespace DTXMania2.結果
                     if( Global.App.ドラム入力.確定キーが入力された() ||
                         Global.App.ドラム入力.キャンセルキーが入力された() )
                     {
-                        #region " 確定キー　→　アニメを完了してアニメ完了フェーズへ "
+                        #region " 確定 or キャンセル　→　アニメを完了してアニメ完了フェーズへ "
                         //----------------
                         this._曲別SKILL.アニメを完了する();
                         this._達成率.アニメを完了する();
@@ -157,11 +157,17 @@ namespace DTXMania2.結果
                     }
                     else
                     {
-                        #region " その他　→　空うちサウンドを再生する "
-                        //----------------
-                        this._空うちサウンドを再生する();
+                        if( Global.App.ログオン中のユーザ.ドラムの音を発声する )
+                        {
+                            #region " その他のキー　→　空うちサウンドを再生する "
+                            //----------------
+                            this._空うちサウンドを再生する();
+                            //----------------
+                            #endregion
+                        }
 
-                        // すべてのアニメが完了したらアニメ完了フェーズへ "
+                        #region " すべてのアニメが完了したらアニメ完了フェーズへ "
+                        //----------------
                         if( this._曲別SKILL.アニメ完了 && this._難易度.アニメ完了 && this._達成率.アニメ完了 )
                             this.現在のフェーズ = フェーズ.アニメ完了;
                         //----------------
@@ -179,10 +185,9 @@ namespace DTXMania2.結果
                     if( Global.App.ドラム入力.確定キーが入力された() ||
                         Global.App.ドラム入力.キャンセルキーが入力された() )
                     {
-                        #region " 確定キー　→　フェーズアウトへ "
+                        #region " 確定 or キャンセル　→　フェーズアウトへ "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.取消音 );    // 確定だけど取消音
-
                         Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( シャッター ) );
                         this.現在のフェーズ = フェーズ.フェードアウト;
                         //----------------
@@ -228,8 +233,8 @@ namespace DTXMania2.結果
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+            d2ddc.Transform = Matrix3x2.Identity;
 
             switch( this.現在のフェーズ )
             {
@@ -238,11 +243,11 @@ namespace DTXMania2.結果
                 {
                     #region " 背景画面を描画する。"
                     //----------------
-                    dc.BeginDraw();
+                    d2ddc.BeginDraw();
 
-                    this._画面を描画する( dc );
+                    this._画面を描画する( d2ddc );
 
-                    dc.EndDraw();
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -252,12 +257,12 @@ namespace DTXMania2.結果
                 {
                     #region " 背景画面＆フェードアウト "
                     //----------------
-                    dc.BeginDraw();
+                    d2ddc.BeginDraw();
 
-                    this._画面を描画する( dc );
-                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
+                    this._画面を描画する( d2ddc );
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( d2ddc );
 
-                    dc.EndDraw();
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -267,11 +272,11 @@ namespace DTXMania2.結果
                 {
                     #region " フェードアウト "
                     //----------------
-                    dc.BeginDraw();
+                    d2ddc.BeginDraw();
 
-                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( d2ddc );
 
-                    dc.EndDraw();
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -280,27 +285,31 @@ namespace DTXMania2.結果
             }
         }
 
-        private void _画面を描画する( DeviceContext dc )
+        private void _画面を描画する( DeviceContext d2ddc )
         {
-            this._背景.進行描画する( dc );
-            dc.FillRectangle( new RectangleF( 0f, 36f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Height - 72f ), this._黒マスクブラシ );
-            this._プレビュー画像を描画する( dc );
-            this._曲名パネル.描画する( dc, 660f, 796f );
-            this._曲名を描画する( dc );
-            this._サブタイトルを描画する( dc );
-            this._演奏パラメータ結果.進行描画する( dc, 1317f, 716f, this._結果 );
-            this._ランク.進行描画する( dc, this._結果.ランク );
-            this._難易度.進行描画する( dc, 1341f, 208f, Global.App.演奏スコア.難易度 );
-            this._曲別SKILL.進行描画する( dc, 1329f, 327f, this._結果.スキル );
-            this._達成率.進行描画する( dc, 1233f, 428f, this._結果.Achievement );
-            this._システム情報.描画する( dc );
+            this._背景.進行描画する( d2ddc );
+
+            d2ddc.FillRectangle(
+                new RectangleF( 0f, 36f, Global.GraphicResources.設計画面サイズ.Width, Global.GraphicResources.設計画面サイズ.Height - 72f ),
+                this._黒マスクブラシ );
+
+            this._プレビュー画像を描画する( d2ddc );
+            this._曲名パネル.描画する( d2ddc, 660f, 796f );
+            this._曲名を描画する( d2ddc );
+            this._サブタイトルを描画する( d2ddc );
+            this._演奏パラメータ結果.進行描画する( d2ddc, 1317f, 716f, this._結果 );
+            this._ランク.進行描画する( d2ddc, this._結果.ランク );
+            this._難易度.進行描画する( d2ddc, 1341f, 208f, Global.App.演奏スコア.難易度 );
+            this._曲別SKILL.進行描画する( d2ddc, 1329f, 327f, this._結果.スキル );
+            this._達成率.進行描画する( d2ddc, 1233f, 428f, this._結果.Achievement );
+            this._システム情報.描画する( d2ddc );
         }
 
-        private void _プレビュー画像を描画する( DeviceContext dc )
+        private void _プレビュー画像を描画する( DeviceContext d2ddc )
         {
             // 枠
             const float 枠の太さdpx = 5f;
-            dc.FillRectangle(
+            d2ddc.FillRectangle(
                 new RectangleF(
                     this._プレビュー画像表示位置dpx.X - 枠の太さdpx,
                     this._プレビュー画像表示位置dpx.Y - 枠の太さdpx,
@@ -309,7 +318,9 @@ namespace DTXMania2.結果
                 this._プレビュー枠ブラシ );
 
             // プレビュー画像
-            var preimage = Global.App.演奏譜面.最高記録を現行化済み ? ( Global.App.演奏譜面.プレビュー画像 ?? this._既定のノード画像 ) : this._現行化前のノード画像;
+            var preimage = Global.App.演奏譜面.最高記録を現行化済み ?
+                ( Global.App.演奏譜面.プレビュー画像 ?? this._既定のノード画像 ) :
+                this._現行化前のノード画像;
 
             var 変換行列2D =
                 Matrix3x2.Scaling(
@@ -319,27 +330,27 @@ namespace DTXMania2.結果
                     this._プレビュー画像表示位置dpx.X,
                     this._プレビュー画像表示位置dpx.Y );
 
-            preimage.描画する( dc, 変換行列2D );
+            preimage.描画する( d2ddc, 変換行列2D );
         }
 
-        private void _曲名を描画する( DeviceContext dc )
+        private void _曲名を描画する( DeviceContext d2ddc )
         {
             var 表示位置dpx = new Vector2( 690f, 820f );
 
             // 拡大率を計算して描画する。
             float 最大幅dpx = 545f;
             float X方向拡大率 = ( this._曲名画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._曲名画像.画像サイズdpx.Width;
-            this._曲名画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
+            this._曲名画像.描画する( d2ddc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
 
-        private void _サブタイトルを描画する( DeviceContext dc )
+        private void _サブタイトルを描画する( DeviceContext d2ddc )
         {
             var 表示位置dpx = new Vector2( 690f, 820f + 60f );
 
             // 拡大率を計算して描画する。
             float 最大幅dpx = 545f;
             float X方向拡大率 = ( this._サブタイトル画像.画像サイズdpx.Width <= 最大幅dpx ) ? 1f : 最大幅dpx / this._サブタイトル画像.画像サイズdpx.Width;
-            this._サブタイトル画像.描画する( dc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
+            this._サブタイトル画像.描画する( d2ddc, 表示位置dpx.X, 表示位置dpx.Y, X方向拡大率: X方向拡大率 );
         }
 
 
@@ -383,6 +394,7 @@ namespace DTXMania2.結果
 
         private readonly Vector3 _プレビュー画像表示サイズdpx = new Vector3( 574f, 574f, 0f );
 
+
         /// <summary>
         ///     成績を、RecordDB と演奏譜面へ追加または反映する。
         /// </summary>
@@ -417,7 +429,7 @@ namespace DTXMania2.結果
                 else
                 {
                     最高成績である = ( Global.App.演奏譜面.最高記録 is null ); // 初回なら最高記録。
-                    Global.App.演奏譜面.最高記録 ??= record;    // 初回なら代入。
+                    Global.App.演奏譜面.最高記録 ??= record;                   // 初回なら代入。
                     Global.App.演奏譜面.最高記録を現行化済み = true;
                 }
                 //----------------
@@ -475,7 +487,12 @@ namespace DTXMania2.結果
                 var ドラムチッププロパティ = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
 
                 // ドラムサウンドを持つチップなら発声する。（持つかどうかはこのメソッド↓内で判定される。）
-                Global.App.ドラムサウンド.再生する( chip.チップ種別, 0, ドラムチッププロパティ.発声前消音, ドラムチッププロパティ.消音グループ種別, ( chip.音量 / (float) SSTF.チップ.最大音量 ) );
+                Global.App.ドラムサウンド.再生する(
+                    chip.チップ種別,
+                    0,
+                    ドラムチッププロパティ.発声前消音,
+                    ドラムチッププロパティ.消音グループ種別,
+                    chip.音量 / (float)SSTF.チップ.最大音量 );
                 //----------------
                 #endregion
             }
@@ -483,15 +500,14 @@ namespace DTXMania2.結果
             {
                 #region " (C) WAVサウンドを再生する。"
                 //----------------
-                int WAV番号 = chip.チップサブID;
                 var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
 
                 // WAVを持つチップなら発声する。（持つかどうかはこのメソッド↓内で判定される。）
-                Global.App.WAV管理.発声する( 
-                    chip.チップサブID, 
-                    prop.発声前消音, 
-                    prop.消音グループ種別, 
-                    BGM以外も再生する: ドラムサウンドを再生する, 
+                Global.App.WAV管理.発声する(
+                    chip.チップサブID,   // WAV番号
+                    prop.発声前消音,
+                    prop.消音グループ種別,
+                    BGM以外も再生する: ドラムサウンドを再生する,
                     音量: ( chip.音量 / (float)SSTF.チップ.最大音量 ) );
                 //----------------
                 #endregion
@@ -501,8 +517,7 @@ namespace DTXMania2.結果
         private void _空うちサウンドを再生する()
         {
             // すべての押下入力（コントロールチェンジを除く）について……
-            foreach( var 入力 in 
-                Global.App.ドラム入力.ポーリング結果
+            foreach( var 入力 in Global.App.ドラム入力.ポーリング結果
                 .Where( ( e ) => e.InputEvent.押された && 0 == e.InputEvent.Control ) )
             {
                 // 結果ステージでは、一番最後に現れたチップを空打ち対象とする。

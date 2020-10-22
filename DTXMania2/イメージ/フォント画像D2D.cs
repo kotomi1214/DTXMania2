@@ -12,10 +12,13 @@ namespace DTXMania2
     class フォント画像D2D : FDK.フォント画像D2D
     {
         public フォント画像D2D( VariablePath 文字盤の画像ファイルパス, VariablePath 文字盤の矩形リストファイルパス, float 文字幅補正dpx = 0f, float 不透明度 = 1f )
-            : base( 
-                  Global.GraphicResources.WicImagingFactory2, 
-                  Global.GraphicResources.既定のD2D1DeviceContext, 
-                  文字盤の画像ファイルパス, 文字盤の矩形リストファイルパス, 文字幅補正dpx, 不透明度 )
+            : base(
+                  Global.GraphicResources.WicImagingFactory2,
+                  Global.GraphicResources.既定のD2D1DeviceContext,
+                  Folder.カルチャを考慮した絶対パスを返す( 文字盤の画像ファイルパス.変数なしパス ),
+                  Folder.カルチャを考慮した絶対パスを返す( 文字盤の矩形リストファイルパス.変数なしパス ),
+                  文字幅補正dpx,
+                  不透明度 )
         {
         }
     }

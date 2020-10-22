@@ -20,7 +20,7 @@ namespace DTXMania2.オプション設定
 
         public int 現在選択されている選択肢の番号 { get; set; } = 0;
 
-        public List<(string 文字列, Color4 色)> 選択肢リスト { get; protected set; } = new List<(string, Color4)>();
+        public List<(string 文字列, Color4 色)> 選択肢リスト { get; } = new List<(string, Color4)>();
 
 
 
@@ -30,11 +30,9 @@ namespace DTXMania2.オプション設定
         public パネル_文字列リスト( string パネル名, IEnumerable<string> 選択肢初期値リスト, int 初期選択肢番号 = 0, Action<パネル>? 値の変更処理 = null )
             : base( パネル名, 値の変更処理 )
         {
-            var list = new List<(string 文字列, Color4 色)>();
-            foreach( var item in 選択肢初期値リスト )
-                list.Add( (item, Color4.White) );   // 既定の色は白
-
-            this._初期化( list, 初期選択肢番号 );
+            this._初期化(
+                選択肢初期値リスト.Select( ( item ) => (item, Color4.White) ),   // // 既定の色は白
+                初期選択肢番号 );
         }
 
         // 色指定あり
@@ -104,31 +102,32 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
+        public override void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置, bool 選択中 )
         {
             // (1) パネルの下地と名前を描画。
 
-            base.進行描画する( dc, left, top, 選択中 );
+            base.進行描画する( d2ddc, 左位置, 上位置, 選択中 );
 
 
             // (2) 選択肢文字列画像の描画。
 
-            float 拡大率Y = (float) this._パネルの高さ割合.Value;
+            float 拡大率Y = (float)this._パネルの高さ割合.Value;
             float 項目の上下マージン = this.項目領域.Height * ( 1f - 拡大率Y ) / 2f;
 
             var 項目矩形 = new RectangleF(
-                x: this.項目領域.X + left,
-                y: this.項目領域.Y + top + 項目の上下マージン,
+                x: this.項目領域.X + 左位置,
+                y: this.項目領域.Y + 上位置 + 項目の上下マージン,
                 width: this.項目領域.Width,
                 height: this.項目領域.Height * 拡大率Y );
 
             var 項目画像 = this._選択肢文字列画像リスト[ this.選択肢リスト[ this.現在選択されている選択肢の番号 ].文字列 ];
 
-            項目画像.ビットマップを生成または更新する( dc );    // 先に画像を更新する。↓で画像サイズを取得するため。
+            項目画像.ビットマップを生成または更新する( d2ddc );    // 先に画像を更新する。↓で画像サイズを取得するため。
+
             float 拡大率X = Math.Min( 1f, ( 項目矩形.Width - 20f ) / 項目画像.画像サイズdpx.Width );    // -20 は左右マージンの最低値[dpx]
 
             項目画像.描画する(
-                dc,
+                d2ddc,
                 項目矩形.Left + ( 項目矩形.Width - 項目画像.画像サイズdpx.Width * 拡大率X ) / 2f,
                 項目矩形.Top + ( 項目矩形.Height - 項目画像.画像サイズdpx.Height * 拡大率Y ) / 2f,
                 X方向拡大率: 拡大率X,
@@ -140,7 +139,6 @@ namespace DTXMania2.オプション設定
         // ローカル
 
 
-        // 各文字列は画像で保持。
-        private Dictionary<string, 文字列画像D2D> _選択肢文字列画像リスト = null!;
+        private Dictionary<string, 文字列画像D2D> _選択肢文字列画像リスト = null!;  // 各文字列は画像で保持。
     }
 }

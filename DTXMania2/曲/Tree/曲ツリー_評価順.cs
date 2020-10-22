@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using FDK;
 
 namespace DTXMania2.曲
@@ -34,7 +33,6 @@ namespace DTXMania2.曲
             base.Dispose();
         }
 
-
         /// <summary>
         ///     ツリーを初期状態に戻す。
         /// </summary>
@@ -43,7 +41,7 @@ namespace DTXMania2.曲
             // 全ノードを解放する。
             foreach( var node in this.ルートノード.Traverse() )
                 node.Dispose();
-            
+
             this.ルートノード.子ノードリスト.Clear();
 
             // RANDOM SELECT を追加する。
@@ -51,12 +49,12 @@ namespace DTXMania2.曲
 
             // 評価BOX を追加する。
             var ratingBoxLabel = new[] {
-                "評価 なし",
-                "評価 ☆",
-                "評価 ☆☆",
-                "評価 ☆☆☆",
-                "評価 ☆☆☆☆",
-                "評価 ☆☆☆☆☆",
+                Properties.Resources.TXT_評価なし,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価1,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価2,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価3,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価4,
+                Properties.Resources.TXT_評価 + " " + Properties.Resources.TXT_評価5,
             };
             this._評価BOX = new BoxNode[ 6 ];   // 0～5
             for( int i = 0; i < this._評価BOX.Length; i++ )
@@ -92,7 +90,6 @@ namespace DTXMania2.曲
             foreach( var song in Global.App.全曲リスト )
             {
                 var score = song.譜面リスト?.FirstOrDefault( ( s ) => ( s != null && s.譜面の属性 != null ) );
-
                 int rating = score?.譜面の属性?.Rating ?? 0;
 
                 this._評価BOX[ rating ].子ノードリスト.Add( new SongNode( song ) { 親ノード = this._評価BOX[ rating ] } );

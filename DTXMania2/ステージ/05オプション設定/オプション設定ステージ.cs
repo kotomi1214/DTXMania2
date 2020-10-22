@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Windows.Forms;
-using FDK;
 using SharpDX.Direct2D1;
+using FDK;
 
 namespace DTXMania2.オプション設定
 {
@@ -51,7 +50,7 @@ namespace DTXMania2.オプション設定
             this.現在のフェーズ = フェーズ.フェードイン;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -104,6 +103,7 @@ namespace DTXMania2.オプション設定
 
                             this._パネルリスト.フェードアウトを開始する();
                             Global.App.アイキャッチ管理.アイキャッチを選択しクローズする( nameof( 半回転黒フェード ) );
+
                             this.現在のフェーズ = フェーズ.フェードアウト;
                             //----------------
                             #endregion
@@ -127,6 +127,7 @@ namespace DTXMania2.オプション設定
                         #region " 上移動 "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
+
                         this._パネルリスト.前のパネルを選択する();
                         //----------------
                         #endregion
@@ -136,6 +137,7 @@ namespace DTXMania2.オプション設定
                         #region " 下移動 "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.カーソル移動音 );
+
                         this._パネルリスト.次のパネルを選択する();
                         //----------------
                         #endregion
@@ -145,6 +147,7 @@ namespace DTXMania2.オプション設定
                         #region " 左移動 "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.変更音 );
+
                         this._パネルリスト.現在選択中のパネル!.左移動キーが入力された();
                         //----------------
                         #endregion
@@ -154,6 +157,7 @@ namespace DTXMania2.オプション設定
                         #region " 右移動 "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.変更音 );
+
                         this._パネルリスト.現在選択中のパネル!.右移動キーが入力された();
                         //----------------
                         #endregion
@@ -163,6 +167,7 @@ namespace DTXMania2.オプション設定
                         #region " 確定 "
                         //----------------
                         Global.App.システムサウンド.再生する( システムサウンド種別.変更音 );
+
                         this._パネルリスト.現在選択中のパネル!.確定キーが入力された();
                         //----------------
                         #endregion
@@ -254,7 +259,7 @@ namespace DTXMania2.オプション設定
                     this.現在のフェーズ = フェーズ.再起動待ち;
                     //----------------
                     #endregion
-                    
+
                     break;
                 }
                 case フェーズ.フェードアウト:
@@ -283,7 +288,9 @@ namespace DTXMania2.オプション設定
             #region " 画面モードが外部（F11キーなど）で変更されている場合には、それを「画面モード」パネルにも反映する。"
             //----------------
             {
-                var 画面モードパネル = this._パネルリスト.パネルツリーのルートノード.子パネルリスト.Find( ( p ) => ( p.パネル名 == "画面モード" ) ) as パネル_文字列リスト;
+                var 画面モードパネル = this._パネルリスト.パネルツリーのルートノード.子パネルリスト
+                    .Find( ( p ) => ( p.パネル名 == Properties.Resources.TXT_画面モード ) )
+                    as パネル_文字列リスト;
 
                 if( 画面モードパネル is null )  // 念のため
                     throw new Exception( "「画面モード」パネルが存在していません。" );
@@ -301,8 +308,8 @@ namespace DTXMania2.オプション設定
         {
             this._システム情報.VPSをカウントする();
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+            d2ddc.Transform = SharpDX.Matrix3x2.Identity;
 
             switch( this.現在のフェーズ )
             {
@@ -315,9 +322,11 @@ namespace DTXMania2.オプション設定
                     this._舞台画像.ぼかしと縮小を適用する( 0.5 );
                     this._パネルリスト.フェードインを開始する();
 
-                    dc.BeginDraw();
-                    this._背景画面を描画する( dc );
-                    dc.EndDraw();
+                    d2ddc.BeginDraw();
+
+                    this._背景画面を描画する( d2ddc );
+
+                    d2ddc.EndDraw();
 
                     this._フェードインフェーズ完了 = true;
                     //----------------
@@ -333,9 +342,11 @@ namespace DTXMania2.オプション設定
                 {
                     #region " 背景画面を描画する。"
                     //----------------
-                    dc.BeginDraw();
-                    this._背景画面を描画する( dc );
-                    dc.EndDraw();
+                    d2ddc.BeginDraw();
+
+                    this._背景画面を描画する( d2ddc );
+
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -345,14 +356,14 @@ namespace DTXMania2.オプション設定
                 {
                     #region " 背景画面＆フェードアウトを描画する。"
                     //----------------
-                    dc.BeginDraw();
+                    d2ddc.BeginDraw();
 
-                    this._舞台画像.進行描画する( dc );
-                    this._パネルリスト.進行描画する( dc, 613f, 0f );
-                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
-                    this._システム情報.描画する( dc );
+                    this._舞台画像.進行描画する( d2ddc );
+                    this._パネルリスト.進行描画する( d2ddc, 613f, 0f );
+                    Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( d2ddc );
+                    this._システム情報.描画する( d2ddc );
 
-                    dc.EndDraw();
+                    d2ddc.EndDraw();
                     //----------------
                     #endregion
 
@@ -378,11 +389,11 @@ namespace DTXMania2.オプション設定
 
         private bool _再起動が必要;
 
-        private void _背景画面を描画する( DeviceContext dc )
+        private void _背景画面を描画する( DeviceContext d2ddc )
         {
-            this._舞台画像.進行描画する( dc );
-            this._パネルリスト.進行描画する( dc, 613f, 0f );
-            this._システム情報.描画する( dc );
+            this._舞台画像.進行描画する( d2ddc );
+            this._パネルリスト.進行描画する( d2ddc, 613f, 0f );
+            this._システム情報.描画する( d2ddc );
         }
 
         private bool _フェードインフェーズ完了 = false;

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
 
@@ -51,12 +50,12 @@ namespace DTXMania2.選曲
             曲.Song.現在の難易度レベル = () => Global.App.曲ツリーリスト.SelectedItem!.フォーカス難易度レベル;
         }
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             // パネルを合計８枚表示する。（左隠れ１枚 ＋ 表示６枚 ＋ 右隠れ１枚）
 
-            int 論理パネル番号 = (int) Math.Truncate( this._論理パネル番号.現在値 );
-            double 差分 = this._論理パネル番号.現在値 - (double) 論理パネル番号;   // -1.0 < 差分 < 1.0
+            int 論理パネル番号 = (int)Math.Truncate( this._論理パネル番号.現在値 );
+            double 差分 = this._論理パネル番号.現在値 - (double)論理パネル番号;   // -1.0 < 差分 < 1.0
 
             for( int i = 0; i < 8; i++ )
             {
@@ -65,8 +64,8 @@ namespace DTXMania2.選曲
 
                 const float パネル幅 = 144f;
                 画像.描画する(
-                    dc, 
-                    左位置: (float) ( 768f + パネル幅 * ( i - 差分 ) ),
+                    d2ddc,
+                    左位置: (float)( 768f + パネル幅 * ( i - 差分 ) ),
                     上位置: ( 3 == i ) ? 90f : 54f,            // i==3 が現在の選択パネル。他より下に描画。
                     不透明度0to1: ( 3 == i ) ? 1f : 0.5f );    //          〃　　　　　　　他より明るく描画。
             }
@@ -88,7 +87,7 @@ namespace DTXMania2.選曲
                 this.画像 = new 画像D2D( path );
 
             }
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this.画像.Dispose();
             }
@@ -99,7 +98,7 @@ namespace DTXMania2.選曲
         /// </summary>
         private readonly List<Panel> _パネルs = new List<Panel>() {
             new Panel( @"$(Images)\SelectStage\Sorting_All.png" ),
-            new Panel( @"$(Images)\SelectStage\Sorting_Evaluation.png" ),
+            new Panel( @"$(Images)\SelectStage\Sorting_by_Rating.png" ),
         };
 
         private readonly TraceValue _論理パネル番号;
@@ -112,7 +111,7 @@ namespace DTXMania2.選曲
                 論理パネル番号 % this._パネルs.Count :
 
                 // 例:パネル数 3 で論理パネル番号が負の時: -1,-2,-3,-4,-5,... → 実パネル番号 = 2,1,0,2,1,0,...
-                ( this._パネルs.Count - ( ( -論理パネル番号 ) % this._パネルs.Count )) % this._パネルs.Count;
+                ( this._パネルs.Count - ( ( -論理パネル番号 ) % this._パネルs.Count ) ) % this._パネルs.Count;
         }
     }
 }

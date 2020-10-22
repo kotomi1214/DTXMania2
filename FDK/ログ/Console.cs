@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -38,7 +37,7 @@ namespace FDK
             this.Dispose( false );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.Dispose( true );
             GC.SuppressFinalize( this );

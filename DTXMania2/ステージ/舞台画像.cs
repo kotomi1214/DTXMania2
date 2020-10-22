@@ -37,24 +37,24 @@ namespace DTXMania2
             this._背景画像 = new 画像D2D( 背景画像ファイル名 ?? @"$(Images)\Background.jpg" );
             this._背景黒幕付き画像 = new 画像D2D( 背景黒幕付き画像ファイル名 ?? @"$(Images)\BackgroundWithDarkCurtain.jpg" );
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
 
-            this._ガウスぼかしエフェクト = new GaussianBlur( dc );
-            this._ガウスぼかしエフェクト黒幕付き用 = new GaussianBlur( dc );
+            this._ガウスぼかしエフェクト = new GaussianBlur( d2ddc );
+            this._ガウスぼかしエフェクト黒幕付き用 = new GaussianBlur( d2ddc );
 
-            this._拡大エフェクト = new Scale( dc ) {
+            this._拡大エフェクト = new Scale( d2ddc ) {
                 CenterPoint = new Vector2(
                     Global.GraphicResources.設計画面サイズ.Width / 2.0f,
                     Global.GraphicResources.設計画面サイズ.Height / 2.0f ),
             };
-            this._拡大エフェクト黒幕付き用 = new Scale( dc ) {
-                CenterPoint = new Vector2( 
-                    Global.GraphicResources.設計画面サイズ.Width / 2.0f, 
+            this._拡大エフェクト黒幕付き用 = new Scale( d2ddc ) {
+                CenterPoint = new Vector2(
+                    Global.GraphicResources.設計画面サイズ.Width / 2.0f,
                     Global.GraphicResources.設計画面サイズ.Height / 2.0f ),
             };
 
-            this._クリッピングエフェクト = new Crop( dc );
-            this._クリッピングエフェクト黒幕付き用 = new Crop( dc );
+            this._クリッピングエフェクト = new Crop( d2ddc );
+            this._クリッピングエフェクト黒幕付き用 = new Crop( d2ddc );
 
             this._ぼかしと縮小割合 = new Variable( Global.Animation.Manager, initialValue: 0.0 );
             this.ぼかしと縮小を適用中 = false;
@@ -150,7 +150,7 @@ namespace DTXMania2
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, bool 黒幕付き = false, Vector4? 表示領域 = null, LayerParameters1? layerParameters1 = null )
+        public void 進行描画する( DeviceContext d2ddc, bool 黒幕付き = false, Vector4? 表示領域 = null, LayerParameters1? layerParameters1 = null )
         {
             if( this._初めての進行描画 )
             {
@@ -171,32 +171,34 @@ namespace DTXMania2
 
             double 割合 = this._ぼかしと縮小割合?.Value ?? 0.0;
 
-            var preBlend = dc.PrimitiveBlend;
+            var preBlend = d2ddc.PrimitiveBlend;
 
-            dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+            d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
 
             if( 黒幕付き )
             {
                 #region " (A) 黒幕付き背景画像を描画する。"
                 //----------------
-                this._拡大エフェクト黒幕付き用.ScaleAmount = new Vector2( (float) ( 1f + ( 1.0 - 割合 ) * 0.04 ) );    // 1.04 ～ 1
-                this._ガウスぼかしエフェクト黒幕付き用.StandardDeviation = (float) ( 割合 * 10.0 );       // 0～10
-                this._クリッピングエフェクト黒幕付き用.Rectangle = ( null != 表示領域 ) ? ( (Vector4) 表示領域 ) : new Vector4( 0f, 0f, this._背景黒幕付き画像.サイズ.Width, this._背景黒幕付き画像.サイズ.Height );
+                this._拡大エフェクト黒幕付き用.ScaleAmount = new Vector2( (float)( 1f + ( 1.0 - 割合 ) * 0.04 ) );    // 1.04 ～ 1
+                this._ガウスぼかしエフェクト黒幕付き用.StandardDeviation = (float)( 割合 * 10.0 );       // 0～10
+                this._クリッピングエフェクト黒幕付き用.Rectangle = ( null != 表示領域 ) ?
+                    (Vector4)表示領域 :
+                    new Vector4( 0f, 0f, this._背景黒幕付き画像.サイズ.Width, this._背景黒幕付き画像.サイズ.Height );
 
                 if( layerParameters1.HasValue )
                 {
                     // (A-a) レイヤーパラメータの指定あり
-                    using( var layer = new Layer( dc ) )
+                    using( var layer = new Layer( d2ddc ) )
                     {
-                        dc.PushLayer( layerParameters1.Value, layer );
-                        dc.DrawImage( this._クリッピングエフェクト黒幕付き用 );
-                        dc.PopLayer();
+                        d2ddc.PushLayer( layerParameters1.Value, layer );
+                        d2ddc.DrawImage( this._クリッピングエフェクト黒幕付き用 );
+                        d2ddc.PopLayer();
                     }
                 }
                 else
                 {
                     // (A-b) レイヤーパラメータの指定なし
-                    dc.DrawImage( this._クリッピングエフェクト黒幕付き用 );
+                    d2ddc.DrawImage( this._クリッピングエフェクト黒幕付き用 );
                 }
                 //----------------
                 #endregion
@@ -205,30 +207,32 @@ namespace DTXMania2
             {
                 #region " (B) 背景画像を描画する。"
                 //----------------
-                this._拡大エフェクト.ScaleAmount = new Vector2( (float) ( 1f + ( 1.0 - 割合 ) * 0.04 ) );    // 1.04 ～ 1
-                this._ガウスぼかしエフェクト.StandardDeviation = (float) ( 割合 * 10.0 );       // 0～10
-                this._クリッピングエフェクト.Rectangle = ( null != 表示領域 ) ? ( (Vector4) 表示領域 ) : new Vector4( 0f, 0f, this._背景画像.サイズ.Width, this._背景画像.サイズ.Height );
+                this._拡大エフェクト.ScaleAmount = new Vector2( (float)( 1f + ( 1.0 - 割合 ) * 0.04 ) );    // 1.04 ～ 1
+                this._ガウスぼかしエフェクト.StandardDeviation = (float)( 割合 * 10.0 );       // 0～10
+                this._クリッピングエフェクト.Rectangle = ( null != 表示領域 ) ?
+                    (Vector4)表示領域 :
+                    new Vector4( 0f, 0f, this._背景画像.サイズ.Width, this._背景画像.サイズ.Height );
 
                 if( layerParameters1.HasValue )
                 {
                     // (B-a) レイヤーパラメータの指定あり
-                    using( var layer = new Layer( dc ) )
+                    using( var layer = new Layer( d2ddc ) )
                     {
-                        dc.PushLayer( layerParameters1.Value, layer );
-                        dc.DrawImage( this._クリッピングエフェクト );
-                        dc.PopLayer();
+                        d2ddc.PushLayer( layerParameters1.Value, layer );
+                        d2ddc.DrawImage( this._クリッピングエフェクト );
+                        d2ddc.PopLayer();
                     }
                 }
                 else
                 {
                     // (B-b) レイヤーパラメータの指定なし
-                    dc.DrawImage( this._クリッピングエフェクト );
+                    d2ddc.DrawImage( this._クリッピングエフェクト );
                 }
                 //----------------
                 #endregion
             }
 
-            dc.PrimitiveBlend = preBlend;
+            d2ddc.PrimitiveBlend = preBlend;
         }
 
 
@@ -257,7 +261,7 @@ namespace DTXMania2
         /// <summary>
         ///		くっきり＆拡大: 0 ～ 1 :ぼかし＆縮小
         /// </summary>
-        private Variable? _ぼかしと縮小割合;
+        private Variable? _ぼかしと縮小割合 = null;
 
         private Storyboard? _ストーリーボード = null;
     }

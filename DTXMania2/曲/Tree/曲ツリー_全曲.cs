@@ -54,9 +54,8 @@ namespace DTXMania2.曲
         {
             //using var _ = new LogBlock( Log.現在のメソッド名 );
 
+            // 曲検索フォルダパスをスキャンして、曲ツリー（と全譜面リスト）を構築する。
             await Task.Run( () => {
-
-                // 曲検索フォルダパスをスキャンして、曲ツリー（と全譜面リスト）を構築する。
 
                 // ルートノードの子ノードリストの先頭に「ランダムセレクト」を追加する。
                 this.ルートノード.子ノードリスト.Add( new RandomSelectNode() { 親ノード = this.ルートノード } );
@@ -68,7 +67,7 @@ namespace DTXMania2.曲
 
                 //  最初の子ノードをフォーカスする。
                 this.フォーカスリスト.SelectFirst();
-            
+
             } );
         }
 
@@ -83,9 +82,10 @@ namespace DTXMania2.曲
 
             await Task.Run( () => {
 
+                // 全レコード抽出
                 using var scoredb = new ScoreDB();
                 using var scorePropertiesdb = new ScorePropertiesDB();
-                using var query = new SqliteCommand( "SELECT * FROM Scores", scoredb.Connection );  // 全レコード抽出
+                using var query = new SqliteCommand( "SELECT * FROM Scores", scoredb.Connection );
                 var result = query.ExecuteReader();
                 while( result.Read() )
                 {
@@ -94,8 +94,7 @@ namespace DTXMania2.曲
                     var record = new ScoreDBRecord( result );
 
                     // レコードに記載されているパスが全譜面リストに存在していれば、レコードの内容で更新する。
-                    var scores = Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == record.ScorePath );
-                    foreach( var score in scores )
+                    foreach( var score in Global.App.全譜面リスト.Where( ( s ) => s.譜面.ScorePath == record.ScorePath ) )
                         score.譜面.UpdateFrom( record );
                 }
 
@@ -163,6 +162,9 @@ namespace DTXMania2.曲
 
             // 一時リスト。作成したノードをいったんこのノードリストに格納し、あとでまとめて曲ツリーに登録する。
             var 追加ノードリスト = new List<Node>();
+
+
+            // (1) フォルダ内のファイルからノードを作成
 
             // set.def/box.def ファイルの有無により処理分岐。
             var dirInfo = new DirectoryInfo( 基点フォルダパス.変数なしパス );
@@ -279,6 +281,8 @@ namespace DTXMania2.曲
             //----------------
             #endregion
 
+
+            // (2) サブフォルダを検索
 
             if( サブフォルダを検索する )
             {

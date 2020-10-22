@@ -1,10 +1,6 @@
-﻿using SharpDX.Direct2D1;
-using SharpDX.WIC;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace FDK
 {
@@ -50,7 +46,7 @@ namespace FDK
             this.リセットする();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
         }

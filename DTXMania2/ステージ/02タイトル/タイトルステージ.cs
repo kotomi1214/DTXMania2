@@ -4,8 +4,6 @@ using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
-using System.Threading;
-using Windows.ApplicationModel.Background;
 
 namespace DTXMania2.タイトル
 {
@@ -39,7 +37,7 @@ namespace DTXMania2.タイトル
             this._タイトルロゴ = new 画像D2D( @"$(Images)\TitleLogo.png" );
             this._帯ブラシ = new SolidColorBrush( Global.GraphicResources.既定のD2D1DeviceContext, new Color4( 0f, 0f, 0f, 0.8f ) );
             this._パッドを叩いてください = new 文字列画像D2D() {
-                表示文字列 = "パッドを叩いてください",
+                表示文字列 = Properties.Resources.TXT_パッドを叩いてください,
                 フォントサイズpt = 40f,
                 描画効果 = 文字列画像D2D.効果.縁取り,
             };
@@ -53,7 +51,7 @@ namespace DTXMania2.タイトル
             this.現在のフェーズ = フェーズ.表示;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -138,8 +136,8 @@ namespace DTXMania2.タイトル
             this._システム情報.VPSをカウントする();
 
             var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
-            
+            dc.Transform = Matrix3x2.Identity;
+
             switch( this.現在のフェーズ )
             {
                 case フェーズ.表示:
@@ -149,13 +147,8 @@ namespace DTXMania2.タイトル
                     dc.BeginDraw();
 
                     this._舞台画像.進行描画する( dc );
-
-                    dc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
-                    this._パッドを叩いてください.描画する( dc, 720f, 810f );
-
-                    this._タイトルロゴ.描画する( dc,
-                        ( Global.GraphicResources.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                        ( Global.GraphicResources.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+                    this._メッセージを描画する( dc );
+                    this._タイトルロゴを描画する( dc );
                     this._システム情報.描画する( dc );
 
                     dc.EndDraw();
@@ -171,16 +164,9 @@ namespace DTXMania2.タイトル
                     dc.BeginDraw();
 
                     this._舞台画像.進行描画する( dc );
-
-                    dc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
-                    this._パッドを叩いてください.描画する( dc, 720f, 810f );
-
-                    this._タイトルロゴ.描画する( dc,
-                        ( Global.GraphicResources.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
-                        ( Global.GraphicResources.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
-
+                    this._メッセージを描画する( dc );
+                    this._タイトルロゴを描画する( dc );
                     Global.App.アイキャッチ管理.現在のアイキャッチ.進行描画する( dc );
-
                     this._システム情報.描画する( dc );
 
                     dc.EndDraw();
@@ -206,5 +192,24 @@ namespace DTXMania2.タイトル
         private readonly Brush _帯ブラシ;
 
         private readonly 文字列画像D2D _パッドを叩いてください;
+
+        private void _タイトルロゴを描画する( DeviceContext d2ddc )
+        {
+            this._タイトルロゴ.描画する( d2ddc,
+                ( Global.GraphicResources.設計画面サイズ.Width - this._タイトルロゴ.サイズ.Width ) / 2f,
+                ( Global.GraphicResources.設計画面サイズ.Height - this._タイトルロゴ.サイズ.Height ) / 2f - 100f );
+        }
+
+        private void _メッセージを描画する( DeviceContext d2ddc )
+        {
+            d2ddc.FillRectangle( new RectangleF( 0f, 800f, Global.GraphicResources.設計画面サイズ.Width, 80f ), this._帯ブラシ );
+
+            if( this._パッドを叩いてください.画像サイズdpx.Width == 0 )
+            {
+                // 画像が未生成なら先に生成する。描画時に画像サイズが必要なため。
+                this._パッドを叩いてください.ビットマップを生成または更新する( d2ddc );
+            }
+            this._パッドを叩いてください.描画する( d2ddc, Global.GraphicResources.設計画面サイズ.Width / 2f - this._パッドを叩いてください.画像サイズdpx.Width / 2f, 810f );
+        }
     }
 }

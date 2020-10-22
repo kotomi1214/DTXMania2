@@ -64,12 +64,12 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
-            this._パネル.描画する( dc, 1458f, 3f );
-            this._サムネイルを描画する( dc );
-            this._曲名を描画する( dc );
-            this._サブタイトルを描画する( dc );
+            this._パネル.描画する( d2ddc, 1458f, 3f );
+            this._サムネイルを描画する( d2ddc );
+            this._曲名を描画する( d2ddc );
+            this._サブタイトルを描画する( d2ddc );
         }
 
 
@@ -95,7 +95,8 @@ namespace DTXMania2.演奏
 
         private readonly Vector2 _曲名表示サイズdpx = new Vector2( 331f - 8f - 4f, 70f - 10f );
 
-        private void _サムネイルを描画する( DeviceContext dc )
+
+        private void _サムネイルを描画する( DeviceContext d2ddc )
         {
             var サムネイル画像 = Global.App.演奏譜面?.プレビュー画像 ?? this._既定のノード画像;
 
@@ -107,26 +108,26 @@ namespace DTXMania2.演奏
                     this._サムネイル画像表示位置dpx.X,
                     this._サムネイル画像表示位置dpx.Y );
 
-            サムネイル画像.描画する( dc, 変換行列2D );
+            サムネイル画像.描画する( d2ddc, 変換行列2D );
         }
 
-        private void _曲名を描画する( DeviceContext dc )
+        private void _曲名を描画する( DeviceContext d2ddc )
         {
             // 拡大率を計算して描画する。
 
             this._曲名画像.描画する(
-                dc,
+                d2ddc,
                 this._曲名表示位置dpx.X,
                 this._曲名表示位置dpx.Y,
                 X方向拡大率: ( this._曲名画像.画像サイズdpx.Width <= this._曲名表示サイズdpx.X ) ? 1f : this._曲名表示サイズdpx.X / this._曲名画像.画像サイズdpx.Width );
         }
 
-        private void _サブタイトルを描画する( DeviceContext dc )
+        private void _サブタイトルを描画する( DeviceContext d2ddc )
         {
             // 拡大率を計算して描画する。
 
             this._サブタイトル画像.描画する(
-                dc,
+                d2ddc,
                 this._曲名表示位置dpx.X,
                 this._曲名表示位置dpx.Y + 30f,
                 X方向拡大率: ( this._サブタイトル画像.画像サイズdpx.Width <= this._曲名表示サイズdpx.X ) ? 1f : this._曲名表示サイズdpx.X / this._サブタイトル画像.画像サイズdpx.Width );

@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using SharpDX;
-using FDK;
-using DTXMania2.曲;
 using SharpDX.Direct2D1;
+using FDK;
 
 namespace DTXMania2.曲読み込み
 {
@@ -36,19 +35,21 @@ namespace DTXMania2.曲読み込み
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
-            var ノード画像 = Global.App.演奏譜面.譜面と画像を現行化済み ? ( Global.App.演奏譜面.プレビュー画像 ?? this._既定のノード画像 ) : this._現行化前のノード画像;
+            var ノード画像 = Global.App.演奏譜面.譜面と画像を現行化済み ?
+                ( Global.App.演奏譜面.プレビュー画像 ?? this._既定のノード画像 ) :
+                this._現行化前のノード画像;
 
             var 変換行列2D =
                 Matrix3x2.Scaling(
                     this._プレビュー画像表示サイズdpx.X / ノード画像.サイズ.Width,
-                    this._プレビュー画像表示サイズdpx.Y / ノード画像.サイズ.Height )*
+                    this._プレビュー画像表示サイズdpx.Y / ノード画像.サイズ.Height ) *
                 Matrix3x2.Translation(
                     this._プレビュー画像表示位置dpx.X,
                     this._プレビュー画像表示位置dpx.Y );
 
-            ノード画像.描画する( dc, 変換行列2D );
+            ノード画像.描画する( d2ddc, 変換行列2D );
         }
 
 

@@ -25,7 +25,7 @@ namespace DTXMania2
             var userdbPath = new VariablePath( @"$(AppData)\UserDB.sqlite3" );
             var userYamls = Directory.EnumerateFiles(
                 path: Folder.フォルダ変数の内容を返す( "AppData" ),
-                searchPattern: @"User_*.yaml", 
+                searchPattern: @"User_*.yaml",
                 searchOption: SearchOption.TopDirectoryOnly );
 
             if( 0 < userYamls.Count() )
@@ -53,7 +53,7 @@ namespace DTXMania2
                 //----------------
                 using( var userdb = new SQLiteDB( userdbPath.変数なしパス ) )
                 {
-                    userdb_version = (int) userdb.UserVersion;
+                    userdb_version = (int)userdb.UserVersion;
                     using var idsQuery = new SqliteCommand( "SELECT * FROM Users", userdb.Connection );
                     var ids = idsQuery.ExecuteReader();
                     while( ids.Read() )
@@ -149,7 +149,7 @@ namespace DTXMania2
                 using var cmd = new SqliteCommand( RecordDBRecord.GetCreateTableSQL(), recorddb.Connection );
                 cmd.ExecuteNonQuery();
                 recorddb.UserVersion = RecordDBRecord.VERSION;
-                
+
                 Log.Info( $"RecordDB を生成しました。" );
                 //----------------
                 #endregion
@@ -176,7 +176,7 @@ namespace DTXMania2
                 var yamlText = File.ReadAllText( path.変数なしパス );
                 var yamlStream = new YamlStream();
                 yamlStream.Load( new StringReader( yamlText ) );
-                var rootMapping = (YamlMappingNode) yamlStream.Documents[ 0 ].RootNode;
+                var rootMapping = (YamlMappingNode)yamlStream.Documents[ 0 ].RootNode;
                 var versionNode = new YamlScalarNode( "Version" );
                 if( rootMapping.Children.ContainsKey( versionNode ) )
                 {

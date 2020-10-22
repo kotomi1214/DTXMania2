@@ -20,12 +20,12 @@ namespace DTXMania2.結果
 
             this._ランクエフェクト = new Dictionary<ランク種別, EffekseerNET.Effect>() {
                 { ランク種別.SS, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankSS.efkefc" ).変数なしパス ) },
-                { ランク種別.S, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankS.efkefc" ).変数なしパス ) },
-                { ランク種別.A, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankA.efkefc" ).変数なしパス ) },
-                { ランク種別.B, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankB.efkefc" ).変数なしパス ) },
-                { ランク種別.C, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankC.efkefc" ).変数なしパス ) },
-                { ランク種別.D, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankD.efkefc" ).変数なしパス ) },
-                { ランク種別.E, EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankE.efkefc" ).変数なしパス ) },
+                { ランク種別.S,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankS.efkefc" ).変数なしパス ) },
+                { ランク種別.A,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankA.efkefc" ).変数なしパス ) },
+                { ランク種別.B,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankB.efkefc" ).変数なしパス ) },
+                { ランク種別.C,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankC.efkefc" ).変数なしパス ) },
+                { ランク種別.D,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankD.efkefc" ).変数なしパス ) },
+                { ランク種別.E,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankE.efkefc" ).変数なしパス ) },
             };
 
             this._初めての進行描画 = true;
@@ -41,8 +41,8 @@ namespace DTXMania2.結果
                 Global.Effekseer.Manager.SetShown( this._ランクエフェクトハンドル, false );
             }
 
-            this._エフェクト開始タイマ.Dispose();
-            this._エフェクト開始イベント.Dispose();
+            this._エフェクト開始タイマ?.Dispose();
+            this._エフェクト開始イベント?.Dispose();
 
             //foreach( var rankEffect in this._ランクエフェクト.Values )
             //    rankEffect.Dispose(); --> 不要
@@ -53,12 +53,11 @@ namespace DTXMania2.結果
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, ランク種別 rank )
+        public void 進行描画する( DeviceContext d2ddc, ランク種別 rank )
         {
             if( this._初めての進行描画 )
             {
                 this._初めての進行描画 = false;
-
                 this._Rank = rank;
 
                 // 0.6 秒後にエフェクト開始
@@ -76,9 +75,11 @@ namespace DTXMania2.結果
             }
             else
             {
-                dc.EndDraw();   // D2D中断
+                d2ddc.EndDraw();   // D2D中断
+
                 Global.Effekseer.描画する( this._ランクエフェクトハンドル );
-                dc.BeginDraw(); // D2D再開
+
+                d2ddc.BeginDraw(); // D2D再開
             }
         }
 
@@ -90,8 +91,11 @@ namespace DTXMania2.結果
 
         private void _ランクエフェクトを開始する()
         {
+            // エフェクトの再生を開始してハンドルを受け取る。
             this._ランクエフェクトハンドル = Global.Effekseer.Manager.Play( this._ランクエフェクト[ this._Rank ], -4.5f, 0.4f, -0f );
-            Global.Effekseer.Manager.SetRotation( this._ランクエフェクトハンドル, new EffekseerNET.Vector3D( 1, 0, 0 ), 0.2f );   // 少し前傾
+
+            // 少しだけ前傾させる。
+            Global.Effekseer.Manager.SetRotation( this._ランクエフェクトハンドル, new EffekseerNET.Vector3D( 1, 0, 0 ), 0.2f );
         }
 
 

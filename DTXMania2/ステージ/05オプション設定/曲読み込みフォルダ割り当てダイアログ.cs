@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows.Forms;
 using FDK;
 
@@ -25,8 +26,13 @@ namespace DTXMania2.オプション設定
             {
                 if( this._リストに変更がある )
                 {
-                    if( MessageBox.Show( "変更を破棄していいですか？", "確認", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2 ) == DialogResult.No )
+                    if( MessageBox.Show(
+                        Properties.Resources.TXT_変更を破棄していいですか,
+                        Properties.Resources.TXT_確認,
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button2 ) == DialogResult.No )
+                    {
                         e.Cancel = true;
+                    }
                 }
             }
         }

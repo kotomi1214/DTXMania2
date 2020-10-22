@@ -57,9 +57,9 @@ namespace FDK
             int len = outBuffer.Length;
             if( len > UInt16.MaxValue )
                 throw new Exception( "送信文字列が長すぎます。" );
-            this._IoStream.WriteByte( (byte) ( len >> 8 ) );
-            this._IoStream.WriteByte( (byte) ( len & 0xFF ) );
-            
+            this._IoStream.WriteByte( (byte)( len >> 8 ) );
+            this._IoStream.WriteByte( (byte)( len & 0xFF ) );
+
             // 次いで、データ本体を送信。
             this._IoStream.Write( outBuffer, 0, len );
             this._IoStream.Flush();

@@ -41,10 +41,10 @@ namespace FDK
 
 
         public static double 生カウント相対値を秒へ変換して返す( long 生カウント相対値 )
-            => (double) 生カウント相対値 / QPCTimer.周波数;
+            => (double)生カウント相対値 / QPCTimer.周波数;
 
         public static long 秒をカウントに変換して返す( double 秒 )
-            => (long) ( 秒 * QPCTimer.周波数 );
+            => (long)( 秒 * QPCTimer.周波数 );
 
 
         public long 現在のキャプチャカウント
@@ -68,10 +68,10 @@ namespace FDK
         }
 
         public long 現在のキャプチャカウント100ns
-            => (long) ( this.現在のキャプチャカウントsec * 10_000_000 + 0.5 );
+            => (long)( this.現在のキャプチャカウントsec * 10_000_000 + 0.5 );
 
         public double 現在のキャプチャカウントsec
-            => (double) this.現在のキャプチャカウント / QPCTimer.周波数;
+            => (double)this.現在のキャプチャカウント / QPCTimer.周波数;
 
         public long 現在のリアルタイムカウント
         {
@@ -97,7 +97,7 @@ namespace FDK
             => (long)( this.現在のリアルタイムカウントsec * 10_000_000 + 0.5 );
 
         public double 現在のリアルタイムカウントsec
-            => (double) this.現在のリアルタイムカウント / QPCTimer.周波数;
+            => (double)this.現在のリアルタイムカウント / QPCTimer.周波数;
 
         public long 前回リセットした時点の生カウント
         {

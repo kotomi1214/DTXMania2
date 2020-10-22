@@ -63,10 +63,10 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
+        public override void 進行描画する( DeviceContext d2ddc, float left, float top, bool 選択中 )
         {
             // パネルの下地と名前を描画。
-            base.進行描画する( dc, left, top, 選択中 );
+            base.進行描画する( d2ddc, left, top, 選択中 );
 
             // その他の描画があれば、ここに記述する。
         }

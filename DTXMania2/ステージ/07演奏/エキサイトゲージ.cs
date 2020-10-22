@@ -22,11 +22,11 @@ namespace DTXMania2.演奏
             this._ゲージ枠通常 = new 画像D2D( @"$(Images)\PlayStage\ExciteGauge.png" );
             this._ゲージ枠DANGER = new 画像D2D( @"$(Images)\PlayStage\ExciteGauge_Danger.png" );
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
 
-            this._通常ブラシ = new SolidColorBrush( dc, new Color4( 0xfff9b200 ) );      // ABGR
-            this._DANGERブラシ = new SolidColorBrush( dc, new Color4( 0xff0000ff ) );
-            this._MAXブラシ = new SolidColorBrush( dc, new Color4( 0xff00c9f4 ) );
+            this._通常ブラシ = new SolidColorBrush( d2ddc, new Color4( 0xfff9b200 ) );      // ABGR
+            this._DANGERブラシ = new SolidColorBrush( d2ddc, new Color4( 0xff0000ff ) );
+            this._MAXブラシ = new SolidColorBrush( d2ddc, new Color4( 0xff00c9f4 ) );
 
             this._ゲージ量 = new Variable( Global.Animation.Manager, initialValue: 0 );
         }
@@ -54,7 +54,7 @@ namespace DTXMania2.演奏
         /// <param name="ゲージ量">
         ///		0～1。 0.0で0%、1.0で100%。
         /// </param>
-        public void 進行描画する( DeviceContext dc, double ゲージ量 )
+        public void 進行描画する( DeviceContext d2ddc, double ゲージ量 )
         {
             ゲージ量 = Math.Clamp( ゲージ量, min: 0f, max: 1f );
 
@@ -64,11 +64,11 @@ namespace DTXMania2.演奏
             //----------------
             if( 0.25 > this._ゲージ量.Value )
             {
-                this._ゲージ枠DANGER.描画する( dc, 540f, 955f );
+                this._ゲージ枠DANGER.描画する( d2ddc, 540f, 955f );
             }
             else
             {
-                this._ゲージ枠通常.描画する( dc, 540f, 955f );
+                this._ゲージ枠通常.描画する( d2ddc, 540f, 955f );
             }
             //----------------
             #endregion
@@ -98,12 +98,13 @@ namespace DTXMania2.演奏
             //----------------
             {
                 var ゲージ領域 = MAXゲージ領域;
-                ゲージ領域.Width *= Math.Min( (float) this._ゲージ量.Value, 1.0f );
+                ゲージ領域.Width *= Math.Min( (float)this._ゲージ量.Value, 1.0f );
+
                 var ブラシ =
                     ( 0.25 > this._ゲージ量.Value ) ? this._DANGERブラシ :
                     ( 1.0 <= this._ゲージ量.Value ) ? this._MAXブラシ : this._通常ブラシ;
 
-                dc.FillRectangle( ゲージ領域, ブラシ );
+                d2ddc.FillRectangle( ゲージ領域, ブラシ );
             }
             //----------------
             #endregion

@@ -38,8 +38,9 @@ namespace DTXMania2
         ///     各入力デバイスを初期化する。
         ///     このコンストラクタは、GUI スレッドから呼び出すこと。
         /// </summary>
-        /// <param name="hWindow"></param>
-        /// <param name="最大入力履歴数"></param>
+        /// <param name="hWindow">ウィンドウハンドル。</param>
+        /// <param name="soundTimer">サウンドタイマ。入力値のタイムスタンプの取得に使用される。</param>
+        /// <param name="最大入力履歴数">入力履歴を使用する場合、その履歴の最大記憶数。</param>
         public ドラム入力( IntPtr hWindow, SoundTimer soundTimer, int 最大入力履歴数 = 32 )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
@@ -65,7 +66,7 @@ namespace DTXMania2
                     デバイスリスト.Add( i, this.MidiIns.DeviceName[ i ] );
                 //----------------
                 #endregion
-                
+
                 #region " (2) キーバインディングのデバイスリストとマージして、新しいデバイスリストを作成する。"
                 //----------------
                 foreach( var kvp in config.MIDIデバイス番号toデバイス名 )
@@ -84,7 +85,7 @@ namespace DTXMania2
                 }
                 //----------------
                 #endregion
-                
+
                 #region " (3) キーバインディングのデバイスから新しいデバイスへ、キーのIDを付け直す。"
                 //----------------
                 var 中間バッファ = new Dictionary<SystemConfig.IdKey, ドラム入力種別>();
@@ -111,7 +112,7 @@ namespace DTXMania2
                 }
                 //----------------
                 #endregion
-                
+
                 #region " (4) 新しいデバイスリストをキーバインディングに格納して、保存する。"
                 //----------------
                 config.MIDIデバイス番号toデバイス名.Clear();
@@ -131,7 +132,7 @@ namespace DTXMania2
             #endregion
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             this.MidiIns.Dispose();
             this.GameControllers.Dispose();
@@ -167,7 +168,7 @@ namespace DTXMania2
             }
             else
             {
-                return ( null != this.ポーリング結果.FirstOrDefault( ( ev ) => ( ev.Type == drumType && ev.InputEvent.押された ) ) );
+                return ( 0 <= this.ポーリング結果.FindIndex( ( ev ) => ( ev.Type == drumType && ev.InputEvent.押された ) ) );
             }
         }
 
@@ -184,7 +185,7 @@ namespace DTXMania2
             }
             else
             {
-                return ( null != this.ポーリング結果.FirstOrDefault( ( ev ) => ( ev.InputEvent.押された && drumTypes.Contains( ev.Type ) ) ) );
+                return ( 0 <= this.ポーリング結果.FindIndex( ( ev ) => ( ev.InputEvent.押された && drumTypes.Contains( ev.Type ) ) ) );
             }
         }
 
@@ -295,6 +296,7 @@ namespace DTXMania2
             if( this._入力履歴.Count < シーケンスのストローク数 )
                 return false;   // 履歴数が足りない。
 
+
             int 履歴の検索開始位置 = this._入力履歴.IndexOf( シーケンス.ElementAt( 0 ) );
 
             if( -1 == 履歴の検索開始位置 )
@@ -302,6 +304,7 @@ namespace DTXMania2
 
             if( ( this._入力履歴.Count - 履歴の検索開始位置 ) < シーケンスのストローク数 )
                 return false;   // 履歴数が足りない。
+
 
             // 検索開始位置から末尾へ、すべてのストロークが一致するか確認する。
             for( int i = 1; i < シーケンスのストローク数; i++ )
@@ -311,7 +314,7 @@ namespace DTXMania2
             }
 
             // 見つけたシーケンスならびにそれより古い履歴を削除する。
-            this._入力履歴.RemoveRange( 0, ( 履歴の検索開始位置 + シーケンスのストローク数 ) );
+            this._入力履歴.RemoveRange( 0, 履歴の検索開始位置 + シーケンスのストローク数 );
 
             return true;
         }
@@ -331,14 +334,17 @@ namespace DTXMania2
             // ストロークはシーケンスの構成単位。ここでは「指定されたドラム入力種別に対応するドラム入力イベント」と同義である。
             // ドラム入力種別 と ドラム入力イベント は、1 対 N の関係である。
 
-            bool 適合する( ドラム入力種別 drumType, ドラム入力イベント drumEvent )
+            static bool 適合する( ドラム入力種別 drumType, ドラム入力イベント drumEvent )
                 => ( drumEvent.Type == drumType && drumEvent.InputEvent.押された );
+
 
             int シーケンスのストローク数 = シーケンス.Count();
 
-            if( ( 0 == シーケンスのストローク数 ) ||                   // 空シーケンスは常に不成立。
-                ( this._入力履歴.Count < シーケンスのストローク数 ) )   // 履歴数が足りない。
-                return false;
+            if( 0 == シーケンスのストローク数 )
+                return false;   // 空シーケンスは常に不成立。
+
+            if( this._入力履歴.Count < シーケンスのストローク数 )
+                return false;   // 履歴数が足りない。
 
 
             // 検索を開始する位置を特定する。
@@ -363,7 +369,7 @@ namespace DTXMania2
 
             // すべて一致したので、そのシーケンスならびにそれより古い履歴を削除する。
 
-            this._入力履歴.RemoveRange( 0, ( 履歴の検索開始位置 + シーケンスのストローク数 ) );
+            this._入力履歴.RemoveRange( 0, 履歴の検索開始位置 + シーケンスのストローク数 );
 
             return true;
         }
@@ -384,13 +390,16 @@ namespace DTXMania2
             // レーン種別 と ドラム入力種別 と ドラム入力イベント は、N 対 M 対 P の関係である。
 
             bool 適合する( SSTF.レーン種別 laneType, ドラム入力イベント drumEvent )
-                => ( 0 < ドラムチッププロパティリスト.チップtoプロパティ.Count( ( kvp ) => ( ( kvp.Value.レーン種別 == laneType ) && ( kvp.Value.ドラム入力種別 == drumEvent.Type ) && ( drumEvent.InputEvent.押された ) ) ) );
+                => ( 0 < ドラムチッププロパティリスト.チップtoプロパティ.Count( ( kvp ) => ( kvp.Value.レーン種別 == laneType ) && ( kvp.Value.ドラム入力種別 == drumEvent.Type ) && ( drumEvent.InputEvent.押された ) ) );
+
 
             int シーケンスのストローク数 = シーケンス.Count();
 
-            if( ( 0 == シーケンスのストローク数 ) ||                   // 空シーケンスは常に不成立。
-                ( this._入力履歴.Count < シーケンスのストローク数 ) )   // 履歴数が足りない。
-                return false;
+            if( 0 == シーケンスのストローク数 )
+                return false;   // 空シーケンスは常に不成立。
+
+            if( this._入力履歴.Count < シーケンスのストローク数 )
+                return false;   // 履歴数が足りない。
 
 
             // 検索を開始する位置を特定する。
@@ -415,7 +424,7 @@ namespace DTXMania2
 
             // すべて一致したので、そのシーケンスならびにそれより古い履歴を削除する。
 
-            this._入力履歴.RemoveRange( 0, ( 履歴の検索開始位置 + シーケンスのストローク数 ) );
+            this._入力履歴.RemoveRange( 0, 履歴の検索開始位置 + シーケンスのストローク数 );
 
             return true;
         }
@@ -442,7 +451,7 @@ namespace DTXMania2
             this._入力履歴を記録中である = 入力履歴を記録する;
 
 
-            // 個別にポーリングする。
+            // 全デバイスをポーリングする。
 
             this.ポーリング結果.Clear();
 
@@ -461,7 +470,7 @@ namespace DTXMania2
 
             // タイムスタンプの小さい順にソートする。
 
-            this.ポーリング結果.Sort( ( x, y ) => (int) ( x.InputEvent.TimeStamp - y.InputEvent.TimeStamp ) );
+            this.ポーリング結果.Sort( ( x, y ) => (int)( x.InputEvent.TimeStamp - y.InputEvent.TimeStamp ) );
         }
 
 
@@ -472,7 +481,7 @@ namespace DTXMania2
         ///		キーバインディングに従ってマッピングされた後の、ドラム入力イベントを対象とする。
         ///		リストのサイズには制限があり（<see cref="_最大入力履歴数"/>）、それを超える場合は、ポーリング時に古いイベントから削除されていく。
         /// </remarks>
-        private List<ドラム入力イベント> _入力履歴;
+        private readonly List<ドラム入力イベント> _入力履歴;
 
         private int _最大入力履歴数 = 32;
 
@@ -493,6 +502,8 @@ namespace DTXMania2
         // ローカル
 
 
+        private const double _連続入力だとみなす最大の間隔sec = 0.5;
+
         /// <summary>
         ///		単一の IInputDevice をポーリングし、対応表に従ってドラム入力へ変換して、ポーリング結果 に追加登録する。
         /// </summary>
@@ -504,6 +515,7 @@ namespace DTXMania2
             {
                 // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
                 var evKey = new SystemConfig.IdKey( ev );
+
                 if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
                     continue;   // 使われないならスキップ。
 
@@ -513,11 +525,9 @@ namespace DTXMania2
 
                 // ドラム入力を入力履歴に追加登録する。
                 if( 入力履歴を記録する &&
-                    ev.押された &&
-                    ドラム入力.Type != ドラム入力種別.HiHat_Control )   // HHC は入力履歴の対象外とする。
+                    ev.押された &&                         // 押下入力だけを記録する。
+                    ドラム入力.InputEvent.Control == 0 )   // コントロールチェンジは入力履歴の対象外とする。
                 {
-                    const double _連続入力だとみなす最大の間隔sec = 0.5;
-
                     double 入力時刻sec = ev.TimeStamp;
 
                     // 容量がいっぱいなら、古い履歴から削除する。

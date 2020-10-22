@@ -6,7 +6,6 @@ using SharpDX.Direct2D1;
 using SharpDX.DirectWrite;
 using FDK;
 using DTXMania2.曲;
-using Windows.Graphics.Printing3D;
 
 namespace DTXMania2.選曲
 {
@@ -74,18 +73,18 @@ namespace DTXMania2.選曲
         /// <param name="選択している難易度レベル">
         ///		0:BASIC～4:ULTIMATE
         ///	</param>
-        public void 進行描画する( DeviceContext dc, int 選択している難易度レベル, Node フォーカスノード )
+        public void 進行描画する( DeviceContext d2ddc, int 選択している難易度レベル, Node フォーカスノード )
         {
             var 背景領域dpx = new RectangleF( 642f, 529f, 338f, 508f );
 
-            var preBlend = dc.PrimitiveBlend;
+            var preBlend = d2ddc.PrimitiveBlend;
 
             #region " 背景を描画する。"
             //----------------
-            dc.PrimitiveBlend = PrimitiveBlend.SourceOver;
-            dc.FillRectangle( 背景領域dpx, this._黒透過ブラシ );
-            
-            dc.PrimitiveBlend = preBlend;
+            d2ddc.PrimitiveBlend = PrimitiveBlend.SourceOver;
+            d2ddc.FillRectangle( 背景領域dpx, this._黒透過ブラシ );
+
+            d2ddc.PrimitiveBlend = preBlend;
             //----------------
             #endregion
 
@@ -100,7 +99,7 @@ namespace DTXMania2.選曲
             #region " 難易度パネル（背景）を描画する。"
             //----------------
             for( int i = 0; i < 5; i++ )
-                this._難易度パネルの背景を１つ描画する( dc, パネル位置リスト[ i ].X, パネル位置リスト[ i ].Y, this._難易度パネル色[ i ], this._黒ブラシ );
+                this._難易度パネルの背景を１つ描画する( d2ddc, パネル位置リスト[ i ].X, パネル位置リスト[ i ].Y, this._難易度パネル色[ i ], this._黒ブラシ );
             //----------------
             #endregion
 
@@ -129,7 +128,7 @@ namespace DTXMania2.選曲
                     難易度リスト[ i ] = snode.曲.譜面リスト[ i ]?.譜面.Level ?? 5.0;
                 }
             }
-            else if( フォーカスノード is RandomSelectNode rnode )
+            else if( フォーカスノード is RandomSelectNode )
             {
                 for( int i = 0; i < 5; i++ )
                 {
@@ -143,7 +142,7 @@ namespace DTXMania2.選曲
             #region " 難易度パネル（テキスト、数値）を描画する。"
             //----------------
             for( int i = 0; i < 5; i++ )
-                this._難易度パネルのテキストを１つ描画する( dc, フォーカスノード, パネル位置リスト[ i ].X, パネル位置リスト[ i ].Y,難易度ラベルリスト[i], 難易度リスト[i], this._白ブラシ );
+                this._難易度パネルのテキストを１つ描画する( d2ddc, フォーカスノード, パネル位置リスト[ i ].X, パネル位置リスト[ i ].Y, 難易度ラベルリスト[ i ], 難易度リスト[ i ], this._白ブラシ );
             //----------------
             #endregion
 
@@ -156,37 +155,41 @@ namespace DTXMania2.選曲
                 var 青領域dpx = new RectangleF( 642f + 10f, 529f + 5f + ( 4 - 選択している難易度レベル ) * 101f, 338f - 20f, 100f );
                 var 太さdpx = 青い線.太さdpx;
 
-                青い線.描画する( dc, new Vector2( 青領域dpx.Left - 太さdpx / 4f, 青領域dpx.Top ), 幅dpx: 青領域dpx.Width + 太さdpx / 2f );      // 上辺
-                青い線.描画する( dc, new Vector2( 青領域dpx.Left, 青領域dpx.Top - 太さdpx / 4f ), 高さdpx: 青領域dpx.Height + 太さdpx / 2f );   // 左辺
-                青い線.描画する( dc, new Vector2( 青領域dpx.Left - 太さdpx / 4f, 青領域dpx.Bottom ), 幅dpx: 青領域dpx.Width + 太さdpx / 2f );   // 下辺
-                青い線.描画する( dc, new Vector2( 青領域dpx.Right, 青領域dpx.Top - 太さdpx / 4f ), 高さdpx: 青領域dpx.Height + 太さdpx / 2f );  // 右辺
+                青い線.描画する( d2ddc, new Vector2( 青領域dpx.Left - 太さdpx / 4f, 青領域dpx.Top ), 幅dpx: 青領域dpx.Width + 太さdpx / 2f );      // 上辺
+                青い線.描画する( d2ddc, new Vector2( 青領域dpx.Left, 青領域dpx.Top - 太さdpx / 4f ), 高さdpx: 青領域dpx.Height + 太さdpx / 2f );   // 左辺
+                青い線.描画する( d2ddc, new Vector2( 青領域dpx.Left - 太さdpx / 4f, 青領域dpx.Bottom ), 幅dpx: 青領域dpx.Width + 太さdpx / 2f );   // 下辺
+                青い線.描画する( d2ddc, new Vector2( 青領域dpx.Right, 青領域dpx.Top - 太さdpx / 4f ), 高さdpx: 青領域dpx.Height + 太さdpx / 2f );  // 右辺
             }
             //----------------
             #endregion
         }
 
-        private void _難易度パネルの背景を１つ描画する( DeviceContext dc, float 基点X, float 基点Y, Brush 見出し背景ブラシ, Brush 数値背景ブラシ )
+        private void _難易度パネルの背景を１つ描画する( DeviceContext d2ddc, float 基点X, float 基点Y, Brush 見出し背景ブラシ, Brush 数値背景ブラシ )
         {
-            dc.FillRectangle( new RectangleF( 基点X, 基点Y, 157f, 20f ), 見出し背景ブラシ );
-            dc.FillRectangle( new RectangleF( 基点X, 基点Y + 20f, 157f, 66f ), 数値背景ブラシ );
+            d2ddc.FillRectangle( new RectangleF( 基点X, 基点Y, 157f, 20f ), 見出し背景ブラシ );
+            d2ddc.FillRectangle( new RectangleF( 基点X, 基点Y + 20f, 157f, 66f ), 数値背景ブラシ );
         }
 
-        private void _難易度パネルのテキストを１つ描画する( DeviceContext dc, Node node, float 基点X, float 基点Y, string 難易度ラベル, double 難易度値, Brush 文字ブラシ )
+        private void _難易度パネルのテキストを１つ描画する( DeviceContext d2ddc, Node node, float 基点X, float 基点Y, string 難易度ラベル, double 難易度値, Brush 文字ブラシ )
         {
             // 難易度ラベル
-            dc.DrawText( 難易度ラベル, this._見出し用TextFormat, new RectangleF( 基点X + 4f, 基点Y, 157f - 8f, 18f ), 文字ブラシ );
+            d2ddc.DrawText( 難易度ラベル, this._見出し用TextFormat, new RectangleF( 基点X + 4f, 基点Y, 157f - 8f, 18f ), 文字ブラシ );
 
             if( node is RandomSelectNode )
             {
                 // RandomNode 用説明文
-                dc.DrawText( 難易度ラベル + " 付近を\nランダムに選択", this._説明文用TextFormat, new RectangleF( 基点X + 4f, 基点Y + 30f, 157f - 8f, 40f ), 文字ブラシ );
+                d2ddc.DrawText(
+                    string.Format( Properties.Resources.TXT_ランダムに選択, 難易度ラベル ),
+                    this._説明文用TextFormat,
+                    new RectangleF( 基点X + 4f, 基点Y + 30f, 157f - 8f, 40f ),
+                    文字ブラシ );
             }
             else if( !string.IsNullOrEmpty( 難易度ラベル ) && 0.00 != 難易度値 )
             {
                 // 難易度値
                 var 難易度値文字列 = 難易度値.ToString( "0.00" ).PadLeft( 1 ); // 整数部は２桁を保証（１桁なら十の位は空白文字）
-                this._数字画像.描画する( dc, 基点X + 84f, 基点Y + 38f, 難易度値文字列[ 2.. ], new Size2F( 0.5f, 0.5f ) );  // 小数部
-                this._数字画像.描画する( dc, 基点X + 20f, 基点Y + 20f, 難易度値文字列[ 0..2 ], new Size2F( 0.7f, 0.7f ) ); // 整数部（'.'含む）
+                this._数字画像.描画する( d2ddc, 基点X + 84f, 基点Y + 38f, 難易度値文字列[ 2.. ], new Size2F( 0.5f, 0.5f ) );  // 小数部
+                this._数字画像.描画する( d2ddc, 基点X + 20f, 基点Y + 20f, 難易度値文字列[ 0..2 ], new Size2F( 0.7f, 0.7f ) ); // 整数部（'.'含む）
             }
         }
 

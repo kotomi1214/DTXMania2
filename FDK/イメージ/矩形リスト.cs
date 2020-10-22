@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.IO;
 using SharpDX;
@@ -28,7 +27,7 @@ namespace FDK
         /// <param name="文字列">文字列。</param>
         /// <returns>文字列に対応する矩形。文字列がマッピングできなければ null を返す。</returns>
         public RectangleF? this[ string 文字列 ]
-            => this.文字列to矩形.TryGetValue( 文字列, out var 矩形 ) ? 矩形 : (RectangleF?) null;
+            => this.文字列to矩形.TryGetValue( 文字列, out var 矩形 ) ? 矩形 : (RectangleF?)null;
 
 
 

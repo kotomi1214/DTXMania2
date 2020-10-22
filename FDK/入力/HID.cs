@@ -764,11 +764,11 @@ namespace FDK
         }
 
         public static string GetUsageName( uint extendedUsage )
-            => GetUsageName( (ushort) ( ( extendedUsage >> 16 ) & 0xFFFF ), (ushort) ( extendedUsage & 0xFFFF ) );
+            => GetUsageName( (ushort)( ( extendedUsage >> 16 ) & 0xFFFF ), (ushort)( extendedUsage & 0xFFFF ) );
 
         public static string GetUsageName( ushort usagePage, ushort usageId )
         {
-            uint extendedUsage = (uint) ( usagePage << 16 ) | (ushort) usageId;
+            uint extendedUsage = (uint)( usagePage << 16 ) | (ushort)usageId;
 
             return ( _UsageName.ContainsKey( extendedUsage ) ) ?
                 _UsageName[ extendedUsage ] :

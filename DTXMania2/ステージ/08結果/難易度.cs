@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using SharpDX;
+using System.Diagnostics;
 using SharpDX.Direct2D1;
 using FDK;
 
@@ -45,7 +44,7 @@ namespace DTXMania2.結果
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, float left, float top, double 難易度 )
+        public void 進行描画する( DeviceContext d2ddc, float x, float y, double 難易度 )
         {
             if( this._初めての進行描画 )
             {
@@ -57,9 +56,9 @@ namespace DTXMania2.結果
                 this._初めての進行描画 = false;
             }
 
-            this._アイコン.進行描画する( dc, left, top );
-            this._数値.進行描画する( dc, left + 221f, top + 3f );
-            this._下線.進行描画する( dc, left + 33f, top + 113f );
+            this._アイコン.進行描画する( d2ddc, x, y );
+            this._数値.進行描画する( d2ddc, x + 221f, y + 3f );
+            this._下線.進行描画する( d2ddc, x + 33f, y + 113f );
         }
 
         public void アニメを完了する()

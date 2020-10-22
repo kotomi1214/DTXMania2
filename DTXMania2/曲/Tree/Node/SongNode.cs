@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using SharpDX;
-using FDK;
 
 namespace DTXMania2.曲
 {

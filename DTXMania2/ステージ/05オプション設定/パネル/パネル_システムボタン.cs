@@ -34,26 +34,27 @@ namespace DTXMania2.オプション設定
         // 進行と描画
 
 
-        public override void 進行描画する( DeviceContext dc, float left, float top, bool 選択中 )
+        public override void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置, bool 選択中 )
         {
-            float 拡大率Y = (float) this._パネルの高さ割合.Value;
+            float 拡大率Y = (float)this._パネルの高さ割合.Value;
 
             float テキストの上下マージン = 72f * ( 1f - 拡大率Y ) / 2f;
-            var テキスト矩形 = new RectangleF( left + 32f, top + 12f + テキストの上下マージン, 294f, 72f * 拡大率Y );
+            var テキスト矩形 = new RectangleF( 左位置 + 32f, 上位置 + 12f + テキストの上下マージン, 294f, 72f * 拡大率Y );
 
 
             // (1) パネルの下地部分の描画。
 
-            using var テキスト背景色 = new SolidColorBrush( dc, Color.LightGray );
-            dc.FillRectangle( テキスト矩形, テキスト背景色 );
+            using( var テキスト背景色 = new SolidColorBrush( d2ddc, Color.LightGray ) )
+                d2ddc.FillRectangle( テキスト矩形, テキスト背景色 );
 
 
             // (2) パネル名の描画。
 
-            float 拡大率X = Math.Min( 1f, ( テキスト矩形.Width - 20f ) / this._パネル名画像.画像サイズdpx.Width );    // -20 は左右マージンの最低値[dpx]
+            const float 左右マージンの最低値dpx = 20f;
+            float 拡大率X = Math.Min( 1f, ( テキスト矩形.Width - 左右マージンの最低値dpx ) / this._パネル名画像.画像サイズdpx.Width );
 
             this._パネル名画像.描画する(
-                dc,
+                d2ddc,
                 テキスト矩形.Left + ( テキスト矩形.Width - this._パネル名画像.画像サイズdpx.Width * 拡大率X ) / 2f,
                 テキスト矩形.Top + ( テキスト矩形.Height - this._パネル名画像.画像サイズdpx.Height * 拡大率Y ) / 2f,
                 X方向拡大率: 拡大率X,

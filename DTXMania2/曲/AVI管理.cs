@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using DTXMania2.演奏;
 using FDK;
-using Windows.UI.Xaml.Controls;
-using SSTF=SSTFormat.v004;
 
 namespace DTXMania2
 {
     /// <summary>
-    ///		<see cref="スコア.AVIリスト"/> の各動画インスタンスを管理する。
+    ///		AVIリストの各動画インスタンスを管理する。
     /// </summary>
     class AVI管理 : IDisposable
     {
@@ -38,7 +35,7 @@ namespace DTXMania2
             this._一時停止中の動画のリスト = new List<Video>();
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 

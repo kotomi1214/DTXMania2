@@ -31,12 +31,12 @@ namespace DTXMania2.終了
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
             this._背景画像 = new 画像D2D( @"$(Images)\ExitStage\Background.jpg" );
-            
+
             // 最初のフェーズへ。
             this.現在のフェーズ = フェーズ.開始;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -57,6 +57,7 @@ namespace DTXMania2.終了
                     #region " 終了ステージ開始音を再生し、表示中フェーズへ。"
                     //----------------
                     Global.App.システムサウンド.再生する( システムサウンド種別.終了ステージ_開始音 );
+
                     this._カウンタ = new Counter( 0, 1, 値をひとつ増加させるのにかける時間ms: 1000 );
 
                     this.現在のフェーズ = フェーズ.表示中;
@@ -101,12 +102,14 @@ namespace DTXMania2.終了
 
         public void 描画する()
         {
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+            d2ddc.Transform = SharpDX.Matrix3x2.Identity;
 
-            dc.BeginDraw();
-            this._背景画像.描画する( dc, 0f, 0f );
-            dc.EndDraw();
+            d2ddc.BeginDraw();
+
+            this._背景画像.描画する( d2ddc, 0f, 0f );
+
+            d2ddc.EndDraw();
         }
 
 

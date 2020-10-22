@@ -37,5 +37,7 @@ namespace DTXMania2
         //LeftCymbal_Mute,	--> （YAMAHAでは）入力信号じゃない
         //RightCymbal_Mute,	--> （YAMAHAでは）入力信号じゃない
         Pause_Resume,
+        PlaySpeed_Up,
+        PlaySpeed_Down,
     }
 }

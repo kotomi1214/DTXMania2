@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
@@ -23,17 +22,19 @@ namespace DTXMania2.選曲
             this._背景画像 = new 画像D2D( @"$(Images)\SelectStage\ScoreStatusPanel.png" );
 
             // 色ブラシを作成。
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
+
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+
             this._色 = new Dictionary<表示レーン種別, SolidColorBrush>() {
-                { 表示レーン種別.LeftCymbal,   new SolidColorBrush( dc, new Color4( 0xff7b1fff ) ) },
-                { 表示レーン種別.HiHat,        new SolidColorBrush( dc, new Color4( 0xffffc06a ) ) },
-                { 表示レーン種別.Foot,         new SolidColorBrush( dc, new Color4( 0xffed4bff ) ) },
-                { 表示レーン種別.Snare,        new SolidColorBrush( dc, new Color4( 0xff16fefc ) ) },
-                { 表示レーン種別.Tom1,         new SolidColorBrush( dc, new Color4( 0xff00ff02 ) ) },
-                { 表示レーン種別.Bass,         new SolidColorBrush( dc, new Color4( 0xffff819b ) ) },
-                { 表示レーン種別.Tom2,         new SolidColorBrush( dc, new Color4( 0xff0000ff ) ) },
-                { 表示レーン種別.Tom3,         new SolidColorBrush( dc, new Color4( 0xff19a9ff ) ) },
-                { 表示レーン種別.RightCymbal,  new SolidColorBrush( dc, new Color4( 0xffffb55e ) ) },
+                { 表示レーン種別.LeftCymbal,   new SolidColorBrush( d2ddc, new Color4( 0xff7b1fff ) ) },
+                { 表示レーン種別.HiHat,        new SolidColorBrush( d2ddc, new Color4( 0xffffc06a ) ) },
+                { 表示レーン種別.Foot,         new SolidColorBrush( d2ddc, new Color4( 0xffed4bff ) ) },
+                { 表示レーン種別.Snare,        new SolidColorBrush( d2ddc, new Color4( 0xff16fefc ) ) },
+                { 表示レーン種別.Tom1,         new SolidColorBrush( d2ddc, new Color4( 0xff00ff02 ) ) },
+                { 表示レーン種別.Bass,         new SolidColorBrush( d2ddc, new Color4( 0xffff819b ) ) },
+                { 表示レーン種別.Tom2,         new SolidColorBrush( d2ddc, new Color4( 0xff0000ff ) ) },
+                { 表示レーン種別.Tom3,         new SolidColorBrush( d2ddc, new Color4( 0xff19a9ff ) ) },
+                { 表示レーン種別.RightCymbal,  new SolidColorBrush( d2ddc, new Color4( 0xffffb55e ) ) },
             };
         }
 
@@ -52,15 +53,11 @@ namespace DTXMania2.選曲
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, Node フォーカスノード )
+        public void 進行描画する( DeviceContext d2ddc, Node フォーカスノード )
         {
             var 領域dpx = new RectangleF( 320f, 532f, 239f, 505f );
 
-            #region " 背景を描画する。"
-            //----------------
-            this._背景画像.描画する( dc, 領域dpx.X, 領域dpx.Y );
-            //----------------
-            #endregion
+            this._背景画像.描画する( d2ddc, 領域dpx.X, 領域dpx.Y );
 
             if( !( フォーカスノード is SongNode snode ) || snode.曲.フォーカス譜面 is null )
             {
@@ -88,16 +85,16 @@ namespace DTXMania2.選曲
                     const float Yオフセット = +2f;
 
                     var Xオフセット = new Dictionary<表示レーン種別, float>() {
-                            { 表示レーン種別.LeftCymbal,   + 70f },
-                            { 表示レーン種別.HiHat,        + 88f },
-                            { 表示レーン種別.Foot,         +106f },
-                            { 表示レーン種別.Snare,        +124f },
-                            { 表示レーン種別.Tom1,         +142f },
-                            { 表示レーン種別.Bass,         +160f },
-                            { 表示レーン種別.Tom2,         +178f },
-                            { 表示レーン種別.Tom3,         +196f },
-                            { 表示レーン種別.RightCymbal,  +214f },
-                        };
+                        { 表示レーン種別.LeftCymbal,   + 70f },
+                        { 表示レーン種別.HiHat,        + 88f },
+                        { 表示レーン種別.Foot,         +106f },
+                        { 表示レーン種別.Snare,        +124f },
+                        { 表示レーン種別.Tom1,         +142f },
+                        { 表示レーン種別.Bass,         +160f },
+                        { 表示レーン種別.Tom2,         +178f },
+                        { 表示レーン種別.Tom3,         +196f },
+                        { 表示レーン種別.RightCymbal,  +214f },
+                    };
 
                     foreach( 表示レーン種別? lane in Enum.GetValues( typeof( 表示レーン種別 ) ) )
                     {
@@ -106,7 +103,7 @@ namespace DTXMania2.選曲
                             var rc = new RectangleF( 領域dpx.X + Xオフセット[ lane.Value ], 領域dpx.Y + Yオフセット, 6f, 405f );
                             rc.Top = rc.Bottom - ( rc.Height * Math.Min( map[ lane.Value ], 250 ) / 250f );
 
-                            dc.FillRectangle( rc, this._色[ lane.Value ] );
+                            d2ddc.FillRectangle( rc, this._色[ lane.Value ] );
                         }
                     }
                 }

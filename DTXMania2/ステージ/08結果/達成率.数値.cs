@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
 using SharpDX;
 using SharpDX.Animation;
 using SharpDX.Direct2D1;
@@ -31,7 +29,7 @@ namespace DTXMania2.結果
                 this._MAXである = false;
             }
 
-            public void Dispose()
+            public virtual void Dispose()
             {
                 this._MAX用半径倍率?.Dispose();
                 this._MAX用拡大角度rad?.Dispose();
@@ -121,29 +119,35 @@ namespace DTXMania2.結果
                 this._ストーリーボード?.Finish( 0.0 );
             }
 
-            public void 進行描画する( DeviceContext dc, float left, float top )
+            public void 進行描画する( DeviceContext d2ddc, float x, float y )
             {
+                if( this._MAX用拡大角度rad is null ||
+                    this._MAX用半径倍率 is null ||
+                    this._不透明度 is null ||
+                    this._左位置dpx is null )
+                    return;
+
                 if( this._MAXである )
                 {
                     // MAX
                     double 回転による拡大率 = Math.Abs( Math.Cos( this._MAX用拡大角度rad.Value ) );    // (0) 1 → 0 → 1（π) → 0 → 1 (2π)
-                    float 拡大率 = (float) ( 1.0 + 回転による拡大率 * this._MAX用半径倍率.Value );
-                    float 左位置dpx = left + 124f + ( ( 1.0f - 拡大率 ) * this._MAX.サイズ.Width ) / 2.0f;
-                    float 上位置dpx = top + 66f + ( ( 1.0f - 拡大率 ) * this._MAX.サイズ.Height ) / 2.0f;
+                    float 拡大率 = (float)( 1.0 + 回転による拡大率 * this._MAX用半径倍率.Value );
+                    float 左位置dpx = x + 124f + ( ( 1.0f - 拡大率 ) * this._MAX.サイズ.Width ) / 2.0f;
+                    float 上位置dpx = y + 66f + ( ( 1.0f - 拡大率 ) * this._MAX.サイズ.Height ) / 2.0f;
 
-                    this._MAX.描画する( dc, 左位置dpx, 上位置dpx, 不透明度0to1: (float) this._不透明度.Value, X方向拡大率: 拡大率, Y方向拡大率: 拡大率 );
+                    this._MAX.描画する( d2ddc, 左位置dpx, 上位置dpx, 不透明度0to1: (float)this._不透明度.Value, X方向拡大率: 拡大率, Y方向拡大率: 拡大率 );
                 }
                 else
                 {
-                    this._数字画像.不透明度 = (float) this._不透明度.Value;
+                    this._数字画像.不透明度 = (float)this._不透明度.Value;
 
-                    float 左位置dpx = left + (float) this._左位置dpx.Value;
+                    float 左位置dpx = x + (float)this._左位置dpx.Value;
 
                     // 整数部を描画する（'.'含む）
-                    this._数字画像.描画する( dc, 左位置dpx, top, this._達成率文字列_整数部, new Size2F( 1.4f, 1.6f ) );
+                    this._数字画像.描画する( d2ddc, 左位置dpx, y, this._達成率文字列_整数部, new Size2F( 1.4f, 1.6f ) );
 
                     // 小数部を描画する
-                    this._数字画像.描画する( dc, 左位置dpx + 246f, top + 50f, this._達成率文字列_小数部, new Size2F( 1.0f, 1.0f ) );
+                    this._数字画像.描画する( d2ddc, 左位置dpx + 246f, y + 50f, this._達成率文字列_小数部, new Size2F( 1.0f, 1.0f ) );
                 }
             }
 
@@ -162,15 +166,15 @@ namespace DTXMania2.結果
 
             private string _達成率文字列_整数部 = "";    // '.' 含む
 
-            private Storyboard _ストーリーボード = null!;
+            private Storyboard? _ストーリーボード = null;
 
-            private Variable _左位置dpx = null!;
+            private Variable? _左位置dpx = null;
 
-            private Variable _不透明度 = null!;
+            private Variable? _不透明度 = null;
 
-            private Variable _MAX用拡大角度rad = null!;
+            private Variable? _MAX用拡大角度rad = null;
 
-            private Variable _MAX用半径倍率 = null!;
+            private Variable? _MAX用半径倍率 = null;
         }
     }
 }

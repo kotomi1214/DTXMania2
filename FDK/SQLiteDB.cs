@@ -29,7 +29,7 @@ namespace FDK
             {
                 using( var cmd = new SqliteCommand( "PRAGMA user_version", this.Connection ) )
                 {
-                    return (long) ( cmd.ExecuteScalar() ??
+                    return (long)( cmd.ExecuteScalar() ??
                         throw new Exception( "SQLite DB からの user_version の取得に失敗しました。" ) );
                 }
             }
@@ -50,7 +50,7 @@ namespace FDK
         public SQLiteDB()
         {
         }
-        
+
         public SQLiteDB( VariablePath DBファイルパス )
         {
             this.Open( DBファイルパス );

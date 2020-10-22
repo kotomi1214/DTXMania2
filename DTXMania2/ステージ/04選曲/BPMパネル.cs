@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
 using FDK;
@@ -36,15 +35,11 @@ namespace DTXMania2.選曲
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, Node フォーカスノード )
+        public void 進行描画する( DeviceContext d2ddc, Node フォーカスノード )
         {
             var 領域 = new RectangleF( 78f, 455f, 357f, 55f );
 
-            #region " パネルを描画する。"
-            //----------------
-            this._BPMパネル.描画する( dc, 領域.X - 5f, 領域.Y - 4f );
-            //----------------
-            #endregion
+            this._BPMパネル.描画する( d2ddc, 領域.X - 5f, 領域.Y - 4f );
 
             if( !( フォーカスノード is SongNode snode ) )
             {
@@ -80,12 +75,12 @@ namespace DTXMania2.選曲
                 if( 10.0 >= Math.Abs( this._最大BPM.Value - this._最小BPM.Value ) ) // 差が10以下なら同一値(A)とみなす。
                 {
                     // (A) 「最小値」だけ描画。
-                    this._パラメータ文字.描画する( dc, 領域.X + 120f, 領域.Y, this._最小BPM.Value.ToString( "0" ).PadLeft( 3 ) );
+                    this._パラメータ文字.描画する( d2ddc, 領域.X + 120f, 領域.Y, this._最小BPM.Value.ToString( "0" ).PadLeft( 3 ) );
                 }
                 else
                 {
                     // (B) 「最小～最大」を描画。
-                    this._パラメータ文字.描画する( dc, 領域.X + 120f, 領域.Y, this._最小BPM.Value.ToString( "0" ) + "~" + this._最大BPM.Value.ToString( "0" ) );
+                    this._パラメータ文字.描画する( d2ddc, 領域.X + 120f, 領域.Y, this._最小BPM.Value.ToString( "0" ) + "~" + this._最大BPM.Value.ToString( "0" ) );
                 }
             }
             //----------------

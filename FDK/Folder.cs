@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 
 namespace FDK
@@ -15,7 +16,7 @@ namespace FDK
     /// </remarks>
     public class Folder
     {
-        
+
         // フォルダ変数関連
 
 
@@ -38,7 +39,7 @@ namespace FDK
 
         public static string フォルダ変数の内容を返す( string 変数名 )
         {
-            return ( Folder._フォルダ変数toパス.ContainsKey( 変数名 ) ) ? 
+            return ( Folder._フォルダ変数toパス.ContainsKey( 変数名 ) ) ?
                 Folder._フォルダ変数toパス[ 変数名 ] :
                 "";
         }
@@ -68,6 +69,53 @@ namespace FDK
                     絶対パス = 絶対パス.Replace( kvp.Value, "$(" + kvp.Key + ")" );
             }
 
+            return 絶対パス;
+        }
+
+        /// <summary>
+        ///     指定された絶対パスで示されるファイルについて、カルチャフォルダ内に同名のファイルがあるなら
+        ///     そちらのファイルへの絶対パスを返す。
+        /// </summary>
+        /// <param name="絶対パス">カルチャを考慮したいファイルへの絶対パス。</param>
+        /// <returns>カルチャを考慮した、ファイルへの絶対パス。</returns>
+        /// <remarks>
+        ///     指定されたファイルと同じ場所に現在のカルチャを表すカルチャフォルダがあり、かつ、
+        ///     そこに指定されたファイルと同名のファイルが存在しているなら、そのファイルへの絶対パスを返す。
+        ///     カルチャフォルダがない、またはカルチャフォルダ内に同名のファイル存在していない場合には、
+        ///     引数に指定された絶対パスをそのまま返す。
+        ///     カルチャフォルダは、ニュートラルカルチャよりも特定カルチャが優先される。
+        ///     例：
+        ///     下記のようなファイルがあるとする。
+        ///         d:\images\message.txt
+        ///         d:\images\ja-JP\message.txt
+        ///         d:\images\en\message.txt
+        ///         d:\images\en-US\message.txt
+        ///     このメソッドに "d:\images\message.txt" を渡すと、現在のカルチャに従って、以下のように返される。
+        ///         現在のカルチャ          戻り値
+        ///         --------------------------------------------------------
+        ///         ja-JP                   "d:\images\ja-JP\message.txt"
+        ///         en-US                   "d:\images\en-US\message.txt"
+        ///         en-CA                   "d:\images\en\message.txt"
+        ///         上記以外                "d:\images\message.txt"
+        ///         --------------------------------------------------------
+        /// </remarks>
+        public static string カルチャを考慮した絶対パスを返す( string 絶対パス )
+        {
+            var culture = CultureInfo.CurrentUICulture;
+            var folder_path = Path.GetDirectoryName( 絶対パス ) ?? @"\";
+            var file_name = Path.GetFileName( 絶対パス );
+
+            // 特定カルチャーでチェック
+            var path = Path.Combine( folder_path, culture.Name, file_name );
+            if( File.Exists( path ) )
+                return path;
+
+            // ニュートラルカルチャーでチェック
+            path = Path.Combine( folder_path, culture.TwoLetterISOLanguageName, file_name );
+            if( File.Exists( path ) )
+                return path;
+
+            // 既定のカルチャを使用する（無変更）
             return 絶対パス;
         }
 

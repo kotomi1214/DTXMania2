@@ -25,7 +25,7 @@ namespace DTXMania2
                 var yamlText = File.ReadAllText( path.変数なしパス );
                 var yamlStream = new YamlStream();
                 yamlStream.Load( new StringReader( yamlText ) );
-                var rootMapping = (YamlMappingNode) yamlStream.Documents[ 0 ].RootNode;
+                var rootMapping = (YamlMappingNode)yamlStream.Documents[ 0 ].RootNode;
                 var versionNode = new YamlScalarNode( "Version" );
                 if( rootMapping.Children.ContainsKey( versionNode ) )
                 {
@@ -70,12 +70,24 @@ namespace DTXMania2
                     }
                     case 4:
                     {
-                        #region " 4 → 最新版 "
+                        #region " 4 → 5 "
                         //----------------
                         var v4 = old.SystemConfig.v004_SystemConfig.読み込む( path );
-                        var v5 = new SystemConfig( v4 );
+                        var v5 = new old.SystemConfig.v005_SystemConfig( v4 );
                         v5.保存する();
                         version = v5.Version;
+                        break;
+                        //----------------
+                        #endregion
+                    }
+                    case 5:
+                    {
+                        #region " 5 → 最新版 "
+                        //----------------
+                        var v5 = old.SystemConfig.v005_SystemConfig.読み込む( path );
+                        var v6 = new SystemConfig( v5 );
+                        v6.保存する();
+                        version = v6.Version;
                         break;
                         //----------------
                         #endregion

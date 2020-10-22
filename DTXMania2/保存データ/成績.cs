@@ -143,7 +143,7 @@ namespace DTXMania2
         /// <summary>
         ///		判定に応じて成績（エキサイトゲージを除く）を更新する。
         /// </summary>
-        public void 成績を更新する( 判定種別 判定, bool autoPlay )
+        public void 成績を更新する( 判定種別 判定 )
         {
             #region " ヒット数を加算する。"
             //----------------
@@ -180,7 +180,7 @@ namespace DTXMania2
                 double 基礎点 = ( 50 <= this.総ノーツ数 ) ? ( 100_0000.0 / ( 1275.0 + 50.0 * ( 総ノーツ数 - 50 ) ) ) : 1;    // 総ノーツ数 0～50 の曲は常に基礎点 1
                 int コンボ数 = Math.Min( this.Combo, 50 );  // 最大50
 
-                this.Score += (int) Math.Floor( 基礎点 * コンボ数 * this._判定値表[ 判定 ] );
+                this.Score += (int)Math.Floor( 基礎点 * コンボ数 * this._判定値表[ 判定 ] );
 
                 // 早送り／早戻しを使った場合、スコアが最大値を超えることがあるので、それを禁止する。
                 if( this.Score > 最大スコア )
@@ -198,6 +198,7 @@ namespace DTXMania2
             {
                 // (A) AutoPlay がすべて ON → 補正なし(x1.0), ただしDBには保存されない。
                 オプション補正0to1 = 1.0;
+                this.無効 = true;
             }
             else
             {
@@ -326,14 +327,14 @@ namespace DTXMania2
         ///     達成率に乗じる数値なので、Autoにすると演奏が簡単になる（と思われる）ものほど補正値は小さくなる。
         /// </summary>
         private readonly Dictionary<AutoPlay種別, double> _Auto時の補正 = new Dictionary<AutoPlay種別, double>() {
-            { AutoPlay種別.LeftCrash, 0.9 },
-            { AutoPlay種別.HiHat, 0.5 },
-            { AutoPlay種別.Foot, 1.0 },       // Foot は判定に使われない。
-            { AutoPlay種別.Snare, 0.5 },
-            { AutoPlay種別.Bass, 0.5 },
-            { AutoPlay種別.Tom1, 0.7 },
-            { AutoPlay種別.Tom2, 0.7 },
-            { AutoPlay種別.Tom3, 0.8 },
+            { AutoPlay種別.LeftCrash,  0.9 },
+            { AutoPlay種別.HiHat,      0.5 },
+            { AutoPlay種別.Foot,       1.0 }, // Foot は判定に使われない。
+            { AutoPlay種別.Snare,      0.5 },
+            { AutoPlay種別.Bass,       0.5 },
+            { AutoPlay種別.Tom1,       0.7 },
+            { AutoPlay種別.Tom2,       0.7 },
+            { AutoPlay種別.Tom3,       0.8 },
             { AutoPlay種別.RightCrash, 0.9 },
         };
 
@@ -371,7 +372,7 @@ namespace DTXMania2
 
             // ヒット数が一番大きい判定は、ヒット割合の小数部を切り捨てる。
             判定 = ヒット数リスト[ 0 ].judge;
-            ヒット割合_整数.Add( 判定, (int) Math.Floor( ヒット割合_実数[ 判定 ] ) );
+            ヒット割合_整数.Add( 判定, (int)Math.Floor( ヒット割合_実数[ 判定 ] ) );
             切り捨てした[ 判定 ] = true;
 
             // 以下、二番目以降についてヒット割合（整数）を算出する。
@@ -382,7 +383,7 @@ namespace DTXMania2
                 判定 = ヒット数リスト[ i ].judge;
 
                 // まずは四捨五入する。
-                ヒット割合_整数.Add( 判定, (int) Math.Round( ヒット割合_実数[ 判定 ], MidpointRounding.AwayFromZero ) );
+                ヒット割合_整数.Add( 判定, (int)Math.Round( ヒット割合_実数[ 判定 ], MidpointRounding.AwayFromZero ) );
 
                 // 合計が100になり、かつ、まだ後続に非ゼロがいるなら、値を -1 する。
                 // → まだ非ゼロの後続がいる場合は、ここで100になってはならない。逆に、後続がすべてゼロなら、ここで100にならなければならない。
@@ -420,7 +421,7 @@ namespace DTXMania2
                     差の絶対値リスト.Add( (判定, Math.Abs( ヒット割合_実数[ 判定 ] - ヒット割合_整数[ 判定 ] )) );
                 }
 
-                差の絶対値リスト.Sort( ( x, y ) => (int) ( y.差の絶対値 * 1000.0 - x.差の絶対値 * 1000.0 ) );     // 降順; 0.xxxx だと (int) で詰むが、1000倍したらだいたいOk
+                差の絶対値リスト.Sort( ( x, y ) => (int)( y.差の絶対値 * 1000.0 - x.差の絶対値 * 1000.0 ) );     // 降順; 0.xxxx だと (int) で詰むが、1000倍したらだいたいOk
 
                 // 余るときはたいてい 99 だと思うが、念のため、100になるまで降順に+1していく。
                 for( int i = 0; i < 差の絶対値リスト.Count; i++ )

@@ -61,7 +61,7 @@ namespace FDK
             this._ファイルから生成した = false;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -114,7 +114,7 @@ namespace FDK
         // 進行と描画
 
 
-        public void 描画する( DeviceContext dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext d2ddc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
         {
             if( this._VideoSource is null )
                 return;
@@ -123,10 +123,10 @@ namespace FDK
                 Matrix3x2.Scaling( 描画先矩形.Width / this._VideoSource.フレームサイズ.Width, 描画先矩形.Height / this._VideoSource.フレームサイズ.Height ) *  // 拡大縮小
                 Matrix3x2.Translation( 描画先矩形.Left, 描画先矩形.Top );  // 平行移動
 
-            this.描画する( dc, 変換行列2D, 不透明度0to1 );
+            this.描画する( d2ddc, 変換行列2D, 不透明度0to1 );
         }
 
-        public void 描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        public void 描画する( DeviceContext d2ddc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( this._VideoSource is null )
                 return;
@@ -139,28 +139,33 @@ namespace FDK
                 {
                     // (A) 次のフレームが前のフレームより過去 → ループしたので、タイマをリセットしてから描画する。
                     this._再生タイマ.リセットする( QPCTimer.秒をカウントに変換して返す( (long)( 次のフレームの表示予定時刻100ns / 10_000_000.0 ) ) );
-                    this._次のフレームを読み込んで描画する( dc, 変換行列2D, 不透明度0to1 );
+                    this._次のフレームを読み込んで描画する( d2ddc, 変換行列2D, 不透明度0to1 );
                 }
                 else if( 次のフレームの表示予定時刻100ns <= this._再生タイマ.現在のリアルタイムカウント100ns )
                 {
                     // (B) 次のフレームの表示時刻に達したので描画する。
-                    this._次のフレームを読み込んで描画する( dc, 変換行列2D, 不透明度0to1 );
+                    this._次のフレームを読み込んで描画する( d2ddc, 変換行列2D, 不透明度0to1 );
                 }
                 else
                 {
                     // (C) 次のフレームの表示時刻にはまだ達していない → 最後に描画したフレームを再描画しておく
-                    this.最後のフレームを再描画する( dc, 変換行列2D, 不透明度0to1 );
+                    this.最後のフレームを再描画する( d2ddc, 変換行列2D, 不透明度0to1 );
                 }
+            }
+            else if( this._VideoSource.IsPlaying )
+            {
+                // (D) デコードが追い付いてない。
+                this.最後のフレームを再描画する( d2ddc, 変換行列2D, 不透明度0to1 );
             }
             else
             {
-                // (D) デコードが追い付いてない、またはループせず再生が終わっている　→ 何も表示しない。デコードが追い付いてないなら点滅するだろう。
+                // (E) ループせず再生が終わっている。
                 this._最後に描画したフレーム?.Dispose();
                 this._最後に描画したフレーム = null;
             }
         }
 
-        public void 最後のフレームを再描画する( DeviceContext dc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
+        public void 最後のフレームを再描画する( DeviceContext d2ddc, RectangleF 描画先矩形, float 不透明度0to1 = 1.0f )
         {
             if( this._VideoSource is null )
                 return;
@@ -169,15 +174,15 @@ namespace FDK
                 Matrix3x2.Scaling( 描画先矩形.Width / this._VideoSource.フレームサイズ.Width, 描画先矩形.Height / this._VideoSource.フレームサイズ.Height ) *  // 拡大縮小
                 Matrix3x2.Translation( 描画先矩形.Left, 描画先矩形.Top );  // 平行移動
 
-            this.最後のフレームを再描画する( dc, 変換行列2D, 不透明度0to1 );
+            this.最後のフレームを再描画する( d2ddc, 変換行列2D, 不透明度0to1 );
         }
 
-        public void 最後のフレームを再描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        public void 最後のフレームを再描画する( DeviceContext d2ddc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( this._最後に描画したフレーム is null )
                 return;
 
-            this._フレームを描画する( dc, 変換行列2D, 不透明度0to1, this._最後に描画したフレーム );
+            this._フレームを描画する( d2ddc, 変換行列2D, 不透明度0to1, this._最後に描画したフレーム );
         }
 
 
@@ -198,7 +203,7 @@ namespace FDK
         private readonly QPCTimer _再生タイマ;
 
 
-        private void _次のフレームを読み込んで描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
+        private void _次のフレームを読み込んで描画する( DeviceContext d2ddc, Matrix3x2 変換行列2D, float 不透明度0to1 = 1.0f )
         {
             if( this._VideoSource is null )
                 return;
@@ -240,27 +245,28 @@ namespace FDK
             }
 
             // 描画。
-            this._フレームを描画する( dc, 変換行列2D, 不透明度0to1, 次のフレーム! );
+            this._フレームを描画する( d2ddc, 変換行列2D, 不透明度0to1, 次のフレーム! );
 
             // 更新。
             this._最後に描画したフレーム?.Dispose();
             this._最後に描画したフレーム = 次のフレーム;
         }
 
-        private void _フレームを描画する( DeviceContext dc, Matrix3x2 変換行列2D, float 不透明度0to1, VideoFrame 描画するフレーム )
+        private void _フレームを描画する( DeviceContext d2ddc, Matrix3x2 変換行列2D, float 不透明度0to1, VideoFrame 描画するフレーム )
         {
             if( 描画するフレーム is null )
                 return;
 
-            var preTrans = dc.Transform;
-            var preBlend = dc.PrimitiveBlend;
+            var preTrans = d2ddc.Transform;
+            var preBlend = d2ddc.PrimitiveBlend;
 
-            dc.Transform = ( 変換行列2D ) * preTrans;
-            dc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
-            dc.DrawBitmap( 描画するフレーム.Bitmap, 不透明度0to1, InterpolationMode.NearestNeighbor );
+            d2ddc.Transform = ( 変換行列2D ) * preTrans;
+            d2ddc.PrimitiveBlend = ( this.加算合成 ) ? PrimitiveBlend.Add : PrimitiveBlend.SourceOver;
+            
+            d2ddc.DrawBitmap( 描画するフレーム.Bitmap, 不透明度0to1, InterpolationMode.NearestNeighbor );
 
-            dc.PrimitiveBlend = preBlend;
-            dc.Transform = preTrans;
+            d2ddc.PrimitiveBlend = preBlend;
+            d2ddc.Transform = preTrans;
         }
     }
 }

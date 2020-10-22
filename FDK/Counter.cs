@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace FDK
@@ -69,7 +70,7 @@ namespace FDK
                     if( this._開始値 != this._終了値 )
                     {
                         this.進行する();
-                        return (float) ( this._現在値 - this._開始値 ) / (float) ( this._終了値 - this._開始値 );
+                        return (float)( this._現在値 - this._開始値 ) / (float)( this._終了値 - this._開始値 );
                     }
                     else
                     {
@@ -218,17 +219,17 @@ namespace FDK
 
 
         private int _開始値 = 0;
-        
+
         private int _終了値 = 0;
-        
+
         private int _現在値 = 0;
-        
+
         private bool _動作中 = false;
-        
+
         private long _間隔ms = QPCTimer.未使用;
 
         private 定間隔進行 _定間隔進行;
-        
+
         private readonly object _スレッド間同期 = new object();
     }
 }

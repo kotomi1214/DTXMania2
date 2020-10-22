@@ -54,7 +54,7 @@ namespace FDK
                 return new Bitmap(
                     d2dDeviceContext,
                     new Size2( captureTexture.Description.Width, captureTexture.Description.Height ),
-                    new DataPointer( dataStream.DataPointer, (int) dataStream.Length ),
+                    new DataPointer( dataStream.DataPointer, (int)dataStream.Length ),
                     dataRect.Pitch,
                     new BitmapProperties(
                         new PixelFormat( Format.B8G8R8A8_UNorm, SharpDX.Direct2D1.AlphaMode.Ignore ),

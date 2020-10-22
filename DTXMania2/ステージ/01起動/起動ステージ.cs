@@ -6,7 +6,6 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using FDK;
-using SharpDX.Direct2D1;
 
 namespace DTXMania2.起動
 {
@@ -32,7 +31,7 @@ namespace DTXMania2.起動
             開始音終了待ち,
             完了,
         }
-        
+
         public フェーズ 現在のフェーズ { get; protected set; } = フェーズ.完了;
 
 
@@ -59,9 +58,14 @@ namespace DTXMania2.起動
                 // ビュアーモードならシステムサウンドなし。
             }
 
-            this._コンソールフォント = new フォント画像D2D( @"$(Images)\ConsoleFont20x32.png", @"$(Images)\ConsoleFont20x32.yaml", 文字幅補正dpx: -6f );
+            this._コンソールフォント = new フォント画像D2D(
+                @"$(Images)\ConsoleFont20x32.png",
+                @"$(Images)\ConsoleFont20x32.yaml",
+                文字幅補正dpx: -6f );
 
-            var copyrights = (AssemblyCopyrightAttribute[]) Assembly.GetExecutingAssembly().GetCustomAttributes( typeof( AssemblyCopyrightAttribute ), false );
+            var copyrights = (AssemblyCopyrightAttribute[])Assembly.GetExecutingAssembly()
+                .GetCustomAttributes( typeof( AssemblyCopyrightAttribute ), false );
+
             this._コンソール表示内容 = new List<string>() {
                     $"{Application.ProductName} Release {int.Parse( Application.ProductVersion.Split( '.' ).ElementAt( 0 ) ):000} - Beats with your heart.",
                     $"{copyrights[ 0 ].Copyright}",
@@ -74,7 +78,7 @@ namespace DTXMania2.起動
             this.現在のフェーズ = フェーズ.開始;
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -180,7 +184,7 @@ namespace DTXMania2.起動
                     if( !this._曲ツリー構築タスク.IsCompleted )
                     {
                         // 進捗カウンタを表示。
-                        var allTree = (曲.曲ツリー_全曲) Global.App.曲ツリーリスト[ 0 ];
+                        var allTree = (曲.曲ツリー_全曲)Global.App.曲ツリーリスト[ 0 ];
                         this._コンソール表示内容[ ^1 ] = $"Enumeration songs... {allTree.進捗カウンタ}";
                     }
                     else
@@ -200,7 +204,7 @@ namespace DTXMania2.起動
                     //----------------
                     this._コンソール表示内容.Add( "Update songs..." );
 
-                    var allTree = (曲.曲ツリー_全曲) Global.App.曲ツリーリスト[ 0 ];
+                    var allTree = (曲.曲ツリー_全曲)Global.App.曲ツリーリスト[ 0 ];
                     this._曲ツリーDB反映タスク = allTree.ノードにDBを反映するAsync();
 
                     // 次のフェーズへ。
@@ -216,7 +220,7 @@ namespace DTXMania2.起動
                     if( !this._曲ツリーDB反映タスク.IsCompleted )
                     {
                         // 進捗カウンタを表示。
-                        var allTree = (曲.曲ツリー_全曲) Global.App.曲ツリーリスト[ 0 ];
+                        var allTree = (曲.曲ツリー_全曲)Global.App.曲ツリーリスト[ 0 ];
                         this._コンソール表示内容[ ^1 ] = $"Update songs... {allTree.進捗カウンタ}";
                     }
                     else
@@ -236,7 +240,7 @@ namespace DTXMania2.起動
                     //----------------
                     this._コンソール表示内容.Add( "Building label images..." );
 
-                    var allTree = (曲.曲ツリー_全曲) Global.App.曲ツリーリスト[ 0 ];
+                    var allTree = (曲.曲ツリー_全曲)Global.App.曲ツリーリスト[ 0 ];
                     this._曲ツリー文字列画像生成タスク = allTree.文字列画像を生成するAsync();
 
                     // 次のフェーズへ。
@@ -252,7 +256,7 @@ namespace DTXMania2.起動
                     if( !this._曲ツリー文字列画像生成タスク.IsCompleted )
                     {
                         // 進捗カウンタを表示。
-                        var allTree = (曲.曲ツリー_全曲) Global.App.曲ツリーリスト[ 0 ];
+                        var allTree = (曲.曲ツリー_全曲)Global.App.曲ツリーリスト[ 0 ];
                         this._コンソール表示内容[ ^1 ] = $"Building label images... {allTree.進捗カウンタ}";
                     }
                     else
@@ -307,19 +311,19 @@ namespace DTXMania2.起動
         {
             Global.App.画面をクリアする();
 
-            var dc = Global.GraphicResources.既定のD2D1DeviceContext;
-            dc.Transform = SharpDX.Matrix3x2.Identity;
+            var d2ddc = Global.GraphicResources.既定のD2D1DeviceContext;
+            d2ddc.Transform = SharpDX.Matrix3x2.Identity;
 
-            dc.BeginDraw();
+            d2ddc.BeginDraw();
 
             #region " 文字列表示 "
             //----------------
             for( int i = 0; i < this._コンソール表示内容.Count; i++ )
-                this._コンソールフォント.描画する( dc, 0f, i * 32f, this._コンソール表示内容[ i ] );
+                this._コンソールフォント.描画する( d2ddc, 0f, i * 32f, this._コンソール表示内容[ i ] );
             //----------------
             #endregion
 
-            dc.EndDraw();
+            d2ddc.EndDraw();
         }
 
 

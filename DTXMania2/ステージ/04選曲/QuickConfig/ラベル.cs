@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Diagnostics;
 using SharpDX;
 using SharpDX.Direct2D1;
 
@@ -39,9 +39,9 @@ namespace DTXMania2.選曲.QuickConfig
         // 進行と描画
 
 
-        public virtual void 進行描画する( DeviceContext dc, float 左位置, float 上位置 )
+        public virtual void 進行描画する( DeviceContext d2ddc, float 左位置, float 上位置 )
         {
-            this._項目名画像.描画する( dc, 左位置, 上位置 );
+            this._項目名画像.描画する( d2ddc, 左位置, 上位置 );
         }
 
 

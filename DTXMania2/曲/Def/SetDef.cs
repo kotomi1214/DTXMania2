@@ -94,7 +94,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L2FILE コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L2FILE", out パラメータ ) )
@@ -105,7 +105,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L3FILE コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L3FILE", out パラメータ ) )
@@ -116,7 +116,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L4FILE コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L4FILE", out パラメータ ) )
@@ -127,7 +127,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L5FILE コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L5FILE", out パラメータ ) )
@@ -138,7 +138,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L1LABEL コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L1LABEL", out パラメータ ) )
@@ -149,7 +149,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L2LABEL コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L2LABEL", out パラメータ ) )
@@ -160,7 +160,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L3LABEL コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L3LABEL", out パラメータ ) )
@@ -171,7 +171,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L4LABEL コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L4LABEL", out パラメータ ) )
@@ -182,7 +182,7 @@ namespace DTXMania2.曲
                     }
                     //---------------------
                     #endregion
-                    
+
                     #region " L5LABEL コマンド "
                     //---------------------
                     if( Global.コマンドのパラメータ文字列部分を返す( 行, @"L5LABEL", out パラメータ ) )
@@ -208,7 +208,7 @@ namespace DTXMania2.曲
                 this.Blocks.Add( block ); // リストに追加。
             }
         }
-        
+
         /// <summary>
         ///     set.def ファイルに保存する。
         /// </summary>
@@ -220,13 +220,18 @@ namespace DTXMania2.曲
             {
                 sw.WriteLine( $"#TITLE: {block.Title}" );
 
-                sw.WriteLine( $"#FONTCOLOR: #{block.FontColor.R:X2}{block.FontColor.G:X2}{block.FontColor.B:X2}" );
+                if( block.FontColor != Color.White )
+                    sw.WriteLine( $"#FONTCOLOR: #{block.FontColor.R:X2}{block.FontColor.G:X2}{block.FontColor.B:X2}" );
 
                 for( int i = 0; i < block.File.Length; i++ )
                 {
-                    sw.WriteLine( "" );
-                    sw.WriteLine( $"L{i + 1}LABEL: {( string.IsNullOrEmpty( block.Label[ i ] ) ? デフォルトのラベル[ i ] : block.Label[ i ] )}" );
-                    sw.WriteLine( $"L{i + 1}FILE: {block.File[ i ]}" );
+                    if( !string.IsNullOrEmpty( block.File[ i ] ) &&
+                        !string.IsNullOrEmpty( block.Label[ i ] ) )
+                    {
+                        sw.WriteLine( "" );
+                        sw.WriteLine( $"L{i + 1}LABEL: {( string.IsNullOrEmpty( block.Label[ i ] ) ? デフォルトのラベル[ i ] : block.Label[ i ] )}" );
+                        sw.WriteLine( $"L{i + 1}FILE: {block.File[ i ]}" );
+                    }
                 }
             }
         }

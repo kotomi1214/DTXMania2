@@ -33,6 +33,12 @@ namespace FDK
 
         public double 再生速度 { get; protected set; } = 1.0;
 
+        /// <summary>
+        ///     ビデオが再生中（デコーダタスクが稼働中）ならtrue。
+        ///     一時停止中であってもtrue。
+        /// </summary>
+        public bool IsPlaying => ( this._デコードタスク != null && !this._デコードタスク.IsCompleted );
+
 
 
         // 生成と終了
@@ -116,7 +122,7 @@ namespace FDK
             this._一時停止解除通知 = new ManualResetEventSlim( true );
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -201,7 +207,7 @@ namespace FDK
         public void Resume()
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
-            
+
             this._一時停止解除通知.Set();   // 解除
         }
 
@@ -296,7 +302,7 @@ namespace FDK
                 return;
             }
             double 再生開始時刻sec = Math.Max( 0.0, (double)obj引数 );  // 再生速度考慮済み
-            long 再生開始時刻100ns = (long) ( 再生開始時刻sec * 10_000_000 + 0.5 );
+            long 再生開始時刻100ns = (long)( 再生開始時刻sec * 10_000_000 + 0.5 );
 
             #region " 再生開始時刻までシーク(1)。"
             //----------------
@@ -417,7 +423,7 @@ namespace FDK
                 new VideoFrame() {
                     Sample = サンプル,
                     Bitmap = this.サンプルからビットマップを取得する( サンプル ),
-                    表示時刻100ns = (long) ( サンプルの表示時刻100ns / 再生速度 ),
+                    表示時刻100ns = (long)( サンプルの表示時刻100ns / 再生速度 ),
                 } );
 
             return true;    // 格納した

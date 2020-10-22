@@ -14,6 +14,12 @@ namespace FDK
         Size2F フレームサイズ { get; }
 
         /// <summary>
+        ///     ビデオが再生中（デコーダタスクが稼働中）ならtrue。
+        ///     一時停止中であってもtrue。
+        /// </summary>
+        bool IsPlaying { get; }
+
+        /// <summary>
         ///     指定した時刻からデコードを開始する。
         /// </summary>
         void Start( double 再生開始時刻sec );

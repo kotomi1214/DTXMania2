@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using SharpDX;
 using SharpDX.Direct2D1;
@@ -61,25 +60,29 @@ namespace DTXMania2.演奏
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc )
+        public void 進行描画する( DeviceContext d2ddc )
         {
             foreach( var laneType in this._フラッシュ情報.Keys )
             {
                 if( this._フラッシュ情報[ laneType ].終了値に達した )
                     continue;
 
-                var フラッシュ１枚のサイズ = new Size2F( this._レーンフラッシュの矩形リスト[ laneType.ToString() ]!.Value.Width, this._レーンフラッシュの矩形リスト[ laneType.ToString() ]!.Value.Height );
+                var フラッシュ１枚のサイズ = new Size2F(
+                    this._レーンフラッシュの矩形リスト[ laneType.ToString() ]!.Value.Width,
+                    this._レーンフラッシュの矩形リスト[ laneType.ToString() ]!.Value.Height );
 
                 float 割合 = this._フラッシュ情報[ laneType ].現在値の割合;   // 0 → 1
                 float 横拡大率 = 0.2f + 0.8f * 割合;                          // 0.2 → 1.0
-                割合 = (float) Math.Cos( 割合 * Math.PI / 2f );               // 1 → 0（加速しながら）
+                割合 = MathF.Cos( 割合 * MathF.PI / 2f );                     // 1 → 0（加速しながら）
 
-                for( float y = ( レーンフレーム.領域.Bottom - フラッシュ１枚のサイズ.Height ); y > ( レーンフレーム.領域.Top - フラッシュ１枚のサイズ.Height ); y -= フラッシュ１枚のサイズ.Height )
+                for( float y = ( レーンフレーム.領域.Bottom - フラッシュ１枚のサイズ.Height );
+                    y > ( レーンフレーム.領域.Top - フラッシュ１枚のサイズ.Height );
+                    y -= フラッシュ１枚のサイズ.Height )
                 {
                     this._レーンフラッシュ画像.描画する(
-                        dc,
-                        レーンフレーム.レーン中央位置X[ laneType ] - フラッシュ１枚のサイズ.Width * 横拡大率 / 2f,
-                        y,
+                        d2ddc,
+                        左位置: レーンフレーム.レーン中央位置X[ laneType ] - フラッシュ１枚のサイズ.Width * 横拡大率 / 2f,
+                        上位置: y,
                         不透明度0to1: 割合 * 0.75f,   // ちょっと暗めに。
                         転送元矩形: this._レーンフラッシュの矩形リスト[ laneType.ToString() ]!.Value,
                         X方向拡大率: 横拡大率 );

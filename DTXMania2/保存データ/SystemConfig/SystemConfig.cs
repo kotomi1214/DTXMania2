@@ -5,6 +5,7 @@ using System.IO;
 using System.Windows.Forms;
 using YamlDotNet.Serialization;
 using SharpDX;
+using YamlDotNet.Core;
 using FDK;
 
 namespace DTXMania2
@@ -15,7 +16,7 @@ namespace DTXMania2
         // プロパティ
 
 
-        public const int VERSION = 5;   // このクラスのバージョン。
+        public const int VERSION = 6;   // このクラスのバージョン。
 
         [YamlMember]
         public int Version { get; set; }
@@ -120,15 +121,25 @@ namespace DTXMania2
             // (1) 読み込み or 新規作成
 
             SystemConfig config = null!;
+
             if( File.Exists( path.変数なしパス ) )
             {
-                var yamlText = File.ReadAllText( path.変数なしパス );
-                var deserializer = new Deserializer();
-                config = deserializer.Deserialize<SystemConfig>( yamlText );
+                try
+                {
+                    var yamlText = File.ReadAllText( path.変数なしパス );
+                    var deserializer = new Deserializer();
+                    config = deserializer.Deserialize<SystemConfig>( yamlText );
+                }
+                catch( YamlException e )
+                {
+                    Log.ERROR( $"YAMLの読み込み時に失敗しました。[{e.Message}]" );
+                    config = null!;
+                }
 
                 if( VERSION != config.Version )
                     config = null!;
             }
+
             if( config is null )
             {
                 // 新規生成
@@ -157,26 +168,27 @@ namespace DTXMania2
             this.DrumSoundsFolder = new VariablePath( @"$(ResourcesRoot)\Default\DrumSounds" );
             this.SystemSoundsFolder = new VariablePath( @"$(ResourcesRoot)\Default\SystemSounds" );
             this.ImagesFolder = new VariablePath( @"$(ResourcesRoot)\Default\Images" );
-
             this.FootPedal最小値 = 0;
             this.FootPedal最大値 = 90; // VH-11 の Normal Resolution での最大値
 
             this.MIDIデバイス番号toデバイス名 = new Dictionary<int, string>();
 
             this.キーボードtoドラム = new Dictionary<IdKey, ドラム入力種別>() {
-                { new IdKey( 0, (int) Keys.Q ),      ドラム入力種別.LeftCrash },
-                { new IdKey( 0, (int) Keys.Return ), ドラム入力種別.LeftCrash },
-                { new IdKey( 0, (int) Keys.A ),      ドラム入力種別.HiHat_Open },
-                { new IdKey( 0, (int) Keys.Z ),      ドラム入力種別.HiHat_Close },
-                { new IdKey( 0, (int) Keys.S ),      ドラム入力種別.HiHat_Foot },
-                { new IdKey( 0, (int) Keys.X ),      ドラム入力種別.Snare },
-                { new IdKey( 0, (int) Keys.C ),      ドラム入力種別.Bass },
-                { new IdKey( 0, (int) Keys.Space ),  ドラム入力種別.Bass },
-                { new IdKey( 0, (int) Keys.V ),      ドラム入力種別.Tom1 },
-                { new IdKey( 0, (int) Keys.B ),      ドラム入力種別.Tom2 },
-                { new IdKey( 0, (int) Keys.N ),      ドラム入力種別.Tom3 },
-                { new IdKey( 0, (int) Keys.M ),      ドラム入力種別.RightCrash },
-                { new IdKey( 0, (int) Keys.K ),      ドラム入力種別.Ride },
+                { new IdKey( 0, (int) Keys.Q ),       ドラム入力種別.LeftCrash },
+                { new IdKey( 0, (int) Keys.Return ),  ドラム入力種別.LeftCrash },
+                { new IdKey( 0, (int) Keys.A ),       ドラム入力種別.HiHat_Open },
+                { new IdKey( 0, (int) Keys.Z ),       ドラム入力種別.HiHat_Close },
+                { new IdKey( 0, (int) Keys.S ),       ドラム入力種別.HiHat_Foot },
+                { new IdKey( 0, (int) Keys.X ),       ドラム入力種別.Snare },
+                { new IdKey( 0, (int) Keys.C ),       ドラム入力種別.Bass },
+                { new IdKey( 0, (int) Keys.Space ),   ドラム入力種別.Bass },
+                { new IdKey( 0, (int) Keys.V ),       ドラム入力種別.Tom1 },
+                { new IdKey( 0, (int) Keys.B ),       ドラム入力種別.Tom2 },
+                { new IdKey( 0, (int) Keys.N ),       ドラム入力種別.Tom3 },
+                { new IdKey( 0, (int) Keys.M ),       ドラム入力種別.RightCrash },
+                { new IdKey( 0, (int) Keys.K ),       ドラム入力種別.Ride },
+                { new IdKey( 0, (int) Keys.PageUp ),  ドラム入力種別.PlaySpeed_Up },
+                { new IdKey( 0, (int) Keys.PageDown ),ドラム入力種別.PlaySpeed_Down },
             };
 
             this.ゲームコントローラtoドラム = new Dictionary<IdKey, ドラム入力種別>() {
@@ -217,24 +229,26 @@ namespace DTXMania2
             };
         }
 
-        public SystemConfig( old.SystemConfig.v004_SystemConfig v4config )
+        public SystemConfig( old.SystemConfig.v005_SystemConfig v5config )
             : this()
         {
-            this.曲検索フォルダ = v4config.曲検索フォルダ;
-            this.ビュアーモード時のウィンドウサイズ = v4config.ビュアーモード時のウィンドウサイズ;
-            this.ビュアーモード時のウィンドウ表示位置 = v4config.ビュアーモード時のウィンドウ表示位置;
-            this.判定位置調整ms = v4config.判定位置調整ms;
-            this.全画面モードである = v4config.全画面モードである;
-            this.DrumSoundsFolder = v4config.DrumSoundsFolder;
-            this.SystemSoundsFolder = v4config.SystemSoundsFolder;
-            this.ImagesFolder = v4config.ImagesFolder;
+            this.曲検索フォルダ = v5config.曲検索フォルダ;
+            this.ビュアーモード時のウィンドウサイズ = v5config.ビュアーモード時のウィンドウサイズ;
+            this.ビュアーモード時のウィンドウ表示位置 = v5config.ビュアーモード時のウィンドウ表示位置;
+            this.判定位置調整ms = v5config.判定位置調整ms;
+            this.全画面モードである = v5config.全画面モードである;
+            this.DrumSoundsFolder = v5config.DrumSoundsFolder;
+            this.SystemSoundsFolder = v5config.SystemSoundsFolder;
+            this.ImagesFolder = v5config.ImagesFolder;
 
-            this.MIDIデバイス番号toデバイス名 = v4config.MIDIデバイス番号toデバイス名;
-            this.キーボードtoドラム = v4config.キーボードtoドラム;
-            this.ゲームコントローラtoドラム = v4config.ゲームコントローラtoドラム;
-            this.MIDItoドラム = v4config.MIDItoドラム;
-            this.FootPedal最小値 = v4config.FootPedal最小値;
-            this.FootPedal最大値 = v4config.FootPedal最大値;
+            this.MIDIデバイス番号toデバイス名 = v5config.MIDIデバイス番号toデバイス名;
+            this.キーボードtoドラム = v5config.キーボードtoドラム;
+            this.キーボードtoドラム.Add( new IdKey( 0, (int)Keys.PageUp ), ドラム入力種別.PlaySpeed_Up );      // 新規追加
+            this.キーボードtoドラム.Add( new IdKey( 0, (int)Keys.PageDown ), ドラム入力種別.PlaySpeed_Down );  // 新規追加
+            this.ゲームコントローラtoドラム = v5config.ゲームコントローラtoドラム;
+            this.MIDItoドラム = v5config.MIDItoドラム;
+            this.FootPedal最小値 = v5config.FootPedal最小値;
+            this.FootPedal最大値 = v5config.FootPedal最大値;
         }
 
         public void 保存する( VariablePath? path = null )
@@ -257,7 +271,7 @@ namespace DTXMania2
 
         public SystemConfig Clone()
         {
-            return (SystemConfig) this.MemberwiseClone();
+            return (SystemConfig)this.MemberwiseClone();
         }
     }
 }

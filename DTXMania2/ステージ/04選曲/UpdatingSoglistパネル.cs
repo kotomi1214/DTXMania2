@@ -32,13 +32,13 @@ namespace DTXMania2.選曲
         // 進行と描画
 
 
-        public void 進行描画する( DeviceContext dc, float x, float y )
+        public void 進行描画する( DeviceContext d2ddc, float x, float y )
         {
             // 現行化タスクが稼働しているときのみ描画する。
             if( Global.App.現行化.現行化中 )
             {
-                float 不透明度 = (float) Math.Sin( Math.PI * this._明滅カウンタ.現在値 / 100.0 );
-                this._パネル画像.描画する( dc, x, y, 不透明度0to1: 不透明度 );
+                float 不透明度 = MathF.Sin( MathF.PI * this._明滅カウンタ.現在値 / 100f );
+                this._パネル画像.描画する( d2ddc, x, y, 不透明度0to1: 不透明度 );
             }
         }
 

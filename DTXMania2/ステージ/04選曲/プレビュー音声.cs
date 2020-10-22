@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -67,11 +66,13 @@ namespace DTXMania2.選曲
 
                 // 500ミリ秒待つ。
                 Thread.Sleep( 500 );
+
                 if( cancelToken.IsCancellationRequested )
                     return; // キャンセルされた
 
                 // ファイルからサウンドを生成する。
                 var sound = this._サウンドを生成する( 音声ファイルの絶対パス );
+
                 if( sound is null )
                 {
                     Log.ERROR( $"サウンドの生成に失敗しました。[{音声ファイルの絶対パス}]" );
@@ -169,7 +170,7 @@ namespace DTXMania2.選曲
                 }
 
                 // キャッシュが一定数を超えたら、一番古いものから削除する。
-                if( キャッシュする個数 < this._キャッシュ世代リスト.Count )
+                if( _キャッシュする個数 < this._キャッシュ世代リスト.Count )
                 {
                     lock( this._キャッシュ用排他 )
                     {
@@ -199,12 +200,12 @@ namespace DTXMania2.選曲
         // キャッシュ
 
 
-        private const int キャッシュする個数 = 20;
+        private const int _キャッシュする個数 = 20;
 
         private readonly object _キャッシュ用排他 = new object();
 
-        private Dictionary<string, ISampleSource> _サンプルソースキャッシュ = new Dictionary<string, ISampleSource>();
+        private readonly Dictionary<string, ISampleSource> _サンプルソースキャッシュ = new Dictionary<string, ISampleSource>();
 
-        private List<string> _キャッシュ世代リスト = new List<string>();
+        private readonly List<string> _キャッシュ世代リスト = new List<string>();
     }
 }
