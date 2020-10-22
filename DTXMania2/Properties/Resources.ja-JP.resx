@@ -184,7 +184,7 @@
     <value>ノートオン</value>
   </data>
   <data name="TXT_パッドを叩いてください" xml:space="preserve">
-    <value>パッドを叩いてください</value>
+    <value>シンバルまたはEnterを叩いてください</value>
   </data>
   <data name="TXT_プレイヤーを選択してください" xml:space="preserve">
     <value>プレイヤーを選択してください。</value>

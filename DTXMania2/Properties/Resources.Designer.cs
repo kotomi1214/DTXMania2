@@ -269,7 +269,7 @@ namespace DTXMania2.Properties {
         }
         
         /// <summary>
-        ///   Hit the pad に類似しているローカライズされた文字列を検索します。
+        ///   Hit any cymbal or Enter key に類似しているローカライズされた文字列を検索します。
         /// </summary>
         internal static string TXT_パッドを叩いてください {
             get {
