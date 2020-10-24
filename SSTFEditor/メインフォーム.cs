@@ -2075,14 +2075,7 @@ namespace SSTFEditor
 
         protected void toolStripMenuItemモード切替え_Click( object sender, EventArgs e )
         {
-            if( this.選択モードである )
-            {
-                this.編集モードに切替えて関連GUIを設定する();
-            }
-            else
-            {
-                this.選択モードに切替えて関連GUIを設定する();
-            }
+            this._モードを切替える();
         }
 
         protected void toolStripMenuItem検索_Click( object sender, EventArgs e )
