@@ -38,6 +38,17 @@ namespace DTXMania2.結果
 
             this._結果 = result;
 
+            Log.Info( $"曲名: {Global.App.演奏譜面.譜面.Title}" );
+            Log.Info( $"難易度: {Global.App.演奏譜面.譜面.Level}" );
+            Log.Info( $"ヒット数: Pf{this._結果.判定別ヒット数[演奏.判定種別.PERFECT]} / " +
+                $"Gr{this._結果.判定別ヒット数[ 演奏.判定種別.GREAT]} / " +
+                $"Gd{this._結果.判定別ヒット数[ 演奏.判定種別.GOOD]} / " +
+                $"Ok{this._結果.判定別ヒット数[ 演奏.判定種別.OK ]} / " +
+                $"Ms{this._結果.判定別ヒット数[ 演奏.判定種別.MISS]}" );
+            Log.Info( $"達成率: {this._結果.Achievement}" );
+            Log.Info( $"スキル: {this._結果.スキル}" );
+            Log.Info( $"ランク: {this._結果.ランク}" );
+
             Global.App.システムサウンド.再生する( システムサウンド種別.ステージクリア );
 
             #region " 成績をDBへ反映する。"
