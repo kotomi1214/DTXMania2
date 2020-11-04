@@ -82,12 +82,24 @@ namespace DTXMania2
                     }
                     case 5:
                     {
-                        #region " 5 → 最新版 "
+                        #region " 5 → 6 "
                         //----------------
                         var v5 = old.SystemConfig.v005_SystemConfig.読み込む( path );
-                        var v6 = new SystemConfig( v5 );
+                        var v6 = new old.SystemConfig.v006_SystemConfig( v5 );
                         v6.保存する();
                         version = v6.Version;
+                        break;
+                        //----------------
+                        #endregion
+                    }
+                    case 6:
+                    {
+                        #region " 6 → 最新版 "
+                        //----------------
+                        var v6 = old.SystemConfig.v006_SystemConfig.読み込む( path );
+                        var v7 = new SystemConfig( v6 );
+                        v7.保存する();
+                        version = v7.Version;
                         break;
                         //----------------
                         #endregion

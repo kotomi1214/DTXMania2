@@ -533,15 +533,25 @@ namespace DTXMania2
             {
                 // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
                 var evKey = new SystemConfig.IdKey( ev );
-
                 if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
                     continue;   // 使われないならスキップ。
+                var drumType = デバイスtoドラム対応表[ evKey ];
+
+                // HHの場合、Velocityが最小値未満の場合は無視する。
+                if( drumType == ドラム入力種別.HiHat_Close ||
+                    drumType == ドラム入力種別.HiHat_Open ||
+                    drumType == ドラム入力種別.HiHat_Foot )
+                {
+                    if( ev.Velocity < Global.App.システム設定.HHVolocity最小値 )
+                        continue;
+                }
 
                 // ドラム入力を、ポーリング結果に追加登録する。
                 var ドラム入力 = new ドラム入力イベント( ev, デバイスtoドラム対応表[ evKey ] );
                 this.ポーリング結果.Add( ドラム入力 );
 
-                // ドラム入力を入力履歴に追加登録する。
+                #region " ドラム入力を入力履歴に追加登録する。 "
+                //----------------
                 if( 入力履歴を記録する &&
                     ev.押された &&                         // 押下入力だけを記録する。
                     ドラム入力.InputEvent.Control == 0 )   // コントロールチェンジは入力履歴の対象外とする。
@@ -565,6 +575,8 @@ namespace DTXMania2
                     this._入力履歴.Add( ドラム入力 );
                     this._前回の入力履歴の追加時刻sec = 入力時刻sec;
                 }
+                //----------------
+                #endregion
             }
         }
     }
