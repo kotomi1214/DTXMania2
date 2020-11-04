@@ -195,14 +195,7 @@ namespace DTXMania2
         /// <returns><see cref="ポーリング結果"/>に含まれていれば true。</returns>
         public bool 確定キーが入力された()
         {
-            return this.ドラムのいずれか１つが入力された(
-                new[] {
-                    ドラム入力種別.LeftCrash,
-                    ドラム入力種別.RightCrash,
-                    ドラム入力種別.China,
-                    ドラム入力種別.Ride,
-                    ドラム入力種別.Splash,
-                } )
+            return this.ドラムのいずれか１つが入力された( this._確定ドラム入力リスト)
                 ;// || this.Keyboard.キーが押された( 0, Key.Return );		Enter は、既定で LeftCrash に割り当てられている前提。
         }
 
@@ -223,7 +216,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom1, ドラム入力種別.Tom1_Rim } );
+                this.ドラムのいずれか１つが入力された( this._上移動ドラム入力リスト );
         }
         public bool 上移動キーが押されている()
         {
@@ -238,7 +231,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom2, ドラム入力種別.Tom2_Rim } );
+                this.ドラムのいずれか１つが入力された( this._下移動ドラム入力リスト );
         }
         public bool 下移動キーが押されている()
         {
@@ -253,7 +246,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Snare, ドラム入力種別.Snare_ClosedRim, ドラム入力種別.Snare_OpenRim } );
+                this.ドラムのいずれか１つが入力された( this._左移動ドラム入力リスト );
         }
         public bool 左移動キーが押されている()
         {
@@ -269,7 +262,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom3, ドラム入力種別.Tom3_Rim } );
+                this.ドラムのいずれか１つが入力された( this._右移動ドラム入力リスト );
         }
         public bool 右移動キーが押されている()
         {
@@ -503,6 +496,31 @@ namespace DTXMania2
 
 
         private const double _連続入力だとみなす最大の間隔sec = 0.5;
+
+        private readonly ドラム入力種別[] _確定ドラム入力リスト = new[] {
+            ドラム入力種別.LeftCrash,
+            ドラム入力種別.RightCrash,
+            ドラム入力種別.China,
+            ドラム入力種別.Ride,
+            ドラム入力種別.Splash,
+        };
+        private readonly ドラム入力種別[] _上移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom1,
+            ドラム入力種別.Tom1_Rim,
+        };
+        private readonly ドラム入力種別[] _下移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom2,
+            ドラム入力種別.Tom2_Rim,
+        };
+        private readonly ドラム入力種別[] _左移動ドラム入力リスト = new[] {
+            ドラム入力種別.Snare,
+            ドラム入力種別.Snare_ClosedRim,
+            ドラム入力種別.Snare_OpenRim,
+        };
+        private readonly ドラム入力種別[] _右移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom3,
+            ドラム入力種別.Tom3_Rim,
+        };
 
         /// <summary>
         ///		単一の IInputDevice をポーリングし、対応表に従ってドラム入力へ変換して、ポーリング結果 に追加登録する。
