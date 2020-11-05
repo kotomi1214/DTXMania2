@@ -294,16 +294,16 @@ BDx2 (既定では SPACEx2) で、曲読み込みフォルダを設定してく�
     <value>評価</value>
   </data>
   <data name="TXT_評価1" xml:space="preserve">
-    <value>★☆☆☆☆</value>
+    <value>★</value>
   </data>
   <data name="TXT_評価2" xml:space="preserve">
-    <value>★★☆☆☆</value>
+    <value>★★</value>
   </data>
   <data name="TXT_評価3" xml:space="preserve">
-    <value>★★★☆☆</value>
+    <value>★★★</value>
   </data>
   <data name="TXT_評価4" xml:space="preserve">
-    <value>★★★★☆</value>
+    <value>★★★★</value>
   </data>
   <data name="TXT_評価5" xml:space="preserve">
     <value>★★★★★</value>
