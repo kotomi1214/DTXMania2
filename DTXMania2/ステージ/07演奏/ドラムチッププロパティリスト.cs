@@ -285,7 +285,7 @@ namespace DTXMania2.演奏
                     表示チップ種別 = 表示チップ種別.Foot,
                     ドラム入力種別 = ドラム入力種別.HiHat_Foot,
                     AutoPlay種別 = AutoPlay種別.Foot,
-                    //入力グループ種別 = ...
+                    入力グループ種別 = 入力グループ種別.HiHat,
                     発声前消音 = true,
                     消音グループ種別 = 消音グループ種別.HiHat,
                     AutoPlayON_自動ヒット_再生 = true,
@@ -1820,7 +1820,9 @@ namespace DTXMania2.演奏
                 switch( this.入力グループプリセット種別 )
                 {
                     case 入力グループプリセット種別.シンバルフリー:
-
+                    {
+                        #region " シンバルフリー "
+                        //----------------
                         switch( kvp.Key )
                         {
                             case SSTF.チップ種別.LeftCrash:
@@ -1831,7 +1833,7 @@ namespace DTXMania2.演奏
                             case SSTF.チップ種別.HiHat_Open:
                             case SSTF.チップ種別.HiHat_HalfOpen:
                             case SSTF.チップ種別.HiHat_Close:
-                            case SSTF.チップ種別.HiHat_Foot:
+                            //case SSTF.チップ種別.HiHat_Foot: --> FootPedal はシンバルフリーから除外。
                             case SSTF.チップ種別.RightCrash:
                                 kvp.Value.入力グループ種別 = 入力グループ種別.Cymbal;
                                 break;
@@ -1841,9 +1843,13 @@ namespace DTXMania2.演奏
                                 break;
                         }
                         break;
-
+                        //----------------
+                        #endregion
+                    }
                     case 入力グループプリセット種別.基本形:
-
+                    {
+                        #region " 基本形 "
+                        //----------------
                         switch( kvp.Key )
                         {
                             case SSTF.チップ種別.LeftCrash:
@@ -1879,7 +1885,9 @@ namespace DTXMania2.演奏
                                 break;
                         }
                         break;
-
+                        //----------------
+                        #endregion
+                    }
                     default:
                         throw new Exception( $"未知の入力グループプリセット種別です。[{this.入力グループプリセット種別.ToString()}]" );
                 }
