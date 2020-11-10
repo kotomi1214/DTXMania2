@@ -28,6 +28,7 @@ namespace DTXMania2.結果
                 { ランク種別.E,  EffekseerNET.Effect.Create( Global.Effekseer.Manager, new VariablePath( @"$(Images)\ResultStage\rankE.efkefc" ).変数なしパス ) },
             };
 
+            this._エフェクト開始イベント = new ManualResetEventSlim( false );
             this._初めての進行描画 = true;
         }
 
@@ -61,7 +62,6 @@ namespace DTXMania2.結果
                 this._Rank = rank;
 
                 // 0.6 秒後にエフェクト開始
-                this._エフェクト開始イベント = new ManualResetEventSlim( false );
                 this._エフェクト開始タイマ = new Timer( ( state ) => { this._エフェクト開始イベント.Set(); }, null, 600, Timeout.Infinite );
             }
 
@@ -85,8 +85,7 @@ namespace DTXMania2.結果
 
         public void アニメを完了する()
         {
-            if( 0 > this._ランクエフェクトハンドル )
-                this._ランクエフェクトを開始する();
+            this._エフェクト開始イベント.Set();
         }
 
         private void _ランクエフェクトを開始する()

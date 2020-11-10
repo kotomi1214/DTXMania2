@@ -531,7 +531,7 @@ namespace DTXMania2.演奏
             var userConfig = Global.App.ログオン中のユーザ;
             double 現在の演奏時刻sec = Global.App.サウンドタイマ.現在時刻sec;
 
-            #region " (1) 自動ヒット処理。"
+            #region " (1) 自動ヒット処理; ユーザの入力がなくても、判定バーに達したら自動的にヒット扱いされるチップの処理。"
             //----------------
             // 描画開始チップ（画面最下位のチップ）から後方（画面上方）のチップに向かって……
             for( int i = this._描画開始チップ番号; ( 0 <= i ) && ( i < Global.App.演奏スコア.チップリスト.Count ); i++ )
@@ -651,7 +651,7 @@ namespace DTXMania2.演奏
                         }
                         else if( チップはAutoPlayではない && chipProperty.AutoPlayOFF_自動ヒット )
                         {
-                            #region " 自動ヒット(B) 手動演奏チップ "
+                            #region " 自動ヒット(B) 手動演奏チップだがAutoPlayOFF時に自動ヒットするよう指定されているチップ "
                             //----------------
                             this._チップのヒット処理を行う(
                                 chip,
@@ -674,218 +674,248 @@ namespace DTXMania2.演奏
 
             Global.App.ドラム入力.すべての入力デバイスをポーリングする( 入力履歴を記録する: false );
 
-            #region " (2) ユーザ入力に対するヒット処理。"
-            //----------------
-            // すべての入力について……
-            foreach( var 入力 in Global.App.ドラム入力.ポーリング結果 )
+            if( 0 < Global.App.ドラム入力.ポーリング結果.Count )
             {
-                double 補正された入力時刻sec = 入力.InputEvent.TimeStamp - Global.App.システム設定.判定位置調整ms * 0.001;
+                // 各入力に処理済みフラグを付与した、新しいリストを作成する。（要素はタプルであり値型なので注意。）
+                (ドラム入力イベント 入力, bool 処理済み)[] 入力リスト =
+                    Global.App.ドラム入力.ポーリング結果.Select( ( ie ) => (ie, false) ).ToArray();
 
-                // ヒット判定対象外の入力は無視。
-                if( !入力.InputEvent.押された ||                  // 押下以外は対象外
-                    入力.InputEvent.Control != 0 ||               // コントロールチェンジは対象外
-                    入力.Type == ドラム入力種別.HiHat_Control ||  // ハイハットコントロールは対象外
-                    入力.Type == ドラム入力種別.Unknown )         // 未知の入力は対象外
-                    continue;
+                // 入力時刻を補正する。
+                foreach( var (入力, 処理済み) in 入力リスト )
+                    入力.InputEvent.TimeStamp -= Global.App.システム設定.判定位置調整ms * 0.001;
 
-                #region " (2-1) チップにヒットしてようがしてまいが、入力に対して起こすアクションを実行。"
+                #region " (2) ユーザ入力に対するチップのヒット判定とヒット処理。"
                 //----------------
+                // 入力集合の判定は２回に分けて行う。１回目は入力グループを無効とし、２回目は有効とする。
+                // これにより、各入力は、入力グループに属するチップよりも自身が対応するチップを優先してヒット判定される。
+                // 例：
+                //      HH入力とRD入力は同一の入力グループに属しており、HH入力でRDチップをヒットしたり、RD入力でHHチップをヒットしたりすることができる。
+                //      ここで、HHチップとRDチップが同時刻に配置されていて、そこへHH入力とRD入力が同時に行われた場合を考える。
+                //      このような場合、HH入力はHHチップと、そしてRD入力はRDチップと、チップを取り違えることなくそれぞれ正しくヒット判定されなければならない。
+                //      すなわち、自身が対応するチップがヒット判定可能である場合には、入力グループに属する他のチップよりも優先して判定されなければならない。
+                for( int i = 1; i <= 2; i++ )
                 {
-                    var dispLane = _入力に対応する表示レーン種別を返す( 入力 );
+                    bool 入力グループが有効 = ( i != 1 );  // １回目はfalse、２回目はtrue
 
-                    if( dispLane != 表示レーン種別.Unknown )
+                    // すべての入力について……
+                    for( int n = 0; n < 入力リスト.Length; n++ )
                     {
-                        this._ドラムキットとヒットバー.ヒットアニメ開始( dispLane );
-                        this._レーンフラッシュ.開始する( dispLane );
-                    }
-                }
-                //----------------
-                #endregion
+                        if( 入力リスト[ n ].処理済み )
+                            continue;
 
-                bool どのチップにもヒットしなかった = true;
+                        var 入力 = 入力リスト[ n ].入力;
 
-                #region " (2-2) 手動ヒット処理。"
-                //----------------
-                {
-                    // 入力に対応する一番近いチップを検索する。
+                        if( this._ユーザヒット対象外である( 入力 ) )
+                            continue;   // ヒット判定対象外の入力は無視。
 
-                    var chip = this._指定された時刻に一番近いチップを返す(
-                        補正された入力時刻sec,
-                        検索開始チップ番号: this._描画開始チップ番号,
-                        追加の検索条件: ( c ) => {
-
-                            #region " チップ c が入力にヒットしているなら true を返す。"
-                            //----------------
-                            this._チップと判定との距離と時間を計算する(
-                                現在の演奏時刻sec,
-                                c,
-                                out double ヒット判定バーと描画との時間sec,   // 負数ならバー未達、0でバー直上、正数でバー通過。 
-                                out double ヒット判定バーと発声との時間sec,   //
-                                out double ヒット判定バーとの距離dpx );       //
-
-                            // 入力時刻の補正とは別に、判定エリア／MISS判定のためのチップの時刻の補正も必要。
-                            ヒット判定バーと描画との時間sec -= Global.App.システム設定.判定位置調整ms * 0.001;
-
-                            // ヒット済みチップは無視。
-                            if( this._チップの演奏状態[ c ].ヒット済みである )
-                                return false;
-
-                            // ドラムチッププロパティが無効のチップは無視。
-                            var chipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ c.チップ種別 ];
-                            if( chipProperty.ドラム入力種別 == ドラム入力種別.Unknown )
-                                return false;
-
-                            // 判定エリアに達していないチップは無視。
-                            if( ヒット判定バーと描画との時間sec < -userConfig.最大ヒット距離sec[ 判定種別.OK ] )
-                                return false;
-
-                            // MISSエリアに達しているチップは無視。
-                            if( ヒット判定バーと描画との時間sec > userConfig.最大ヒット距離sec[ 判定種別.OK ] )
-                                return false;
-
-                            // AutoPlay ON のチップは無視。
-                            if( userConfig.AutoPlay[ chipProperty.AutoPlay種別 ] )
-                                return false;
-
-                            // AutoPlay OFF のときユーザヒットの対象にならないチップは無視。
-                            if( !chipProperty.AutoPlayOFF_ユーザヒット )
-                                return false;
-
-                            // 入力に対応しないチップは無視……の前に入力グループ判定。
-                            if( chipProperty.ドラム入力種別 != 入力.Type )
-                            {
-                                // 入力グループ判定：
-                                // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
-                                // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
-                                var 入力のヒット判定対象となる入力グループ種別集合 =
-                                    from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
-                                    where kvp.Value.ドラム入力種別 == 入力.Type
-                                    select kvp.Value.入力グループ種別;
-
-                                // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
-                                if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == chipProperty.入力グループ種別 ) ) )
-                                    return false;
-                            }
-
-                            // ここまで到達できれば、チップは入力にヒットしている。
-                            return true;
-                            //----------------
-                            #endregion
-
-                        } );
-
-                    if( null != chip )   // あった
-                    {
-                        #region " チップの手動ヒット処理。"
+                        #region " (2-1) チップにヒットしてようがしてまいが、入力に対して起こすアクションを実行。"
                         //----------------
-                        this._チップと判定との距離と時間を計算する(
-                            現在の演奏時刻sec,
-                            chip,
-                            out double ヒット判定バーと描画との時間sec,   // 負数ならバー未達、0でバー直上、正数でバー通過。 
-                            out double ヒット判定バーと発声との時間sec,   //
-                            out double ヒット判定バーとの距離dpx );       //
+                        {
+                            var dispLane = _入力に対応する表示レーン種別を返す( 入力 );
 
-                        var chipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
-                        double 入力とチップの時間差sec = 補正された入力時刻sec - chip.描画時刻sec;
-                        double 入力とチップの時間差の絶対値sec = Math.Abs( 入力とチップの時間差sec );
-                        var ヒット判定 =
-                            ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
-                            ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
-                            ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD :
-                            判定種別.OK;
+                            if( dispLane != 表示レーン種別.Unknown )
+                            {
+                                this._ドラムキットとヒットバー.ヒットアニメ開始( dispLane );
+                                this._レーンフラッシュ.開始する( dispLane );
+                            }
+                        }
+                        //----------------
+                        #endregion
 
-                        this._チップのヒット処理を行う(
-                            chip,
-                            ヒット判定,
-                            chipProperty.AutoPlayOFF_ユーザヒット_再生       // ヒットすれば再生する？
-                                && userConfig.ドラムの音を発声する,          // 　自動演奏チップとは異なり、オプション設定の影響を受ける。
-                            chipProperty.AutoPlayOFF_ユーザヒット_判定,      // ヒットすれば判定する？
-                            chipProperty.AutoPlayOFF_ユーザヒット_非表示,    // ヒットすれば非表示にする？
-                            ヒット判定バーと発声との時間sec,
-                            入力とチップの時間差sec );
+                        #region " (2-2) 手動ヒット処理; ユーザの入力に対してヒット可能なチップを検索し、あればヒット処理する。"
+                        //----------------
+                        {
+                            // 入力に対応する一番近いチップを検索する。
 
-                        this.成績.エキサイトゲージを更新する( ヒット判定 );
+                            var chip = this._指定された時刻に一番近いチップを返す(
+                                入力.InputEvent.TimeStamp,
+                                this._描画開始チップ番号,
+                                追加の検索条件: ( c ) => {
 
-                        どのチップにもヒットしなかった = false;
+                                    #region " チップ c が入力にヒットしているなら true を返す。"
+                                    //----------------
+                                    // ヒット済みチップは無視。
+                                    if( this._チップの演奏状態[ c ].ヒット済みである )
+                                        return false;
+
+                                    // ドラムチッププロパティが無効のチップは無視。
+                                    var chipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ c.チップ種別 ];
+                                    if( chipProperty.ドラム入力種別 == ドラム入力種別.Unknown )
+                                        return false;
+
+                                    // AutoPlay ON のチップは無視。
+                                    if( userConfig.AutoPlay[ chipProperty.AutoPlay種別 ] )
+                                        return false;
+
+                                    // AutoPlay OFF のときユーザヒットの対象にならないチップは無視。
+                                    if( !chipProperty.AutoPlayOFF_ユーザヒット )
+                                        return false;
+
+                                    // 距離と時刻を計算。
+                                    this._チップと判定との距離と時間を計算する(
+                                        現在の演奏時刻sec,
+                                        c,
+                                        out double ヒット判定バーと描画との時間sec,   // 負数ならバー未達、0でバー直上、正数でバー通過。 
+                                        out double ヒット判定バーと発声との時間sec,   //
+                                        out double ヒット判定バーとの距離dpx );       //
+
+                                    // 入力時刻の補正とは別に、判定エリア／MISS判定のためのチップの時刻の補正も必要。
+                                    ヒット判定バーと描画との時間sec -= Global.App.システム設定.判定位置調整ms * 0.001;
+
+                                    // 判定エリアに達していないチップは無視。
+                                    if( ヒット判定バーと描画との時間sec < -userConfig.最大ヒット距離sec[ 判定種別.OK ] )
+                                        return false;
+
+                                    // MISSエリアに達しているチップは無視。
+                                    if( ヒット判定バーと描画との時間sec > userConfig.最大ヒット距離sec[ 判定種別.OK ] )
+                                        return false;
+
+                                    // 入力に対応しないチップは無視……の前に入力グループ判定。
+                                    if( chipProperty.ドラム入力種別 != 入力.Type )
+                                    {
+                                        if( 入力グループが有効 )
+                                        {
+                                            // 入力グループ判定：
+                                            // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
+                                            // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
+
+                                            // 入力が属する入力グループ種別（任意個）を取得。
+                                            var 入力のヒット判定対象となる入力グループ種別集合 =
+                                                from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
+                                                where kvp.Value.ドラム入力種別 == 入力.Type
+                                                select kvp.Value.入力グループ種別;
+
+                                            // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
+                                            if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == chipProperty.入力グループ種別 ) ) )
+                                                return false;
+                                        }
+                                        else
+                                        {
+                                            return false;   // 無視。
+                                        }
+                                    }
+
+                                    // ここまで到達できれば、チップは入力にヒットしている。
+                                    return true;
+                                    //----------------
+                                    #endregion
+
+                                } );
+
+                            if( null != chip )   // あった
+                            {
+                                #region " チップの手動ヒット処理。"
+                                //----------------
+                                this._チップと判定との距離と時間を計算する(
+                                    現在の演奏時刻sec,
+                                    chip,
+                                    out double ヒット判定バーと描画との時間sec,   // 負数ならバー未達、0でバー直上、正数でバー通過。 
+                                    out double ヒット判定バーと発声との時間sec,   //
+                                    out double ヒット判定バーとの距離dpx );       //
+
+                                var chipProperty = userConfig.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
+                                double 入力とチップの時間差sec = 入力.InputEvent.TimeStamp - chip.描画時刻sec;
+                                double 入力とチップの時間差の絶対値sec = Math.Abs( 入力とチップの時間差sec );
+                                var ヒット判定 =
+                                    ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.PERFECT ] ) ? 判定種別.PERFECT :
+                                    ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.GREAT ] ) ? 判定種別.GREAT :
+                                    ( 入力とチップの時間差の絶対値sec <= userConfig.最大ヒット距離sec[ 判定種別.GOOD ] ) ? 判定種別.GOOD :
+                                    判定種別.OK;
+
+                                this._チップのヒット処理を行う(
+                                    chip,
+                                    ヒット判定,
+                                    chipProperty.AutoPlayOFF_ユーザヒット_再生       // ヒットすれば再生する？
+                                        && userConfig.ドラムの音を発声する,          // 　自動演奏チップとは異なり、オプション設定の影響を受ける。
+                                    chipProperty.AutoPlayOFF_ユーザヒット_判定,      // ヒットすれば判定する？
+                                    chipProperty.AutoPlayOFF_ユーザヒット_非表示,    // ヒットすれば非表示にする？
+                                    ヒット判定バーと発声との時間sec,
+                                    入力とチップの時間差sec );
+
+                                this.成績.エキサイトゲージを更新する( ヒット判定 );
+                                //----------------
+                                #endregion
+
+                                入力リスト[ n ].処理済み = true;
+                            }
+                        }
                         //----------------
                         #endregion
                     }
                 }
-                //----------------
-                #endregion
 
-                if( どのチップにもヒットしなかった )
+                if( userConfig.ドラムの音を発声する )
                 {
-                    #region " この入力を空打ちとみなし、空打ち音を再生する。"
-                    //----------------
-                    if( userConfig.ドラムの音を発声する )
+                    foreach( var (入力, 処理済み) in 入力リスト )
                     {
-                        // 入力に一番近いチップ（ヒット・未ヒット問わず）を検索する。
+                        if( !処理済み && !this._ユーザヒット対象外である( 入力 ) )
+                        {
+                            #region " ヒットしなかった入力については空打ちと見なし、空打ち音を再生する。"
+                            //----------------
+                            // 入力に一番近いチップ（ヒット・未ヒット問わず、入力グループは有効）を検索する。
+                            var chip = this._指定された時刻に一番近いチップを返す(
+                                入力.InputEvent.TimeStamp,
+                                検索開始チップ番号: 0,   // 常に先頭から
+                                追加の検索条件: ( chip ) => {
 
-                        var chip = this._指定された時刻に一番近いチップを返す(
-                            補正された入力時刻sec,
-                            検索開始チップ番号: 0,   // 常に先頭から
-                            追加の検索条件: ( chip ) => {
+                                    var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
+                                    if( prop.ドラム入力種別 != 入力.Type )
+                                    {
+                                        // 入力グループ判定：
+                                        // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
+                                        // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
+                                        var 入力のヒット判定対象となる入力グループ種別集合 =
+                                                from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
+                                                where kvp.Value.ドラム入力種別 == 入力.Type
+                                                select kvp.Value.入力グループ種別;
 
-                                var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト.チップtoプロパティ[ chip.チップ種別 ];
-
-                                if( prop.ドラム入力種別 == 入力.Type )
+                                        // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
+                                        if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == prop.入力グループ種別 ) ) )
+                                            return false;
+                                    }
                                     return true;
 
-                                // 入力グループ判定：
-                                // 1つの入力に対して、種類の異なる複数のチップがヒット判定対象になることができる。
-                                // 例えば、Ride入力は、RideチップとRide_Cupチップのどちらにもヒットすることができる。
-                                var 入力のヒット判定対象となる入力グループ種別集合 =
-                                    from kvp in userConfig.ドラムチッププロパティリスト.チップtoプロパティ
-                                    where kvp.Value.ドラム入力種別 == 入力.Type
-                                    select kvp.Value.入力グループ種別;
+                                } );
 
-                                // チップの入力グループ種別が入力の入力グループ種別集合に含まれていないなら無視。
-                                if( !入力のヒット判定対象となる入力グループ種別集合.Any( ( type ) => ( type == prop.入力グループ種別 ) ) )
-                                    return false;
-
-                                return true;
-
-                            } );
-
-                        if( null != chip )  // あった
-                        {
-                            var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト[ chip.チップ種別 ];
-
-                            if( 0 == chip.チップサブID )
+                            if( null != chip )  // あった
                             {
-                                // (A) SSTF の場合 → プリセットドラムを鳴らす。
-                                Global.App.ドラムサウンド.再生する( prop.チップ種別, 0, prop.発声前消音, prop.消音グループ種別 );
+                                var prop = Global.App.ログオン中のユーザ.ドラムチッププロパティリスト[ chip.チップ種別 ];
+
+                                if( 0 == chip.チップサブID )
+                                {
+                                    // (A) SSTF の場合 → プリセットドラムを鳴らす。
+                                    Global.App.ドラムサウンド.再生する( prop.チップ種別, 0, prop.発声前消音, prop.消音グループ種別 );
+                                }
+                                else
+                                {
+                                    // (B) DTX他の場合 → チップのWAVを再生する。
+                                    Global.App.WAV管理.発声する(
+                                        chip.チップサブID,   // zz 番号を示す
+                                        prop.発声前消音,
+                                        prop.消音グループ種別,
+                                        BGM以外も再生する: true,
+                                        音量: chip.音量 / (float)SSTF.チップ.最大音量 );
+                                }
                             }
                             else
                             {
-                                // (B) DTX他の場合 → チップのWAVを再生する。
-                                Global.App.WAV管理.発声する(
-                                    chip.チップサブID,   // zz 番号を示す
-                                    prop.発声前消音,
-                                    prop.消音グループ種別,
-                                    BGM以外も再生する: true,
-                                    音量: chip.音量 / (float)SSTF.チップ.最大音量 );
+                                // SSTF, DTX他とも、該当するチップがなかった場合には無音となる。
                             }
-                        }
-                        else
-                        {
-                            // SSTF, DTX他とも、該当するチップがなかった場合には無音となる。
+                            //----------------
+                            #endregion
                         }
                     }
-                    //----------------
-                    #endregion
                 }
-            }
-            //----------------
-            #endregion
+                //----------------
+                #endregion
 
-            #region " (3) 入力に応じたハイハットの開閉 "
-            //----------------
-            foreach( var ev in Global.App.ドラム入力.MidiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
-                this._ドラムキットとヒットバー.ハイハットの開度を設定する( ev.Velocity );
-            //----------------
-            #endregion
+                #region " (3) 入力に応じたハイハットの開閉 "
+                //----------------
+                foreach( var ev in Global.App.ドラム入力.MidiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
+                    this._ドラムキットとヒットバー.ハイハットの開度を設定する( ev.Velocity );
+                //----------------
+                #endregion
+            }
 
             #region " (4) その他の操作。"
             //----------------
@@ -2003,6 +2033,15 @@ namespace DTXMania2.演奏
                 select kvp.Value.表示レーン種別;
 
             return ( 0 < 表示レーン種別集合.Count() ) ? 表示レーン種別集合.First() : 表示レーン種別.Unknown;
+        }
+
+        private bool _ユーザヒット対象外である( ドラム入力イベント 入力 )
+        {
+            return
+                !入力.InputEvent.押された ||                  // 押下以外は対象外
+                入力.InputEvent.Control != 0 ||               // コントロールチェンジは対象外
+                入力.Type == ドラム入力種別.HiHat_Control ||  // ハイハットコントロールは対象外
+                入力.Type == ドラム入力種別.Unknown;          // 未知の入力は対象外
         }
 
 

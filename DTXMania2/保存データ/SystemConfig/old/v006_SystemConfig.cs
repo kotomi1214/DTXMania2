@@ -8,15 +8,17 @@ using SharpDX;
 using YamlDotNet.Core;
 using FDK;
 
-namespace DTXMania2
+namespace DTXMania2.old.SystemConfig
 {
-    partial class SystemConfig
+    using IdKey = DTXMania2.SystemConfig.IdKey;
+
+    partial class v006_SystemConfig
     {
 
         // プロパティ
 
 
-        public const int VERSION = 7;   // このクラスのバージョン。
+        public const int VERSION = 6;   // このクラスのバージョン。
 
         [YamlMember]
         public int Version { get; set; }
@@ -106,15 +108,12 @@ namespace DTXMania2
         [YamlMember( Alias = "MaxFoolPedalValue" )]
         public int FootPedal最大値 { get; set; }
 
-        [YamlMember( Alias = "MinHHVelocity" )]
-        public int HHVolocity最小値 { get; set; }
-
 
 
         // 生成と終了
 
 
-        public static SystemConfig 読み込む( VariablePath? path = null )
+        public static v006_SystemConfig 読み込む( VariablePath? path = null )
         {
             using var _ = new LogBlock( Log.現在のメソッド名 );
 
@@ -123,7 +122,7 @@ namespace DTXMania2
 
             // (1) 読み込み or 新規作成
 
-            SystemConfig config = null!;
+            v006_SystemConfig config = null!;
 
             if( File.Exists( path.変数なしパス ) )
             {
@@ -131,7 +130,7 @@ namespace DTXMania2
                 {
                     var yamlText = File.ReadAllText( path.変数なしパス );
                     var deserializer = new Deserializer();
-                    config = deserializer.Deserialize<SystemConfig>( yamlText );
+                    config = deserializer.Deserialize<v006_SystemConfig>( yamlText );
                 }
                 catch( YamlException e )
                 {
@@ -147,7 +146,7 @@ namespace DTXMania2
             {
                 // 新規生成
                 Log.Info( "システム設定ファイルを新規に作成します。" );
-                config = new SystemConfig();
+                config = new v006_SystemConfig();
             }
 
 
@@ -160,7 +159,7 @@ namespace DTXMania2
             return config;
         }
 
-        public SystemConfig()
+        public v006_SystemConfig()
         {
             this.Version = VERSION;
             this.曲検索フォルダ = new List<VariablePath>() { @"$(Exe)" };
@@ -173,7 +172,6 @@ namespace DTXMania2
             this.ImagesFolder = new VariablePath( @"$(ResourcesRoot)\Default\Images" );
             this.FootPedal最小値 = 0;
             this.FootPedal最大値 = 90; // VH-11 の Normal Resolution での最大値
-            this.HHVolocity最小値 = 20;
 
             this.MIDIデバイス番号toデバイス名 = new Dictionary<int, string>();
 
@@ -233,25 +231,26 @@ namespace DTXMania2
             };
         }
 
-        public SystemConfig( old.SystemConfig.v006_SystemConfig v6config )
+        public v006_SystemConfig( old.SystemConfig.v005_SystemConfig v5config )
             : this()
         {
-            this.曲検索フォルダ = v6config.曲検索フォルダ;
-            this.ビュアーモード時のウィンドウサイズ = v6config.ビュアーモード時のウィンドウサイズ;
-            this.ビュアーモード時のウィンドウ表示位置 = v6config.ビュアーモード時のウィンドウ表示位置;
-            this.判定位置調整ms = v6config.判定位置調整ms;
-            this.全画面モードである = v6config.全画面モードである;
-            this.DrumSoundsFolder = v6config.DrumSoundsFolder;
-            this.SystemSoundsFolder = v6config.SystemSoundsFolder;
-            this.ImagesFolder = v6config.ImagesFolder;
+            this.曲検索フォルダ = v5config.曲検索フォルダ;
+            this.ビュアーモード時のウィンドウサイズ = v5config.ビュアーモード時のウィンドウサイズ;
+            this.ビュアーモード時のウィンドウ表示位置 = v5config.ビュアーモード時のウィンドウ表示位置;
+            this.判定位置調整ms = v5config.判定位置調整ms;
+            this.全画面モードである = v5config.全画面モードである;
+            this.DrumSoundsFolder = v5config.DrumSoundsFolder;
+            this.SystemSoundsFolder = v5config.SystemSoundsFolder;
+            this.ImagesFolder = v5config.ImagesFolder;
 
-            this.MIDIデバイス番号toデバイス名 = v6config.MIDIデバイス番号toデバイス名;
-            this.キーボードtoドラム = v6config.キーボードtoドラム;
-            this.ゲームコントローラtoドラム = v6config.ゲームコントローラtoドラム;
-            this.MIDItoドラム = v6config.MIDItoドラム;
-            this.FootPedal最小値 = v6config.FootPedal最小値;
-            this.FootPedal最大値 = v6config.FootPedal最大値;
-            this.HHVolocity最小値 = 20;    // 新規追加
+            this.MIDIデバイス番号toデバイス名 = v5config.MIDIデバイス番号toデバイス名;
+            this.キーボードtoドラム = v5config.キーボードtoドラム;
+            this.キーボードtoドラム.Add( new IdKey( 0, (int)Keys.PageUp ), ドラム入力種別.PlaySpeed_Up );      // 新規追加
+            this.キーボードtoドラム.Add( new IdKey( 0, (int)Keys.PageDown ), ドラム入力種別.PlaySpeed_Down );  // 新規追加
+            this.ゲームコントローラtoドラム = v5config.ゲームコントローラtoドラム;
+            this.MIDItoドラム = v5config.MIDItoドラム;
+            this.FootPedal最小値 = v5config.FootPedal最小値;
+            this.FootPedal最大値 = v5config.FootPedal最大値;
         }
 
         public void 保存する( VariablePath? path = null )
@@ -272,9 +271,9 @@ namespace DTXMania2
             Log.Info( $"システム設定 を保存しました。[{path.変数付きパス}]" );
         }
 
-        public SystemConfig Clone()
+        public v006_SystemConfig Clone()
         {
-            return (SystemConfig)this.MemberwiseClone();
+            return (v006_SystemConfig)this.MemberwiseClone();
         }
     }
 }

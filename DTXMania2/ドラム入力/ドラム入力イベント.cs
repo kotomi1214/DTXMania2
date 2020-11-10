@@ -23,5 +23,11 @@ namespace DTXMania2
             this.InputEvent = 入力イベント;
             this.Type = ドラム入力種別;
         }
+
+        public void Reset()
+        {
+            this.InputEvent = new InputEvent();
+            this.Type = ドラム入力種別.Unknown;
+        }
     }
 }

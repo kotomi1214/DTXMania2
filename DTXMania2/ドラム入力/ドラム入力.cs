@@ -195,14 +195,7 @@ namespace DTXMania2
         /// <returns><see cref="ポーリング結果"/>に含まれていれば true。</returns>
         public bool 確定キーが入力された()
         {
-            return this.ドラムのいずれか１つが入力された(
-                new[] {
-                    ドラム入力種別.LeftCrash,
-                    ドラム入力種別.RightCrash,
-                    ドラム入力種別.China,
-                    ドラム入力種別.Ride,
-                    ドラム入力種別.Splash,
-                } )
+            return this.ドラムのいずれか１つが入力された( this._確定ドラム入力リスト)
                 ;// || this.Keyboard.キーが押された( 0, Key.Return );		Enter は、既定で LeftCrash に割り当てられている前提。
         }
 
@@ -223,7 +216,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Up ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom1, ドラム入力種別.Tom1_Rim } );
+                this.ドラムのいずれか１つが入力された( this._上移動ドラム入力リスト );
         }
         public bool 上移動キーが押されている()
         {
@@ -238,7 +231,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Down ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom2, ドラム入力種別.Tom2_Rim } );
+                this.ドラムのいずれか１つが入力された( this._下移動ドラム入力リスト );
         }
         public bool 下移動キーが押されている()
         {
@@ -253,7 +246,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Left ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Snare, ドラム入力種別.Snare_ClosedRim, ドラム入力種別.Snare_OpenRim } );
+                this.ドラムのいずれか１つが入力された( this._左移動ドラム入力リスト );
         }
         public bool 左移動キーが押されている()
         {
@@ -269,7 +262,7 @@ namespace DTXMania2
         {
             return
                 this.Keyboard.キーが押された( 0, System.Windows.Forms.Keys.Right ) ||
-                this.ドラムのいずれか１つが入力された( new[] { ドラム入力種別.Tom3, ドラム入力種別.Tom3_Rim } );
+                this.ドラムのいずれか１つが入力された( this._右移動ドラム入力リスト );
         }
         public bool 右移動キーが押されている()
         {
@@ -504,6 +497,31 @@ namespace DTXMania2
 
         private const double _連続入力だとみなす最大の間隔sec = 0.5;
 
+        private readonly ドラム入力種別[] _確定ドラム入力リスト = new[] {
+            ドラム入力種別.LeftCrash,
+            ドラム入力種別.RightCrash,
+            ドラム入力種別.China,
+            ドラム入力種別.Ride,
+            ドラム入力種別.Splash,
+        };
+        private readonly ドラム入力種別[] _上移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom1,
+            ドラム入力種別.Tom1_Rim,
+        };
+        private readonly ドラム入力種別[] _下移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom2,
+            ドラム入力種別.Tom2_Rim,
+        };
+        private readonly ドラム入力種別[] _左移動ドラム入力リスト = new[] {
+            ドラム入力種別.Snare,
+            ドラム入力種別.Snare_ClosedRim,
+            ドラム入力種別.Snare_OpenRim,
+        };
+        private readonly ドラム入力種別[] _右移動ドラム入力リスト = new[] {
+            ドラム入力種別.Tom3,
+            ドラム入力種別.Tom3_Rim,
+        };
+
         /// <summary>
         ///		単一の IInputDevice をポーリングし、対応表に従ってドラム入力へ変換して、ポーリング結果 に追加登録する。
         /// </summary>
@@ -515,15 +533,25 @@ namespace DTXMania2
             {
                 // キーバインディングを使って、入力イベント ev をドラム入力 evKey にマッピングする。
                 var evKey = new SystemConfig.IdKey( ev );
-
                 if( false == デバイスtoドラム対応表.ContainsKey( evKey ) )
                     continue;   // 使われないならスキップ。
+                var drumType = デバイスtoドラム対応表[ evKey ];
+
+                // HHの場合、Velocityが最小値未満の場合は無視する。
+                if( drumType == ドラム入力種別.HiHat_Close ||
+                    drumType == ドラム入力種別.HiHat_Open ||
+                    drumType == ドラム入力種別.HiHat_Foot )
+                {
+                    if( ev.Velocity < Global.App.システム設定.HHVolocity最小値 )
+                        continue;
+                }
 
                 // ドラム入力を、ポーリング結果に追加登録する。
                 var ドラム入力 = new ドラム入力イベント( ev, デバイスtoドラム対応表[ evKey ] );
                 this.ポーリング結果.Add( ドラム入力 );
 
-                // ドラム入力を入力履歴に追加登録する。
+                #region " ドラム入力を入力履歴に追加登録する。 "
+                //----------------
                 if( 入力履歴を記録する &&
                     ev.押された &&                         // 押下入力だけを記録する。
                     ドラム入力.InputEvent.Control == 0 )   // コントロールチェンジは入力履歴の対象外とする。
@@ -547,6 +575,8 @@ namespace DTXMania2
                     this._入力履歴.Add( ドラム入力 );
                     this._前回の入力履歴の追加時刻sec = 入力時刻sec;
                 }
+                //----------------
+                #endregion
             }
         }
     }

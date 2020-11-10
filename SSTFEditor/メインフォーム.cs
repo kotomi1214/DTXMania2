@@ -738,7 +738,9 @@ namespace SSTFEditor
 
         private void _検索する()
         {
-            this.選択モード.検索する();  // 現在のモードに関わらず、検索はすべて選択モードオブジェクトが行う。	
+            this._選択モードにする();
+
+            this.選択モード.検索する();
         }
 
         private void _ガイド間隔を変更する( int n分 )
@@ -2073,14 +2075,7 @@ namespace SSTFEditor
 
         protected void toolStripMenuItemモード切替え_Click( object sender, EventArgs e )
         {
-            if( this.選択モードである )
-            {
-                this.編集モードに切替えて関連GUIを設定する();
-            }
-            else
-            {
-                this.選択モードに切替えて関連GUIを設定する();
-            }
+            this._モードを切替える();
         }
 
         protected void toolStripMenuItem検索_Click( object sender, EventArgs e )
