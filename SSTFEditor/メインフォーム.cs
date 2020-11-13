@@ -1601,6 +1601,7 @@ namespace SSTFEditor
                 Filter = "SSTFoverDTXファイル(*.dtx)|*.dtx|SSTFファイル(*.sstf)|*.sstf",
                 FilterIndex = 1,
                 InitialDirectory = this._作業フォルダパス,
+                FileName = Path.GetFileNameWithoutExtension( this._編集中のファイル名 ),
             } )
             {
                 result = dialog.ShowDialog( this );
