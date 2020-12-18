@@ -756,7 +756,7 @@ namespace DTXMania2.演奏
 
                                     // 距離と時刻を計算。
                                     this._チップと判定との距離と時間を計算する(
-                                        現在の演奏時刻sec,
+                                        入力.InputEvent.TimeStamp,
                                         c,
                                         out double ヒット判定バーと描画との時間sec,   // 負数ならバー未達、0でバー直上、正数でバー通過。 
                                         out double ヒット判定バーと発声との時間sec,   //
