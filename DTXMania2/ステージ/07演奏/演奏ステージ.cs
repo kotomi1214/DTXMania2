@@ -762,9 +762,6 @@ namespace DTXMania2.演奏
                                         out double ヒット判定バーと発声との時間sec,   //
                                         out double ヒット判定バーとの距離dpx );       //
 
-                                    // 入力時刻の補正とは別に、判定エリア／MISS判定のためのチップの時刻の補正も必要。
-                                    ヒット判定バーと描画との時間sec -= Global.App.システム設定.判定位置調整ms * 0.001;
-
                                     // 判定エリアに達していないチップは無視。
                                     if( ヒット判定バーと描画との時間sec < -userConfig.最大ヒット距離sec[ 判定種別.OK ] )
                                         return false;
