@@ -11,6 +11,11 @@ namespace FDK
     public class MidiIns : IDisposable
     {
 
+        // 定数
+
+        public const int CTL_FOOTPEDAL = 4; // フットペダルのコントロールチェンジ番号
+
+
         // プロパティ
 
 

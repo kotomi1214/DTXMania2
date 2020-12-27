@@ -903,7 +903,7 @@ namespace DTXMania2.演奏
 
                 #region " (3) 入力に応じたハイハットの開閉 "
                 //----------------
-                foreach( var ev in Global.App.ドラム入力.MidiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) ) )
+                foreach( var ev in Global.App.ドラム入力.MidiIns.入力イベントリスト.Where( ( ie ) => ( 255 == ie.Key ) && ( MidiIns.CTL_FOOTPEDAL == ie.Control ) ) )
                     this._ドラムキットとヒットバー.ハイハットの開度を設定する( ev.Velocity );
                 //----------------
                 #endregion
