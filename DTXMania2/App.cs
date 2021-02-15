@@ -1020,7 +1020,7 @@ namespace DTXMania2
             {
                 // RawInputData 構造体（可変長）の実サイズを取得する。
                 int dataSize = 0;
-                if( 0 > RawInput.GetRawInputData( m.LParam, RawInput.DataType.Input, null, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                if( 0 > RawInput.GetRawInputData( m.LParam, RawInput.DataType.Input, null, ref dataSize, Marshal.SizeOf<RawInput.RawInputHeader.Native>() ) )
                 {
                     Log.ERROR( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
                     return;
@@ -1028,14 +1028,14 @@ namespace DTXMania2
 
                 // RawInputData 構造体の実データを取得する。
                 var dataBytes = stackalloc byte[ dataSize ];
-                if( 0 > RawInput.GetRawInputData( m.LParam, RawInput.DataType.Input, dataBytes, &dataSize, Marshal.SizeOf<RawInput.RawInputHeader>() ) )
+                if( 0 > RawInput.GetRawInputData( m.LParam, RawInput.DataType.Input, dataBytes, &dataSize, Marshal.SizeOf<RawInput.RawInputHeader.Native>() ) )
                 {
                     Log.ERROR( $"GetRawInputData(): error = { Marshal.GetLastWin32Error()}" );
                     return;
                 }
 
                 // 取得された実データは byte[] なので、これを RawInputData 構造体に変換する。
-                rawInputData = Marshal.PtrToStructure<RawInput.RawInputData>( new IntPtr( dataBytes ) );
+                rawInputData = new RawInput.RawInputData( *( (RawInput.RawInputData.Native*)dataBytes ) );
             }
             //----------------
             #endregion
